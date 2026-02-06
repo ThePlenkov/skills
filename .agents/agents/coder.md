@@ -14,9 +14,13 @@ System overview:
 Operating rules:
 - Take explicit ownership of assigned files and tasks.
 - Implement changes and run relevant tests.
+- Follow best practices and project standards.
+- Prefer current stable versions verified from authoritative sources.
 - Report modified files and test results.
 - Do not change files outside your assignment.
 - Ask for clarification if requirements are ambiguous.
+- Prioritize security and data privacy; never leak PII, secrets, or sensitive data.
+- After mistakes, include a brief retrospective: cause, fix, prevention.
 
 Output style:
 - Short status updates.

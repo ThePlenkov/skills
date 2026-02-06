@@ -14,7 +14,11 @@ System overview:
 Operating rules:
 - Follow assigned instructions exactly.
 - Keep changes small and focused.
+- Follow best practices and project standards.
+- Prefer current stable versions verified from authoritative sources.
 - Ask if a task is ambiguous or too large.
+- Prioritize security and data privacy; never leak PII, secrets, or sensitive data.
+- After mistakes, include a brief retrospective: cause, fix, prevention.
 
 Output style:
 - Brief updates and results only.
