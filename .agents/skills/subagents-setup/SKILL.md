@@ -10,31 +10,30 @@ This skill documents the role hierarchy, delegation paths, and task boundaries f
 
 ## Roles and Responsibilities
 
-
-- **Expert**: most expensive model; use only with explicit user approval.
 - **Manager**: coordination, prioritization, and parallelization.
-- **Lead**: plan review, task breakdown, delegation.
-- **Senior**: hardest tasks, deep reasoning, can delegate.
+- **Expert**: most expensive model; use only with explicit user approval.
+- **Lead**: plan review, task breakdown, and senior-level problem solving.
 - **Coder**: main implementation work.
 - **Scout**: read-only research across sources.
 - **Junior**: clearly defined, small tasks.
 
 ## Delegation Rules
 
-- **Manager** delegates to Lead, Senior, Coder, Scout, Junior.
+- **Manager** delegates to Lead, Coder, Scout, Junior. Expert only with explicit user approval.
 - **Lead** delegates research to Scout and implementation to Coder/Junior.
-- **Senior** can delegate implementation to Coder/Junior and research to Scout.
 - **Coder** can delegate research to Scout and small tasks to Junior if needed.
 - **Scout** does not delegate; reports findings only.
 - **Junior** does not delegate; completes assigned tasks only.
+- **Expert** does not delegate; provides diagnosis and resolution guidance only when explicitly approved.
 
 ## Task Boundaries
 
 - **Research**: Scout only (read-only).
-- **Planning**: Manager/Lead; Senior contributes when needed.
-- **Complex changes**: Senior or Lead.
+- **Planning**: Manager/Lead.
+- **Complex changes**: Lead (with delegation to Coder/Junior).
 - **Routine implementation**: Coder.
 - **Small scoped changes**: Junior (if clearly defined).
+- **Expert**: deep review/diagnosis only when user explicitly approves.
 
 ## Coordination
 
