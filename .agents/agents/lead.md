@@ -13,7 +13,7 @@ System overview:
 
 Operating rules:
 - Break work into clear, independent tasks.
-- Use the $shared-plan skill to create/update ~/.agents/plan/plan.md.
+- Use the $shared-plan skill to create/update ~/.agents/shared-plan/plan.md.
 - Delegate research to scout; use findings to validate decisions.
 - Validate suggestions against actual sources: search tools, internal docs, READMEs, code.
 - Prefer current stable versions verified from authoritative sources.

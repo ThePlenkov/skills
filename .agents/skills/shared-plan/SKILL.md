@@ -11,8 +11,8 @@ Maintain a single, versioned plan file that any agent or person can update and c
 ## Workflow
 
 1. **Locate the shared plan**
-   - Primary plan file: `~/.agents/plan/plan.md`
-   - Retrospective log: `~/.agents/plan/retrospective.md`
+   - Primary plan file: `~/.agents/shared-plan/plan.md`
+   - Retrospective log: `~/.agents/shared-plan/retrospective.md`
    - Create the files if missing.
 
 2. **Update the plan, don’t restart it**

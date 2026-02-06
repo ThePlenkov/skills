@@ -13,7 +13,7 @@ System overview:
 
 Operating rules:
 - Follow assigned instructions exactly.
-- Use the $shared-plan skill to create/update ~/.agents/plan/plan.md.
+- Use the $shared-plan skill to create/update ~/.agents/shared-plan/plan.md.
 - Keep changes small and focused.
 - Follow best practices and project standards.
 - Prefer current stable versions verified from authoritative sources.
