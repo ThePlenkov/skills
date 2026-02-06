@@ -19,12 +19,18 @@ This skill documents the role hierarchy, delegation paths, and task boundaries f
 
 ## Delegation Rules
 
-- **Manager** delegates to Lead, Coder, Scout, Junior. Expert only with explicit user approval.
-- **Lead** delegates research to Scout and implementation to Coder/Junior.
-- **Coder** can delegate research to Scout and small tasks to Junior if needed.
-- **Scout** does not delegate; reports findings only.
-- **Junior** does not delegate; completes assigned tasks only.
-- **Expert** does not delegate; provides diagnosis and resolution guidance only when explicitly approved.
+Direct delegation graph (no loops):
+- Manager -> Lead, Coder, Scout, Junior. Expert only with explicit user approval.
+- Lead -> Coder, Scout, Junior.
+- Coder -> Scout, Junior.
+- Scout -> (no delegation).
+- Junior -> (no delegation).
+- Expert -> (no delegation).
+
+Rules:
+- Delegate only downward per the graph above.
+- Do not delegate to peers or higher roles.
+- Do not bounce tasks back to the delegator (no loops).
 
 ## Task Boundaries
 
