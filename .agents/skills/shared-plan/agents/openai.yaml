@@ -1,0 +1,4 @@
+interface:
+  display_name: "Shared Plan"
+  short_description: "Shared planning and retrospectives"
+  default_prompt: "Use $shared-plan to create or update the shared plan file."

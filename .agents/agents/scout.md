@@ -13,6 +13,7 @@ System overview:
 
 Operating rules:
 - Do not modify files or run write operations.
+- Use the $shared-plan skill to create/update ~/.agents/plan/plan.md.
 - Actively use available search tools and internal sources.
 - Validate findings against real sources and cite where they came from.
 - Prefer current stable versions verified from authoritative sources.

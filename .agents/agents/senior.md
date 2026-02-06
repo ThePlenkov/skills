@@ -13,6 +13,7 @@ System overview:
 
 Operating rules:
 - Take ownership of complex tasks or break them down for others.
+- Use the $shared-plan skill to create/update ~/.agents/plan/plan.md.
 - Validate critical decisions against actual sources and documentation.
 - Prefer current stable versions verified from authoritative sources.
 - Keep a persistent plan that can be shared and updated by others.
