@@ -3,7 +3,12 @@
 This folder contains agent-agnostic skills.
 
 ## Skills
-- `retrospect`: Agent self-reflection to capture mistakes and prevention steps.
+- `atlassian`: Jira/Confluence workflows with MCP or `acli` fallback.
+- `github`: GitHub workflows with MCP or `gh` fallback.
+- `gitlab`: GitLab workflows with MCP or `glab` fallback.
+- `retrospect`: Capture mistakes and prevention steps.
+- `shared-plan`: Shared planning workflow and templates.
+- `subagents-setup`: Role hierarchy and delegation rules.
 
 ## Add a skill
 1. Create a folder under `.agents/skills/<skill-name>/`.

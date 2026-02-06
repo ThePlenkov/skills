@@ -1,57 +1,34 @@
 # AGENTS.md
 
-This repository is an agent-agnostic collection of skills.
+This repository is maintained by an agent that creates and updates skills and role prompts.
 
-## Conventions
-- Skills live under `.agents/skills/`
-- Each skill is a folder that contains a `SKILL.md` file at its root
-- Additional assets for a skill (scripts, templates, references) should live inside that skill folder
-- Keep skills self-contained: do not rely on agent-specific folders like `.codex/` or `.clade/`
+## Layout
+- `.agents/agents/` role prompts (tiered filenames only, role text without tiers).
+- `.agents/skills/` skills (each skill is a folder with `SKILL.md`).
 
-## Suggested skill folder layout
-```
-.agents/skills/<skill-name>/
-  SKILL.md
-  references/
-    *.md          (documentation, schemas, reference material)
-  scripts/
-    *.py, *.sh    (executable code for automation)
-  assets/
-    *             (templates, boilerplate, non-doc files)
-```
+## Repository rules
+- Do not create new top-level folders under `.agents/` besides `agents/` and `skills/`.
+- Keep skills agent-agnostic.
+- Avoid hardcoded absolute paths in skills or prompts.
+- Use project-relative defaults when needed (for example `./docs/planning`).
+- Keep prompts concise and focused on the role.
 
-## Skill Usage Protocol
+## Skill creation workflow
+1. Create a new skill folder under `.agents/skills/<skill-name>/`.
+2. Add `SKILL.md` with a clear description and workflow.
+3. Add `assets/`, `references/`, or `scripts/` only if needed.
+4. Update `.agents/skills/README.md` with a short description.
+5. Validate the skill if the validator is available.
 
-### Discovery
-Before starting work, identify relevant skills:
-1. Check `.agents/skills/README.md` for available skills
-2. Read the `description` field in each `SKILL.md` frontmatter
-3. Load the full `SKILL.md` if the skill applies to your current task
+## Optional UI metadata
+- Some skills may include `agents/openai.yaml` for UI metadata.
+- This is optional and does not affect skill behavior.
 
-### Retrospect Integration
+## Role prompts
+- Role prompts should reference `$subagents-setup` for hierarchy and delegation rules.
+- Role prompts should reference `$shared-plan` for shared planning.
+- Do not repeat the full system overview in each role prompt.
 
-The `retrospect` skill converts mistakes into durable guardrails stored in `.agents/skills/retrospect/references/LEARNINGS.md`.
-
-#### Before Significant Actions
-Before code changes, major decisions, or complex outputs:
-1. Search `.agents/skills/retrospect/references/LEARNINGS.md` for keywords matching your task
-2. Check if any learned guardrails apply to your current context
-3. If a match exists, apply the "IF/THEN" rule
-
-#### After Failures or Friction
-When output has problems, user feedback indicates issues, or you detect mistakes:
-1. Invoke the `retrospect` skill (or ask the coordinator to)
-2. It will check prior learnings for repeat patterns (Step 0)
-3. New learnings are recorded to `references/LEARNINGS.md` with severity tiers
-
-**Severity Guide:**
-| Level | Meaning | Action |
-|-------|---------|--------|
-| H | Harm/loss/critical miss | Escalate + prioritize learning |
-| M | Rework/friction | Add to learnings + apply proactively |
-| L | Minor inefficiency | Document + low priority |
-
-This creates a **read-write feedback loop**: failures → searchable rules → prevention in future tasks.
-
-## Index
-- A human-readable index of skills should be kept in `.agents/skills/README.md`
+## Retrospect
+- Use the `retrospect` skill after mistakes or friction to capture learnings.
+- It is secondary to an agent’s own tools and memory.
