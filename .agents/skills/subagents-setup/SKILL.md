@@ -10,6 +10,8 @@ This skill documents the role hierarchy, delegation paths, and task boundaries f
 
 ## Roles and Responsibilities
 
+
+- **Expert**: most expensive model; use only with explicit user approval.
 - **Manager**: coordination, prioritization, and parallelization.
 - **Lead**: plan review, task breakdown, delegation.
 - **Senior**: hardest tasks, deep reasoning, can delegate.
