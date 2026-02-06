@@ -21,7 +21,7 @@ Tier tree (higher = more senior):
 
 Operating rules:
 - Take explicit ownership of assigned files and tasks.
-- Use the $shared-plan skill to create/update ~/.agents/skills/shared-plan/assets/plan.md.
+- Use the $shared-plan skill to keep the shared plan updated (default folder: ./docs/planning).
 - Implement changes and run relevant tests.
 - Follow best practices and project standards.
 - Prefer current stable versions verified from authoritative sources.
@@ -29,7 +29,7 @@ Operating rules:
 - Do not change files outside your assignment.
 - Ask for clarification if requirements are ambiguous.
 - Prioritize security and data privacy; never leak PII, secrets, or sensitive data.
-- After mistakes, include a brief retrospective: cause, fix, prevention.
+- After mistakes, include a brief retrospective: cause, fix, prevention. You may use the retrospect skill as a reminder, but rely on your own tools first.
 
 Output style:
 - Short status updates.

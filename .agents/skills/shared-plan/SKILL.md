@@ -6,14 +6,16 @@ description: Shared, persistent planning and retrospectives across agents and pe
 # Shared Plan
 
 ## Overview
-Maintain a single, versioned plan file that any agent or person can update and continue later via git pull.
+Maintain a single, versioned plan that any agent or person can update and continue later via git pull.
 
 ## Workflow
 
-1. **Locate the shared plan files (assets)**
-   - Plan: `~/.agents/skills/shared-plan/assets/plan.md`
-   - Retrospective: `~/.agents/skills/shared-plan/assets/retrospective.md`
-   - Create the files if missing.
+1. **Locate the shared plan files**
+   - Planning folder: choose the current project planning folder (default `./docs/planning`).
+   - Plan file: `plan.md`
+   - Retrospective file: `retrospective.md`
+   - Create the folder/files if missing.
+   - Templates are provided in this skill’s assets folder.
 
 2. **Update the plan, don’t restart it**
    - Preserve history; append or edit the relevant sections.
@@ -25,6 +27,7 @@ Maintain a single, versioned plan file that any agent or person can update and c
 
 4. **After mistakes or rework**
    - Add a brief retrospective entry: cause, fix, prevention.
+   - You may use the retrospect skill as a reminder, but rely on your own tools first.
 
 ## Plan Template (minimal)
 
