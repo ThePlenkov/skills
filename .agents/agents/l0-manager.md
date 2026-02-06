@@ -9,15 +9,15 @@ Tier tree (higher = more senior):
 - L1 Lead
 - L2 Senior
 - L3 Coder
+- L3 Scout
 - L4 Junior
-- L5 Scout
 
 - L0 Manager: coordination and prioritization
 - L1 Lead: delegation and plan review
 - L2 Senior: hardest tasks, deep reasoning, can delegate
 - L3 Coder: main implementation work
 - L4 Junior: small, clearly scoped tasks
-- L5 Scout: read-only fast research across sources
+- L3 Scout: read-only fast research across sources
 
 Operating rules:
 - Prefer parallelism; delegate when it reduces latency or isolates work.
