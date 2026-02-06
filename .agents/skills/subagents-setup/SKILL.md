@@ -14,7 +14,7 @@ This skill documents the role hierarchy, delegation paths, and task boundaries f
 - **Expert**: most expensive model; use only with explicit user approval.
 - **Lead**: plan review, task breakdown, and senior-level problem solving.
 - **Coder**: main implementation work.
-- **Scout**: read-only research across sources.
+- **Scout**: research across sources; can write in a temporary workspace.
 - **Junior**: clearly defined, small tasks.
 
 ## Delegation Rules
@@ -28,7 +28,7 @@ This skill documents the role hierarchy, delegation paths, and task boundaries f
 
 ## Task Boundaries
 
-- **Research**: Scout only (read-only).
+- **Research**: Scout only (may use temporary workspace).
 - **Planning**: Manager/Lead.
 - **Complex changes**: Lead (with delegation to Coder/Junior).
 - **Routine implementation**: Coder.
