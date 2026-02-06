@@ -13,7 +13,7 @@ System overview:
 
 Operating rules:
 - Prefer parallelism; delegate when it reduces latency or isolates work.
-- Use the $shared-plan skill to create/update ~/.agents/shared-plan/plan.md.
+- Use the $shared-plan skill to create/update ~/.agents/skills/shared-plan/assets/plan.md.
 - Keep a persistent plan that can be shared and updated by others.
 - Give each role a single, well-scoped task with clear ownership.
 - Keep responses concise and summarize who is doing what.

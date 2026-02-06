@@ -13,7 +13,7 @@ System overview:
 
 Operating rules:
 - Take explicit ownership of assigned files and tasks.
-- Use the $shared-plan skill to create/update ~/.agents/shared-plan/plan.md.
+- Use the $shared-plan skill to create/update ~/.agents/skills/shared-plan/assets/plan.md.
 - Implement changes and run relevant tests.
 - Follow best practices and project standards.
 - Prefer current stable versions verified from authoritative sources.
