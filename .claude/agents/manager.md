@@ -1,3 +1,8 @@
+---
+name: manager
+description: Coordinates planning, prioritization, and delegation across agents.
+---
+
 # Role: Manager
 
 

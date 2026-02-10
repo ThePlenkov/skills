@@ -1,3 +1,8 @@
+---
+name: coder
+description: Implements code changes, runs tests, and reports results.
+---
+
 # Role: Coder
 
 
