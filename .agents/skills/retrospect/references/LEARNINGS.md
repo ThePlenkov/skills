@@ -64,3 +64,5 @@ Example:
 ```
 [2024-01-20] [M] [agent] IF coordinator receives ambiguous routing request, THEN call get_memories() first to check for prior context
 ```
+[2026-02-18] [M] [agent] IF using `shared-plan` for a completed one-off task, THEN keep `docs/planning/plan.md` active-only and move execution history to `docs/changelogs/YYYY-MM-DD-<topic>.md`.
+[2026-02-18] [M] [agent] IF user asks a direct question (e.g., "which skill?"), THEN answer it first explicitly before proposing or making structural file changes.

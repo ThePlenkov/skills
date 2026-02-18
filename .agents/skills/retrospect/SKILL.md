@@ -12,6 +12,9 @@ Analyze mistakes and create searchable guardrails that prevent repeat errors.
 **0. Check Prior Learnings**
 Search `references/LEARNINGS.md` for patterns matching current issues. Flag if this is a repeat of a previous learning. Include repeat context in the Issues section.
 
+**0.5 Direct-answer rule**
+If the user asked a direct factual question (e.g., "which skill did this?"), answer it explicitly first, then provide the retrospective structure.
+
 **1. Review Context**
 Identify the user's goals and where responses diverged. Note setup context:
 - **User setup**: preferences, constraints, environment, explicit/implicit requirements

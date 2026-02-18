@@ -6,26 +6,34 @@ description: Shared, persistent planning and retrospectives across agents and pe
 # Shared Plan
 
 ## Overview
-Maintain a single, versioned plan that any agent or person can update and continue later via git pull.
+Maintain a shared, versioned **active plan** that any agent or person can continue later via git pull.
+Completed work should be moved to changelogs.
 
 ## Workflow
 
-1. **Locate the shared plan files**
-   - Planning folder: choose the current project planning folder (default `./docs/planning`).
-   - Plan file: `plan.md`
-   - Retrospective file: `retrospective.md`
-   - Create the folder/files if missing.
+1. **Locate the shared planning files**
+   - Planning folder: choose the current project agent plans folder (default `./.agents/plans`).
+   - Per-plan files: `YYYY-MM-DD-HHMM-<topic>.md`
+   - Retrospective file (optional): `retrospective.md`
+   - Create folder/files if missing.
    - Templates are provided in this skill’s assets folder.
 
-2. **Update the plan, don’t restart it**
-   - Preserve history; append or edit the relevant sections.
+2. **Validate timestamp before creating files**
+   - Before creating any plan/changelog file, read current local timestamp from the environment (do not infer from memory).
+   - Use that timestamp in the filename to avoid wrong day/year.
+   - Changelog filenames: `YYYY-MM-DD-HHMM-<topic>.md`.
+
+3. **Keep plans active-only**
+   - Keep active work in per-plan files under `./.agents/plans/`.
+   - When work is done, move execution history to `./.agents/changelogs/YYYY-MM-DD-HHMM-<topic>.md`.
+   - In plan files, remove completed details or keep short done marker linking to changelog.
    - Add a timestamp and owner on each update.
 
-3. **Keep it actionable**
+4. **Keep it actionable**
    - Separate parallel tasks, ownership, and next actions.
    - Record decisions and sources used to validate them.
 
-4. **After mistakes or rework**
+5. **After mistakes or rework**
    - Add a brief retrospective entry: cause, fix, prevention.
    - You may use the retrospect skill as a reminder, but rely on your own tools first.
 
@@ -72,3 +80,4 @@ Maintain a single, versioned plan that any agent or person can update and contin
 - Always update `Next Actions` and `Updates` before handoff.
 - If you used sources, list them in `Decisions`.
 - Keep entries short and easy to scan.
+- Answer direct user questions explicitly before applying structural doc changes.
