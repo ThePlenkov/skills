@@ -1,14 +1,8 @@
----
-name: subagents-setup
-description: Describes the multi-agent hierarchy, delegation rules, and task boundaries. Use when coordinating subagents, assigning work, clarifying ownership, or deciding who should handle a task.
----
+# Subagents
 
-# Subagents Setup
+Multi-agent hierarchy, delegation rules, and task boundaries.
 
-## Overview
-This skill documents the role hierarchy, delegation paths, and task boundaries for the subagents setup.
-
-## Roles and Responsibilities
+## Roles
 
 - **Manager**: coordination, prioritization, and parallelization.
 - **Expert**: most expensive model; use only with explicit user approval.
@@ -20,12 +14,12 @@ This skill documents the role hierarchy, delegation paths, and task boundaries f
 ## Delegation Rules
 
 Direct delegation graph (no loops):
-- Manager -> Lead, Coder, Scout, Junior. Expert only with explicit user approval.
-- Lead -> Coder, Scout, Junior.
-- Coder -> Scout, Junior.
-- Scout -> (no delegation).
-- Junior -> (no delegation).
-- Expert -> (no delegation).
+- Manager → Lead, Coder, Scout, Junior. Expert only with explicit user approval.
+- Lead → Coder, Scout, Junior.
+- Coder → Scout, Junior.
+- Scout → (no delegation).
+- Junior → (no delegation).
+- Expert → (no delegation).
 
 Rules:
 - Delegate only downward per the graph above.
@@ -43,5 +37,5 @@ Rules:
 
 ## Coordination
 
-- Use $shared-plan for shared planning and handoffs (default planning folder: `./docs/planning`).
+- Use `$shared-plan` for shared planning and handoffs (default planning folder: `./docs/planning`).
 - Keep ownership explicit and avoid duplicate work.

@@ -25,7 +25,7 @@ Where:
 ### System skill (dot-prefixed directory)
 
 ```
-Source repo: /mnt/wsl/workspace/ubuntu/skills-personal
+Source repo: /path/to/skills-personal
 Skill file:  .agents/skills/.system/skill-sync/SKILL.md
 Prefix:      personal
 Relative:    .system/skill-sync  →  system/skill-sync
@@ -35,7 +35,7 @@ Result:      personal-system-skill-sync
 ### Integration skill
 
 ```
-Source repo: /mnt/wsl/workspace/ubuntu/skills-personal
+Source repo: /path/to/skills-personal
 Skill file:  .agents/skills/integrations/github/SKILL.md
 Prefix:      personal
 Relative:    integrations/github
@@ -45,7 +45,7 @@ Result:      personal-integrations-github
 ### Methodology skill (deeply nested)
 
 ```
-Source repo: /mnt/wsl/workspace/ubuntu/skills-personal
+Source repo: /path/to/skills-personal
 Skill file:  .agents/skills/methodology/change-management/git-commit/SKILL.md
 Prefix:      personal
 Relative:    methodology/change-management/git-commit
@@ -55,7 +55,7 @@ Result:      personal-methodology-change-management-git-commit
 ### Work skill
 
 ```
-Source repo: /mnt/wsl/workspace/ubuntu/skills-booking
+Source repo: /path/to/skills-work
 Skill file:  .agents/skills/bk/SKILL.md
 Prefix:      work
 Relative:    bk

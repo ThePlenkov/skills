@@ -1,0 +1,7 @@
+{
+  "target": "~/.agents/skills",
+  "sources": {
+    "personal": "/path/to/skills-personal",
+    "work": "/path/to/skills-work"
+  }
+}

@@ -21,10 +21,8 @@ Skills are organized by subject into a deep folder structure.
 
 | Skill | Description |
 |-------|-------------|
-| `skill` | Skill system philosophy, discovery, and creation. |
-| `skill-sync` | Synchronize skills from multiple source repos into flat `~/.agents/skills/`. |
-| `subagents-setup` | Agent hierarchy, delegation rules, and task boundaries. |
-| `retrospect` | Self-reflection, mistake capture, and guardrails. |
+| `dotagents` | Framework lifecycle: `/dotagents init`, `install`, `sync`, `list`. Includes skill philosophy, subagent hierarchy, and sync script. |
+| `retrospect` | Self-correction protocol — persist fixes that prevent recurrence. |
 
 ## integrations
 
@@ -39,6 +37,7 @@ Skills are organized by subject into a deep folder structure.
 | Skill | Description |
 |-------|-------------|
 | `claude-skills` | Claude-specific skill symlink management. |
+| `gitlab-ci-local` | Test GitLab CI pipelines locally without pushing to GitLab. |
 
 ## change-management
 

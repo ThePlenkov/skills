@@ -1,70 +1,74 @@
 ---
 name: retrospect
-description: Structured self-reflection to identify mistakes and convert them into durable guardrails. Use when asked to reflect, do a retrospective, capture lessons learned, or when output had problems that should not repeat. Stores learnings in references/LEARNINGS.md for future prevention.
+description: Self-correction protocol for AI agents. Use when a mistake is made, a correction is received, or lessons need to be captured to prevent recurrence.
 ---
 
 # Retrospect
 
-Analyze mistakes and create searchable guardrails that prevent repeat errors.
+When something goes wrong, the agent must stop, understand why, and **persist a fix that actually prevents recurrence**.
 
-## Workflow
+## Core Principle
 
-**0. Check Prior Learnings**
-Search `references/LEARNINGS.md` for patterns matching current issues. Flag if this is a repeat of a previous learning. Include repeat context in the Issues section.
+> A retrospection is only successful if the mistake **cannot happen again** in the same context.
 
-**0.5 Direct-answer rule**
-If the user asked a direct factual question (e.g., "which skill did this?"), answer it explicitly first, then provide the retrospective structure.
+The agent decides HOW to persist the fix — memory, skill update, `AGENTS.md` change, code comment, project docs — whatever mechanism is most effective for the specific finding. There is no single right answer.
 
-**1. Review Context**
-Identify the user's goals and where responses diverged. Note setup context:
-- **User setup**: preferences, constraints, environment, explicit/implicit requirements
-- **Project setup**: repo structure, conventions, tools, policies
-- **Agent setup**: configuration, limitations, tool availability
+## Protocol
 
-**2. Extract Issues (with Severity)**
-List concrete mistakes, missed requirements, or process failures. Rate each:
-- **H (High)**: Caused user harm, data loss, or fundamental requirement miss
-- **M (Medium)**: Caused rework or friction but recoverable  
-- **L (Low)**: Minor inefficiency or style issue
+### 1. Stop
+Stop the current approach immediately. Acknowledge the mistake. Don't continue hoping it will work out.
 
-Tie each issue to its setup factor (user/project/agent).
+### 2. Understand
+- **What went wrong?** — describe precisely
+- **Why?** — missing context? wrong assumption? ignored conventions?
+- **Is this a pattern?** — has this happened before?
 
-**3. Derive Prevention Steps**
-For each issue, create "IF [trigger], THEN [action]" guardrails. Include a one-line root cause hint. Prefer explicit, checkable conditions.
+### 3. Determine Scope
 
-**4. Record to references/LEARNINGS.md**
-Append entries in this format:
-```
-[YYYY-MM-DD] [H/M/L] [user|project|agent] IF <condition>, THEN <action>
-```
-If agent has memory tools available, also store in agent memory.
+The fix must land at the right level:
 
-**5. Propose Config Updates (optional)**
-Suggest changes to user setup, project setup, or agent setup that would prevent similar issues. Frame as optional recommendations, not blockers.
+| Scope | When | Examples |
+|-------|------|---------|
+| **Universal** | Applies to all agents, all projects | Update `AGENTS.md` or `.agents/skills/` |
+| **Project** | Specific to this codebase | Update project docs, README, config |
+| **Agent** | Specific to this agent's behavior | Agent memory, tool-specific rules |
+| **Session** | One-off, won't recur | Mental note, no persistence needed |
 
-## Output Format
+**Key rule**: extend existing rules rather than creating new ones. One source of truth per topic.
 
-Use this structure for clarity:
+### 4. Persist the Fix
 
-```
-## Issues
-| # | Severity | Context | Issue | Root Cause |
-|---|----------|---------|-------|------------|
-| 1 | H/M/L | user/project/agent | [issue] | [hint] |
+The agent chooses the persistence mechanism based on scope and its own capabilities:
+- **Skill update** — if the finding improves a skill's instructions
+- **AGENTS.md** — if it's a universal project rule
+- **Agent memory** — if it's agent-specific context
+- **Code comments** — if it's implementation-level
+- **Project docs** — if it's project-specific knowledge
 
-## Repeat Check
-- [ ] New issue / [x] Repeat of: [previous learning reference]
+The only requirement: **the fix must be where the agent (or another agent) will encounter it before making the same mistake**.
 
-## Prevention Steps
-- IF [trigger], THEN [action]
-- IF [trigger], THEN [action]
+### 5. Apply Now
 
-## Recorded To
-- references/LEARNINGS.md: [entries added]
-- Agent Memory: [if applicable]
+Apply the learning to the current task immediately. Don't just document it for the future.
 
-## Config Updates (optional)
-- [user|project|agent]: [recommendation]
-```
+## Authority Hierarchy
 
-**Tone**: Factual, self-accountable. Do not blame the user. Every issue should map to a concrete prevention step.
+When rules conflict:
+1. `AGENTS.md` — highest authority
+2. `.agents/skills/` — domain rules
+3. Project documentation — project-specific
+4. Agent memory — lowest priority
+
+When conflicts are detected: **stop, present to user, wait for resolution**.
+
+## Anti-Patterns
+
+- ❌ Persisting to a file nobody reads (including yourself)
+- ❌ Only using memory when the finding is universal
+- ❌ Only using files when the finding is agent-specific
+- ❌ Skipping root cause — fixing symptoms instead of causes
+- ❌ Blaming the user
+- ❌ Continuing without acknowledging the mistake
+
+## References
+- [ATTRIBUTION.md](references/ATTRIBUTION.md) — AI attribution headers for external posts
