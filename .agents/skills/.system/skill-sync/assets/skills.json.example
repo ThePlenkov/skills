@@ -1,0 +1,7 @@
+{
+  "target": "~/.agents/skills",
+  "sources": {
+    "personal": "/mnt/wsl/workspace/ubuntu/skills-personal",
+    "work": "/mnt/wsl/workspace/ubuntu/skills-work"
+  }
+}
