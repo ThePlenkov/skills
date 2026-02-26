@@ -13,7 +13,8 @@ Manages the `.agents/` framework lifecycle — from bootstrapping a new agent to
 
 | Command | Purpose | Workflow |
 |---------|---------|----------|
-| `/dotagents init` | Bootstrap a new agent into the framework | [workflows/init.md](workflows/init.md) |
+| `/dotagents init` | Self-bootstrap: the current agent sets itself up | [workflows/init.md](workflows/init.md) |
+| `/dotagents init <agent>` | Onboard another agent (e.g., `init claude`, `init codex`) | [workflows/init.md](workflows/init.md) |
 | `/dotagents install` | Install or update skills in an agent's native format | [workflows/install.md](workflows/install.md) |
 | `/dotagents sync` | Synchronize skills from source repos into `~/.agents/skills/` | [workflows/sync.md](workflows/sync.md) |
 | `/dotagents list` | Print current setup — skills, agents, config | [workflows/list.md](workflows/list.md) |
@@ -55,6 +56,12 @@ See [assets/TEMPLATE.md](assets/TEMPLATE.md) for a skill template.
 3. Create `<skill-name>/SKILL.md` with YAML frontmatter (`name`, `description`)
 4. Optional: add `references/`, `assets/`, or `scripts/`
 5. Run `/dotagents sync` to refresh symlinks
+
+## Scope Rules
+
+- **`sync`** operates globally — aggregates skills from multiple repos into `~/.agents/skills/`
+- **`init` and `install`** operate **per-project** — only install skills found in the current project's `.agents/` (and optionally from `.agents/skills.json` if present)
+- Never leak skills from unrelated repos into a project's agent setup
 
 ## Subagents
 

@@ -1,30 +1,37 @@
 # /dotagents install
 
-Install or update skills into an agent's native format. Idempotent — safe to re-run.
+Install or update skills into the current agent's native format. Idempotent — safe to re-run.
 
-## How It Works
+## Skill Discovery
 
-Each agent has its own way of consuming skills. The agent must choose the right approach based on its own capabilities.
+Scan the **current project** for skills to install:
 
-| Agent | Native Format | Typical Approach |
-|-------|--------------|------------------|
-| Claude | `.claude/skills/` symlinks | Symlink skill dirs into `.claude/skills/` |
-| Codex | `.codex/instructions.md` | Reference skills in instructions file |
-| Windsurf/Cascade | `.windsurf/workflows/` | Create workflows that reference skills |
-| Cursor | `.cursorrules`, `.cursor/` | Embed or reference in rules file |
-| Cagent | Agent-specific config | Adapt to tool's conventions |
+1. **Local skills**: Find all `SKILL.md` files under `.agents/` in the current working directory
+   ```bash
+   find .agents -name "SKILL.md" -exec dirname {} \;
+   ```
 
-## Steps
+2. **Config-based skills** (optional): If `.agents/skills.json` exists in the project root, also install skills from the configured external sources
 
-1. **Ensure sync is current**: Run `/dotagents sync` first if skills may have changed
-2. **Identify agent format**: Determine the agent's native skill/config format
-3. **Create tool directory**: `.{toolname}/` if it doesn't exist
-4. **Link or reference skills**: Using the agent's native mechanism
-5. **Verify**: Confirm skills are accessible from within the agent
+**Only install skills that belong to or are configured for this project.**
+
+## Installation
+
+The agent installs discovered skills in its **own native format**:
+
+1. **Identify own format**: How does this agent consume skills? (symlinks, config files, inline references, etc.)
+2. **Create agent directory**: `.{agent}/skills/` (or equivalent) if it doesn't exist
+3. **Create references**: Use **relative symlinks** back to `.agents/` where possible, so the project stays portable
+   ```bash
+   ln -sf ../../.agents/skills/<category>/<skill> .{agent}/skills/<flat-name>
+   ```
+4. **Flatten names**: Convert deep paths to flat names (e.g., `.system/dotagents` → `system-dotagents`)
+5. **Verify**: Confirm each skill's `SKILL.md` is reachable from the agent's perspective
 
 ## Principles
 
 - The agent decides HOW to install — this workflow only says WHAT.
 - Don't prescribe a single method — every agent is different.
-- Prefer symlinks or references over copying (to stay in sync with updates).
+- Prefer relative symlinks or references over copying (to stay in sync with updates).
 - Don't overwrite existing configs without user approval.
+- Never pull in skills from unrelated sources — scope is the current project.
