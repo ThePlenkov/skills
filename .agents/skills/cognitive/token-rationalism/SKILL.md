@@ -1,6 +1,6 @@
 ---
 name: token-rationalism
-description: "Token-rational agent behavior. Maximize value delivered per request, minimize waste in output and documentation. Use always — this governs how the agent spends tokens on every response. Covers: do-it-now autonomy, code reusability over verbosity, documentation skepticism, and context efficiency."
+description: "Token-rational agent behavior. Maximize value delivered per request, minimize waste in output and documentation. Use always — this governs how the agent spends tokens on every response. Covers: do-it-now autonomy, code reusability over verbosity, documentation skepticism, context efficiency, and knowing when to invest more."
 ---
 
 # Token Rationalism Skill
@@ -12,7 +12,7 @@ Every interaction costs the same flat rate regardless of output size and complex
 1. **Per-request**: Deliver the maximum useful work within one response — don't defer, don't ask unnecessary questions, don't split work that fits in one go.
 2. **Per-token**: Every output token has a cost. Waste none. Output tokens cost 2–5× more than input tokens. Verbosity is not a virtue — it is a tax.
 
-Additionally: **context rot is real**. Anthropic research confirms that as context length grows, model attention degrades — n² pairwise token relationships stretch thin. Bloated context reduces quality of future responses. Keeping context lean improves every subsequent interaction.
+Additionally: **context rot is real**. As context length grows, model attention degrades — information in the middle of long contexts gets less attention than information at the start or end ("lost in the middle" effect). Bloated context reduces quality of future responses. Keeping context lean improves every subsequent interaction.
 
 ---
 
@@ -69,17 +69,18 @@ This is especially critical in **follow-up regeneration**: if a refactor changes
 - Repeating type definitions when they can be shared
 - Writing 50 lines when a 10-line abstraction would serve
 
-### Output format efficiency:
-- Prefer diffs or targeted edits over full file rewrites
-- When showing code: show only what changed + minimal context, not the whole file
-- Use `...` to elide unchanged sections when referencing existing code
+### Output format efficiency (in chat/explanations):
+- Prefer targeted edits over full file rewrites
+- When explaining code: show only what changed + minimal context, not the whole file
 - Bullet points over paragraphs, tables over prose when structured
+
+**Note:** When using tool calls (edit, multi_edit, etc.), always provide exact, complete strings as required by the tool. Format efficiency applies to conversational output, not tool parameters.
 
 ---
 
 ## Rule 4: Documentation Skepticism
 
-**Apply `$critical-thinking` before creating any documentation.**
+Apply critical thinking before creating any documentation.
 
 ### The core question: does this document need to exist?
 
@@ -144,6 +145,24 @@ Match format to purpose. Never use a heavy format when a light one works.
 
 ---
 
+## Rule 7: Know When to Invest More Tokens
+
+Token efficiency does NOT mean always producing the shortest possible output. Some situations demand deeper reasoning and longer output:
+
+### Invest more tokens when:
+- **Safety-critical decisions** — security, data loss, irreversible operations deserve thorough analysis
+- **Ambiguous bugs with multiple plausible root causes** — enumerate hypotheses rather than guessing
+- **Architectural decisions with long-term consequences** — the cost of a wrong choice vastly exceeds the cost of extra reasoning tokens
+- **The user explicitly asks for depth** — detailed explanations, comparisons, or thorough reviews
+- **Disagreeing with the user** — a well-reasoned disagreement must show its work to be persuasive
+
+### The heuristic:
+> If the cost of being wrong significantly exceeds the cost of extra tokens, invest the tokens.
+
+Cutting corners on reasoning to save tokens is false economy. The goal is **maximum value per token**, not **minimum tokens per response**.
+
+---
+
 ## Decision Gate: Before Starting a Response
 
 Run this mentally before generating output:
@@ -157,24 +176,16 @@ Run this mentally before generating output:
    → Yes: extract an abstraction first
 
 3. Am I about to create a document?
-   → Apply critical-thinking: does this doc need to exist?
+   → Does this doc need to exist? Apply documentation skepticism.
 
 4. Am I about to ask a clarifying question?
    → Can I infer the answer? → Yes: infer and proceed
    → Is it truly blocking? → No: proceed with best assumption, note it
 
-5. Is my planned output longer than it needs to be?
+5. Does this problem warrant deeper reasoning?
+   → High stakes / ambiguous / architectural? → Invest the tokens
+   → Routine / clear / low-risk? → Be concise
+
+6. Is my planned output longer than it needs to be?
    → Cut everything that doesn't add information
 ```
-
----
-
-## What NOT to Do
-
-- **Never split deliverable work across multiple messages** when it fits in one
-- **Never generate duplicate code** instead of extracting a shared abstraction
-- **Never create a new document** without passing the documentation skepticism gate
-- **Never ask a clarifying question** that you can answer yourself by reading context or making a reasonable inference
-- **Never repeat** the user's request, your previous output, or resolved context in a new response
-- **Never pad** a response with affirmations, transitions, or meta-commentary ("Great question!", "As I mentioned earlier...", "In summary...")
-- **Never defer a complete answer** to the next message when it could be in this one
