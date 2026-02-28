@@ -1,7 +1,30 @@
 {
-  "target": "~/.agents/skills",
-  "sources": {
-    "personal": "/path/to/skills-personal",
-    "work": "/path/to/skills-work"
-  }
+  "sources": [
+    {
+      "prefix": "personal",
+      "path": "/path/to/skills-personal"
+    },
+    {
+      "prefix": "work",
+      "path": "/path/to/skills-work",
+      "include": ["bk/**", "litellm/**"]
+    }
+  ],
+  "targets": [
+    {
+      "path": "~/.agents/skills",
+      "flat": true
+    },
+    {
+      "path": "/path/to/project/.claude/skills",
+      "flat": true,
+      "name_style": "basename",
+      "sources": ["personal"]
+    },
+    {
+      "path": "/path/to/project/.windsurf/workflows",
+      "flat": false,
+      "sources": ["personal"]
+    }
+  ]
 }

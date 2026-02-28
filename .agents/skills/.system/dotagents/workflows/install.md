@@ -21,11 +21,11 @@ The agent installs discovered skills in its **own native format**:
 
 1. **Identify own format**: How does this agent consume skills? (symlinks, config files, inline references, etc.)
 2. **Create agent directory**: `.{agent}/skills/` (or equivalent) if it doesn't exist
-3. **Create references**: Use **relative symlinks** back to `.agents/` where possible, so the project stays portable
+3. **Create references**: Use **relative symlinks** back to `.agents/` where possible, so the project stays portable. Use the **skill's own directory name** (basename) as the link name — this must match the `name` field in `SKILL.md` for agents like Claude that derive the slash command from the directory name:
    ```bash
-   ln -sf ../../.agents/skills/<category>/<skill> .{agent}/skills/<flat-name>
+   ln -sf ../../.agents/skills/<category>/<skill> .{agent}/skills/<skill>
    ```
-4. **Flatten names**: Convert deep paths to flat names (e.g., `.system/dotagents` → `system-dotagents`)
+4. **Do not flatten names**: Use the skill's own directory name, not a flattened path (e.g., for `.system/dotagents` use `dotagents`, not `system-dotagents`)
 5. **Verify**: Confirm each skill's `SKILL.md` is reachable from the agent's perspective
 
 ## Principles
