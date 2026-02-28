@@ -1,9 +1,9 @@
 ---
-name: rationalism
-description: Token-rational agent behavior. Maximize value delivered per request, minimize waste in output and documentation. Use always — this governs how the agent spends tokens on every response. Covers: do-it-now autonomy, code reusability over verbosity, documentation skepticism, and context efficiency.
+name: token-rationalism
+description: "Token-rational agent behavior. Maximize value delivered per request, minimize waste in output and documentation. Use always — this governs how the agent spends tokens on every response. Covers: do-it-now autonomy, code reusability over verbosity, documentation skepticism, and context efficiency."
 ---
 
-# Rationalism Skill
+# Token Rationalism Skill
 
 ## The Core Economic Reality
 
