@@ -14,7 +14,7 @@ This repository is maintained by an agent that creates and updates skills and ro
 - Keep prompts concise and focused on the role.
 
 ## Skill creation workflow
-1. Create a new skill folder under `.agents/skills/<category>/<skill-name>/`.
+1. Create a new skill folder under `.agents/skills/<skill-name>/`.
 2. Add `SKILL.md` with a clear description and workflow.
 3. Add `assets/`, `references/`, or `scripts/` only if needed.
 4. Update `.agents/skills/README.md` with a short description.

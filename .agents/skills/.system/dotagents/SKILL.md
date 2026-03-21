@@ -34,7 +34,7 @@ npx skills check
 npx skills update
 ```
 
-See the [skills tool](../../tools/skills/SKILL.md) for full CLI reference.
+See the [skills tool](../../skills/SKILL.md) for full CLI reference.
 
 ## What Are Skills?
 
