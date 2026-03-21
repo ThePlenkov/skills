@@ -4,46 +4,42 @@ Print the current `.agents/` framework setup — skills, agents, config.
 
 ## What to Show
 
-### 1. Sync Config
+### 1. Installed Skills
 
-Read and display `~/.agents/skills.json`:
-
-```bash
-cat ~/.agents/skills.json | jq .
-```
-
-### 2. Synced Skills
-
-List all skills currently symlinked in `~/.agents/skills/`:
+List all skills installed via `npx skills`:
 
 ```bash
-ls -la ~/.agents/skills/ | grep "^l"
+npx skills list
 ```
 
-### 3. Available Skills by Source
+### 2. Available Skills in This Repo
 
-For each source in `skills.json`, list skills with their categories:
+List skills available in the current project:
 
 ```bash
-find <source>/.agents/skills -name "SKILL.md" -exec dirname {} \; | sort
+npx skills add . --list
 ```
 
-### 4. Agent Installations
+Or find them directly:
+
+```bash
+find .agents/skills -name "SKILL.md" -exec dirname {} \; | sort
+```
+
+### 3. Agent Installations
 
 Check which agents have skills installed:
 
 ```bash
-for dir in .windsurf .claude .codex .cursor .cagent; do
-  [ -d "$dir" ] && echo "$dir: installed" || echo "$dir: not found"
+for dir in .windsurf .claude .codex .cursor .agents; do
+  [ -d "$dir/skills" ] && echo "$dir/skills: installed" || echo "$dir/skills: not found"
 done
 ```
 
-### 5. Stale Symlinks
-
-Check for broken symlinks:
+### 4. Check for Updates
 
 ```bash
-find ~/.agents/skills -maxdepth 1 -type l ! -exec test -e {} \; -print
+npx skills check
 ```
 
 ## Output

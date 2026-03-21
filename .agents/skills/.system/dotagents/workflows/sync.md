@@ -1,82 +1,53 @@
 # /dotagents sync
 
-Synchronize skills from multiple source repositories into one or more target directories using symlinks.
+Install or update skills from one or more remote repositories using `npx skills`.
 
-## How It Works
+## Sync with `npx skills`
 
-1. Reads `~/.agents/skills.json` for source and target configuration
-2. For each target, scans applicable sources for `SKILL.md` files
-3. Creates symlinks in each target using the configured mode
-4. Cleans up stale symlinks per target
-
-## Config Schema
-
-See [../assets/skills.json.example](../assets/skills.json.example) for a full example.
-
-```json
-{
-  "sources": [
-    { "prefix": "personal", "path": "/path/to/skills-personal" },
-    { "prefix": "work", "path": "/path/to/skills-work", "include": ["bk/**"] }
-  ],
-  "targets": [
-    { "path": "~/.agents/skills", "flat": true },
-    { "path": "/path/to/project/.claude/skills", "flat": true, "sources": ["personal"] }
-  ]
-}
-```
-
-### Sources
-
-| Field | Required | Description |
-|-------|----------|-------------|
-| `prefix` | yes | Short name used in flat link naming (e.g. `personal`) |
-| `path` | yes | Root of the skills repo |
-| `include` | no | Glob patterns relative to `.agents/skills/` — only matching skills are synced |
-
-### Targets
-
-| Field | Required | Description |
-|-------|----------|-------------|
-| `path` | yes | Destination directory (`~` is expanded) |
-| `flat` | no | `true` (default): flat symlinks per skill. `false`: one symlink per source prefix pointing to the source's `.agents/skills/` dir |
-| `name_style` | no | `prefix` (default): `{prefix}-{flat-path}`. `basename`: skill directory name only — must be unique across sources |
-| `sources` | no | Array of source prefixes to include. Omit to include all sources |
-
-## Run
+Use the [`npx skills` CLI](https://github.com/vercel-labs/skills) to install or update skills from a repository:
 
 ```bash
-bash scripts/sync.sh              # normal
-bash scripts/sync.sh --dry-run    # preview changes
-bash scripts/sync.sh --verbose    # detailed output
-bash scripts/sync.sh --config PATH  # use alternate config
+# Install all skills from a repo to all detected agents
+npx skills add ThePlenkov/skills --all -y
+
+# Install from multiple repos
+npx skills add ThePlenkov/skills --all -y
+npx skills add other-owner/other-skills --all -y
+
+# Install to specific agents only
+npx skills add ThePlenkov/skills -a claude-code -a windsurf -y
+
+# Check for updates across all installed skills
+npx skills check
+
+# Update all installed skills to latest versions
+npx skills update
 ```
 
-Or via the synced symlink:
+## Source Formats
 
 ```bash
-bash ~/.agents/skills/personal-system-dotagents/scripts/sync.sh --verbose
+# GitHub shorthand
+npx skills add owner/repo
+
+# Full GitHub URL
+npx skills add https://github.com/owner/repo
+
+# Local clone
+npx skills add /path/to/skills-repo
+
+# Current project
+npx skills add .
 ```
-
-## Flat Mode Naming
-
-`{source-prefix}-{relative-path}` with `/` replaced by `-` and leading dots stripped.
-
-Example: `.system/dotagents` in `personal` repo → `personal-system-dotagents`
-
-See [../references/naming-convention.md](../references/naming-convention.md) for full details.
 
 ## Behavior
 
 - **Idempotent**: Safe to run multiple times
-- **Symlinks only**: Only removes/creates symlinks, never touches regular files
-- **Stale cleanup**: Removes symlinks no longer in desired set, per target
-- **Per-target isolation**: Each target is managed independently
+- **No manual symlinks**: The CLI manages all agent paths automatically
+- **Auto-detection**: Detects which coding agents are installed
 
 ## Troubleshooting
 
-- **`jq: command not found`** — Install jq: `apt install jq` or `brew install jq`
-- **`skills.json not found`** — Create `~/.agents/skills.json` (see Setup above)
-- **`Unsupported legacy config format`** — Migrate from old `{target, sources: {}}` to new `{sources: [], targets: []}` schema
-- **Broken symlinks** — Re-run sync; stale symlinks are cleaned automatically
-- **Name collision** — Two skills resolve to the same name. Rename one or adjust the source prefix
+- **`npx: command not found`** — Install Node.js: `apt install nodejs npm` or `brew install node`
+- **Permission errors** — Ensure write access to the target agent directory
+- **Skill not loading** — Verify `SKILL.md` has valid `name` and `description` frontmatter
