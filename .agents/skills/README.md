@@ -36,7 +36,8 @@ Skills are organized by subject into a deep folder structure.
 
 | Skill | Description |
 |-------|-------------|
-| `claude-skills` | Claude-specific skill symlink management. |
+| `skills` | Install and manage agent skills using the `npx skills` CLI (vercel-labs/skills). |
+| `claude-skills` | Install or refresh skills for Claude Code using `npx skills add`. |
 | `gitlab-ci-local` | Test GitLab CI pipelines locally without pushing to GitLab. |
 
 ## change-management

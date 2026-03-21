@@ -21,7 +21,7 @@ The current agent bootstraps itself into the `.agents/` framework.
 3. Own tool directory if it exists (`.windsurf/`, `.claude/`, `.codex/`, etc.)
 
 ### 3. Install Skills
-Run `/dotagents install` to set up skills in own native format.
+Run `npx skills add . --all -y` or `/dotagents install` to set up skills in own native format.
 
 ### 4. Configure Subagents
 If subagents/delegation are supported, read `references/subagents.md` and configure.
@@ -50,41 +50,42 @@ Use web search to find:
 
 ### 2. Discover Skills to Install
 
-Scan the **current project** for skills:
+Use `npx skills add` to install from the current project:
 
-1. **Local skills**: Find all `SKILL.md` files under `.agents/` in the current working directory
-   ```bash
-   find .agents -name "SKILL.md" -exec dirname {} \;
-   ```
+```bash
+# List available skills first
+npx skills add . --list
 
-2. **Config-based skills** (optional): If `.agents/skills.json` exists, also install skills from the configured external sources
+# Install all skills to the target agent
+npx skills add . -a <agent-name> -y
+```
 
 The key rule: **only install skills that belong to or are configured for this project**. Never pull in unrelated skills from other sources.
 
-### 3. Create the Agent Directory
+### 3. Install Skills for the Target Agent
 
-Create `.{agent}/` in the project root if it doesn't exist:
-```bash
-mkdir -p .{agent}/
-```
-
-### 4. Install Skills for the Target Agent
-
-Based on research, create skill references in the target agent's native format. Use **relative symlinks** pointing back to `.agents/` so the project stays portable:
+Use the [`npx skills` CLI](https://github.com/vercel-labs/skills) to install skills in the target agent's native format:
 
 ```bash
-# Example for an agent that uses symlinks:
-ln -sf ../../.agents/skills/<category>/<skill> .{agent}/skills/<flat-name>
+# Install to a specific agent
+npx skills add . -a <agent-name> -y
+
+# Examples:
+npx skills add . -a claude-code -y
+npx skills add . -a windsurf -y
+npx skills add . -a codex -y
 ```
 
-### 5. Configure Subagents (if supported)
+The CLI automatically creates the correct directory structure for each agent.
+
+### 4. Configure Subagents (if supported)
 
 If the target agent supports subagents, configure delegation per `references/subagents.md`.
 
-### 6. Verify
+### 5. Verify
 
 - [ ] Target agent directory exists with correct structure
-- [ ] Skills are linked/referenced in the target agent's native format
+- [ ] Skills are installed in the target agent's native format
 - [ ] Only project-relevant skills are installed (no leaking from other repos)
 - [ ] No existing configs were overwritten without user approval
 

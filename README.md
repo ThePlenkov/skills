@@ -7,7 +7,24 @@ Personal, agent-agnostic skills repository.
 - `.agents/skills/` contains all skills.
 
 ## Quick start
-1. Create a new folder under `.agents/skills/<skill-name>/`.
+
+Install all skills from this repo to all your coding agents:
+
+```bash
+npx skills add ThePlenkov/skills --all -y
+```
+
+Or install to a specific agent:
+
+```bash
+npx skills add ThePlenkov/skills -a claude-code
+npx skills add ThePlenkov/skills -a windsurf
+```
+
+Powered by the [`npx skills` CLI](https://github.com/vercel-labs/skills).
+
+## Creating a skill
+1. Create a new folder under `.agents/skills/<category>/<skill-name>/`.
 2. Add `SKILL.md` with a clear description and workflow.
 3. Add `assets/`, `references/`, or `scripts/` only if needed.
 4. Update `.agents/skills/README.md` with the new skill.
@@ -19,10 +36,7 @@ This repository is self-installable as a [GitHub Codespaces dotfiles](https://do
 1. Go to **Settings → Codespaces → Dotfiles** on GitHub.
 2. Select this repository and enable **Automatically install dotfiles**.
 
-When a new codespace starts, `install.sh` runs automatically and:
-- Creates `~/.agents/skills.json` pointing to the cloned repo (non-destructive — skips if already present).
-- Syncs all skills as symlinks into `~/.agents/skills/` (universal agent registry).
-- Syncs all skills as symlinks into `~/.claude/skills/` (Claude Code).
+When a new codespace starts, `install.sh` runs automatically and installs all skills using `npx skills add`.
 
 To re-run manually: `bash ~/dotfiles/install.sh`
 

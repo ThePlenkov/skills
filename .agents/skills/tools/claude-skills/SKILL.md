@@ -1,40 +1,41 @@
 ---
 name: claude-skills
-description: Scans ~/.agents/skills for nested skill directories and creates flat symlinks in ~/.claude/skills for Claude Code.
+description: Install or refresh skills for Claude Code using `npx skills add`. Use when setting up Claude Code for the first time or after adding new skills to the repository.
 ---
 
 # Claude Skills Manager
 
-Scans `~/.agents/skills` for nested skill directories and creates flat symlinks in `~/.claude/skills` to make them accessible to Claude Code.
+Installs skills from this repository into Claude Code using the [`npx skills` CLI](https://github.com/vercel-labs/skills).
 
-## Usage
-
-```bash
-/claude-skills [--dry-run] [--clean]
-```
-
-## Options
-
-- `--dry-run`: Show what would be done without making changes
-- `--clean`: Remove existing skill symlinks before creating new ones
-
-## How it works
-
-1. Recursively scans `~/.agents/skills` for directories containing `SKILL.md`
-2. For each found skill:
-   - Generates a unique flat name (e.g., `github`, `atlassian`, etc.)
-   - Creates a symlink in `~/.claude/skills/` pointing to the nested skill directory
-3. Skips the `claude-skills` skill itself to avoid recursion
-
-## Examples
+## Install skills for Claude Code
 
 ```bash
-# Preview what would be done
-/claude-skills --dry-run
+# Install all skills from this repo to Claude Code (project-scoped)
+npx skills add ThePlenkov/skills -a claude-code
 
-# Clean and recreate all skill symlinks
-/claude-skills --clean
+# Install all skills globally (available across all projects)
+npx skills add ThePlenkov/skills -a claude-code -g
 
-# Create symlinks for newly added skills
-/claude-skills
+# Install from a local clone
+npx skills add . -a claude-code
+
+# Non-interactive
+npx skills add ThePlenkov/skills -a claude-code -y
 ```
+
+## List available skills
+
+```bash
+npx skills add ThePlenkov/skills --list
+```
+
+## Update skills
+
+```bash
+npx skills update
+```
+
+## Notes
+
+- Skills are installed to `.claude/skills/` (project) or `~/.claude/skills/` (global).
+- Re-running the install command is safe and idempotent.

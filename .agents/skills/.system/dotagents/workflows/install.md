@@ -1,37 +1,43 @@
 # /dotagents install
 
-Install or update skills into the current agent's native format. Idempotent — safe to re-run.
+Install or update skills into the current agent's native format using `npx skills add`. Idempotent — safe to re-run.
 
-## Skill Discovery
+## Install with `npx skills`
 
-Scan the **current project** for skills to install:
+Use the [`npx skills` CLI](https://github.com/vercel-labs/skills) to install skills from the current project into your agent:
 
-1. **Local skills**: Find all `SKILL.md` files under `.agents/` in the current working directory
-   ```bash
-   find .agents -name "SKILL.md" -exec dirname {} \;
-   ```
+```bash
+# Install all skills from this repo to all detected agents
+npx skills add . --all -y
 
-2. **Config-based skills** (optional): If `.agents/skills.json` exists in the project root, also install skills from the configured external sources
+# Install to a specific agent
+npx skills add . -a claude-code
+npx skills add . -a windsurf
 
-**Only install skills that belong to or are configured for this project.**
+# List available skills first
+npx skills add . --list
+```
 
-## Installation
+The CLI auto-detects which coding agents are installed. Skills are placed in the agent's standard path (e.g., `.claude/skills/`, `.windsurf/skills/`).
 
-The agent installs discovered skills in its **own native format**:
+## Install from GitHub
 
-1. **Identify own format**: How does this agent consume skills? (symlinks, config files, inline references, etc.)
-2. **Create agent directory**: `.{agent}/skills/` (or equivalent) if it doesn't exist
-3. **Create references**: Use **relative symlinks** back to `.agents/` where possible, so the project stays portable. Use the **skill's own directory name** (basename) as the link name — this must match the `name` field in `SKILL.md` for agents like Claude that derive the slash command from the directory name:
-   ```bash
-   ln -sf ../../.agents/skills/<category>/<skill> .{agent}/skills/<skill>
-   ```
-4. **Do not flatten names**: Use the skill's own directory name, not a flattened path (e.g., for `.system/dotagents` use `dotagents`, not `system-dotagents`)
-5. **Verify**: Confirm each skill's `SKILL.md` is reachable from the agent's perspective
+```bash
+# Install from the published repo (equivalent to installing from local)
+npx skills add ThePlenkov/skills --all -y
+```
+
+## Agent Paths
+
+| Agent | Project Path |
+|-------|-------------|
+| Claude Code | `.claude/skills/` |
+| Windsurf | `.windsurf/skills/` |
+| Codex | `.agents/skills/` |
+| Cursor | `.agents/skills/` |
 
 ## Principles
 
-- The agent decides HOW to install — this workflow only says WHAT.
-- Don't prescribe a single method — every agent is different.
-- Prefer relative symlinks or references over copying (to stay in sync with updates).
+- Use `npx skills` as the standard install tool.
 - Don't overwrite existing configs without user approval.
 - Never pull in skills from unrelated sources — scope is the current project.

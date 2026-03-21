@@ -1,8 +1,8 @@
 ---
 name: dotagents
 description: End-to-end lifecycle management for the .agents/ framework. Use for initializing agents, installing/updating skills, syncing across repos, and listing current setup.
-version: "1.0"
-compatibility: Sync script requires bash, jq, and find.
+version: "2.0"
+compatibility: Requires Node.js (for npx skills).
 ---
 
 # dotagents
@@ -16,8 +16,25 @@ Manages the `.agents/` framework lifecycle — from bootstrapping a new agent to
 | `/dotagents init` | Self-bootstrap: the current agent sets itself up | [workflows/init.md](workflows/init.md) |
 | `/dotagents init <agent>` | Onboard another agent (e.g., `init claude`, `init codex`) | [workflows/init.md](workflows/init.md) |
 | `/dotagents install` | Install or update skills in an agent's native format | [workflows/install.md](workflows/install.md) |
-| `/dotagents sync` | Synchronize skills from source repos into `~/.agents/skills/` | [workflows/sync.md](workflows/sync.md) |
+| `/dotagents sync` | Install skills from remote repositories | [workflows/sync.md](workflows/sync.md) |
 | `/dotagents list` | Print current setup — skills, agents, config | [workflows/list.md](workflows/list.md) |
+
+## Skill Management
+
+Skills are installed and managed using the [`npx skills` CLI](https://github.com/vercel-labs/skills):
+
+```bash
+# Install all skills from this repo to all detected agents
+npx skills add ThePlenkov/skills --all -y
+
+# Check for updates
+npx skills check
+
+# Update all installed skills
+npx skills update
+```
+
+See the [skills tool](../../tools/skills/SKILL.md) for full CLI reference.
 
 ## What Are Skills?
 
@@ -55,13 +72,12 @@ See [assets/TEMPLATE.md](assets/TEMPLATE.md) for a skill template.
 2. Choose the appropriate category folder under `.agents/skills/`
 3. Create `<skill-name>/SKILL.md` with YAML frontmatter (`name`, `description`)
 4. Optional: add `references/`, `assets/`, or `scripts/`
-5. Run `/dotagents sync` to refresh symlinks
+5. Run `npx skills add . --all -y` to install updated skills
 
 ## Scope Rules
 
-- **`sync`** operates globally — aggregates skills from multiple repos into `~/.agents/skills/`
-- **`init` and `install`** operate **per-project** — only install skills found in the current project's `.agents/` (and optionally from `.agents/skills.json` if present)
-- Never leak skills from unrelated repos into a project's agent setup
+- **`sync`** installs skills from remote repositories using `npx skills add`
+- **`install`** installs skills from the **current project** into one or more agents
 
 ## Subagents
 
@@ -72,9 +88,7 @@ See [references/subagents.md](references/subagents.md) for roles, delegation rul
 ## References
 
 - [references/subagents.md](references/subagents.md) — Agent hierarchy and delegation rules
-- [references/naming-convention.md](references/naming-convention.md) — Flat symlink naming convention
 
 ## Assets
 
 - [assets/TEMPLATE.md](assets/TEMPLATE.md) — Skill template
-- [assets/skills.json.example](assets/skills.json.example) — Sync config template
