@@ -24,7 +24,7 @@ npx skills add ThePlenkov/skills -a windsurf
 Powered by the [`npx skills` CLI](https://github.com/vercel-labs/skills).
 
 ## Creating a skill
-1. Create a new folder under `.agents/skills/<category>/<skill-name>/`.
+1. Create a new folder under `.agents/skills/<skill-name>/`.
 2. Add `SKILL.md` with a clear description and workflow.
 3. Add `assets/`, `references/`, or `scripts/` only if needed.
 4. Update `.agents/skills/README.md` with the new skill.

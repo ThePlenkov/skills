@@ -1,7 +1,7 @@
 # Skills Index
 
 This folder contains agent-agnostic, generic skills (no company-specific content).
-Skills are organized by subject into a deep folder structure.
+Skills live directly under `.agents/skills/<skill-name>/`.
 
 ## Structure
 
@@ -36,7 +36,6 @@ Skills are organized by subject into a deep folder structure.
 
 | Skill | Description |
 |-------|-------------|
-| `skills` | Install and manage agent skills using the `npx skills` CLI (vercel-labs/skills). |
 | `claude-skills` | Install or refresh skills for Claude Code using `npx skills add`. |
 | `gitlab-ci-local` | Test GitLab CI pipelines locally without pushing to GitLab. |
 
@@ -58,11 +57,16 @@ Skills are organized by subject into a deep folder structure.
 |-------|-------------|
 | `shared-plan` | Shared planning and coordination across agents. |
 
+## skills
+
+| Skill | Description |
+|-------|-------------|
+| `skills` | Install and manage agent skills using the `npx skills` CLI (vercel-labs/skills). |
+
 ## Add a skill
 
-1. Choose the appropriate category folder (or create a new one).
-2. Create `<skill-name>/SKILL.md` inside that category.
-3. Add YAML frontmatter: `name`, `description`, optional `version` and `prerequisites`.
-4. Optional: add `assets/`, `references/`, or `scripts/` inside the skill folder.
-5. Run `skill-sync` to refresh symlinks in `~/.agents/skills/`.
-6. Update this index.
+1. Create `<skill-name>/SKILL.md` directly under `.agents/skills/`.
+2. Add YAML frontmatter: `name`, `description`, optional `version` and `prerequisites`.
+3. Optional: add `assets/`, `references/`, or `scripts/` inside the skill folder.
+4. Run `npx skills add . --all -y` to install updated skills.
+5. Update this index.
