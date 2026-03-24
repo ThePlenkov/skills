@@ -1,8 +1,6 @@
 ---
 name: dotagents
 description: End-to-end lifecycle management for the .agents/ framework. Use for initializing agents, installing/updating skills, syncing across repos, and listing current setup.
-version: "2.0"
-compatibility: Requires Node.js (for npx skills).
 ---
 
 # dotagents
@@ -88,7 +86,4 @@ See [references/subagents.md](references/subagents.md) for roles, delegation rul
 ## References
 
 - [references/subagents.md](references/subagents.md) — Agent hierarchy and delegation rules
-
-## Assets
-
 - [assets/TEMPLATE.md](assets/TEMPLATE.md) — Skill template

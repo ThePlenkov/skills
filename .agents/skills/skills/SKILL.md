@@ -11,26 +11,20 @@ The `npx skills` CLI ([vercel-labs/skills](https://github.com/vercel-labs/skills
 
 ```bash
 # Install all skills from this repo to all detected agents
-npx skills add ThePlenkov/skills --all --full-depth
+npx skills add ThePlenkov/skills --all
 
 # Install to specific agents
-npx skills add ThePlenkov/skills -a claude-code --full-depth
+npx skills add ThePlenkov/skills -a claude-code
 
 # Install specific skills only
 npx skills add ThePlenkov/skills --skill dotagents --skill github
 
 # List available skills without installing
-npx skills add ThePlenkov/skills --list --full-depth
+npx skills add ThePlenkov/skills --list
 
 # Non-interactive (CI/CD)
-npx skills add ThePlenkov/skills --all --full-depth -y
+npx skills add ThePlenkov/skills --all -y
 ```
-
-> **`--full-depth`**: Required when skills are organized in custom category
-> subdirectories (e.g. `.agents/skills/cognitive/adhd/SKILL.md`). Without it,
-> only depth-1 children of each search dir are discovered. Exception: the
-> built-in prefixes `.system/`, `.curated/`, and `.experimental/` are always
-> searched as priority dirs and do not need `--full-depth`.
 
 ## Source Formats
 

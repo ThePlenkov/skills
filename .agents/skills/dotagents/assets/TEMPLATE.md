@@ -1,7 +1,6 @@
 ---
 name: skill-name
 description: A clear description of what this skill does and when an agent should use it. Use keywords that help agents identify relevant tasks.
-version: "1.0"
 ---
 
 # skill-name

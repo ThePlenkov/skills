@@ -1,8 +1,6 @@
 ---
 name: gitlab-ci-local
 description: Test GitLab CI pipelines locally using gitlab-ci-local. Use when debugging CI jobs, validating pipeline changes, or running jobs without pushing to GitLab.
-version: "1.0"
-compatibility: Requires Node.js and Docker installed and running.
 ---
 
 # GitLab CI Local Testing

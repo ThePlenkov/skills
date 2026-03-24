@@ -18,7 +18,7 @@ This repository is maintained by an agent that creates and updates skills and ro
 2. Add `SKILL.md` with a clear description and workflow.
 3. Add `assets/`, `references/`, or `scripts/` only if needed.
 4. Update `.agents/skills/README.md` with a short description.
-5. Run `npx skills add . --all --full-depth -y` to install updated skills to all agents.
+5. Run `npx skills add . --all -y` to install updated skills to all agents.
 
 ## Optional UI metadata
 - Some skills may include `agents/openai.yaml` for UI metadata.

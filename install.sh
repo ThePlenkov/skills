@@ -9,4 +9,4 @@ if ! command -v npx &>/dev/null; then
   exit 1
 fi
 
-npx skills add . --all --full-depth -y
+npx skills add . --all -y
