@@ -8,6 +8,7 @@ Skills live directly under `.agents/skills/<skill-name>/`.
 ```
 .agents/skills/
 ├── .system/                   # Agent behavioral rules & meta
+├── cognitive/                 # Agent cognition & reasoning behavior
 ├── integrations/              # Platform integrations (high-level workflows)
 ├── tools/                     # CLIs and standalone tools
 ├── change-management/         # How we submit changes
@@ -22,7 +23,16 @@ Skills live directly under `.agents/skills/<skill-name>/`.
 | Skill | Description |
 |-------|-------------|
 | `dotagents` | Framework lifecycle: `/dotagents init`, `install`, `sync`, `list`. Includes skill philosophy, subagent hierarchy, and sync script. |
+| `memory` | Persistent memory enforcement — recall before acting, persist after learning. Integrates with `$retrospect`. |
 | `retrospect` | Self-correction protocol — persist fixes that prevent recurrence. |
+
+## cognitive
+
+| Skill | Description |
+|-------|-------------|
+| `adhd` | Goal anchoring for ADHD-impacted users — detect drift, externalize state, keep focus. |
+| `critical-thinking` | Sycophancy resistance, evidence-driven evaluation, structured disagreement. |
+| `token-rationalism` | Maximize value per token — do-it-now autonomy, code reusability, documentation skepticism. |
 
 ## integrations
 
@@ -31,6 +41,7 @@ Skills live directly under `.agents/skills/<skill-name>/`.
 | `github` | GitHub workflows with MCP or `gh` CLI fallback. |
 | `gitlab` | GitLab workflows with MCP or `glab` CLI fallback. |
 | `atlassian` | Jira & Confluence workflows with MCP or `acli` CLI fallback. |
+| `deepwiki` | Analyze public GitHub repos via DeepWiki AI docs. Spawns background subagent — never blocks. |
 
 ## tools
 
@@ -38,6 +49,7 @@ Skills live directly under `.agents/skills/<skill-name>/`.
 |-------|-------------|
 | `claude-skills` | Install or refresh skills for Claude Code using `npx skills add`. |
 | `gitlab-ci-local` | Test GitLab CI pipelines locally without pushing to GitLab. |
+| `glab` | GitLab CLI automation with non-interactive mode (sets GLAB_NO_PROMPT=true). |
 
 ## change-management
 
