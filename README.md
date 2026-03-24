@@ -11,14 +11,14 @@ Personal, agent-agnostic skills repository.
 Install all skills from this repo to all your coding agents:
 
 ```bash
-npx skills add ThePlenkov/skills --all -y
+npx skills add ThePlenkov/skills --all --full-depth
 ```
 
 Or install to a specific agent:
 
 ```bash
-npx skills add ThePlenkov/skills -a claude-code
-npx skills add ThePlenkov/skills -a windsurf
+npx skills add ThePlenkov/skills -a claude-code --full-depth
+npx skills add ThePlenkov/skills -a windsurf --full-depth
 ```
 
 Powered by the [`npx skills` CLI](https://github.com/vercel-labs/skills).

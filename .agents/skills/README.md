@@ -13,16 +13,14 @@ Skills live directly under `.agents/skills/<skill-name>/`.
 ├── tools/                     # CLIs and standalone tools
 ├── change-management/         # How we submit changes
 ├── development/               # Development practices & methods
-├── project-management/        # Planning & coordination
-├── testing/                   # (future)
-└── documentation/             # (future)
+└── project-management/        # Planning & coordination
 ```
 
 ## .system
 
 | Skill | Description |
 |-------|-------------|
-| `dotagents` | Framework lifecycle: `/dotagents init`, `install`, `sync`, `list`. Includes skill philosophy, subagent hierarchy, and sync script. |
+| `dotagents` | Framework lifecycle: `/dotagents init`, `install`, `list`. Includes skill philosophy and subagent hierarchy. |
 | `memory` | Persistent memory enforcement — recall before acting, persist after learning. Integrates with `$retrospect`. |
 | `retrospect` | Self-correction protocol — persist fixes that prevent recurrence. |
 
@@ -78,7 +76,7 @@ Skills live directly under `.agents/skills/<skill-name>/`.
 ## Add a skill
 
 1. Create `<skill-name>/SKILL.md` directly under `.agents/skills/`.
-2. Add YAML frontmatter: `name`, `description`, optional `version` and `prerequisites`.
+2. Add YAML frontmatter: `name` and `description` (the only spec-compliant fields).
 3. Optional: add `assets/`, `references/`, or `scripts/` inside the skill folder.
-4. Run `npx skills add . --all -y` to install updated skills.
+4. Run `npx skills add . --all --full-depth -y` to install updated skills.
 5. Update this index.
