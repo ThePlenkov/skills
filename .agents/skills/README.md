@@ -21,6 +21,7 @@ Skills live directly under `.agents/skills/<skill-name>/`.
 | `memory` | Persistent memory enforcement — recall before acting, persist after learning. |
 | `retrospect` | Self-correction protocol — persist fixes that prevent recurrence. |
 | `shared-plan` | Shared planning and coordination across agents. |
+| `npm-publish` | Publish npm packages with granular tokens or OIDC trusted publishing. Includes `prepare-ci` to bootstrap CI publishing for new packages. |
 | `skills` | Install and manage agent skills using the `npx skills` CLI (vercel-labs/skills). |
 | `spec-kit` | Spec-Driven Development with GitHub Spec Kit. |
 | `token-rationalism` | Maximize value per token — do-it-now autonomy, code reusability, documentation skepticism. |
