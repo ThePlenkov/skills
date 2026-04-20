@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
+# GitHub Codespaces dotfiles entrypoint — auto-runs on codespace creation.
+# Delegates to scripts/install.sh, which creates the single
+# ~/.agents/skills/personal symlink exposing all skills in this repo.
 set -euo pipefail
-
-# Dotfiles install script — runs automatically when used as a GitHub Codespaces dotfiles repo.
-# Installs all skills from this repository to all detected coding agents.
-
-if ! command -v npx &>/dev/null; then
-  echo "Error: Node.js / npx is required. Please install Node.js first." >&2
-  exit 1
-fi
-
-npx skills add . --all -y
+exec "$(dirname "$0")/scripts/install.sh" "$@"
