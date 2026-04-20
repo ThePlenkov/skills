@@ -25,6 +25,7 @@ Skills live directly under `.agents/skills/<skill-name>/`.
 | `skills` | Install and manage agent skills using the `npx skills` CLI (vercel-labs/skills). |
 | `spec-kit` | Spec-Driven Development with GitHub Spec Kit. |
 | `token-rationalism` | Maximize value per token — do-it-now autonomy, code reusability, documentation skepticism. |
+| `triage-issue` | End-to-end triage of a GitLab/GitHub issue — acknowledge, investigate, fix-or-retest, verify, report back on the issue. |
 
 ## Add a skill
 
