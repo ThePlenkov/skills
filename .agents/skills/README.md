@@ -15,6 +15,7 @@ Skills live directly under `.agents/skills/<skill-name>/`.
 | `dotagents` | Framework lifecycle: `/dotagents init`, `install`, `list`. Includes skill philosophy and subagent hierarchy. |
 | `git-commit` | Structured git commit workflow with message conventions. |
 | `github` | GitHub workflows with MCP or `gh` CLI fallback. |
+| `github-pr-review` | Write a code review for a GitHub PR — context → diff → prioritised findings → post back via `gh`. |
 | `gitlab` | GitLab workflows with MCP or `glab` CLI fallback. |
 | `gitlab-ci-local` | Test GitLab CI pipelines locally without pushing to GitLab. |
 | `glab` | GitLab CLI automation with non-interactive mode (sets GLAB_NO_PROMPT=true). |
