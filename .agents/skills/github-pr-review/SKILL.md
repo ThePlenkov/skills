@@ -165,10 +165,39 @@ Keys per comment: `path`, `line` (or `start_line`+`line` for a range), `side` (d
 
 If the finding is a one-line cosmetic fix and you have write access, it's often cleaner to push a commit on top of the PR branch (or open a follow-up) than to leave an inline comment. Mention the commit SHA in the review body. Do NOT force-push or rewrite history on someone else's branch.
 
+### Resolving threads is NOT a one-shot operation
+
+Automated reviewers on this repo (CodeRabbit, Devin Review, Amazon Q, Copilot PR reviewer, Kilo) re-scan on **every push**. That means the thread list is a moving target:
+
+- At T=0 you resolve N threads and see "0 open". Correct at T=0.
+- Your next commit may trigger new bot reviews within 1–5 minutes.
+- Those new threads are NOT resolved just because earlier ones were.
+
+**Workflow:**
+
+1. After batch-resolving threads, **wait for CI + bot re-reviews** to complete before reporting "all resolved". `gh pr checks <N>` pending-count → 0 is a reasonable signal; `gh api graphql` to count open `reviewThreads` is the definitive one.
+2. Never say "all threads resolved" in chat without immediately re-running the count query **after** the most recent push. The user sees threads through GitHub's UI in real time; "resolved" claims get falsified instantly if you trust a stale count.
+3. If new bot threads appear after your fix, treat them as another round. Do not promise the previous round was the last.
+
+Use:
+
+```bash
+gh api graphql -f query='{
+  repository(owner: "<owner>", name: "<repo>") {
+    pullRequest(number: <N>) {
+      reviewThreads(first: 100) { nodes { isResolved } }
+    }
+  }
+}' --jq '.data.repository.pullRequest.reviewThreads.nodes | group_by(.isResolved) | map({resolved: .[0].isResolved, count: length})'
+```
+
+… as the authoritative check before and after each batch.
+
 ## Forbidden
 
 - Thanking the author ("nice work!", "great PR!"). Compliments go in **Positive observations** as concrete observations ("X correctly handles the null case"), not kudos.
 - Re-raising findings a bot already surfaced.
 - Guessing at intent when you can ask in two lines of chat.
+- Claiming "all threads resolved" / "0 open" without a fresh `reviewThreads` query taken AFTER the most recent push has settled (bots re-scan every commit).
 - Approving a PR you haven't actually read the diff of.
 - Review comments without file:line references.
