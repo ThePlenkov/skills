@@ -4,9 +4,14 @@ on:
   push:
     paths:
       - '.agents/skills/**'
+      - '.github/workflows/skill-scan.yml'
+      - '.skillspector-baseline.yaml'
   pull_request:
     paths:
       - '.agents/skills/**'
+      - '.github/workflows/skill-scan.yml'
+      - '.skillspector-baseline.yaml'
+  workflow_dispatch:
 
 jobs:
   scan:
@@ -26,11 +31,15 @@ jobs:
 
       - name: Run security scan (static only, SARIF)
         run: |
+          BASELINE_ARG=""
+          if [ -f .skillspector-baseline.yaml ]; then
+            BASELINE_ARG="--baseline .skillspector-baseline.yaml"
+          fi
           skillspector scan .agents/skills/ \
             --no-llm \
             --format sarif \
             --output skillspector.sarif \
-            ${{ hashFiles('.skillspector-baseline.yaml') != '' && '--baseline .skillspector-baseline.yaml' || '' }}
+            $BASELINE_ARG
         continue-on-error: true  # allow SARIF upload even if scan fails
 
       - name: Upload SARIF to GitHub Security
@@ -45,4 +54,4 @@ jobs:
           if [ -f .skillspector-baseline.yaml ]; then
             BASELINE_ARG="--baseline .skillspector-baseline.yaml"
           fi
-          skillspector scan .agents/skills/ --no-llm "$BASELINE_ARG"
+          skillspector scan .agents/skills/ --no-llm $BASELINE_ARG
