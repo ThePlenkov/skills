@@ -3,6 +3,7 @@
 Personal, agent-agnostic skills repository.
 
 ## Layout
+
 - `.agents/agents/` contains role prompts.
 - `.agents/skills/` contains all skills (each skill is a folder with `SKILL.md`).
 
