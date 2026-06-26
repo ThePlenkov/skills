@@ -1,6 +1,6 @@
 ---
 name: patcher
-description: Narrow patch worker for Devin SE1.6. Use only when the parent provides exact files, one fix hypothesis, and explicit edit permission.
+description: Narrow patch worker. Use only when the parent provides exact files, one fix hypothesis, and explicit edit permission.
 allowed-tools: [read, grep, glob, edit, write, exec]
 permissions:
   edit: ask

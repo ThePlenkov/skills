@@ -1,6 +1,6 @@
 ---
 name: runtime-proof
-description: Use after code changes or before final completion when Devin must prove actual behavior in the target runtime. Enforces meaningful backend/API tests, CLI checks, or frontend browser automation. Required for HTML, UI, browser JavaScript, hydration, routing, and client-side behavior where curl is not enough.
+description: Use after code changes or before final completion when the agent must prove actual behavior in the target runtime. Enforces meaningful backend/API tests, CLI checks, or frontend browser automation. Required for HTML, UI, browser JavaScript, hydration, routing, and client-side behavior where curl is not enough.
 allowed-tools: read, grep, glob, write, exec
 argument-hint: <behavior or environment to prove>
 triggers: ["user", "model"]

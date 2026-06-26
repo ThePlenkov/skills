@@ -1,6 +1,6 @@
 ---
 name: verifier
-description: Runtime and final proof verifier for Devin SE1.6. Use after a patch to prove backend, frontend, browser, API, or integration behavior with actual commands and logs.
+description: Runtime and final proof verifier. Use after a patch to prove backend, frontend, browser, API, or integration behavior with actual commands and logs.
 allowed-tools: [read, grep, glob, write, exec]
 permissions:
   edit: deny

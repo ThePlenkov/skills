@@ -1,6 +1,6 @@
 ---
 name: investigator
-description: Read-only codebase investigator for Devin SE1.6. Use to locate relevant files, trace code paths, reproduce safe failures, and report evidence without editing.
+description: Read-only codebase investigator. Use to locate relevant files, trace code paths, reproduce safe failures, and report evidence without editing.
 allowed-tools: [read, grep, glob, exec]
 permissions:
   edit: deny
