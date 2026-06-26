@@ -1,0 +1,61 @@
+name: SkillSpector Security Scan
+
+on:
+  push:
+    paths:
+      - '.agents/skills/**'
+      - '.github/workflows/skill-scan.yml'
+      - '.skillspector-baseline.yaml'
+  pull_request:
+    paths:
+      - '.agents/skills/**'
+      - '.github/workflows/skill-scan.yml'
+      - '.skillspector-baseline.yaml'
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+      pull-requests: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install SkillSpector
+        run: uv tool install git+https://github.com/NVIDIA/skillspector.git
+
+      - name: Run security scan (static only, SARIF)
+        run: |
+          BASELINE_ARG=""
+          if [ -f .skillspector-baseline.yaml ]; then
+            BASELINE_ARG="--baseline .skillspector-baseline.yaml"
+          fi
+          skillspector scan .agents/skills/ \
+            --recursive \
+            --no-llm \
+            --format sarif \
+            --output skillspector.sarif \
+            $BASELINE_ARG
+        continue-on-error: true  # allow SARIF upload even if findings exist
+
+      - name: Upload SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        continue-on-error: true  # non-fatal if Security tab not available
+        with:
+          sarif_file: skillspector.sarif
+
+      - name: Fail on HIGH/CRITICAL findings
+        run: |
+          BASELINE_ARG=""
+          if [ -f .skillspector-baseline.yaml ]; then
+            BASELINE_ARG="--baseline .skillspector-baseline.yaml"
+          fi
+          skillspector scan .agents/skills/ --recursive --no-llm $BASELINE_ARG
