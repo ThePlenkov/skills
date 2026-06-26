@@ -21,7 +21,7 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install -g ajv-cli gray-matter
+        run: npm install -g ajv-cli js-yaml
 
       - name: Validate all SKILL.md frontmatter
         run: |
@@ -38,16 +38,19 @@ jobs:
               continue
             fi
 
-            # Write to temp file and validate
-            tmpfile=$(mktemp /tmp/skill-XXXXXX.yaml)
-            echo "$frontmatter" > "$tmpfile"
-            if npx ajv validate -s "$SCHEMA" -d "$tmpfile" --spec=draft7 2>&1; then
+            # Write YAML to temp file, convert to JSON for ajv validation
+            tmpyaml=$(mktemp /tmp/skill-XXXXXX.yaml)
+            tmpjson=$(mktemp /tmp/skill-XXXXXX.json)
+            echo "$frontmatter" > "$tmpyaml"
+            npx js-yaml "$tmpyaml" > "$tmpjson"
+
+            if npx ajv validate -s "$SCHEMA" -d "$tmpjson" --spec=draft7 2>&1; then
               echo "✅ $skill_file"
             else
               echo "❌ $skill_file — frontmatter validation failed"
               FAILED=1
             fi
-            rm "$tmpfile"
+            rm "$tmpyaml" "$tmpjson"
           done < <(find .agents/skills -name 'SKILL.md' -print0)
 
           exit $FAILED

@@ -23,9 +23,9 @@ npx skills add ThePlenkov/skills -a windsurf
 
 Powered by the [`npx skills` CLI](https://github.com/vercel-labs/skills).
 
-> **Note:** The `npx skills add . --all -y` command (local dot-path form) has a known
-> destructive bug that empties `SKILL.md` files in the source tree.
-> **Always use the `ThePlenkov/skills` remote form above**, or the symlink method below.
+> **Note:** Always use the remote `ThePlenkov/skills` form above, or the symlink method below.
+> The local dot-path form of this command has a known destructive bug that empties `SKILL.md`
+> files in the source tree — do not use it on a local clone.
 
 ### Symlink install (local clone — recommended for contributors)
 
@@ -61,7 +61,7 @@ repository.
 2. Select this repository and enable **Automatically install dotfiles**.
 
 When a new codespace starts, `install.sh` runs automatically and creates the symlink
-`~/.agents/skills/personal → .agents/skills/`.
+`~/.agents/skills/personal → <repo>/.agents/skills/`.
 
 To re-run manually:
 
@@ -73,5 +73,5 @@ bash ~/dotfiles/scripts/install.sh
 
 - Keep skills agent-agnostic and avoid hardcoded absolute paths.
 - Use project-relative paths when a default is needed (for example `./docs/planning`).
-- Never use `npx skills add . --all -y` on a local clone — it has a destructive bug.
-  Use `scripts/install.sh` instead.
+- Use `scripts/install.sh` for local installs — the remote CLI form is for consuming skills
+  from other machines or agents.
