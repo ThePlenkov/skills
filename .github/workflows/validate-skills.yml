@@ -1,0 +1,53 @@
+name: Validate Skills
+
+on:
+  push:
+    paths:
+      - '.agents/skills/**/SKILL.md'
+  pull_request:
+    paths:
+      - '.agents/skills/**/SKILL.md'
+
+jobs:
+  validate-frontmatter:
+    name: Validate SKILL.md frontmatter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install -g ajv-cli gray-matter
+
+      - name: Validate all SKILL.md frontmatter
+        run: |
+          set -euo pipefail
+          SCHEMA=".github/skill-schema.json"
+          FAILED=0
+
+          while IFS= read -r -d '' skill_file; do
+            # Extract YAML frontmatter between --- delimiters
+            frontmatter=$(awk '/^---/{if(p)exit;p=1;next} p' "$skill_file")
+            if [ -z "$frontmatter" ]; then
+              echo "⚠️  No frontmatter found: $skill_file"
+              FAILED=1
+              continue
+            fi
+
+            # Write to temp file and validate
+            tmpfile=$(mktemp /tmp/skill-XXXXXX.yaml)
+            echo "$frontmatter" > "$tmpfile"
+            if npx ajv validate -s "$SCHEMA" -d "$tmpfile" --spec=draft7 2>&1; then
+              echo "✅ $skill_file"
+            else
+              echo "❌ $skill_file — frontmatter validation failed"
+              FAILED=1
+            fi
+            rm "$tmpfile"
+          done < <(find .agents/skills -name 'SKILL.md' -print0)
+
+          exit $FAILED
