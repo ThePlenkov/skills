@@ -18,7 +18,12 @@ This repository is maintained by an agent that creates and updates skills and ro
 2. Add `SKILL.md` with a clear description and workflow.
 3. Add `assets/`, `references/`, or `scripts/` only if needed.
 4. Update `.agents/skills/README.md` with a short description.
-5. Run `npx skills add . --all -y` to install updated skills to all agents.
+5. Installation is automatic for agents on this machine: `~/.agents/skills/personal`
+   is a symlink to `.agents/skills/`, so every skill here is immediately available
+   as `~/.agents/skills/personal/<name>`. Run `scripts/install.sh` once per machine
+   to create that symlink (idempotent). Do NOT run `npx skills add . --all -y` here
+   — it has a destructive bug that empties `.agents/skills/*/SKILL.md` in the source
+   tree. Use `npx skills add ThePlenkov/skills --all` only when consuming from outside.
 
 ## Optional UI metadata
 - Some skills may include `agents/openai.yaml` for UI metadata.

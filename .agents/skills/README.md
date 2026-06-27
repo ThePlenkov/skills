@@ -10,6 +10,17 @@ Skills live directly under `.agents/skills/<skill-name>/`.
 || `adhd` | Goal anchoring for ADHD-impacted users — detect drift, externalize state, keep focus. |
 || `atlassian` | Jira & Confluence workflows with MCP or `acli` CLI fallback. |
 || `claude-skills` | Install or refresh skills for Claude Code using `npx skills add`. |
+|| `codehome` | Detect code that works but lives in the wrong layer — fix placement, not just correctness. |
+|| `investigate-first` | Inspect, search, and reproduce before any patch. Prevents chaotic edits. |
+|| `minimal-root-cause` | Climb the laziness ladder before editing — avoid overengineering and symptom patches. |
+|| `one-shot-patch` | Exactly one narrow change with verification. For isolated fixes with known cause. |
+|| `runtime-proof` | Prove actual behavior in the target runtime — real tests, not just code reading. |
+|| `safeguard` | Prevent destructive agent actions (rm, git clean, reset, restore). Cross-agent safety. |
+|| `salvage` | Emergency recovery after accidental deletion or destructive action. |
+|| `sandbox` | Isolate risky experiments in a branch or worktree with checkpoint commits. |
+|| `save-session` | Durable end-of-work save across code, plans, memory, and docs. |
+|| `subagent-capsule` | Build a complete context capsule before launching any subagent. |
+|| `unwind` | Collapse a solved subtask into the parent plan and continue automatically. |
 || `critical-thinking` | Sycophancy resistance, evidence-driven evaluation, structured disagreement. |
 || `deepwiki` | Analyze public GitHub repos via DeepWiki AI docs. Spawns background subagent — never blocks. |
 || `dotagents` | Framework lifecycle: `/dotagents init`, `install`, `list`. Includes skill philosophy and subagent hierarchy. |
@@ -37,5 +48,7 @@ Skills live directly under `.agents/skills/<skill-name>/`.
 1. Create `<skill-name>/SKILL.md` directly under `.agents/skills/`.
 2. Add YAML frontmatter: `name` and `description` (the only spec-compliant fields).
 3. Optional: add `assets/`, `references/`, or `scripts/` inside the skill folder.
-4. Run `npx skills add . --all -y` to install updated skills.
+4. No install step needed locally — `scripts/install.sh` exposes every skill here
+   via `~/.agents/skills/personal/<name>`. Do NOT run `npx skills add . --all -y`
+   inside this repo (destructive bug that empties SKILL.md files).
 5. Update this index.
