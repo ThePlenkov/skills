@@ -1,6 +1,6 @@
 ---
 name: codehome
-description: Detect and fix code that works but lives in the wrong architectural layer, file, or configuration surface. Use when an agent has placed large runtime logic inside config files, route files, components, scripts, tests, temporary folders, or other inappropriate homes. This skill is cross-agent: investigator, patcher, and verifier must all use it when reviewing implementation placement, not just correctness.
+description: "Detect and fix code that works but lives in the wrong architectural layer, file, or configuration surface. Use when an agent has placed large runtime logic inside config files, route files, components, scripts, tests, temporary folders, or other inappropriate homes. This skill is cross-agent: investigator, patcher, and verifier must all use it when reviewing implementation placement, not just correctness."
 argument-hint: "[optional file, feature, or concern]"
 triggers:
   - user

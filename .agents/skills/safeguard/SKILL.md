@@ -1,6 +1,6 @@
 ---
 name: safeguard
-description: Prevent destructive agent actions from deleting user work, untracked files, experimental code, or recoverable evidence. Use before any rollback, cleanup, restore, reset, delete, git clean, git restore, git reset, rm, overwrite, mass edit, or dependency cleanup. This is a cross-agent safety skill: investigator, patcher, verifier, and any subagent must obey it before destructive commands.
+description: "Prevent destructive agent actions from deleting user work, untracked files, experimental code, or recoverable evidence. Use before any rollback, cleanup, restore, reset, delete, git clean, git restore, git reset, rm, overwrite, mass edit, or dependency cleanup. This is a cross-agent safety skill: investigator, patcher, verifier, and any subagent must obey it before destructive commands."
 argument-hint: "[optional reason for destructive action]"
 triggers:
   - user
