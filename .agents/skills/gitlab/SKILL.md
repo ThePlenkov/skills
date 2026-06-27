@@ -6,10 +6,13 @@ description: Work with GitLab projects, issues, merge requests, pipelines, and r
 # GitLab
 
 ## Overview
+
 Use MCP tools when available. If MCP/tools are unavailable, use the `glab` CLI. If `glab` is missing, recommend installing it.
 
 ## Core CLI Operations (glab)
+
 From `glab --help`:
+
 - **auth**: Manage authentication.
 - **repo**: Work with repositories and projects.
 - **issue**: Work with issues.
@@ -21,9 +24,11 @@ From `glab --help`:
 - **variable**: Manage project/group variables.
 
 ## Workflow
+
 1. Prefer MCP tools if available.
 2. If MCP/tools are unavailable, use `glab` for the task.
 3. If `glab` is missing, recommend installing it and continue with guidance.
 
 ## Notes
+
 - Validate decisions and data against live sources where possible.

@@ -16,9 +16,11 @@ The agent decides HOW to persist the fix — memory, skill update, `AGENTS.md` c
 ## Protocol
 
 ### 1. Stop
+
 Stop the current approach immediately. Acknowledge the mistake. Don't continue hoping it will work out.
 
 ### 2. Understand
+
 - **What went wrong?** — describe precisely
 - **Why?** — missing context? wrong assumption? ignored conventions?
 - **Is this a pattern?** — has this happened before?
@@ -39,6 +41,7 @@ The fix must land at the right level:
 ### 4. Persist the Fix
 
 The agent chooses the persistence mechanism based on scope and its own capabilities:
+
 - **Skill update** — if the finding improves a skill's instructions
 - **AGENTS.md** — if it's a universal project rule
 - **Agent memory** — if it's agent-specific context
@@ -54,6 +57,7 @@ Apply the learning to the current task immediately. Don't just document it for t
 ## Authority Hierarchy
 
 When rules conflict:
+
 1. `AGENTS.md` — highest authority
 2. `.agents/skills/` — domain rules
 3. Project documentation — project-specific
@@ -71,4 +75,5 @@ When conflicts are detected: **stop, present to user, wait for resolution**.
 - ❌ Continuing without acknowledging the mistake
 
 ## References
+
 - [ATTRIBUTION.md](references/ATTRIBUTION.md) — AI attribution headers for external posts

@@ -19,11 +19,13 @@ Additionally: **context rot is real**. As context length grows, model attention 
 ## Rule 1: Do the Work, Don't Ask Permission
 
 **Default behavior: act, then report.** Ask only when:
+
 - The request is genuinely ambiguous with multiple conflicting valid interpretations
 - The action is destructive or irreversible
 - A required input is completely missing (not inferrable)
 
 **Do NOT ask** when:
+
 - You can make a reasonable inference
 - There are multiple valid approaches and you can pick the best one
 - The user said "create X" and you know what X needs
@@ -38,16 +40,19 @@ When in doubt: make the decision, do the work, state what you decided and why �
 
 A request is not done when the immediate ask is answered — it's done when the user can actually use the result without another round-trip.
 
-### What "complete" means in practice:
+### What "complete" means in practice
+
 - Code: runnable, imports included, edge cases handled, no TODOs left unless intentional
 - File changes: all affected files updated, not just the one mentioned
 - Plans: next action identified, not just current action completed
 - Bugs: root cause fixed, not symptom patched
 
-### Batch independent work:
+### Batch independent work
+
 Use parallel tool calls for independent operations. Never sequence what can be parallelized. Each sequential step that could have been parallel wastes a round-trip.
 
-### Anticipate the follow-up:
+### Anticipate the follow-up
+
 If the user's request will obviously lead to "now do Y," do Y proactively in the same response unless Y is large enough to risk quality.
 
 ---
@@ -57,19 +62,22 @@ If the user's request will obviously lead to "now do Y," do Y proactively in the
 ### Repetition = signal to refactor, not copy-paste
 
 When writing code that starts looking like a pattern:
+
 - **Stop before the third repetition**
 - Extract: a function, a helper, a loop, a config structure
 - Reusable code is shorter AND better — it's a free win
 
 This is especially critical in **follow-up regeneration**: if a refactor changes shared logic, update the abstraction, not every callsite individually.
 
-### Anti-patterns to avoid:
+### Anti-patterns to avoid
+
 - Generating boilerplate that could be a loop
 - Duplicating error handling when a wrapper exists
 - Repeating type definitions when they can be shared
 - Writing 50 lines when a 10-line abstraction would serve
 
-### Output format efficiency (in chat/explanations):
+### Output format efficiency (in chat/explanations)
+
 - Prefer targeted edits over full file rewrites
 - When explaining code: show only what changed + minimal context, not the whole file
 - Bullet points over paragraphs, tables over prose when structured
@@ -85,19 +93,22 @@ Apply critical thinking before creating any documentation.
 ### The core question: does this document need to exist?
 
 Before writing a new doc, answer:
+
 1. **Is the code self-explanatory?** If yes → skip the doc
 2. **Is this ephemeral knowledge?** (How to fix one bug, one setup step) → put it in a comment, not a file
 3. **Will this document be read more than once?** If no → don't write it
 4. **Does a doc already exist that should be updated?** If yes → update it, don't create a parallel one
 5. **Is this doc replacing actual code quality?** (Docs that explain confusing code instead of simplifying it) → fix the code instead
 
-### Documentation that earns its tokens:
+### Documentation that earns its tokens
+
 - Architecture decisions that aren't obvious from code
 - Non-obvious operational constraints (why X is configured this way)
 - Public API contracts that external consumers need
 - Onboarding steps that can't be scripted
 
-### Documentation that wastes tokens:
+### Documentation that wastes tokens
+
 - README sections restating what the code does
 - Comments explaining *what* code does (not *why*)
 - Step-by-step guides for one-time tasks
@@ -111,18 +122,21 @@ Before writing a new doc, answer:
 
 Bloated context degrades future response quality (context rot). Apply these principles:
 
-### In long sessions:
+### In long sessions
+
 - Summarize resolved decisions rather than keeping full threads
 - Reference existing artifacts (files, plans) instead of restating their content
 - When a problem is solved, close it — don't leave it dangling in context
 
-### In responses:
+### In responses
+
 - Don't repeat the user's request back before answering it
 - Don't summarize what you just did at the end of doing it (the actions speak)
 - Don't pad responses with affirmations, transitions, or meta-commentary
 - One-sentence status updates over multi-paragraph explanations
 
-### Structured note-taking over context bloat:
+### Structured note-taking over context bloat
+
 For long-horizon work: write decisions, state, and next actions to a file (plan, notes) rather than relying on the conversation history. The file survives context resets; the conversation history degrades.
 
 ---
@@ -149,14 +163,16 @@ Match format to purpose. Never use a heavy format when a light one works.
 
 Token efficiency does NOT mean always producing the shortest possible output. Some situations demand deeper reasoning and longer output:
 
-### Invest more tokens when:
+### Invest more tokens when
+
 - **Safety-critical decisions** — security, data loss, irreversible operations deserve thorough analysis
 - **Ambiguous bugs with multiple plausible root causes** — enumerate hypotheses rather than guessing
 - **Architectural decisions with long-term consequences** — the cost of a wrong choice vastly exceeds the cost of extra reasoning tokens
 - **The user explicitly asks for depth** — detailed explanations, comparisons, or thorough reviews
 - **Disagreeing with the user** — a well-reasoned disagreement must show its work to be persuasive
 
-### The heuristic:
+### The heuristic
+>
 > If the cost of being wrong significantly exceeds the cost of extra tokens, invest the tokens.
 
 Cutting corners on reasoning to save tokens is false economy. The goal is **maximum value per token**, not **minimum tokens per response**.

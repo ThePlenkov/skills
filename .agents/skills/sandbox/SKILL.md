@@ -83,7 +83,7 @@ git worktree list
 
 If this is a nested repository, inspect the nested repository separately.
 
-2. If the current working tree is dirty, protect it first.
+1. If the current working tree is dirty, protect it first.
 
 Dirty tree means:
 
@@ -106,7 +106,7 @@ Create a rescue checkpoint before doing anything else:
 
 If user work and agent work are mixed, stop and ask before moving or reverting anything.
 
-3. Create an agent sandbox.
+1. Create an agent sandbox.
 
 Preferred approach:
 
@@ -124,7 +124,7 @@ The sandbox must be separate from the user's active worktree.
 
 If git worktree is unavailable, use a dedicated branch in the current repository only after preserving the current state.
 
-4. Move risky work into the sandbox.
+1. Move risky work into the sandbox.
 
 From this point onward:
 
@@ -136,7 +136,7 @@ From this point onward:
 
 The original working tree should remain stable.
 
-5. Create checkpoint commits.
+1. Create checkpoint commits.
 
 Checkpoint commits are required at these moments:
 
@@ -159,7 +159,7 @@ agent checkpoint: console websocket - browser proof passes
 
 Checkpoint commits must stay on agent/* branches unless the user explicitly approves integration.
 
-6. Failed experiments stay isolated.
+1. Failed experiments stay isolated.
 
 If an experiment fails:
 
@@ -169,7 +169,7 @@ If an experiment fails:
 - preserve the failed sandbox if useful
 - report the branch/worktree path and failure evidence
 
-7. Successful experiments are integrated deliberately.
+1. Successful experiments are integrated deliberately.
 
 Before integration:
 
@@ -191,11 +191,11 @@ Do not integrate broken checkpoint commits.
 Do not integrate unrelated experiments.
 Do not integrate without verifying in the target context.
 
-8. If the user says "continue", continue in the sandbox unless they explicitly request integration.
+1. If the user says "continue", continue in the sandbox unless they explicitly request integration.
 
-9. If the user says "/unwind", fold the proven sandbox state into the mainline plan and proceed with the next parent-level action.
+2. If the user says "/unwind", fold the proven sandbox state into the mainline plan and proceed with the next parent-level action.
 
-10. If the user says "undo", "you broke it", or "restore", trigger safeguard or salvage first.
+3. If the user says "undo", "you broke it", or "restore", trigger safeguard or salvage first.
 
 ## CHECKPOINT COMMAND
 

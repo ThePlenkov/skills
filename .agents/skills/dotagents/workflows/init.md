@@ -1,6 +1,7 @@
 # /dotagents init
 
 Two modes:
+
 - `/dotagents init` — **self-bootstrap**: the current agent sets itself up
 - `/dotagents init <agent>` — **cross-agent onboarding**: the current agent sets up another agent (e.g., Cascade onboards Claude)
 
@@ -11,22 +12,27 @@ Two modes:
 The current agent bootstraps itself into the `.agents/` framework.
 
 ### 1. Self-Identification
+
 - **Who am I?** — model name, provider, version
 - **What can I do?** — file access, command execution, web search, memory, MCP tools
 - **What are my limits?** — context window, output length, tool restrictions, sandbox mode
 
 ### 2. Read the Framework
+
 1. `AGENTS.md` — project-level rules (supreme authority)
 2. `.agents/skills/` — available skills (start with `.system/dotagents/`)
 3. Own tool directory if it exists (`.windsurf/`, `.claude/`, `.codex/`, etc.)
 
 ### 3. Install Skills
+
 Run `npx skills add . --all -y` or `/dotagents install` to set up skills in own native format.
 
 ### 4. Configure Subagents
+
 If subagents/delegation are supported, read `references/subagents.md` and configure.
 
 ### 5. Verify
+
 - [ ] Can discover and read skills
 - [ ] Respects `AGENTS.md` rules
 - [ ] Skills accessible in native format
@@ -41,6 +47,7 @@ The current agent onboards a **different** agent. For example: you are Cascade, 
 ### 1. Research the Target Agent
 
 Use web search to find:
+
 - **Config format**: What files does the target agent read? (e.g., `.claude/skills/`, `.codex/instructions.md`, `.cursorrules`)
 - **Skill format**: How does it consume skills? Symlinks? Inline markdown? YAML?
 - **Directory conventions**: What is the expected directory structure?

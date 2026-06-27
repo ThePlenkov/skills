@@ -9,8 +9,8 @@ description: Use Spec-Driven Development with GitHub Spec Kit. Create specificat
 
 GitHub's Spec Kit enables **Spec-Driven Development (SDD)**: write executable specifications that directly generate working implementations, rather than generating specs from code.
 
-**Official**: https://github.com/github/spec-kit  
-**Docs**: https://github.github.io/spec-kit/
+**Official**: <https://github.com/github/spec-kit>  
+**Docs**: <https://github.github.io/spec-kit/>
 
 ## When to Use
 
@@ -53,6 +53,7 @@ specify init . --ai claude
 ```
 
 This creates:
+
 - `.speckit/` folder with project configuration
 - `.speckit/constitution.md` — Project principles and guidelines
 - `.speckit/implementation_hints.md` — Implementation guidance
@@ -65,6 +66,7 @@ This creates:
 ```
 
 This establishes:
+
 - Development standards
 - Code quality requirements
 - Testing expectations
@@ -99,6 +101,7 @@ Create `.speckit/*.spec.md` files:
 ### 4. Generate Implementation
 
 Once specification is written, ask your AI assistant to implement it. The AI will:
+
 - Read the specification
 - Reference constitution principles
 - Generate code matching spec
@@ -307,6 +310,7 @@ specify init . --ai claude
 ### Constitution too vague
 
 Constitution should be:
+
 - Specific (measurable, enforceable)
 - Not too long (1-2 pages max)
 - Focused on standards, not implementation details
@@ -315,10 +319,10 @@ Rewrite as needed; it evolves with project.
 
 ## References
 
-- **GitHub Spec Kit Repo**: https://github.com/github/spec-kit
-- **Spec-Driven Development Manifesto**: https://github.com/github/spec-kit/blob/main/spec-driven.md
-- **Documentation**: https://github.github.io/spec-kit/
-- **AGENTS.md**: https://github.com/github/spec-kit/blob/main/AGENTS.md (AI agent integration)
+- **GitHub Spec Kit Repo**: <https://github.com/github/spec-kit>
+- **Spec-Driven Development Manifesto**: <https://github.com/github/spec-kit/blob/main/spec-driven.md>
+- **Documentation**: <https://github.github.io/spec-kit/>
+- **AGENTS.md**: <https://github.com/github/spec-kit/blob/main/AGENTS.md> (AI agent integration)
 
 ## Notes
 

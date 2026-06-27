@@ -41,11 +41,13 @@ Skills are **documentation for the LLM**, not shell script wrappers.
 The LLM is intelligent enough to read `SKILL.md` and act. Skills provide context, not automation.
 
 **Skills should NOT:**
+
 - Wrap simple commands in shell scripts
 - Duplicate logic across skills
 - Create unnecessary abstraction layers
 
 **Skills SHOULD:**
+
 - Provide clear documentation
 - List prerequisites
 - Show exact commands the LLM should run

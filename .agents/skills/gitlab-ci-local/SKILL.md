@@ -15,21 +15,25 @@ Test GitLab CI pipelines locally using `gitlab-ci-local` without pushing to GitL
 ## Commands
 
 ### Run a specific job
+
 ```bash
 gitlab-ci-local <job-name>
 ```
 
 ### Run with environment variables
+
 ```bash
 gitlab-ci-local <job-name> -e VAR_NAME=value -e ANOTHER_VAR=value
 ```
 
 ### List available jobs
+
 ```bash
 gitlab-ci-local --list
 ```
 
 ### Run ignoring dependencies (faster for testing single jobs)
+
 ```bash
 gitlab-ci-local <job-name> --needs
 ```

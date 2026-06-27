@@ -27,6 +27,7 @@ Use the `glean-bk` wrapper for Glean operations instead of the Docker MCP Toolbo
 ## How glean-bk Works
 
 The wrapper automatically:
+
 1. Validates bk OAuth tokens for Glean
 2. Refreshes tokens if expired via `bk genai:mcp:auth`
 3. Syncs tokens from bk to Glean CLI storage
@@ -36,18 +37,21 @@ The wrapper automatically:
 ## First-Time Setup
 
 1. Install glean-bk:
+
 ```bash
 brew tap petr-plenkov/tools git@gitlab.com:booking-com/personal/petr.plenkov/homebrew-tools.git
 brew trust petr-plenkov/tools
 brew install petr-plenkov/tools/glean-bk
 ```
 
-2. Authenticate Glean via bk:
+1. Authenticate Glean via bk:
+
 ```bash
 bk genai:mcp:auth --action auth --service glean --yes
 ```
 
-3. Verify:
+1. Verify:
+
 ```bash
 glean-bk auth status
 ```
@@ -69,16 +73,19 @@ glean-bk auth status
 ## Usage Examples
 
 ### Search
+
 ```bash
 glean-bk search "quarterly OKRs"
 ```
 
 ### Chat (scripting-friendly)
+
 ```bash
 glean-bk chat --save=false "Summarize the latest incident report"
 ```
 
 ### Raw API
+
 ```bash
 glean-bk api /rest/api/v1/chat -X POST -d '{
   "messages": [{"author":"USER","messageType":"CONTENT","fragments":[{"text":"What is Glean?"}]}]
@@ -95,6 +102,6 @@ glean-bk api /rest/api/v1/chat -X POST -d '{
 
 ## Reference
 
-- glean-bk repo: https://gitlab.com/booking-com/personal/petr.plenkov/glean-bk
-- Homebrew tap: https://gitlab.com/booking-com/personal/petr.plenkov/homebrew-tools
-- Glean CLI repo: https://github.com/gleanwork/glean-cli
+- glean-bk repo: <https://gitlab.com/booking-com/personal/petr.plenkov/glean-bk>
+- Homebrew tap: <https://gitlab.com/booking-com/personal/petr.plenkov/homebrew-tools>
+- Glean CLI repo: <https://github.com/gleanwork/glean-cli>

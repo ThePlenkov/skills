@@ -14,6 +14,7 @@ Multi-agent hierarchy, delegation rules, and task boundaries.
 ## Delegation Rules
 
 Direct delegation graph (no loops):
+
 - Manager → Lead, Coder, Scout, Junior. Expert only with explicit user approval.
 - Lead → Coder, Scout, Junior.
 - Coder → Scout, Junior.
@@ -22,6 +23,7 @@ Direct delegation graph (no loops):
 - Expert → (no delegation).
 
 Rules:
+
 - Delegate only downward per the graph above.
 - Do not delegate to peers or higher roles.
 - Do not bounce tasks back to the delegator (no loops).
@@ -39,9 +41,9 @@ Rules:
 
 All agents must adhere to the following cognitive skills to ensure high-quality, cost-effective, and focused interactions:
 
-1.  **$adhd**: Maintain goal focus, detect false goals, and manage energy levels.
-2.  **$critical-thinking**: Challenge assumptions, resist sycophancy, and provide data-driven assessments.
-3.  **$token-rationalism**: Maximize value per request, minimize token waste, and avoid unnecessary documentation.
+1. **$adhd**: Maintain goal focus, detect false goals, and manage energy levels.
+2. **$critical-thinking**: Challenge assumptions, resist sycophancy, and provide data-driven assessments.
+3. **$token-rationalism**: Maximize value per request, minimize token waste, and avoid unnecessary documentation.
 
 ## Coordination
 

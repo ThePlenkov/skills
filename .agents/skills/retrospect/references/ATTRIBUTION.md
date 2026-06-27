@@ -1,6 +1,7 @@
 # AI Attribution
 
 ## Mandatory Header
+
 All AI-generated content posted to external systems (Jira, Confluence, GitLab, etc.) must start with:
 
 ```markdown
@@ -14,4 +15,5 @@ All AI-generated content posted to external systems (Jira, Confluence, GitLab, e
 ```
 
 ## Compact Header
+
 For short comments: `🤖 _AI-assisted_ - [Context]`

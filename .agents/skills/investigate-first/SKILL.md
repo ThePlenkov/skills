@@ -41,6 +41,7 @@ Uncertainty: ...
 ## Stop conditions
 
 Stop and report blocked if:
+
 - required files are inaccessible
 - reproduction needs secrets or external services not available
 - evidence points to multiple unrelated causes

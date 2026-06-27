@@ -15,6 +15,7 @@ A subagent must be treated as having zero reliable memory of the parent task unl
 ## Before launching
 
 Choose exactly one profile:
+
 - investigator: read-only evidence gathering
 - patcher: one narrow approved patch
 - verifier: runtime proof only
@@ -22,6 +23,7 @@ Choose exactly one profile:
 Do not launch parallel subagents unless the user explicitly asks.
 
 Do not launch a subagent with a vague prompt like:
+
 - check this
 - fix it
 - look around
@@ -43,6 +45,7 @@ Forbidden scope: [everything else or specific exclusions]
 Edit permission: [none | exact files only]
 Verification expectation: [command/browser/runtime proof expected]
 Output contract:
+
 1. Status: resolved, blocked, failed, or inconclusive
 2. Findings
 3. Evidence with file paths, line refs, or command output

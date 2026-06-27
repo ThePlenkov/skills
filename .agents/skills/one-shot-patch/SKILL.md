@@ -13,6 +13,7 @@ Goal: apply exactly one logical fix and verify it.
 ## Preconditions
 
 Before editing, confirm:
+
 - exact file or files to change
 - one fix hypothesis
 - expected verification command or runtime proof
