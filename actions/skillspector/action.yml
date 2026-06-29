@@ -211,7 +211,7 @@ runs:
           if [ -n "${NX_BASE:-}" ] \
             && ! git -C "$GITHUB_WORKSPACE" cat-file -e "${NX_BASE}" 2>/dev/null; then
             git -C "$GITHUB_WORKSPACE" fetch --depth=200 origin "${NX_BASE}" 2>/dev/null || \
-              echo "::warning::fetch of NX_BASE SHA failed; nx affected will likely fail too"
+              echo "::warning title=skillspector action:NX_BASE fetch::fetch of NX_BASE SHA failed; nx affected will likely fail too"
           fi
           if [ -z "${NX_BASE:-}" ]; then
             if NX_BASE=$(git -C "$GITHUB_WORKSPACE" merge-base "origin/${BASE_REF}" HEAD 2>/dev/null) && [ -n "$NX_BASE" ]; then
@@ -220,7 +220,7 @@ runs:
             fi
           fi
           if [ -z "${NX_BASE:-}" ]; then
-            echo "::warning::NX_BASE could not be determined; falling back to nx run-many"
+            echo "::warning title=skillspector action:NX_BASE missing::NX_BASE could not be determined; falling back to nx run-many"
             NX_SUBCMD="run-many"
           fi
         fi

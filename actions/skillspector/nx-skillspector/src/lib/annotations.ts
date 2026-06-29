@@ -16,25 +16,33 @@ const MAX_SNIPPET_LENGTH = 400;
 export function buildTitle(
   ruleId: string,
   properties: Record<string, unknown>,
-  toolName = 'skillspector',
+  _toolName = 'skillspector',
 ): string {
-  const parts: string[] = [];
+  // GitHub renders the workflow job name and tool name in the UI
+  // header for each annotation, so the title only needs to carry the
+  // signal a reader can't get elsewhere: rule ID + human-readable
+  // category + taxonomy tag. Older format was
+  //   [<tag>]skillspector[<rule>]: <category>
+  // which repeated both the tool name and the category, and made the
+  // bold title line in the PR Files tab visually noisy. Compacting to
+  //   TM1 · Tool Misuse (ASI02)
+  // keeps the signal and drops the redundancy.
+  const parts: string[] = [ruleId];
+  const category = properties.category as string | undefined;
+  if (category) parts.push(category);
   const tags = properties.tags as string[] | undefined;
   if (tags && tags.length > 0) {
     const seen = new Set<string>();
-    const tagStrs: string[] = [];
+    const dedup: string[] = [];
     for (const t of tags) {
       if (t && !seen.has(t)) {
         seen.add(t);
-        tagStrs.push(String(t));
+        dedup.push(String(t));
       }
     }
-    if (tagStrs.length > 0) parts.push('[' + tagStrs.join(' ') + ']');
+    if (dedup.length > 0) parts.push('(' + dedup.join(',') + ')');
   }
-  parts.push(toolName + '[' + ruleId + ']');
-  const category = properties.category as string | undefined;
-  if (category) parts.push(': ' + category);
-  return parts.join('');
+  return parts.join(' · ');
 }
 
 export function buildMessage(explanation: string, properties: Record<string, unknown>): string {
