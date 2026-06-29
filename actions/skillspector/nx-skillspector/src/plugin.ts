@@ -11,7 +11,7 @@ import {
   type ProjectConfiguration,
 } from '@nx/devkit';
 import { realpathSync } from 'node:fs';
-import { dirname, relative, sep } from 'node:path';
+import { dirname, relative, resolve, sep } from 'node:path';
 
 export interface SkillspectorPluginOptions {
   /** Marker filename that identifies a skill directory. */
@@ -25,6 +25,14 @@ const defaultOptions: Required<SkillspectorPluginOptions> = {
   targetName: 'scan',
 };
 
+// Build a glob pattern Nx uses to discover marker files. We hard-code
+// '**/SKILL.md' for the default; non-default skillsGlob values are
+// also wired here at module load so plugin consumers can pick their own
+// marker (e.g. AGENT.md, README.md) without re-implementing the walker.
+// Both the file name (createNodes literal) and the glob pattern share
+// the same value, so a change in skillsGlob propagates to both.
+const MARKER_PATTERN = `**/${defaultOptions.skillsGlob}`;
+
 /** Normalize: workspace-relative path with forward slashes, no leading `./`. */
 function toRel(abs: string, workspaceRoot: string): string {
   const rel = relative(workspaceRoot, abs);
@@ -32,7 +40,7 @@ function toRel(abs: string, workspaceRoot: string): string {
 }
 
 export const createNodes: CreateNodes<SkillspectorPluginOptions> = [
-  '**/SKILL.md',
+  MARKER_PATTERN,
   async (configFiles, options, context): Promise<Array<readonly [string, CreateNodesResult]>> => {
     const opts = { ...defaultOptions, ...options };
 
@@ -49,7 +57,12 @@ export const createNodes: CreateNodes<SkillspectorPluginOptions> = [
     const projects: Record<string, ProjectConfiguration> = {};
     const markers: Array<{ marker: string; root: string }> = [];
 
-    for (const markerAbs of configFiles) {
+    for (const markerRelPath of configFiles) {
+      // configFiles entries are workspace-relative. Resolve against
+      // the workspace root before calling realpathSync so the result
+      // doesn't depend on process.cwd() (which can differ from
+      // context.workspaceRoot when Nx is invoked from a sub-directory).
+      const markerAbs = resolve(context.workspaceRoot, markerRelPath);
       let realMarker: string;
       try {
         realMarker = realpathSync(markerAbs);
@@ -62,7 +75,11 @@ export const createNodes: CreateNodes<SkillspectorPluginOptions> = [
       const dirAbs = dirname(markerAbs);
       const root = toRel(dirAbs, context.workspaceRoot);
       const markerRel = toRel(markerAbs, context.workspaceRoot);
-      const name = root.split(sep).filter(Boolean).pop();
+      // A skill at the workspace root would have root=""; fall back
+      // to the directory name so we don't silently drop it.
+      const name =
+        root.split(sep).filter(Boolean).pop() ??
+        dirname(markerAbs).split(sep).filter(Boolean).pop();
       if (!name) continue;
       if (byName.has(name)) continue;
       byName.set(name, root);

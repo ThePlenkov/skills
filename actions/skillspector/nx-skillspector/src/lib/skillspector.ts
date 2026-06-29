@@ -52,8 +52,16 @@ export function runSkillspector(opts: SkillspectorRunOptions): Promise<Skillspec
     child.on('close', (code) => {
       const stdout = Buffer.concat(chunks).toString('utf8');
       const stderr = Buffer.concat(errChunks).toString('utf8');
+      // Slice the JSON payload between the first '{' and the last
+      // '}'. Using only the first '{' (as before) can swallow trailing
+      // noise appended after the JSON closes, producing a malformed
+      // string that JSON.parse then rejects.
       const firstBrace = stdout.indexOf('{');
-      const jsonText = firstBrace >= 0 ? stdout.slice(firstBrace) : '';
+      const lastBrace = stdout.lastIndexOf('}');
+      const jsonText =
+        firstBrace >= 0 && lastBrace > firstBrace
+          ? stdout.slice(firstBrace, lastBrace + 1)
+          : '';
       settle({ exitCode: code ?? 1, stdout, stderr, jsonText });
     });
   });
