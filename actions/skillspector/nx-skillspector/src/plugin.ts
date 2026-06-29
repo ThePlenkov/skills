@@ -33,10 +33,14 @@ const defaultOptions: Required<SkillspectorPluginOptions> = {
 // the same value, so a change in skillsGlob propagates to both.
 const MARKER_PATTERN = `**/${defaultOptions.skillsGlob}`;
 
-/** Normalize: workspace-relative path with forward slashes, no leading `./`. */
+/** Normalize: workspace-relative path with forward slashes, no leading `./`.
+ *  Strip a `./` prefix (the only `.`-prefix that `relative()` emits) but
+ *  leave paths like `.agents/skills/spec-kit` alone — they're relative
+ *  to a workspace root that itself ends in a `.`-prefixed segment.
+ */
 function toRel(abs: string, workspaceRoot: string): string {
   const rel = relative(workspaceRoot, abs);
-  return rel.startsWith('.') ? rel.slice(2) : rel;
+  return rel.startsWith('./') ? rel.slice(2) : rel;
 }
 
 export const createNodes: CreateNodes<SkillspectorPluginOptions> = [
