@@ -1,0 +1,34 @@
+{
+  "name": "e2e-ai-testing-skill",
+  "version": "1.0.0",
+  "description": "Abstract AI-first testing framework for MCP scenarios",
+  "type": "module",
+  "bin": {
+    "e2e-agent": "./cli.ts"
+  },
+  "scripts": {
+    "prepublishOnly": "bun run build"
+  },
+  "files": [
+    "cli.ts",
+    "scripts/framework/**/*.ts",
+    "!scripts/framework/**/*.test.ts",
+    "SKILL.md",
+    "SPEC.md"
+  ],
+  "keywords": [
+    "e2e",
+    "testing",
+    "ai",
+    "mcp",
+    "scenarios"
+  ],
+  "dependencies": {
+    "js-yaml": "4.2.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "4.0.9",
+    "@types/node": "22.15.21",
+    "typescript": "6.0.3"
+  }
+}
