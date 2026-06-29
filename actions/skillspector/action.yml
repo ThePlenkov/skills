@@ -96,7 +96,7 @@ runs:
   steps:
 
     - name: Set up Node (LTS)
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         # Pin to the current LTS line so we don't track the runner's
         # moving default. Without this, composite actions on
@@ -105,7 +105,7 @@ runs:
         node-version: "lts/*"
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         # Skillspector 2.3.7 requires Python >=3.12,<3.14 (pinned by
         # its setup.py). 3.12 is the lowest supported version, which

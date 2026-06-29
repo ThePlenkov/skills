@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # The action handles installation of skillspector and per-skill
       # iteration internally. The path is auto-detected: a single
@@ -54,7 +54,7 @@ jobs:
 
       - name: Upload SARIF report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: skillspector-sarif
           path: ${{ steps.scan.outputs.sarif-path }}
