@@ -309,9 +309,11 @@ runs:
         if [ "${{ inputs.affected }}" = "true" ]; then
           BASE_REF="${{ inputs.base-branch }}"
           # Ensure origin/<base> is fetched; checkout's default
-          # fetch-depth=1 doesn't always include other refs.
-          if ! git rev-parse --verify "origin/${BASE_REF}" >/dev/null 2>&1; then
-            git fetch --depth=50 origin "${BASE_REF}" 2>/dev/null || true
+          # fetch-depth=1 doesn't always include other refs. Use
+          # the host repo's git dir explicitly because cwd at this
+          # point is the action's checkout (GITHUB_ACTION_PATH).
+          if ! git -C "$GITHUB_WORKSPACE" rev-parse --verify "origin/${BASE_REF}" >/dev/null 2>&1; then
+            git -C "$GITHUB_WORKSPACE" fetch --depth=50 origin "${BASE_REF}" 2>/dev/null || true
           fi
           # nx-set-shas returns a specific commit SHA for NX_BASE
           # (not the branch tip). That SHA may lie outside the
@@ -320,7 +322,7 @@ runs:
           # last successful workflow. Fetch the SHA explicitly
           # so `nx affected --base` can resolve it.
           if [ -n "${NX_BASE:-}" ] && ! git -C "$GITHUB_WORKSPACE" cat-file -e "${NX_BASE}" >/dev/null 2>&1; then
-            git fetch --depth=200 origin "${NX_BASE}" 2>/dev/null || true
+            git -C "$GITHUB_WORKSPACE" fetch --depth=200 origin "${NX_BASE}" 2>/dev/null || true
           fi
           # Fallback: nx-set-shas can return empty NX_BASE for the
           # first CI run on a branch (or for cascade-of-PRs setups
