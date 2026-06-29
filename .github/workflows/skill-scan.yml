@@ -29,6 +29,12 @@ concurrency:
 permissions:
   contents: read
   actions: read
+  # security-events: write is required to upload SARIF to the
+  # code-scanning API, which is what makes findings appear inline
+  # in the PR Files tab as proper code-scanning alerts (the same
+  # mechanism SonarCloud and CodeQL use). Without this permission,
+  # upload-sarif fails with HTTP 403 on the security-events endpoint.
+  security-events: write
 
 jobs:
   scan:
@@ -56,6 +62,27 @@ jobs:
           # previous PR's branch (not main), pass the actual base.
           # nx-set-shas uses this to compute NX_BASE for `nx affected`.
           base-branch: ${{ github.event.pull_request.base.ref || 'main' }}
+
+      # Upload the merged SARIF to the code-scanning API. This is
+      # what makes findings appear inline in the PR Files Changed
+      # tab as code-scanning alerts (yellow ⚠ for warnings, red ❌
+      # for errors), same UX as SonarCloud / CodeQL.
+      #
+      # For PRs from forks the upload is silently ignored (GitHub
+      # blocks security-events writes from untrusted contexts). In
+      # that case the workflow-command annotations below still
+      # surface findings in the Checks panel.
+      #
+      # `category: skillspector` keeps this analysis as a distinct
+      # named category so future tools (e.g. a codeql run) don't
+      # overwrite our results when they upload under a different
+      # category.
+      - name: Upload SARIF to code-scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif-path }}
+          category: skillspector
 
       - name: Upload SARIF report
         if: always()
