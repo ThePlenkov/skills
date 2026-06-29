@@ -4,9 +4,18 @@ on:
   push:
     paths:
       - '.agents/skills/**/SKILL.md'
+      - '.github/skill-schema.json'
+      - '.github/workflows/validate-skills.yml'
+      - '.github/scripts/**'
   pull_request:
     paths:
       - '.agents/skills/**/SKILL.md'
+      - '.github/skill-schema.json'
+      - '.github/workflows/validate-skills.yml'
+      - '.github/scripts/**'
+
+permissions:
+  contents: read
 
 jobs:
   validate-frontmatter:
@@ -24,6 +33,10 @@ jobs:
         run: npm install -g ajv-cli js-yaml
 
       - name: Validate all SKILL.md frontmatter
+        # For each SKILL.md: extract YAML frontmatter, convert to JSON,
+        # validate against the JSON schema with ajv. On failure, emit a
+        # GitHub annotation that points at the offending file. Step exits
+        # non-zero if any skill failed validation.
         run: |
           set -euo pipefail
           SCHEMA=".github/skill-schema.json"
@@ -33,24 +46,28 @@ jobs:
             # Extract YAML frontmatter between --- delimiters
             frontmatter=$(awk '/^---/{if(p)exit;p=1;next} p' "$skill_file")
             if [ -z "$frontmatter" ]; then
-              echo "⚠️  No frontmatter found: $skill_file"
+              echo "::error file=${skill_file},title=ajv[frontmatter]::no YAML frontmatter found (expected '---' delimiters)"
               FAILED=1
               continue
             fi
 
-            # Write YAML to temp file, convert to JSON for ajv validation
-            tmpyaml=$(mktemp /tmp/skill-XXXXXX.yaml)
+            # Convert YAML → JSON for ajv validation
             tmpjson=$(mktemp /tmp/skill-XXXXXX.json)
-            echo "$frontmatter" > "$tmpyaml"
-            npx js-yaml "$tmpyaml" > "$tmpjson"
+            printf '%s\n' "$frontmatter" | npx --yes js-yaml > "$tmpjson"
 
-            if npx ajv validate -s "$SCHEMA" -d "$tmpjson" --spec=draft7 2>&1; then
-              echo "✅ $skill_file"
+            # Run ajv and capture combined output. On failure, emit annotations.
+            if ajv validate -s "$SCHEMA" -d "$tmpjson" --spec=draft7 \
+                 > /tmp/ajv.out 2>&1; then
+              echo "✅ ${skill_file}"
             else
-              echo "❌ $skill_file — frontmatter validation failed"
+              # Feed ajv output through the annotation converter; CURRENT_FILE
+              # gives the converter context for which SKILL.md failed.
+              echo "❌ ${skill_file} — frontmatter validation failed"
+              CURRENT_FILE="$skill_file" \
+                .github/scripts/to-annotations.sh ajv < /tmp/ajv.out
               FAILED=1
             fi
-            rm "$tmpyaml" "$tmpjson"
+            rm -f "$tmpjson" /tmp/ajv.out
           done < <(find .agents/skills -name 'SKILL.md' -print0)
 
           exit $FAILED
