@@ -10,8 +10,8 @@ import {
   type CreateNodesResult,
   type ProjectConfiguration,
 } from '@nx/devkit';
-import { readdirSync, realpathSync, statSync } from 'node:fs';
-import { join, relative, sep } from 'node:path';
+import { realpathSync } from 'node:fs';
+import { dirname, relative, resolve, sep } from 'node:path';
 
 export interface SkillspectorPluginOptions {
   /** Marker filename that identifies a skill directory. */
@@ -25,46 +25,13 @@ const defaultOptions: Required<SkillspectorPluginOptions> = {
   targetName: 'scan',
 };
 
-/** Walk root looking for dirs that contain `marker` at top level.
- *  Uses realpathSync to avoid infinite loops through self-symlinks.
- */
-function* walk(root: string, marker: string, maxDepth = 3): Generator<string> {
-  const seen = new Set<string>();
-  const stack: Array<{ dir: string; depth: number }> = [{ dir: root, depth: 0 }];
-  while (stack.length > 0) {
-    const { dir, depth } = stack.pop()!;
-    if (depth > maxDepth) continue;
-    let real: string;
-    try {
-      real = realpathSync(dir);
-    } catch {
-      continue;
-    }
-    if (seen.has(real)) continue;
-    seen.add(real);
-    let entries: import('node:fs').Dirent[];
-    try {
-      entries = readdirSync(dir, { withFileTypes: true });
-    } catch {
-      continue;
-    }
-    for (const entry of entries) {
-      if (entry.name === 'node_modules' || entry.name === '.nx' || entry.name === '.git') continue;
-      const full = join(dir, entry.name);
-      let isDir = false;
-      try {
-        isDir = statSync(full).isDirectory();
-      } catch {
-        continue;
-      }
-      if (isDir) {
-        stack.push({ dir: full, depth: depth + 1 });
-      } else if (entry.name === marker) {
-        yield join(dir, entry.name);
-      }
-    }
-  }
-}
+// Build a glob pattern Nx uses to discover marker files. We hard-code
+// '**/SKILL.md' for the default; non-default skillsGlob values are
+// also wired here at module load so plugin consumers can pick their own
+// marker (e.g. AGENT.md, README.md) without re-implementing the walker.
+// Both the file name (createNodes literal) and the glob pattern share
+// the same value, so a change in skillsGlob propagates to both.
+const MARKER_PATTERN = `**/${defaultOptions.skillsGlob}`;
 
 /** Normalize: workspace-relative path with forward slashes, no leading `./`. */
 function toRel(abs: string, workspaceRoot: string): string {
@@ -73,35 +40,61 @@ function toRel(abs: string, workspaceRoot: string): string {
 }
 
 export const createNodes: CreateNodes<SkillspectorPluginOptions> = [
-  '**/SKILL.md',
-  async (_configFiles, options, context): Promise<Array<readonly [string, CreateNodesResult]>> => {
+  MARKER_PATTERN,
+  async (configFiles, options, context): Promise<Array<readonly [string, CreateNodesResult]>> => {
     const opts = { ...defaultOptions, ...options };
 
-    // Walk the workspace for skill directories. Dedupe by skill name
-    // so symlinks/hardlinks to the same skill don't produce two projects.
+    // Use Nx's configFiles as the primary source — it's already
+    // globbed and deduped by the daemon, so we skip the redundant
+    // synchronous readdirSync walk that the previous version did.
+    //
+    // Dedup by realpath so cyclic symlinks (e.g. `act/act → act`)
+    // don't produce duplicate projects even when Nx reports both
+    // paths. Dedupe by name as a final tiebreaker so a real
+    // duplicate still doesn't yield two projects.
+    const seen = new Set<string>();
+    const byName = new Map<string, string>();
     const projects: Record<string, ProjectConfiguration> = {};
     const markers: Array<{ marker: string; root: string }> = [];
 
-    for (const markerAbs of walk(context.workspaceRoot, opts.skillsGlob)) {
-      const dirAbs = markerAbs.replace(new RegExp(`[/\\\\]${opts.skillsGlob.replace('.', '\\.')}$`), '');
+    for (const markerRelPath of configFiles) {
+      // configFiles entries are workspace-relative. Resolve against
+      // the workspace root before calling realpathSync so the result
+      // doesn't depend on process.cwd() (which can differ from
+      // context.workspaceRoot when Nx is invoked from a sub-directory).
+      const markerAbs = resolve(context.workspaceRoot, markerRelPath);
+      let realMarker: string;
+      try {
+        realMarker = realpathSync(markerAbs);
+      } catch {
+        realMarker = markerAbs;
+      }
+      if (seen.has(realMarker)) continue;
+      seen.add(realMarker);
+
+      const dirAbs = dirname(markerAbs);
       const root = toRel(dirAbs, context.workspaceRoot);
       const markerRel = toRel(markerAbs, context.workspaceRoot);
-      const name = root.split(sep).filter(Boolean).pop();
+      // A skill at the workspace root would have root=""; fall back
+      // to the directory name so we don't silently drop it.
+      const name =
+        root.split(sep).filter(Boolean).pop() ??
+        dirname(markerAbs).split(sep).filter(Boolean).pop();
       if (!name) continue;
-      if (Object.values(projects).some(p => p.name === name)) continue;
-        if (!projects[root]) {
-        projects[root] = {
-          name,
-          root,
-          targets: {
-            [opts.targetName]: {
-              executor: '@theplenkov/nx-skillspector:scan',
-              options: { path: root, workspaceRoot: context.workspaceRoot, ...(process.env.SARIF_OUT ? { sarif: process.env.SARIF_OUT } : {}) },
-            },
+      if (byName.has(name)) continue;
+      byName.set(name, root);
+
+      projects[root] = {
+        name,
+        root,
+        targets: {
+          [opts.targetName]: {
+            executor: '@theplenkov/nx-skillspector:scan',
+            options: { path: root, workspaceRoot: context.workspaceRoot, ...(process.env.SARIF_OUT ? { sarif: process.env.SARIF_OUT } : {}) },
           },
-        };
-        markers.push({ marker: markerRel, root });
-      }
+        },
+      };
+      markers.push({ marker: markerRel, root });
     }
 
     return markers.map(({ marker, root }) => {
@@ -112,4 +105,3 @@ export const createNodes: CreateNodes<SkillspectorPluginOptions> = [
 ];
 
 export default createNodes;
-

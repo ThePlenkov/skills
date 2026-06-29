@@ -372,10 +372,26 @@ runs:
         NX_EXIT=${PIPESTATUS[0]}
         set -e
 
-        # Aggregate counts from the executor's annotations
-        TOTAL_FINDINGS=$(grep -oE "findings=[0-9]+" /tmp/nx-scan.log | awk -F= '{s+=$2} END {print s+0}')
-        TOTAL_ERRORS=$(grep -oE "errors=[0-9]+" /tmp/nx-scan.log | awk -F= '{s+=$2} END {print s+0}')
-        TOTAL_WARNINGS=$(grep -oE "warnings=[0-9]+" /tmp/nx-scan.log | awk -F= '{s+=$2} END {print s+0}')
+        # Flush workflow-command annotations to stdout. Nx prefixes
+        # every line of worker output with ANSI-coloured
+        # "project-name:" + TTY reset, which GitHub's
+        # workflow-command parser can't strip — so ::error file=…
+        # lines emitted by the executor never reach the check-run's
+        # annotations API. The executor writes the raw lines to a
+        # shared file; we cat it here so the runner sees clean lines.
+        if [ -s /tmp/nx-skillspector-annotations.log ]; then
+          cat /tmp/nx-skillspector-annotations.log
+        fi
+
+        # Aggregate counts from the executor's annotations. Use awk
+        # instead of grep so 0 matches exits 0 (grep would exit 1 and
+        # fail the workflow under `set -eo pipefail`). Use exact
+        # key=value matching (split on '=' and compare key) so plain
+        # prose like "12 findings" doesn't match — only the structured
+        # `findings=N` lines the executor emits.
+        TOTAL_FINDINGS=$(awk '{for(i=1;i<=NF;i++) if(split($i,a,"=")==2 && a[1]=="findings") s+=a[2]} END {print s+0}' /tmp/nx-scan.log)
+        TOTAL_ERRORS=$(awk '{for(i=1;i<=NF;i++) if(split($i,a,"=")==2 && a[1]=="errors") s+=a[2]} END {print s+0}' /tmp/nx-scan.log)
+        TOTAL_WARNINGS=$(awk '{for(i=1;i<=NF;i++) if(split($i,a,"=")==2 && a[1]=="warnings") s+=a[2]} END {print s+0}' /tmp/nx-scan.log)
 
         {
           echo "error-count=${TOTAL_ERRORS}"

@@ -5,7 +5,7 @@
  * This executor is invoked once per inferred project (one SKILL.md).
  * Nx handles parallelism, caching, and per-skill hash inputs.
  */
-import type { ExecutorContext } from 'nx/src/config/misc-interfaces';
+import type { ExecutorContext } from "@nx/devkit";
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { issuesToAnnotations } from '../../lib/annotations.ts';
@@ -38,13 +38,17 @@ export default async function scanExecutor(
 ): Promise<{ success: boolean }> {
   const {
     path: skillPath,
-    sarif = '',
-    annotations = true,
-    failOnError = true,
-    jobSummary = true,
-    noLlM = true,
-    baseline = '',
-    skillspectorBin = 'skillspector',
+    // Fall back to env vars exported by action.yml when the plugin
+    // invocation didn't pass them as options. Without this fallback,
+    // inputs like `sarif`, `fail-on-error`, `baseline`, and
+    // `no-llm` from the composite action are silently ignored.
+    sarif = process.env.SARIF_OUT || '',
+    annotations = process.env.ANNOTATIONS_ENABLED !== 'false',
+    failOnError = process.env.FAIL_ON_ERROR !== 'false',
+    jobSummary = process.env.JOB_SUMMARY_ENABLED !== 'false',
+    noLlM = process.env.SKILLSPECTOR_NO_LLM !== 'false',
+    baseline = process.env.SKILLSPECTOR_BASELINE || '',
+    skillspectorBin = process.env.SKILLSPECTOR_BIN || 'skillspector',
   } = options;
 
   // Nx's ExecutorContext.root is the workspace root. The project root
@@ -88,9 +92,29 @@ export default async function scanExecutor(
   const issues = doc.issues ?? [];
 
   if (annotations) {
-    for (const line of issuesToAnnotations(issues)) {
-      console.log(line);
-    }
+    // Write each annotation line to a shared file rather than
+    // echoing it via console.log. Nx prefixes every line of worker
+    // stdout with ANSI-coloured "project-name:" + a TTY reset, e.g.
+    //   "\x1b[1m\x1b[36mminimal-root-cause:\x1b[39m\x1b[22m ::error file=…"
+    // GitHub's workflow-command parser keys on the literal "::error"
+    // token at the start of the line (or after a project-name
+    // prefix it doesn't strip), so Nx-prefixed lines are dropped
+    // from the check-run's annotations API and the PR Files tab
+    // shows nothing.
+    //
+    // The action's outer step cats this file at the end of nx, so
+    // the workflow commands reach the runner cleanly (no ANSI, no
+    // project prefix). Each executor invocation appends; the final
+    // cat prints them in skill order, which matches the iteration
+    // order of nx run-many / nx affected.
+    const annotationsPath = process.env.ANNOTATIONS_FILE
+      ?? '/tmp/nx-skillspector-annotations.log';
+    fs.mkdirSync(path.dirname(annotationsPath), { recursive: true });
+    fs.appendFileSync(
+      annotationsPath,
+      issuesToAnnotations(issues).join('\n') + '\n',
+      'utf8',
+    );
   }
 
   let errorCount = 0;

@@ -54,7 +54,22 @@ function issueToResult(issue: SkillspectorIssue, ruleIndex: Map<string, number>)
     }
   }
 
-  const ruleId = issue.id ?? '?';
+  // If the issue has no rule id, emit a synthetic ruleIndex pointing
+  // at an inline placeholder rule built below. Without this guard,
+  // ruleIndex defaulted to 0 and pointed at whatever rule happened
+  // to be first in the array — silently attributing the finding
+  // to the wrong rule in SARIF viewers.
+  const ruleId = issue.id;
+  if (!ruleId) {
+    return {
+      ruleId: 'unknown-rule',
+      ruleIndex: -1,
+      level,
+      message: { text: issue.explanation ?? '(no explanation)' },
+      ...(artifactUri ? { locations: [{ physicalLocation }] } : {}),
+      ...(Object.keys(properties).length > 0 ? { properties } : {}),
+    };
+  }
   const result: SarifResult = {
     ruleId,
     level,

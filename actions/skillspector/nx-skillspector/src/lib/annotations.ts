@@ -52,12 +52,14 @@ export function buildMessage(explanation: string, properties: Record<string, unk
   }
   const confidence = properties.confidence as number | undefined;
   if (confidence !== undefined && confidence !== null) {
-    try {
-      const pct = Math.round(Number(confidence) * 100);
-      // No literal '%' here — see sarif-to-annotations SKILL.md for why
-      // GitHub's %25 double-escape would corrupt the rendering.
+    const parsed = Number(confidence);
+    // Math.round(NaN) returns NaN silently (no throw), so the
+    // previous try/catch never caught the case the comment warned
+    // about. Check explicitly before rounding.
+    if (!isNaN(parsed)) {
+      const pct = Math.round(parsed * 100);
       out.push('confidence=' + pct);
-    } catch { /* ignore non-numeric confidence */ }
+    }
   }
   return out.join(' — ');
 }
@@ -85,14 +87,23 @@ export function issueToAnnotation(issue: SkillspectorIssue, toolName = 'skillspe
 
   const loc = issue.location ?? {};
   const parts: string[] = [];
-  if (loc.file) parts.push('file=' + loc.file);
+  if (loc.file) parts.push('file=' + escapeParam(loc.file));
   if (loc.start_line !== undefined && loc.start_line !== null) parts.push('line=' + loc.start_line);
   if (loc.end_line !== undefined && loc.end_line !== null) parts.push('endLine=' + loc.end_line);
-  parts.push('title=' + title);
+  parts.push('title=' + escapeParam(title));
   const props = parts.join(',');
 
   const safe = message.replace(/%/g, '%25').replace(/\r/g, ' ').replace(/\n/g, ' ');
   return '::' + ghCmd + ' ' + props + '::' + safe;
+}
+
+// Escape a GitHub Actions workflow-command parameter value.
+// `%` starts a data section, `\r`/`\n` terminate the command, `,` separates
+// fields, `:` delimits the command prefix. Title and file in the
+// comma-separated parameter list were unescaped before this fix and
+// could truncate or split annotations containing these characters.
+function escapeParam(s: string): string {
+  return s.replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A').replace(/:/g, '%3A').replace(/,/g, '%2C');
 }
 
 export function issuesToAnnotations(issues: SkillspectorIssue[], toolName = 'skillspector'): string[] {
