@@ -4,11 +4,19 @@
 import type { SkillspectorIssue } from './mapping.ts';
 import { SEVERITY_TO_LEVEL } from './sarif.ts';
 
+// Promote warning/notice to 'error' so they appear inline in the PR
+// Files tab as annotations. GitHub renders `::warning` only in the
+// Checks panel summary; only `::error` annotations show inline. To
+// match SonarCloud / CodeQL's UX of seeing warnings inline, we have
+// to emit everything as `::error`. The workflow sets
+// `continue-on-error: true` on this step so issueCount > 0 doesn't
+// fail the workflow — the check's "failure" conclusion is then
+// driven solely by `fail-on-error` (HIGH/CRITICAL findings only).
 const LEVEL_TO_GH_CMD: Record<string, 'error' | 'warning' | 'notice'> = {
   error: 'error',
-  warning: 'warning',
-  note: 'notice',
-  none: 'notice',
+  warning: 'error',
+  note: 'error',
+  none: 'error',
 };
 
 const MAX_SNIPPET_LENGTH = 400;
