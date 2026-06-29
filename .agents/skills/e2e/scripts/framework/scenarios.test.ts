@@ -7,6 +7,7 @@ import {
   parseScenarioMarkdown,
   toScenario,
 } from './scenarios'
+import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Scenario } from './types'
 
@@ -56,7 +57,14 @@ describe('scenarios', () => {
   })
 
   test('loadScenariosFromDir loads launcher scenario files', () => {
+    // Migration note: in abapify/openadt this dir lived at e2e/scenarios/launcher.
+    // In ThePlenkov/skills the e2e framework is shipped without example scenarios;
+    // consumers bring their own. Skip if the dir is absent.
     const dir = join(import.meta.dir, '..', '..', '..', '..', '..', 'e2e', 'scenarios', 'launcher')
+    if (!existsSync(dir)) {
+      // no example scenarios in this checkout — that's fine for the framework repo
+      return
+    }
     const all = loadScenariosFromDir(dir)
     expect(all.length).toBeGreaterThanOrEqual(5)
     const mcp1 = all.find((s) => s.code === 'mcp-1')
