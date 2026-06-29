@@ -192,7 +192,6 @@ export default async function scanExecutor(
       fs.writeFileSync(
         summaryPath,
         [
-          '<!-- SkillSpector:start -->',
           '<!-- SkillSpector:rows -->',
           '| Skill | File | Line | Severity | Rule | Summary |',
           '| :--- | :--- | ---: | :--- | :--- | :--- |',
