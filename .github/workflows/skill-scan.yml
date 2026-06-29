@@ -32,41 +32,89 @@ jobs:
       - name: Install SkillSpector
         run: uv tool install git+https://github.com/NVIDIA/skillspector.git
 
-      # Run scan with --format json, then:
-      # 1. Pipe through to-annotations.sh so each finding becomes an inline
-      #    GitHub PR annotation (the primary deliverable now that GitHub Code
-      #    Scanning is gone for free-tier repos).
-      # 2. Tee the raw JSON to skillspector.json for archival.
+      # IMPORTANT: SkillSpector's `--format json` output is structured
+      # differently depending on whether you scan one skill or many:
+      #   - single skill → top-level "issues" array with full per-finding
+      #     detail (file, line, explanation, remediation, etc.)
+      #   - --recursive (multi-skill) → top-level "skills" array with only
+      #     per-skill SUMMARIES (name, risk_score, finding_count). The
+      #     individual issues are NOT included, so the annotation converter
+      #     has nothing to emit.
       #
-      # Exit code:
-      #   - skillspector exits non-zero if any HIGH/CRITICAL issue is found
-      #     (when --no-llm is used). This becomes the gate for the workflow.
-      #   - The annotation converter always succeeds (even when there's no
-      #     output to convert), so we use PIPESTATUS[0] to gate on skillspector.
-      #   - `tee` writes the JSON regardless of the gate.
-      - name: Run security scan and emit annotations
+      # We therefore iterate over each skill directory and scan it
+      # individually. This gives us one JSON file per skill with the
+      # detailed `issues` array we need for inline annotations.
+      #
+      # Exit code: skillspector exits non-zero when HIGH or CRITICAL issues
+      # are found (with --no-llm). We accumulate per-skill exit codes so the
+      # step still fails when any skill has HIGH/CRITICAL, while still
+      # emitting annotations for every skill (including those that pass).
+      - name: Run per-skill security scan and emit annotations
         run: |
-          set -o pipefail
+          set -u
 
           BASELINE_ARG=""
           if [ -f .skillspector-baseline.yaml ]; then
             BASELINE_ARG="--baseline .skillspector-baseline.yaml"
           fi
 
-          # Two-pass: first run gets the gate exit code, second run is for the
-          # annotations. We avoid running skillspector twice by capturing
-          # output to a file, then converting and gating separately.
-          skillspector scan .agents/skills/ \
-            --recursive \
-            --no-llm \
-            --format json \
-            --output skillspector.json \
-            $BASELINE_ARG \
-            || SCAN_EXIT=$?
-          SCAN_EXIT="${SCAN_EXIT:-0}"
+          mkdir -p /tmp/skillspector
+          FAILED=0
+          TOTAL_FINDINGS=0
+          TOTAL_ERRORS=0
 
-          # Convert findings to GitHub annotations.
-          jq -r '.issues // [] | length' skillspector.json > /dev/null  # sanity
-          .github/scripts/to-annotations.sh skillspector < skillspector.json
+          for skill_dir in .agents/skills/*/; do
+            [ -d "$skill_dir" ] || continue
+            [ -f "${skill_dir}SKILL.md" ] || continue
+            skill=$(basename "$skill_dir")
+            json_path="/tmp/skillspector/${skill}.json"
 
-          exit "$SCAN_EXIT"
+            echo "::group::Scanning ${skill}"
+
+            # Capture exit code without aborting the loop
+            skillspector scan "$skill_dir" \
+              --no-llm \
+              --format json \
+              --output "$json_path" \
+              $BASELINE_ARG \
+              || SCAN_EXIT=$?
+            SCAN_EXIT="${SCAN_EXIT:-0}"
+
+            # Per-skill issue count and HIGH/CRITICAL count
+            findings=$(jq -r '.issues // [] | length' "$json_path" 2>/dev/null || echo 0)
+            errors=$(jq -r '
+              [.issues // [] | .[] | select(.severity == "HIGH" or .severity == "CRITICAL")] | length
+            ' "$json_path" 2>/dev/null || echo 0)
+
+            echo "  findings=$findings errors=$errors exit=$SCAN_EXIT"
+
+            # Emit inline annotations for every finding in this skill
+            .github/scripts/to-annotations.sh skillspector < "$json_path"
+
+            # Aggregate gates
+            if [ "$SCAN_EXIT" -ne 0 ] || [ "$errors" -gt 0 ]; then
+              FAILED=1
+            fi
+            TOTAL_FINDINGS=$((TOTAL_FINDINGS + findings))
+            TOTAL_ERRORS=$((TOTAL_ERRORS + errors))
+
+            echo "::endgroup::"
+          done
+
+          echo
+          echo "=== Summary ==="
+          echo "Total findings across all skills: $TOTAL_FINDINGS"
+          echo "Total HIGH/CRITICAL findings:     $TOTAL_ERRORS"
+
+          exit $FAILED
+
+      - name: Upload per-skill JSON reports as artifacts
+        # Keep the raw per-skill JSON for after-the-fact inspection. These
+        # are NOT used as SARIF (free tier no longer processes SARIF) — just
+        # for download/debugging.
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skillspector-reports
+          path: /tmp/skillspector/
+          retention-days: 7
