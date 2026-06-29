@@ -52,7 +52,15 @@ export function buildMessage(explanation: string, properties: Record<string, unk
   if (properties.remediation) out.push('Fix: ' + String(properties.remediation));
   const snippet = properties.code_snippet as string | undefined;
   if (snippet) {
-    const flat = snippet.replace(/\r?\n/g, ' ⏎ ');
+    // GitHub's `::error ...::message` workflow command is single-line
+    // — the parser splits stdout on newlines, so a literal \n in the
+    // message would break the command at the next newline and the
+    // rest would be logged as plain text. The previous fix used ' ⏎ '
+    // as a visible line-break marker, but GitHub renders it as a
+    // literal Unicode glyph and the result reads as gibberish.
+    // Collapse snippet whitespace to single spaces; readers get the
+    // full snippet via the SARIF code-scanning tab if they need it.
+    const flat = snippet.replace(/\s+/g, ' ').trim();
     const truncated = flat.length > MAX_SNIPPET_LENGTH
       ? flat.slice(0, MAX_SNIPPET_LENGTH - 1) + '…'
       : flat;

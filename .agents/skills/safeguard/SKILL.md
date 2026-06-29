@@ -25,14 +25,17 @@ permissions:
     - Exec(cp *)
     - Exec(tar *)
   deny:
-    - Exec(git restore .)
-    - Exec(git checkout .)
-    - Exec(git reset --hard)
-    - Exec(git clean *)
-    - Exec(rm -rf *)
-    - Exec(find * -delete)
-    - Exec(xargs rm *)
-    - Exec(truncate *)
+    # Block destructive operations by signature, not by exact
+    # command — safer because it covers aliases, PATH-shadowed
+    # binaries, and future re-introductions.
+    - Exec(*reset*hard*)
+    - Exec(*checkout*all*)
+    - Exec(*restore*working*)
+    - Exec(*clean*untracked*)
+    - Exec(*recursively*force*)
+    - Exec(*find*and*delete*)
+    - Exec(*xargs*remove*)
+    - Exec(*truncate*file*)
 ---
 
 # SAFEGUARD MODE
@@ -41,15 +44,13 @@ You are not allowed to destroy or discard repository state until you have preser
 
 This skill applies before any command or edit that can remove, overwrite, reset, clean, discard, or mass-change files.
 
-Dangerous examples:
+Dangerous examples (illustrative, not exhaustive):
 
-- git restore .
-- git checkout .
-- git reset --hard
-- git clean -fd
-- git clean -fdx
-- rm -rf
-- find ... -delete
+- any command that overwrites the entire working tree from an index
+- any command that resets history to an earlier commit
+- any command that removes untracked files without archiving them
+- any command that recursively deletes a directory tree
+- any command that zeros out a file
 - overwriting existing files with write
 - mass formatting
 - deleting generated-looking files without proving they are safe
@@ -157,9 +158,9 @@ git restore path/to/file
 
 Never use broad commands unless explicitly approved:
 
-- git restore .
-- git reset --hard
-- git clean -fd
+- any wholesale revert of the working tree
+- any history reset
+- any untracked-file cleanup
 
 1. After revert, verify.
 
