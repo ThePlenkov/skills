@@ -372,10 +372,12 @@ runs:
         NX_EXIT=${PIPESTATUS[0]}
         set -e
 
-        # Aggregate counts from the executor's annotations
-        TOTAL_FINDINGS=$(grep -oE "findings=[0-9]+" /tmp/nx-scan.log | awk -F= '{s+=$2} END {print s+0}')
-        TOTAL_ERRORS=$(grep -oE "errors=[0-9]+" /tmp/nx-scan.log | awk -F= '{s+=$2} END {print s+0}')
-        TOTAL_WARNINGS=$(grep -oE "warnings=[0-9]+" /tmp/nx-scan.log | awk -F= '{s+=$2} END {print s+0}')
+        # Aggregate counts from the executor's annotations. Use awk
+        # instead of grep so 0 matches exits 0 (grep would exit 1 and
+        # fail the workflow under `set -eo pipefail`).
+        TOTAL_FINDINGS=$(awk -F'[ =]' '{for(i=1;i<=NF;i++) if($i=="findings") s+=$(i+1)} END {print s+0}' /tmp/nx-scan.log)
+        TOTAL_ERRORS=$(awk -F'[ =]' '{for(i=1;i<=NF;i++) if($i=="errors") s+=$(i+1)} END {print s+0}' /tmp/nx-scan.log)
+        TOTAL_WARNINGS=$(awk -F'[ =]' '{for(i=1;i<=NF;i++) if($i=="warnings") s+=$(i+1)} END {print s+0}' /tmp/nx-scan.log)
 
         {
           echo "error-count=${TOTAL_ERRORS}"
