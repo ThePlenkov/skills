@@ -59,6 +59,41 @@ not listed here is intentionally ignored.
 | `tool.driver.name` | Defaults to `tool`. |
 | `tool.driver.rules[]` | Rules map is empty; no `shortDescription` prefix is added. |
 
+## Robustness
+
+The script is defensive against three real-world quirks:
+
+1. **Progress text prepended to stdout.** Some tools (SkillSpector
+   with `--recursive` is the canonical case) print progress lines to
+   stdout **before** the actual JSON document:
+
+   ```
+   Multi-skill directory detected: 43 skills found
+
+     [1/43] Scanning act (act/)
+            Score: 25/100 (MEDIUM)
+     ...
+   {
+     "$schema": "...",
+     "version": "2.1.0",
+     "runs": [...]
+   }
+   ```
+
+   The converter reads the entire stdin and locates the first `{`,
+   then parses from there. Any leading progress text is silently
+   dropped. (If you see a `##[error]no JSON object found in input`
+   message, your tool did not produce SARIF at all and the file
+   probably needs investigation.)
+
+2. **Empty results array.** A SARIF document with `"results": []`
+   (clean run) is treated as success — exit 0, no annotations.
+
+3. **Missing `runs[]`.** A SARIF document with no `runs` field (or
+   `runs: null`) is treated as success — exit 0, no annotations.
+   This is a defensive default; per the SARIF spec, a run with no
+   results is valid and not an error.
+
 ## Path handling
 
 `artifactLocation.uri` is passed through **verbatim** to the annotation

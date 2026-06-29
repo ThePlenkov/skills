@@ -29,27 +29,28 @@ jobs:
       - name: Install SkillSpector
         run: uv tool install git+https://github.com/NVIDIA/skillspector.git
 
-      # SkillSpector natively emits SARIF 2.1.0 (its default format). We
-      # capture the report, then run a separate skill — `sarif-to-annotations`
-      # — that converts the SARIF to GitHub Actions workflow commands so
-      # each finding becomes an inline PR annotation.
+      # Why per-skill (not --recursive):
+      #   skillspector 2.3.7's --recursive mode is broken for non-terminal
+      #   output formats. Specifically:
+      #     - --format json  → emits a SUMMARY document with no per-issue
+      #                        details (only per-skill finding_count)
+      #     - --format sarif → emits progress text to stdout, never the
+      #                         SARIF document
+      #   The single-skill invocation correctly produces a full SARIF
+      #   document with per-issue details. So we iterate, scan each
+      #   skill individually, capture SARIF, convert to annotations.
       #
-      # The conversion is a separate concern from this workflow: the
-      # `sarif-to-annotations` skill in .agents/skills/ is reusable for any
-      # tool that emits SARIF (CodeQL, Snyk, ESLint, etc.).
+      # Why use the sarif-to-annotations skill:
+      #   The conversion logic is a reusable skill at
+      #   .agents/skills/sarif-to-annotations/ — any tool that emits
+      #   SARIF (CodeQL, Snyk, ESLint, Semgrep, Trivy) can drop in the
+      #   same `python3 ... < report.sarif` line and get the same
+      #   inline annotations.
       #
-      # Exit code semantics:
-      #   - SkillSpector returns 0 on success, 1 if any HIGH/CRITICAL issue
-      #     is found.
-      #   - The sarif-to-annotations script returns 1 if any `level: error`
-      #     result is in the SARIF (i.e. HIGH/CRITICAL from SkillSpector),
-      #     0 otherwise. We use its exit code to gate the workflow.
-      #   - We do NOT `set -e` in this step so the annotation step always
-      #     runs even if SkillSpector fails. We capture SkillSpector's exit
-      #     code with `|| SS_EXIT=$?` and surface it as a workflow-failure
-      #     annotation if non-zero AND no error-severity results were
-      #     already reported.
-      - name: Run SkillSpector and emit SARIF annotations
+      # Gate: any error-severity SARIF result fails the workflow.
+      # The annotation script returns 1 in that case, which we surface
+      # as the workflow's exit code.
+      - name: Run per-skill SARIF scan and emit annotations
         run: |
           set -u
 
@@ -58,49 +59,71 @@ jobs:
             BASELINE_ARG="--baseline .skillspector-baseline.yaml"
           fi
 
-          # Scan every skill in the repo. SkillSpector's --recursive flag
-          # makes it discover each .agents/skills/<name>/SKILL.md. Default
-          # output format is SARIF 2.1.0.
-          #
-          # NOTE: with --recursive, the --output FILE flag is silently
-          # ignored in skillspector 2.3.7 — the SARIF document is always
-          # written to stdout. Workaround: redirect stdout to a file
-          # and let stderr (progress) go to the log.
-          skillspector scan .agents/skills/ \
-            --recursive \
-            --no-llm \
-            --format sarif \
-            $BASELINE_ARG \
-            > skillspector.sarif \
-            || SS_EXIT=$?
-          SS_EXIT="${SS_EXIT:-0}"
+          mkdir -p /tmp/skillspector
+          FAILED=0
+          TOTAL_FINDINGS=0
+          TOTAL_ERRORS=0
 
-          echo "SkillSpector exit: $SS_EXIT"
-          echo "SARIF size: $(wc -c < skillspector.sarif) bytes"
+          for skill_dir in .agents/skills/*/; do
+            [ -d "$skill_dir" ] || continue
+            [ -f "${skill_dir}SKILL.md" ] || continue
+            skill=$(basename "$skill_dir")
+            sarif_path="/tmp/skillspector/${skill}.sarif"
 
-          # Convert SARIF → GitHub annotations. Exit code:
-          #   0 = no error-severity findings
-          #   1 = one or more error-severity findings (HIGH/CRITICAL)
-          #   2 = invalid input
-          python3 .agents/skills/sarif-to-annotations/scripts/to-annotations.py \
-            < skillspector.sarif \
-            || ANN_EXIT=$?
-          ANN_EXIT="${ANN_EXIT:-0}"
+            echo "::group::Scanning ${skill} (SARIF)"
 
-          # Gate on either signal: SkillSpector non-zero OR annotation
-          # script reports errors. The annotation script's count is the
-          # more specific signal (per-result severity), so prefer it when
-          # both fire.
-          if [ "$ANN_EXIT" -ne 0 ]; then
-            exit "$ANN_EXIT"
-          elif [ "$SS_EXIT" -ne 0 ]; then
-            exit "$SS_EXIT"
-          fi
+            # Single-skill SARIF output goes to the file via --output.
+            # We force the exit code into SS_EXIT and don't abort the loop.
+            skillspector scan "$skill_dir" \
+              --no-llm \
+              --format sarif \
+              --output "$sarif_path" \
+              $BASELINE_ARG \
+              || SS_EXIT=$?
+            SS_EXIT="${SS_EXIT:-0}"
 
-      - name: Upload SARIF report as artifact
+            # Convert SARIF → GitHub annotations. The script accepts a
+            # leading progress-text prefix (skillspector sometimes emits
+            # one before the actual JSON), finds the first '{' and parses
+            # from there.
+            if [ -s "$sarif_path" ]; then
+              python3 .agents/skills/sarif-to-annotations/scripts/to-annotations.py \
+                < "$sarif_path" \
+                || ANN_EXIT=$?
+              ANN_EXIT="${ANN_EXIT:-0}"
+            else
+              echo "  (no SARIF produced for $skill)"
+              ANN_EXIT=0
+            fi
+
+            # Per-skill counts from the SARIF
+            findings=$(jq -r '.runs // [] | [.[] | .results // [] | length] | add // 0' "$sarif_path" 2>/dev/null || echo 0)
+            errors=$(jq -r '
+              [.runs // [] | .[] | .results // [] | .[] | select(.level == "error")] | length
+            ' "$sarif_path" 2>/dev/null || echo 0)
+
+            echo "  findings=$findings errors=$errors exit=$SS_EXIT annotations_exit=$ANN_EXIT"
+
+            if [ "$SS_EXIT" -ne 0 ] || [ "$ANN_EXIT" -ne 0 ] || [ "$errors" -gt 0 ]; then
+              FAILED=1
+            fi
+            TOTAL_FINDINGS=$((TOTAL_FINDINGS + findings))
+            TOTAL_ERRORS=$((TOTAL_ERRORS + errors))
+
+            echo "::endgroup::"
+          done
+
+          echo
+          echo "=== Summary ==="
+          echo "Total findings across all skills: $TOTAL_FINDINGS"
+          echo "Total error-severity findings:     $TOTAL_ERRORS"
+
+          exit $FAILED
+
+      - name: Upload SARIF reports as artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: skillspector-sarif
-          path: skillspector.sarif
+          path: /tmp/skillspector/
           retention-days: 7

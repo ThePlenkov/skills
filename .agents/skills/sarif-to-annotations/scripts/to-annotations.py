@@ -45,8 +45,20 @@ def collect_rules(runs):
 
 
 def main():
+    # Read all of stdin. Some tools (e.g. SkillSpector --recursive) prepend
+    # progress text to stdout before the actual JSON document; the SARIF
+    # object then starts partway through. Find the first '{' and parse from
+    # there to be robust against that pattern.
+    raw = sys.stdin.read()
+    start = raw.find("{")
+    if start < 0:
+        print(
+            "::error title=sarif-to-annotations::no JSON object found in input",
+            file=sys.stderr,
+        )
+        sys.exit(2)
     try:
-        data = json.load(sys.stdin)
+        data = json.loads(raw[start:])
     except json.JSONDecodeError as e:
         print(
             "::error title=sarif-to-annotations::invalid JSON: " + str(e),
