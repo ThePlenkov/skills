@@ -1,17 +1,30 @@
 name: SkillSpector Security Scan
 
 on:
+  # Post-merge scan: when code lands on main. The `branches:` filter
+  # restricts push to main only, so PR-branch pushes (handled by the
+  # pull_request event below) don't double-fire this workflow.
   push:
+    branches: [main]
     paths:
       - '.agents/skills/**'
       - '.github/workflows/skill-scan.yml'
       - '.github/scripts/**'
+  # Pre-merge scan: when a PR is opened or updated. Provides inline
+  # annotations on the PR Files Changed tab.
   pull_request:
     paths:
       - '.agents/skills/**'
       - '.github/workflows/skill-scan.yml'
       - '.github/scripts/**'
   workflow_dispatch:
+
+# Cancel in-progress runs for the same workflow on the same ref. This
+# prevents duplicate runs when a single commit triggers both a push
+# and a pull_request event (e.g. when a PR branch is force-pushed).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read

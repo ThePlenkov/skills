@@ -5,7 +5,7 @@
 # Usage:
 #   to-annotations.sh <tool>
 #
-# Where <tool> ∈ {skillspector, shellcheck, markdownlint, ajv}
+# Where <tool> ∈ {shellcheck, markdownlint, ajv}
 #
 # Reads tool output from stdin and emits GitHub workflow commands to stdout:
 #   ::error file=…,line=…,title=…::message
@@ -14,6 +14,10 @@
 #
 # Reference:
 #   https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands
+#
+# NOTE: SARIF-emitting tools (SkillSpector, CodeQL, Snyk, etc.) are NOT
+# handled here. Use the reusable skill at
+# `.agents/skills/sarif-to-annotations/scripts/to-annotations.py` for that.
 
 set -euo pipefail
 
@@ -23,17 +27,12 @@ tool="${1:-}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PARSERS_DIR="${SCRIPT_DIR}/parsers"
 
-# Prefer jq for skillspector (it's the cleanest jq fit). For everything else,
-# dispatch to a dedicated Python parser script. python3 is always present on
-# GitHub-hosted ubuntu-latest runners; local dev falls back to `python`.
+# Find a Python interpreter. python3 is always present on GitHub-hosted
+# ubuntu-latest runners; local dev falls back to `python`.
+PY="$(command -v python3 || command -v python || true)"
 
 case "$tool" in
-  skillspector)
-    jq -rf "${PARSERS_DIR}/skillspector.jq"
-    ;;
-
   shellcheck)
-    PY="$(command -v python3 || command -v python || true)"
     if [ -z "$PY" ]; then
       echo "::error title=to-annotations::python3 not found in PATH" >&2
       exit 2
@@ -42,7 +41,6 @@ case "$tool" in
     ;;
 
   markdownlint)
-    PY="$(command -v python3 || command -v python || true)"
     if [ -z "$PY" ]; then
       echo "::error title=to-annotations::python3 not found in PATH" >&2
       exit 2
@@ -51,7 +49,6 @@ case "$tool" in
     ;;
 
   ajv)
-    PY="$(command -v python3 || command -v python || true)"
     if [ -z "$PY" ]; then
       echo "::error title=to-annotations::python3 not found in PATH" >&2
       exit 2
@@ -60,7 +57,7 @@ case "$tool" in
     ;;
 
   *)
-    echo "::error title=to-annotations::unknown tool '$tool' (expected: skillspector|shellcheck|markdownlint|ajv)" >&2
+    echo "::error title=to-annotations::unknown tool '$tool' (expected: shellcheck|markdownlint|ajv). For SARIF, use .agents/skills/sarif-to-annotations/scripts/to-annotations.py" >&2
     exit 2
     ;;
 esac
