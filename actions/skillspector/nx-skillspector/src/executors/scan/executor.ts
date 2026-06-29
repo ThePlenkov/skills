@@ -5,7 +5,7 @@
  * This executor is invoked once per inferred project (one SKILL.md).
  * Nx handles parallelism, caching, and per-skill hash inputs.
  */
-import type { ExecutorContext } from 'nx/src/config/misc-interfaces';
+import type { ExecutorContext } from "@nx/devkit";
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { issuesToAnnotations } from '../../lib/annotations.ts';
