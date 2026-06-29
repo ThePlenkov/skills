@@ -160,13 +160,13 @@ runs:
       run: |
         set -euo pipefail
 
-        # Put the action's bundled `nx` binary on PATH. `npx nx` resolves
-        # via `node_modules/.bin` of the cwd, which here is the host
-        # repo (no `node_modules`). Without this, npx would fetch a
-        # fresh copy from npm — which has no `@theplenkov/nx-skillspector`
-        # plugin installed and produces an empty project graph
-        # ("project runtime-proof not found").
-        export PATH="$GITHUB_ACTION_PATH/node_modules/.bin:$PATH"
+        # Invoke the action's bundled `nx` directly. `npx nx` from
+        # `$GITHUB_WORKSPACE` searches `./node_modules/.bin` first
+        # (no node_modules here → miss) and falls back to fetching
+        # a fresh `nx@23.0.1` from npm — which has no
+        # `@theplenkov/nx-skillspector` plugin and produces an empty
+        # project graph ("project <skill> not found").
+        NX_BIN="$GITHUB_ACTION_PATH/node_modules/.bin/nx"
 
         # Stage nx.json: save existing (if any), write action's, restore on exit.
         NX_BACKUP=$(mktemp)
@@ -221,14 +221,14 @@ runs:
         fi
 
         set +e
-        npx nx "$NX_SUBCMD" -t scan \
+        "$NX_BIN" "$NX_SUBCMD" -t scan \
           --parallel="$MAX_WORKERS" \
           --output-style=stream \
           2>&1 | tee /tmp/nx-scan.log
         NX_EXIT=${PIPESTATUS[0]}
         set -e
 
-# Flush workflow-command annotations to stdout. Nx prefixes
+        # Flush workflow-command annotations to stdout. Nx prefixes
         # every line of worker output with ANSI-coloured
         # "project-name:" + TTY reset, which GitHub's
         # workflow-command parser can't strip — so ::error file=…
