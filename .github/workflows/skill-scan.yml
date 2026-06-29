@@ -68,18 +68,26 @@ jobs:
       # tab as code-scanning alerts (yellow ⚠ for warnings, red ❌
       # for errors), same UX as SonarCloud / CodeQL.
       #
-      # For PRs from forks the upload is silently ignored (GitHub
-      # blocks security-events writes from untrusted contexts). In
-      # that case the workflow-command annotations below still
-      # surface findings in the Checks panel.
+      # Requirements for this step to actually create alerts:
+      # - the repo must have code-scanning enabled in settings
+      #   (Settings → Code security and analysis → Code scanning),
+      #   OR be public (code-scanning is on by default for public
+      #   repos with GitHub Advanced Security free tier).
+      # - this job must have `security-events: write` (declared above).
       #
-      # `category: skillspector` keeps this analysis as a distinct
-      # named category so future tools (e.g. a codeql run) don't
-      # overwrite our results when they upload under a different
-      # category.
+      # On PRs from forks the upload is silently ignored (GitHub
+      # blocks security-events writes from untrusted contexts). In
+      # that case the workflow-command annotations still surface
+      # findings in the Checks panel.
+      #
+      # `continue-on-error: true` because the SARIF file may be
+      # empty when zero skills were scanned (e.g. nx affected reported
+      # zero projects on a no-change PR); in that case upload-sarif
+      # exits non-zero with "no SARIF files were found".
       - name: Upload SARIF to code-scanning
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: ${{ steps.scan.outputs.sarif-path }}
           category: skillspector
