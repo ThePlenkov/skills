@@ -90,7 +90,15 @@ export const createNodes: CreateNodes<SkillspectorPluginOptions> = [
         targets: {
           [opts.targetName]: {
             executor: '@theplenkov/nx-skillspector:scan',
-            options: { path: root, workspaceRoot: context.workspaceRoot, ...(process.env.SARIF_OUT ? { sarif: process.env.SARIF_OUT } : {}) },
+            // NOTE: do NOT pass `workspaceRoot` here. Nx hashes the
+            // options object for task caching; an absolute workspace
+            // path that changes per CI run invalidates every task
+            // hash and defeats the cache. The executor reads
+            // `context.root` directly, so no option is needed.
+            options: {
+              path: root,
+              ...(process.env.SARIF_OUT ? { sarif: process.env.SARIF_OUT } : {}),
+            },
           },
         },
       };

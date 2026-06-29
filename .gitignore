@@ -5,6 +5,8 @@ node_modules/
 .env.*
 tmp/
 skillspector.sarif
+# Nx cache (populated by actions/skillspector; do not commit)
+.nx/
 # Python bytecode
 **/__pycache__/
 *.pyc
