@@ -77,6 +77,9 @@ outputs:
   sarif-path:
     description: "Absolute path to the SARIF file, if `sarif` input was set."
     value: ${{ steps.scan.outputs.sarif-path }}
+  summary-path:
+    description: "Absolute path to the PR-comment summary Markdown file (per-skill rows)."
+    value: /tmp/skillspector-summary.md
   error-count:
     description: "Total error-severity findings across all scanned skills."
     value: ${{ steps.scan.outputs.error-count }}
@@ -156,6 +159,7 @@ runs:
         SARIF_OUT: ${{ inputs.sarif }}
         ANNOTATIONS_ENABLED: ${{ inputs.annotations }}
         FAIL_ON_ERROR: ${{ inputs.fail-on-error }}
+        PR_SUMMARY_FILE: /tmp/skillspector-summary.md
         JOB_SUMMARY_ENABLED: ${{ inputs.job-summary }}
       run: |
         set -euo pipefail

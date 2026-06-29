@@ -51,18 +51,8 @@ jobs:
       # See actions/skillspector/README.md for the full architecture
       # rationale (JSON→SARIF translation preserving the per-issue
       # schema, dual output modes, etc.).
-      #
-      # continue-on-error: true because the executor emits
-      # `::error`-level annotations for ALL severities (so they
-      # appear inline in the PR Files tab — `::warning` only shows
-      # in the Checks panel). With these annotations, issueCount > 0
-      # and the step would otherwise be marked failed even when no
-      # HIGH/CRITICAL findings exist. The check's "failure"
-      # conclusion is driven solely by `fail-on-error`, which only
-      # fires on HIGH/CRITICAL findings.
       - name: Run SkillSpector scan
         id: scan
-        continue-on-error: true
         uses: ./actions/skillspector
         with:
           path: ./.agents/skills/
@@ -110,3 +100,64 @@ jobs:
           path: ${{ steps.scan.outputs.sarif-path }}
           retention-days: 7
           if-no-files-found: ignore
+
+      # Post a SonarCloud-style PR summary comment to the Conversation
+      # tab. Mirrors the UX users see from SonarQube / CodeQL — a
+      # single Markdown comment listing all findings, updated in
+      # place on each push. Workflow-command annotations still
+      # surface errors inline in the Files tab; this comment adds
+      # a top-level overview that includes warnings (which the
+      # annotation API never shows inline).
+      #
+      # Idempotency: searches for our previous comment by the
+      # <!-- SkillSpector:start --> marker. PATCH if found (update),
+      # POST if not (first run on this PR).
+      #
+      # PRs from forks: GITHUB_TOKEN has read-only access to
+      # pull-requests for fork PRs; this step will 403 and we skip
+      # silently. continue-on-error: true so the workflow doesn't fail.
+      - name: Post SkillSpector PR summary
+        if: always() && github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SUMMARY_FILE: /tmp/skillspector-summary.md
+          ERROR_COUNT: ${{ steps.scan.outputs.error-count }}
+          WARNING_COUNT: ${{ steps.scan.outputs.warning-count }}
+          TOTAL_COUNT: ${{ steps.scan.outputs.total-count }}
+        run: |
+          set -euo pipefail
+          if [ ! -s "$SUMMARY_FILE" ]; then
+            echo "::notice title=SkillSpector::no findings to post"
+            exit 0
+          fi
+
+          # Build the comment body: header + summary table + per-skill rows.
+          {
+            echo '<!-- SkillSpector:start -->'
+            echo "## 🔍 SkillSpector scan"
+            echo
+            echo "| ❌ Errors | ⚠️ Warnings | Total findings |"
+            echo "| ---: | ---: | ---: |"
+            echo "| ${ERROR_COUNT:-0} | ${WARNING_COUNT:-0} | ${TOTAL_COUNT:-0} |"
+            echo
+            cat "$SUMMARY_FILE"
+          } > /tmp/skillspector-comment.md
+
+          # Find our previous comment on this PR (matched by marker).
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PREVIOUS_ID=$(gh api \
+            "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments?per_page=100" \
+            --jq '.[] | select(.body | test("<!-- SkillSpector:start -->")) | .id' \
+            | head -1 || true)
+
+          if [ -n "$PREVIOUS_ID" ]; then
+            gh api -X PATCH \
+              "repos/${{ github.repository }}/issues/comments/${PREVIOUS_ID}" \
+              --field body=@/tmp/skillspector-comment.md > /dev/null
+            echo "::notice title=SkillSpector::updated existing PR comment ${PREVIOUS_ID}"
+          else
+            gh pr comment "${PR_NUMBER}" \
+              --body-file /tmp/skillspector-comment.md > /dev/null
+            echo "::notice title=SkillSpector::posted new PR comment"
+          fi
