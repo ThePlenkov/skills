@@ -38,13 +38,17 @@ export default async function scanExecutor(
 ): Promise<{ success: boolean }> {
   const {
     path: skillPath,
-    sarif = '',
-    annotations = true,
-    failOnError = true,
-    jobSummary = true,
-    noLlM = true,
-    baseline = '',
-    skillspectorBin = 'skillspector',
+    // Fall back to env vars exported by action.yml when the plugin
+    // invocation didn't pass them as options. Without this fallback,
+    // inputs like `sarif`, `fail-on-error`, `baseline`, and
+    // `no-llm` from the composite action are silently ignored.
+    sarif = process.env.SARIF_OUT || '',
+    annotations = process.env.ANNOTATIONS_ENABLED !== 'false',
+    failOnError = process.env.FAIL_ON_ERROR !== 'false',
+    jobSummary = process.env.JOB_SUMMARY_ENABLED !== 'false',
+    noLlM = process.env.SKILLSPECTOR_NO_LLM !== 'false',
+    baseline = process.env.SKILLSPECTOR_BASELINE || '',
+    skillspectorBin = process.env.SKILLSPECTOR_BIN || 'skillspector',
   } = options;
 
   // Nx's ExecutorContext.root is the workspace root. The project root
