@@ -35,6 +35,12 @@ permissions:
   # mechanism SonarCloud and CodeQL use). Without this permission,
   # upload-sarif fails with HTTP 403 on the security-events endpoint.
   security-events: write
+  # pull-requests: write lets the workflow post a PR summary comment
+  # (and update it in place across pushes). Declaring `permissions:`
+  # above overrides the default token scopes, so we have to enumerate
+  # this explicitly — otherwise the PR comment step gets 403 from
+  # `gh api ... issues/comments/...` and silently fails.
+  pull-requests: write
 
 jobs:
   scan:
