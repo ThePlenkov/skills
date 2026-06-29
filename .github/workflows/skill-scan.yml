@@ -9,14 +9,14 @@ on:
     paths:
       - '.agents/skills/**'
       - '.github/workflows/skill-scan.yml'
-      - '.github/scripts/**'
+      - 'actions/skillspector/**'
   # Pre-merge scan: when a PR is opened or updated. Provides inline
   # annotations on the PR Files Changed tab.
   pull_request:
     paths:
       - '.agents/skills/**'
       - '.github/workflows/skill-scan.yml'
-      - '.github/scripts/**'
+      - 'actions/skillspector/**'
   workflow_dispatch:
 
 # Cancel in-progress runs for the same workflow on the same ref. This
@@ -36,133 +36,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
-
-      - name: Install SkillSpector
-        run: uv tool install git+https://github.com/NVIDIA/skillspector.git
-
-      # Why per-skill (not --recursive):
-      #   skillspector 2.3.7's --recursive mode is broken for non-terminal
-      #   output formats. Specifically:
-      #     - --format json  → emits a SUMMARY document with no per-issue
-      #                        details (only per-skill finding_count)
-      #     - --format sarif → emits progress text to stdout, never the
-      #                         SARIF document
-      #   The single-skill invocation correctly produces a full document
-      #   with per-issue details. So we iterate, scan each skill
-      #   individually.
+      # The action handles installation of skillspector and per-skill
+      # iteration internally. The path is auto-detected: a single
+      # skill (`path/SKILL.md`) is scanned once; a parent directory
+      # is iterated over its `*/SKILL.md` children.
       #
-      # Why JSON instead of SARIF:
-      #   skillspector's --format json output has a much richer schema
-      #   than its --format sarif output. Per-issue fields that the SARIF
-      #   format drops but JSON keeps: category, confidence (0-1),
-      #   remediation, code_snippet, intent, tags (OWASP/MITRE/CWE
-      #   categories), end_line, pattern. We use --format json as the
-      #   source of truth and route it through a JSON→SARIF wrapper
-      #   (`skillspector-json-to-sarif.py`) that preserves the extra
-      #   fields under SARIF's standard `properties` extension point.
-      #   The downstream `to-annotations.py` reads those properties and
-      #   surfaces them in the GitHub annotation as tag prefix, category
-      #   in the title, remediation, code snippet, and confidence.
-      #
-      # Why use the sarif-to-annotations skill:
-      #   The conversion logic is a reusable skill at
-      #   .agents/skills/sarif-to-annotations/ — any tool that emits
-      #   SARIF (CodeQL, Snyk, ESLint, Semgrep, Trivy) can drop in the
-      #   same `python3 ... < report.sarif` line and get the same
-      #   inline annotations.
-      #
-      # Gate: any error-severity SARIF result fails the workflow.
-      # The annotation script returns 1 in that case, which we surface
-      # as the workflow's exit code.
-      - name: Run per-skill scan (JSON) → enriched SARIF → annotations
-        run: |
-          set -u
+      # See actions/skillspector/README.md for the full architecture
+      # rationale (JSON→SARIF translation preserving the per-issue
+      # schema, dual output modes, etc.).
+      - name: Run SkillSpector scan
+        id: scan
+        uses: ./actions/skillspector
+        with:
+          path: ./.agents/skills/
+          sarif: ${{ github.workspace }}/skillspector.sarif
+          job-summary: 'true'
 
-          BASELINE_ARGS=()
-          if [ -f .skillspector-baseline.yaml ]; then
-            BASELINE_ARGS=(--baseline .skillspector-baseline.yaml)
-          fi
-
-          mkdir -p /tmp/skillspector
-          FAILED=0
-          TOTAL_FINDINGS=0
-          TOTAL_ERRORS=0
-
-          for skill_dir in .agents/skills/*/; do
-            [ -d "$skill_dir" ] || continue
-            [ -f "${skill_dir}SKILL.md" ] || continue
-            skill=$(basename "$skill_dir")
-            json_path="/tmp/skillspector/${skill}.json"
-            sarif_path="/tmp/skillspector/${skill}.sarif"
-
-            echo "::group::Scanning ${skill} (JSON → SARIF)"
-
-            # Single-skill JSON output goes to stdout. Redirect to a file
-            # so we can both (a) wrap to enriched SARIF, and (b) feed to
-            # the annotation converter.
-            skillspector scan "$skill_dir" \
-              --no-llm \
-              --format json \
-              "${BASELINE_ARGS[@]}" \
-              > "$json_path" \
-              || SS_EXIT=$?
-            SS_EXIT="${SS_EXIT:-0}"
-
-            if [ ! -s "$json_path" ]; then
-              echo "  (no JSON produced for $skill)"
-              echo "::endgroup::"
-              continue
-            fi
-
-            # Step 1: JSON → enriched SARIF (preserves category,
-            # confidence, remediation, code_snippet, intent, tags).
-            python3 .agents/skills/sarif-to-annotations/scripts/skillspector-json-to-sarif.py \
-              < "$json_path" \
-              > "$sarif_path" \
-              || true
-
-            # Step 2: SARIF → GitHub annotations. Exit 1 on error-severity
-            # results; we use that as the gate.
-            if [ -s "$sarif_path" ]; then
-              python3 .agents/skills/sarif-to-annotations/scripts/to-annotations.py \
-                < "$sarif_path" \
-                || ANN_EXIT=$?
-              ANN_EXIT="${ANN_EXIT:-0}"
-            else
-              echo "  (SARIF conversion produced no output)"
-              ANN_EXIT=0
-            fi
-
-            # Per-skill counts from the SARIF
-            findings=$(jq -r '.runs // [] | [.[] | .results // [] | length] | add // 0' "$sarif_path" 2>/dev/null || echo 0)
-            errors=$(jq -r '
-              [.runs // [] | .[] | .results // [] | .[] | select(.level == "error")] | length
-            ' "$sarif_path" 2>/dev/null || echo 0)
-
-            echo "  findings=$findings errors=$errors exit=$SS_EXIT annotations_exit=$ANN_EXIT"
-
-            if [ "$SS_EXIT" -ne 0 ] || [ "$ANN_EXIT" -ne 0 ] || [ "$errors" -gt 0 ]; then
-              FAILED=1
-            fi
-            TOTAL_FINDINGS=$((TOTAL_FINDINGS + findings))
-            TOTAL_ERRORS=$((TOTAL_ERRORS + errors))
-
-            echo "::endgroup::"
-          done
-
-          echo
-          echo "=== Summary ==="
-          echo "Total findings across all skills: $TOTAL_FINDINGS"
-          echo "Total error-severity findings:     $TOTAL_ERRORS"
-
-          exit $FAILED
-
-      - name: Upload reports as artifacts
+      - name: Upload SARIF report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: skillspector-reports
-          path: /tmp/skillspector/
+          name: skillspector-sarif
+          path: ${{ steps.scan.outputs.sarif-path }}
           retention-days: 7
+          if-no-files-found: ignore

@@ -1,0 +1,271 @@
+name: SkillSpector scan
+description: >-
+  Run SkillSpector on a skill (or set of skills) and emit GitHub PR
+  annotations, an optional SARIF file, and structured step outputs.
+
+author: ThePlenkov
+
+branding:
+  icon: shield
+  color: red
+
+
+inputs:
+  path:
+    description: >-
+      Path to scan. If it contains a `SKILL.md`, the action treats it as
+      a single skill. Otherwise it iterates over immediate sub-directories
+      that contain a `SKILL.md` and runs the scan per skill.
+    required: false
+    default: .
+  recursive:
+    description: >-
+      Pass `--recursive` to skillspector. Note: as of skillspector 2.3.7
+      `--recursive --format json` emits a per-skill summary only and drops
+      the per-issue schema (NVIDIA/SkillSpector #228). Default behavior
+      already iterates per skill, so this is usually unnecessary.
+    required: false
+    default: "false"
+  baseline:
+    description: >-
+      Path to a `.skillspector-baseline.yaml` file passed as
+      `--baseline`. Leave empty to skip.
+    required: false
+    default: ""
+  no-llm:
+    description: "Pass `--no-llm` to skillspector (disables LLM meta-analysis)."
+    required: false
+    default: "true"
+  annotations:
+    description: >-
+      Emit GitHub Actions workflow commands for inline PR annotations
+      (the `::error|warning|notice file=…,line=…,title=…::message` form).
+      Set to "false" to suppress annotations but still write SARIF.
+    required: false
+    default: "true"
+  sarif:
+    description: >-
+      Path to write a SARIF 2.1.0 report. Leave empty to skip the SARIF
+      file. When set, the SARIF is also written regardless of
+      `annotations`. The same per-issue schema is preserved under SARIF's
+      standard `properties` extension point, so any SARIF-aware tool
+      (Code Scanning tab, IDE plugins, dashboards) can read the full
+      per-issue context.
+    required: false
+    default: ""
+  fail-on-error:
+    description: >-
+      When "true" (default), the action exits with code 1 if any
+      `error`-severity (HIGH/CRITICAL) finding is emitted. When
+      "false", the action always exits 0 — useful when the same
+      findings are surfaced through SARIF and you want a separate gate.
+    required: false
+    default: "true"
+  job-summary:
+    description: >-
+      When "true", append a markdown summary table to
+      `$GITHUB_STEP_SUMMARY` listing per-skill finding counts.
+    required: false
+    default: "true"
+  skillspector-version:
+    description: >-
+      Skillspector version to install. Default tracks the version this
+      action was last verified against (commit SHA pinned for
+      reproducibility — see the `pip install` step).
+    required: false
+    default: "78be329a7ea9749842e335598132ce171b8717d4"
+
+
+outputs:
+  sarif-path:
+    description: "Absolute path to the SARIF file, if `sarif` input was set."
+    value: ${{ steps.emit.outputs.sarif-path }}
+  error-count:
+    description: "Total number of error-severity findings across all scanned skills."
+    value: ${{ steps.emit.outputs.error-count }}
+  warning-count:
+    description: "Total number of warning-severity findings across all scanned skills."
+    value: ${{ steps.emit.outputs.warning-count }}
+  total-count:
+    description: "Total number of findings across all scanned skills."
+    value: ${{ steps.emit.outputs.total-count }}
+
+
+runs:
+  using: composite
+  steps:
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install SkillSpector
+      shell: bash
+      run: |
+        set -euo pipefail
+        pip install --quiet "git+https://github.com/NVIDIA/skillspector.git@${{ inputs.skillspector-version }}"
+
+    - name: Discover skills
+      id: discover
+      shell: bash
+      run: |
+        set -euo pipefail
+        target="${{ inputs.path }}"
+        if [ -f "${target}/SKILL.md" ]; then
+          # Single-skill: scan the directory itself.
+          printf 'single\t%s\n' "$target" >> "$GITHUB_OUTPUT"
+        else
+          # Multi-skill: collect sub-directories that contain SKILL.md.
+          tmp=$(mktemp)
+          found=0
+          for d in "${target}"/*/; do
+            [ -d "$d" ] || continue
+            if [ -f "${d}SKILL.md" ]; then
+              printf '%s\n' "${d%/}" >> "$tmp"
+              found=1
+            fi
+          done
+          if [ "$found" = "0" ]; then
+            echo "::error title=skillspector::no SKILL.md found in ${target} or its sub-directories"
+            exit 2
+          fi
+          printf 'multi\n' >> "$GITHUB_OUTPUT"
+          {
+            echo "skills<<EOF"
+            cat "$tmp"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          rm -f "$tmp"
+        fi
+
+    - name: Run SkillSpector and emit annotations + SARIF
+      id: emit
+      shell: bash
+      env:
+        GITHUB_OUTPUT: ${{ github.output }}
+        GITHUB_STEP_SUMMARY: ${{ github.summary }}
+      run: |
+        set -euo pipefail
+
+        MODE="${{ steps.discover.outputs.single }}"  # "single" or empty
+        SKILL_DIRS=()
+
+        if [ -n "$MODE" ]; then
+          SKILL_DIRS=("${{ inputs.path }}")
+        else
+          while IFS= read -r line; do
+            SKILL_DIRS+=("$line")
+          done < <(printf '%s' "${{ steps.discover.outputs.skills }}")
+        fi
+
+        # Build skillspector flags
+        SS_ARGS=()
+        if [ "${{ inputs.no-llm }}" = "true" ]; then
+          SS_ARGS+=(--no-llm)
+        fi
+        if [ -n "${{ inputs.baseline }}" ]; then
+          SS_ARGS+=(--baseline "${{ inputs.baseline }}")
+        fi
+        if [ "${{ inputs.recursive }}" = "true" ]; then
+          SS_ARGS+=(--recursive)
+        fi
+
+        # Build emit.py flags
+        ANN_FLAG=""
+        if [ "${{ inputs.annotations }}" != "true" ]; then
+          ANN_FLAG="--no-annotations"
+        fi
+        SARIF_FLAG=""
+        SARIF_PATH=""
+        if [ -n "${{ inputs.sarif }}" ]; then
+          SARIF_PATH="${{ inputs.sarif }}"
+          SARIF_FLAG="--sarif-out ${SARIF_PATH}"
+        fi
+        FAIL_FLAG=""
+        if [ "${{ inputs.fail-on-error }}" != "true" ]; then
+          FAIL_FLAG="--no-fail-on-error"
+        fi
+        SUMMARY_FLAG=""
+        if [ "${{ inputs.job-summary }}" = "true" ]; then
+          SUMMARY_FLAG="--write-summary"
+        fi
+
+        TOTAL_ERRORS=0
+        TOTAL_WARNINGS=0
+        TOTAL_FINDINGS=0
+        FAILED=0
+        TMPDIR=$(mktemp -d)
+
+        for skill_dir in "${SKILL_DIRS[@]}"; do
+          skill=$(basename "$skill_dir")
+          echo "::group::Scanning ${skill}"
+
+          # Run skillspector, capture JSON
+          json_path="${TMPDIR}/${skill}.json"
+          set +e
+          skillspector scan "$skill_dir" "${SS_ARGS[@]}" --format json \
+            > "$json_path" 2>/dev/null
+          SS_EXIT=$?
+          set -e
+
+          if [ ! -s "$json_path" ]; then
+            echo "  (no output — skillspector exit=$SS_EXIT)"
+            echo "::endgroup::"
+            if [ "$SS_EXIT" -ne 0 ]; then
+              FAILED=1
+            fi
+            continue
+          fi
+
+          # Pipe through emit.py
+          set +e
+          python3 "$GITHUB_ACTION_PATH/scripts/emit.py" \
+            --input "$json_path" \
+            --tool-name skillspector \
+            --skill-name "$skill" \
+            $ANN_FLAG $SARIF_FLAG $FAIL_FLAG $SUMMARY_FLAG
+          EMIT_EXIT=$?
+          set -e
+
+          # Per-skill counts (re-parse for the per-skill summary)
+          err=$(jq '[.runs // [] | .[] | .results // [] | .[] | select(.level == "error")] | length' \
+            "$SARIF_PATH" 2>/dev/null || echo 0)
+          warn=$(jq '[.runs // [] | .[] | .results // [] | .[] | select(.level == "warning")] | length' \
+            "$SARIF_PATH" 2>/dev/null || echo 0)
+          tot=$(jq '[.runs // [] | .[] | .results // [] | .[]] | length' \
+            "$SARIF_PATH" 2>/dev/null || echo 0)
+
+          # When SARIF is not requested, count from JSON directly.
+          if [ -z "$SARIF_PATH" ]; then
+            err=$(jq '[.issues // [] | .[] | select(.severity == "HIGH" or .severity == "CRITICAL")] | length' \
+              "$json_path" 2>/dev/null || echo 0)
+            warn=$(jq '[.issues // [] | .[] | select(.severity == "MEDIUM" or .severity == "WARNING")] | length' \
+              "$json_path" 2>/dev/null || echo 0)
+            tot=$(jq '.issues // [] | length' "$json_path" 2>/dev/null || echo 0)
+          fi
+
+          echo "  findings=$tot errors=$err warnings=$warn exit=$EMIT_EXIT"
+
+          if [ "$EMIT_EXIT" -ne 0 ] || [ "$err" -gt 0 ]; then
+            FAILED=1
+          fi
+          TOTAL_ERRORS=$((TOTAL_ERRORS + err))
+          TOTAL_WARNINGS=$((TOTAL_WARNINGS + warn))
+          TOTAL_FINDINGS=$((TOTAL_FINDINGS + tot))
+
+          echo "::endgroup::"
+        done
+
+        # Final summary outputs
+        {
+          echo "error-count=${TOTAL_ERRORS}"
+          echo "warning-count=${TOTAL_WARNINGS}"
+          echo "total-count=${TOTAL_FINDINGS}"
+          if [ -n "$SARIF_PATH" ]; then
+            echo "sarif-path=${SARIF_PATH}"
+          fi
+        } >> "$GITHUB_OUTPUT"
+
+        rm -rf "$TMPDIR"
+        exit $FAILED
