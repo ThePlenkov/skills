@@ -1,0 +1,45 @@
+# SkillSpector baseline — suppress known/accepted findings.
+# Generated manually for ThePlenkov/skills initial setup.
+#
+# These are intentional patterns in personal agent skills that are NOT
+# security issues in this context. Re-run `skillspector baseline` after
+# triaging new findings to keep this file up to date.
+#
+# Rules reference: https://github.com/NVIDIA/skillspector
+#
+# Format: glob rules by rule_id, file path, or message.
+# See: https://github.com/NVIDIA/skillspector/blob/main/docs/SUPPRESSION.md
+
+rules:
+  # token-rationalism: "never ask", "always" directives are intentional
+  # cognitive guidelines for the agent, not safety bypasses.
+  - rule_id: AR1
+    path: ".agents/skills/token-rationalism/**"
+    reason: "Intentional agent autonomy instructions"
+
+  - rule_id: AR2
+    path: ".agents/skills/token-rationalism/**"
+    reason: "Intentional agent behavior shaping"
+
+  # safeguard skill documents safety patterns to DETECT them — not exploit them.
+  - rule_id: "P[1-5]"
+    path: ".agents/skills/safeguard/**"
+    reason: "Skill documents prompt injection patterns for detection purposes"
+
+  - rule_id: AR3
+    path: ".agents/skills/safeguard/**"
+    reason: "Skill documents jailbreak patterns for detection purposes"
+
+  # subagent-capsule: autonomous decision-making is the explicit design goal.
+  - rule_id: EA2
+    path: ".agents/skills/subagent-capsule/**"
+    reason: "Autonomous subagent orchestration is the intended behavior"
+
+  # sandbox skill describes isolation — legitimate use of permission language.
+  - rule_id: PE1
+    path: ".agents/skills/sandbox/**"
+    reason: "Permission discussion is the topic of the skill, not a request"
+
+  - rule_id: EA1
+    path: ".agents/skills/sandbox/**"
+    reason: "Tool access discussion is the topic of the skill"

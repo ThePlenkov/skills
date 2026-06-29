@@ -1,0 +1,37 @@
+{
+  "name": "act-skill",
+  "root": ".agents/skills/act",
+  "projectType": "library",
+  "targets": {
+    "act-debt": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bun .agents/skills/act/scripts/review-debt-cli.ts"
+      }
+    },
+    "act-debt-query": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bun .agents/skills/act/scripts/review-debt-cli.ts query"
+      }
+    },
+    "act-debt-plan": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bun .agents/skills/act/scripts/review-debt-cli.ts plan"
+      }
+    },
+    "act-debt-done": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bun .agents/skills/act/scripts/review-debt-cli.ts done"
+      }
+    },
+    "act-debt-test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bun .agents/skills/act/scripts/review-debt-cli.ts test"
+      }
+    }
+  }
+}

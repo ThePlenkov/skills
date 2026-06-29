@@ -4,8 +4,8 @@ Personal, agent-agnostic skills repository.
 
 ## Layout
 
-- `.agents/agents/` contains role prompts.
-- `.agents/skills/` contains all skills (each skill is a folder with `SKILL.md`).
+- `.agents/agents/` contains role prompts (one folder per role, e.g. `investigator/`, `patcher/`, `verifier/`).
+- `.agents/skills/` contains all skills.
 
 ## Quick start
 
@@ -61,8 +61,9 @@ repository.
 1. Go to **Settings → Codespaces → Dotfiles** on GitHub.
 2. Select this repository and enable **Automatically install dotfiles**.
 
-When a new codespace starts, `install.sh` runs automatically and creates the symlink
-`~/.agents/skills/personal → <repo>/.agents/skills/`.
+When a new codespace starts, `install.sh` runs automatically and creates the
+`~/.agents/skills/personal` symlink exposing every skill under `.agents/skills/`.
+No re-install is needed when skills are added or updated.
 
 To re-run manually:
 
