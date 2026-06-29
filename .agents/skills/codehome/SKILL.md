@@ -1,6 +1,6 @@
 ---
 name: codehome
-description: Detect and fix code that works but lives in the wrong architectural layer, file, or configuration surface. Use when an agent has placed large runtime logic inside config files, route files, components, scripts, tests, temporary folders, or other inappropriate homes. This skill is cross-agent: investigator, patcher, and verifier must all use it when reviewing implementation placement, not just correctness.
+description: "Detect and fix code that works but lives in the wrong architectural layer, file, or configuration surface. Use when an agent has placed large runtime logic inside config files, route files, components, scripts, tests, temporary folders, or other inappropriate homes. This skill is cross-agent: investigator, patcher, and verifier must all use it when reviewing implementation placement, not just correctness."
 argument-hint: "[optional file, feature, or concern]"
 triggers:
   - user
@@ -60,6 +60,7 @@ A 1000-line WebSocket server is placed directly inside vite.config.ts.
 Better:
 vite.config.ts only wires config.
 The WebSocket server implementation lives in a dedicated module or bin entrypoint, for example:
+
 - bin/tmux-websocket-server.cjs
 - src/server/tmux-websocket-server.ts
 - src/server/ws/tmux-server.ts
@@ -82,7 +83,7 @@ Why this file is suspicious:
 Approximate size/scope:
 Runtime responsibility found here:
 
-2. Classify the file's proper role.
+1. Classify the file's proper role.
 
 Examples:
 
@@ -104,7 +105,7 @@ Examples:
 - test file:
   should contain test setup and assertions, not production implementation.
 
-3. Decide whether this is a codehome violation.
+1. Decide whether this is a codehome violation.
 
 Use this checklist:
 
@@ -118,7 +119,7 @@ Use this checklist:
 
 If yes, it is a codehome violation.
 
-4. Choose the correct home.
+1. Choose the correct home.
 
 Pick the smallest better home.
 
@@ -135,7 +136,7 @@ Preferred movement pattern:
 - component owns rendering and user interaction
 - tests own verification only
 
-5. Extract with one narrow movement.
+1. Extract with one narrow movement.
 
 If edits are authorized:
 
@@ -151,7 +152,7 @@ If edits are not authorized:
 
 - report the exact extraction plan and stop
 
-6. Verify behavior after rehoming.
+1. Verify behavior after rehoming.
 
 Required:
 

@@ -27,7 +27,7 @@ run() {
   if [ "$DRY_RUN" = "1" ]; then
     echo "[dry-run] $*"
   else
-    eval "$@"
+    "$@"
   fi
 }
 
@@ -41,12 +41,12 @@ if [ -L "$PERSONAL_LINK" ]; then
     exit 0
   fi
   echo "↻ retargeting $PERSONAL_LINK (was → $(readlink "$PERSONAL_LINK"))"
-  run "ln -sfn '$SOURCE_DIR' '$PERSONAL_LINK'"
+  run ln -sfn "$SOURCE_DIR" "$PERSONAL_LINK"
 elif [ -e "$PERSONAL_LINK" ]; then
   echo "❌ $PERSONAL_LINK exists and is not a symlink. Remove or rename it first." >&2
   exit 1
 else
-  run "ln -s '$SOURCE_DIR' '$PERSONAL_LINK'"
+  run ln -s "$SOURCE_DIR" "$PERSONAL_LINK"
 fi
 
 echo "✓ linked $PERSONAL_LINK → $SOURCE_DIR"

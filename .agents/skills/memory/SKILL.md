@@ -42,6 +42,7 @@ If no internal memory tool exists, use the **Memory MCP server** (`mcp/memory` �
 | `delete_relations` | Remove outdated relations |
 
 **Setup reference** (for MCP configuration):
+
 ```json
 {
   "mcpServers": {
@@ -76,14 +77,16 @@ Then fall back to session-scoped notes (plan files, todo lists) as best-effort m
 
 This is non-negotiable. Skipping recall means potentially repeating work that was already done.
 
-#### What to search for:
+#### What to search for
+
 - The project or repository name
 - Key file paths or component names mentioned in the task
 - Error messages or bug descriptions
 - Tool or library names being used
 - The user's name or preferences (if known)
 
-#### How to use recall results:
+#### How to use recall results
+
 - **Prior decisions** → apply them, don't re-debate
 - **Known pitfalls** → avoid them proactively
 - **User preferences** → follow them without asking
@@ -94,7 +97,7 @@ This is non-negotiable. Skipping recall means potentially repeating work that wa
 
 When the agent discovers something worth remembering, persist it **immediately** — don't batch it to end-of-session where it might be forgotten.
 
-#### What to persist:
+#### What to persist
 
 | Category | Examples | Entity Type |
 |----------|----------|-------------|
@@ -105,13 +108,16 @@ When the agent discovers something worth remembering, persist it **immediately**
 | **Tool/library knowledge** | Quirks, workarounds, version-specific behavior | `tool` |
 | **Decisions** | Why X was chosen over Y, trade-offs considered | `decision` |
 
-#### Entity naming convention (for MCP knowledge graph):
+#### Entity naming convention (for MCP knowledge graph)
+
 - Use descriptive, searchable names: `project:myapp:build-commands`, `user:preferences:code-style`, `retrospect:myapp:api-auth-bug`
 - Prefix with category for easy filtering
 - Include project context when project-specific
 
-#### Observation format:
+#### Observation format
+
 Keep observations **atomic and actionable** — one fact per observation, not paragraphs:
+
 - Good: `"Build requires Node 20+, fails silently on Node 18"`
 - Bad: `"The build system is complex and has many requirements including Node version constraints among other things..."`
 
@@ -158,6 +164,7 @@ When persisting a retrospect finding, check memory for **similar prior findings*
 ## Session Lifecycle
 
 ### Session Start
+
 ```
 1. Detect memory backend (internal tool > MCP server > none)
 2. If a task is given: search memory for prior context
@@ -165,6 +172,7 @@ When persisting a retrospect finding, check memory for **similar prior findings*
 ```
 
 ### During Work
+
 ```
 1. Persist significant findings as they occur (don't batch)
 2. Update existing entities when new information emerges
@@ -172,6 +180,7 @@ When persisting a retrospect finding, check memory for **similar prior findings*
 ```
 
 ### Session End (or task completion)
+
 ```
 1. Persist any remaining unpersisted learnings
 2. Update task entities with completion status and outcomes

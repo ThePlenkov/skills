@@ -62,6 +62,7 @@ A small patch in the wrong place is not minimal. It is another bug.
 ## Output rule
 
 When proposing or applying a simplification, report:
+
 - what was reused or avoided
 - why this is the root-cause location
 - what was intentionally not built

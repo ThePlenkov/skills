@@ -1,6 +1,6 @@
 ---
 name: safeguard
-description: Prevent destructive agent actions from deleting user work, untracked files, experimental code, or recoverable evidence. Use before any rollback, cleanup, restore, reset, delete, git clean, git restore, git reset, rm, overwrite, mass edit, or dependency cleanup. This is a cross-agent safety skill: investigator, patcher, verifier, and any subagent must obey it before destructive commands.
+description: "Prevent destructive agent actions from deleting user work, untracked files, experimental code, or recoverable evidence. Use before any rollback, cleanup, restore, reset, delete, git clean, git restore, git reset, rm, overwrite, mass edit, or dependency cleanup. This is a cross-agent safety skill: investigator, patcher, verifier, and any subagent must obey it before destructive commands."
 argument-hint: "[optional reason for destructive action]"
 triggers:
   - user
@@ -75,7 +75,7 @@ Instead, perform the safeguard procedure.
 
 If a dev server, watcher, or script is still running and may continue modifying files, stop it safely.
 
-2. Inspect repository state.
+1. Inspect repository state.
 
 Run:
 
@@ -83,7 +83,7 @@ git status --short
 
 If inside a nested repo, inspect both parent and nested repo before changing anything.
 
-3. Create a rescue checkpoint outside the repository or in a clearly named checkpoint folder.
+1. Create a rescue checkpoint outside the repository or in a clearly named checkpoint folder.
 
 Preferred checkpoint directory:
 
@@ -93,7 +93,7 @@ If outside-repo creation is not possible, use:
 
 .agent-checkpoints/YYYYMMDD-HHMMSS-REASON/
 
-4. Save tracked changes.
+1. Save tracked changes.
 
 Run:
 
@@ -103,7 +103,7 @@ Run:
 
 git diff --cached --binary > CHECKPOINT_DIR/staged.patch
 
-5. Save status.
+1. Save status.
 
 Run:
 
@@ -113,13 +113,13 @@ Run:
 
 git status --short > CHECKPOINT_DIR/status-short.txt
 
-6. Save untracked file list.
+1. Save untracked file list.
 
 Run:
 
 git ls-files --others --exclude-standard > CHECKPOINT_DIR/untracked-files.txt
 
-7. Save untracked files.
+1. Save untracked files.
 
 If untracked files exist, archive them before any clean/delete command.
 
@@ -129,7 +129,7 @@ tar -czf CHECKPOINT_DIR/untracked-files.tgz -T CHECKPOINT_DIR/untracked-files.tx
 
 If tar with list fails due paths or spaces, use a safer null-delimited method if available.
 
-8. Report the checkpoint.
+1. Report the checkpoint.
 
 Output:
 
@@ -141,7 +141,7 @@ Untracked archive:
 Status file:
 Files at risk:
 
-9. Ask for explicit approval.
+1. Ask for explicit approval.
 
 Do not continue with destructive action until the user approves.
 
@@ -149,7 +149,7 @@ Required approval wording:
 
 "I preserved the current state. May I revert only the agent-created changes listed below?"
 
-10. If approved, revert only the approved scope.
+1. If approved, revert only the approved scope.
 
 Prefer targeted restore:
 
@@ -161,7 +161,7 @@ Never use broad commands unless explicitly approved:
 - git reset --hard
 - git clean -fd
 
-11. After revert, verify.
+1. After revert, verify.
 
 Run:
 

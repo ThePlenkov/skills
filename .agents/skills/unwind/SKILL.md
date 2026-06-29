@@ -68,7 +68,7 @@ Files changed:
 Runtime evidence:
 What is now baseline:
 
-2. Convert evidence into plan constraints.
+1. Convert evidence into plan constraints.
 
 Write:
 
@@ -78,7 +78,7 @@ Do not revisit unless contradicted:
 Still unproven:
 Risks:
 
-3. Rebuild the parent/root plan.
+1. Rebuild the parent/root plan.
 
 Write a short plan with 3 to 6 concrete steps.
 
@@ -88,7 +88,7 @@ Do not include completed work as future work.
 
 Do not ask the user to choose between obvious next steps.
 
-4. Select the next best action.
+1. Select the next best action.
 
 Write:
 
@@ -97,11 +97,12 @@ Action:
 Reason:
 Expected proof:
 
-5. Proceed.
+1. Proceed.
 
 Immediately perform the next best action using available tools.
 
 This includes:
+
 - Direct tool usage (read, grep, edit, exec, etc.)
 - Launching subagents with run_subagent when the next action is best handled by investigator, patcher, or verifier
 - Using @skills:subagent-capsule before launching any subagent

@@ -1,0 +1,41 @@
+{
+  "title": "Skill frontmatter",
+  "description": "JSON Schema for SKILL.md YAML frontmatter validation",
+  "type": "object",
+  "required": ["name", "description"],
+  "additionalProperties": true,
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Unique skill identifier (kebab-case)",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "description": {
+      "type": "string",
+      "description": "One-sentence description shown in skill listings",
+      "minLength": 10,
+      "maxLength": 500
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version (optional, e.g. 1.0.0)",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+    },
+    "allowed-tools": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ],
+      "description": "Tools the agent is allowed to use when this skill is active"
+    },
+    "triggers": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["user", "model", "always"] },
+      "description": "When the skill should be activated"
+    },
+    "argument-hint": {
+      "type": "string",
+      "description": "Hint for argument passing to the skill"
+    }
+  }
+}

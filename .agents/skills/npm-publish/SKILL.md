@@ -36,6 +36,7 @@ npm token create \
 ```
 
 Key flags:
+
 - `--packages` / `--scopes` — limit token to specific packages or scopes (up to 50 each)
 - `--packages-and-scopes-permission` — `read-only`, `read-write`, or `no-access`
 - `--expires` — days until expiration (minimum 1 day); use the shortest viable duration
@@ -139,15 +140,19 @@ Bootstraps CI/CD publishing for packages that don't yet exist on the registry. U
 ### Workflow
 
 1. **Login**
+
    ```sh
    npm login
    ```
+
    Complete any SSO or 2FA prompts.
 
 2. **Detect CI/CD provider from git remote**
+
    ```sh
    git remote -v
    ```
+
    - `github.com` → GitHub Actions
    - `gitlab.com` → GitLab CI/CD
    - Otherwise → ask user to confirm provider

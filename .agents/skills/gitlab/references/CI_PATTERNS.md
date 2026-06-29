@@ -9,6 +9,7 @@
 
 **1. Child Pipeline (`child.yml`):**
 Define the input type and use it in the matrix.
+
 ```yaml
 spec:
   inputs:
@@ -26,6 +27,7 @@ job_matrix:
 
 **2. Parent Pipeline (`.gitlab-ci.yml`):**
 Pass the input from the parent to the child.
+
 ```yaml
 spec:
   inputs:
@@ -46,6 +48,7 @@ include:
 **Rule:** `spec:inputs` can be used in the global `variables` section of the entry pipeline (e.g., `.gitlab-ci.yml`), but NOT in the global `variables` of an included file if you want them to be dynamic based on the include.
 
 **Pattern:**
+
 ```yaml
 # .gitlab-ci.yml
 variables:

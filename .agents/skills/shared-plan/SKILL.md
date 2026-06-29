@@ -6,6 +6,7 @@ description: Shared, persistent planning and retrospectives across agents and pe
 # Shared Plan
 
 ## Overview
+
 Maintain a shared, versioned **active plan** that any agent or person can continue later via git pull.
 Completed work should be moved to changelogs.
 
@@ -77,6 +78,7 @@ Completed work should be moved to changelogs.
 ```
 
 ## Handoff Rules
+
 - Always update `Next Actions` and `Updates` before handoff.
 - If you used sources, list them in `Decisions`.
 - Keep entries short and easy to scan.

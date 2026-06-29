@@ -47,11 +47,13 @@ Post a short comment so the reporter sees traction. Keep it factual; no promises
 ### 3. Investigate
 
 For CI failures:
+
 - Find the failing job in the latest pipeline.
 - Pull its trace (`glab ci trace <job-id>` or `gh run view <run-id> --log-failed`).
 - Grep the trace for the actual error line (past the usual noise).
 
 For behavioral bugs:
+
 - Identify the component / file from the report.
 - Use `$blame-trace` to find the commit that introduced the suspected code.
 - Read related tests or recent PRs in the area.
@@ -59,6 +61,7 @@ For behavioral bugs:
 ### 4. Check for upstream fix
 
 Before writing new code:
+
 - Search recent commits on the default branch for the symptom string / error message.
 - Check merged PRs/MRs in the last 2–4 weeks for the same area.
 - If a fix already landed, the reporter's pipeline likely ran against an older ref.
@@ -66,12 +69,14 @@ Before writing new code:
 ### 5. Act
 
 **Case A — already fixed upstream:**
+
 1. Retrigger the reporter's pipeline (or the entry point that created it).
 2. Wait for completion and inspect the result.
 3. If green: post verification comment with pipeline link + explanation + close the issue.
 4. If still red: fall through to Case B.
 
 **Case B — new fix needed:**
+
 1. Create a branch, implement the minimal fix.
 2. Add or update a test that reproduces the failure.
 3. Verify locally (run tests / lint / relevant `test-local.sh`).
@@ -80,6 +85,7 @@ Before writing new code:
 6. Leave the issue open until the PR/MR merges and a re-run passes.
 
 **Case C — cannot reproduce / not enough info:**
+
 1. Post a comment asking for the missing data (logs, env, repro steps, expected vs actual).
 2. Assign the issue back to the reporter.
 3. Stop — do not escalate further until they respond.

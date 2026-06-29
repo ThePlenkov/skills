@@ -54,7 +54,7 @@ Do not keep developing.
 
 Kill dev servers, watchers, generators, or scripts that might overwrite more files.
 
-2. Preserve current state.
+1. Preserve current state.
 
 Create a salvage checkpoint:
 
@@ -68,7 +68,7 @@ Save:
 - list of current untracked files
 - archive of current untracked files if any
 
-3. Determine what happened.
+1. Determine what happened.
 
 Inspect recent commands from conversation/logs.
 
@@ -81,7 +81,7 @@ Classify damage:
 - generated files removed
 - nested repository affected
 
-4. Check recovery sources.
+1. Check recovery sources.
 
 Use only non-destructive reads:
 
@@ -96,13 +96,13 @@ Use only non-destructive reads:
 - previous assistant messages containing file contents
 - package manager or framework regeneration commands, only after preservation
 
-5. Be honest.
+1. Be honest.
 
 Tracked committed files can usually be restored.
 Tracked uncommitted changes may be recoverable only from patches, stash, IDE local history, or object database if they were staged.
 Untracked files deleted by git clean are often not recoverable by Git unless they were staged, stashed, copied, committed, or saved by IDE/filesystem backup.
 
-6. Do not claim recovery unless a file is actually restored and inspected.
+1. Do not claim recovery unless a file is actually restored and inspected.
 
 ## Output format
 
@@ -116,6 +116,7 @@ Checkpoint path:
 Files saved:
 
 [RECOVERY SOURCES CHECKED]
+
 - Source:
   Result:
 
