@@ -321,8 +321,18 @@ runs:
           # base ref hasn't received any new commits since the
           # last successful workflow. Fetch the SHA explicitly
           # so `nx affected --base` can resolve it.
-          if [ -n "${NX_BASE:-}" ] && ! git -C "$GITHUB_WORKSPACE" cat-file -e "${NX_BASE}" >/dev/null 2>&1; then
-            git -C "$GITHUB_WORKSPACE" fetch --depth=200 origin "${NX_BASE}" 2>/dev/null || true
+          if [ -n "${NX_BASE:-}" ]; then
+            echo "NX_BASE=${NX_BASE} (looking for it in host repo's objects)"
+            if git -C "$GITHUB_WORKSPACE" cat-file -e "${NX_BASE}" 2>/dev/null; then
+              echo "  -> already present"
+            else
+              echo "  -> not present, fetching from origin"
+              if git -C "$GITHUB_WORKSPACE" fetch --depth=200 origin "${NX_BASE}" 2>&1; then
+                echo "  -> fetch succeeded"
+              else
+                echo "  ::warning::fetch of NX_BASE SHA failed; `nx affected` will likely fail too"
+              fi
+            fi
           fi
           # Fallback: nx-set-shas can return empty NX_BASE for the
           # first CI run on a branch (or for cascade-of-PRs setups
