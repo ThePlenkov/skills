@@ -40,7 +40,7 @@ LEVEL_MAP = {
 
 
 def collect_rules(runs):
-    """Build ruleId → {tool, short, full, help} map across all runs."""
+    """Index each entry from tool.driver.entries by its identifier."""
     rules_by_id = {}
     for run in runs:
         driver = run.get("tool", {}).get("driver", {})

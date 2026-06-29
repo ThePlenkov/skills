@@ -2,6 +2,8 @@
 
 Install or update skills from one or more remote repositories using `npx skills`.
 
+> Scope: opt-in per user invocation. This workflow **only runs when the user explicitly invokes** `/dotagents sync`; never automatically. Each invocation prompts the user before pulling new skill content or changing agent configuration.
+
 ## Sync with `npx skills`
 
 Use the [`npx skills` CLI](https://github.com/vercel-labs/skills) to install or update skills from a repository:
