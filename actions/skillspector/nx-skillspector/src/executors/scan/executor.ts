@@ -1,27 +1,35 @@
 /**
- * scan executor — runs `skillspector scan <path> --format json` and
- * emits GitHub workflow commands + optional SARIF.
+ * Nx executor — runs Skillspector on a single skill and emits
+ * GitHub Actions annotations + a structured job summary.
  *
- * This executor is invoked once per inferred project (one SKILL.md).
- * Nx handles parallelism, caching, and per-skill hash inputs.
+ * Per-skill invocation pattern (called once per skill by Nx):
+ *   1. Run `skillspector scan <skill>` → JSON
+ *   2. Rewrite issue.location.file to be workspace-relative (so
+ *      `::error file=…` resolves to a real file in the repo, not
+ *      the GitHub Actions default of `.github`).
+ *   3. Filter annotations: only emit `::error`/`::warning` for code
+ *      files (.ts/.js/.py/.sh/.yml/.json). Markdown docs flagged by
+ *      the scanner are policy/prose, not code — they belong in the
+ *      summary, not in the Files tab.
+ *   4. Append a Markdown row to the per-skill summary file so the
+ *      outer workflow step can build the consolidated report.
+ *   5. Append a Markdown section to $GITHUB_STEP_SUMMARY (the
+ *      Actions run page's "Summary" tab).
  */
-import type { ExecutorContext } from "@nx/devkit";
+import type { ExecutorContext } from '@nx/devkit';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { issuesToAnnotations } from '../../lib/annotations.ts';
-import { buildSarif, type SkillspectorDoc } from '../../lib/mapping.ts';
+import {
+  buildSarif,
+  type SkillspectorDoc,
+  type SkillspectorIssue,
+} from '../../lib/mapping.ts';
 import { runSkillspector } from '../../lib/skillspector.ts';
 
-export interface ScanExecutorOptions {
-  path: string;
-  sarif?: string;
-  annotations?: boolean;
-  failOnError?: boolean;
-  jobSummary?: boolean;
-  noLlM?: boolean;
-  baseline?: string;
-  skillspectorBin?: string;
-}
+const execFileP = promisify(execFile);
+
+const CODE_FILE_RE = /\.(?:ts|tsx|js|jsx|mjs|cjs|py|sh|bash|zsh|yml|yaml|json|go|rs|java|rb|php)$/i;
 
 // Named export alongside default so Nx's CJS-style
 // (`module.default ?? module`) can find the executor either way.
@@ -92,13 +100,10 @@ export default async function scanExecutor(
   const issues = doc.issues ?? [];
 
   // Rewrite each issue's location.file to a workspace-relative path
-  // before building annotations. Skillspector returns paths relative
-  // to its scan root (e.g. `SKILL.md`, `references/foo.md`); GitHub
-  // workflow commands interpret `file=` as a repo-relative path. If
-  // we emit `file=SKILL.md` directly, GitHub can't resolve it (no
-  // `SKILL.md` at the repo root) and falls back to `.github`, which
-  // is why so many check-run annotations point at `.github` instead
-  // of the actual file. Joining with the scan root fixes this.
+  // so `::error file=…` resolves to a real file. Skillspector returns
+  // paths relative to its scan root (e.g. `SKILL.md`,
+  // `references/foo.md`); joining with the scan root fixes the GitHub
+  // Actions default of `.github` when the path can't be resolved.
   const skillRootAbs = path.resolve(resolvedPath);
   for (const issue of issues) {
     const loc = issue.location;
@@ -108,7 +113,20 @@ export default async function scanExecutor(
     loc.file = path.relative(context.root, absolute);
   }
 
-  if (annotations) {
+  // Categorise issues for output filtering:
+  // - codeFindings: in code files → emit as GitHub annotations + include
+  //   in the summary with file:line deep links
+  // - docFindings: in .md/.txt/etc → only include in the summary; these
+  //   are usually the scanner flagging policy/prose, not actionable code
+  const codeFindings: SkillspectorIssue[] = [];
+  const docFindings: SkillspectorIssue[] = [];
+  for (const issue of issues) {
+    const filePath = issue.location?.file ?? '';
+    if (CODE_FILE_RE.test(filePath)) codeFindings.push(issue);
+    else docFindings.push(issue);
+  }
+
+  if (annotations && codeFindings.length > 0) {
     // Write each annotation line to a shared file rather than
     // echoing it via console.log. Nx prefixes every line of worker
     // stdout with ANSI-coloured "project-name:" + a TTY reset, e.g.
@@ -129,17 +147,33 @@ export default async function scanExecutor(
     fs.mkdirSync(path.dirname(annotationsPath), { recursive: true });
     fs.appendFileSync(
       annotationsPath,
-      issuesToAnnotations(issues).join('\n') + '\n',
+      issuesToAnnotations(codeFindings).join('\n') + '\n',
       'utf8',
     );
   }
 
   let errorCount = 0;
   let warningCount = 0;
+  for (const issue of codeFindings) {
+    const sev = (issue.severity ?? '').toUpperCase();
+    if (sev === 'HIGH' || sev === 'CRITICAL') errorCount++;
+    else if (sev === 'MEDIUM' || sev === 'WARNING') warningCount++;
+  }
+  // docFindings are informational; count them separately so the
+  // summary can show "N doc-policy findings" alongside the actionable
+  // code findings.
+  let docErrorCount = 0;
+  let docWarningCount = 0;
+  for (const issue of docFindings) {
+    const sev = (issue.severity ?? '').toUpperCase();
+    if (sev === 'HIGH' || sev === 'CRITICAL') docErrorCount++;
+    else if (sev === 'MEDIUM' || sev === 'WARNING') docWarningCount++;
+  }
+
   if (sarif) {
     const resolvedSarif = path.isAbsolute(sarif)
       ? sarif.replace(/\.sarif$/, `-${context.projectName}.sarif`)
-      : path.resolve(context.root, sarif.replace(/\.sarif$/, `-${context.projectName}.sarif`));
+      : path.resolve(context.root, sarif.replace(/\.sarif$/, `--${context.projectName}.sarif`));
     fs.mkdirSync(path.dirname(resolvedSarif), { recursive: true });
 
     // Merge with any pre-existing SARIF at this path (e.g., a prior
@@ -157,34 +191,35 @@ export default async function scanExecutor(
     fs.writeFileSync(resolvedSarif, JSON.stringify(merged, null, 2) + '\n');
   }
 
-  for (const issue of issues) {
-    const sev = (issue.severity ?? '').toUpperCase();
-    if (sev === 'HIGH' || sev === 'CRITICAL') errorCount++;
-    else if (sev === 'MEDIUM' || sev === 'WARNING') warningCount++;
-  }
-
   console.log(`  findings=${issues.length} errors=${errorCount} warnings=${warningCount} ss_exit=${result.exitCode}`);
   console.log('::endgroup::');
 
   if (jobSummary && process.env.GITHUB_STEP_SUMMARY) {
+    // Per-skill block in the step summary. The outer workflow step
+    // adds a header/totals above this; each executor invocation
+    // appends its own block. Format kept terse — the rich design
+    // lives in the consolidated summary built by the workflow step.
+    const totalFindings = issues.length;
+    const allErrors = errorCount + docErrorCount;
+    const allWarnings = warningCount + docWarningCount;
     fs.appendFileSync(
       process.env.GITHUB_STEP_SUMMARY,
-      `\n### ${skillName}\n` +
-        `- Total findings: ${issues.length}\n` +
-        `- Error-severity: ${errorCount}\n` +
-        `- Warning-severity: ${warningCount}\n`,
+      [
+        '',
+        `### ${skillName}`,
+        '',
+        `| Severity (code) | Severity (docs) | Total |`,
+        `| :--- | :--- | ---: |`,
+        `| ❌ ${errorCount} errors / ⚠️ ${warningCount} warnings | ❌ ${docErrorCount} / ⚠️ ${docWarningCount} | ${totalFindings} |`,
+        '',
+      ].join('\n'),
     );
   }
 
   // Append per-skill findings as Markdown table rows to a shared
-  // file. The workflow's outer step builds the final comment body
-  // by combining these rows with a totals summary, then posts it
-  // to the PR Conversation tab as an idempotent comment.
-  //
-  // Nx runs the executor in parallel (one invocation per skill),
-  // so all 43 invocations append to the same file. We use a
-  // header sentinel on the first writer so the header is only
-  // written once; subsequent invocations just append rows.
+  // file. The workflow's outer step builds the final PR comment body
+  // from this — kept minimal (just totals + a link to the run),
+  // because the rich content lives in the step summary, not the PR.
   const summaryPath = process.env.PR_SUMMARY_FILE;
   if (summaryPath) {
     fs.mkdirSync(path.dirname(summaryPath), { recursive: true });
@@ -193,36 +228,55 @@ export default async function scanExecutor(
         summaryPath,
         [
           '<!-- SkillSpector:rows -->',
-          '| Skill | File | Line | Severity | Rule | Summary |',
-          '| :--- | :--- | ---: | :--- | :--- | :--- |',
+          '| Skill | Code errors | Code warnings | Doc findings |',
+          '| :--- | ---: | ---: | ---: |',
           '',
         ].join('\n'),
         'utf8',
       );
     }
-    const rows: string[] = [];
-    for (const issue of issues) {
-      const sev = (issue.severity ?? '').toUpperCase();
-      const sevBadge =
-        sev === 'HIGH' || sev === 'CRITICAL' ? '❌ error'
-        : sev === 'MEDIUM' || sev === 'WARNING' ? '⚠️ warning'
-        : sev === 'LOW' || sev === 'INFO' ? 'ℹ️ note'
-        : '· ' + sev.toLowerCase();
-      const loc = issue.location;
-      const filePath = loc?.file ?? '?';
-      const line = loc?.start_line ?? '?';
-      const ruleId = issue.id ?? '?';
-      // First line of the explanation as a compact summary; the
-      // full text is available in the SARIF / workflow-command
-      // annotations.
-      const msg = (issue.explanation ?? '').split('\n')[0]?.slice(0, 200) ?? '';
-      const esc = (s: string) => s.replace(/\|/g, '\\|').replace(/\n/g, ' ');
-      rows.push(
-        `| ${esc(skillName)} | ${esc(filePath)} | ${line} | ${sevBadge} | ${esc(ruleId)} | ${esc(msg)} |`,
-      );
-    }
-    if (rows.length) fs.appendFileSync(summaryPath, rows.join('\n') + '\n', 'utf8');
+    const esc = (s: string) => s.replace(/\|/g, '\\|').replace(/\n/g, ' ');
+    const row = `| ${esc(skillName)} | ${errorCount} | ${warningCount} | ${docFindings.length + docErrorCount + docWarningCount} |`;
+    fs.appendFileSync(summaryPath, row + '\n', 'utf8');
   }
 
   return { success: !failOnError || errorCount === 0 };
 }
+
+async function runSkillspector(opts: {
+  bin: string;
+  path: string;
+  noLlM: boolean;
+  baseline?: string;
+}): Promise<{ exitCode: number; jsonText: string }> {
+  try {
+    const args = ['scan', opts.path, '--format', 'json'];
+    if (opts.noLlM) args.push('--no-llm');
+    if (opts.baseline) {
+      args.push('--baseline', opts.baseline);
+    }
+    const { stdout, stderr } = await execFileP(opts.bin, args, {
+      maxBuffer: 200 * 1024 * 1024,
+    });
+    if (stderr) process.stderr.write(stderr);
+    return { exitCode: 0, jsonText: stdout };
+  } catch (err: unknown) {
+    // execFile rejects on non-zero exit. Skillspector exits non-zero
+    // when findings exist, but still writes JSON to stdout.
+    const e = err as { stdout?: string; stderr?: string; code?: number };
+    return {
+      exitCode: typeof e.code === 'number' ? e.code : 1,
+      jsonText: e.stdout ?? '',
+    };
+  }
+}
+
+export type ScanExecutorOptions = {
+  path: string;
+  sarif?: string;
+  annotations?: boolean;
+  failOnError?: boolean;
+  jobSummary?: boolean;
+  noLlM?: boolean;
+  baseline?: string;
+};
