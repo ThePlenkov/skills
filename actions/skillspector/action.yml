@@ -169,16 +169,21 @@ runs:
         NX_BIN="$GITHUB_ACTION_PATH/node_modules/.bin/nx"
 
         # Stage nx.json: save existing (if any), write action's, restore on exit.
+        # Trap uses double quotes so $NX_BACKUP expands at exit time
+        # (not at trap-registration time, where it's empty).
+        # Always removes $NX_BACKUP on exit to avoid /tmp leaks.
         NX_BACKUP=$(mktemp)
-        trap 'if [ -s "$NX_BACKUP" ]; then mv "$NX_BACKUP" nx.json; else rm -f nx.json; fi' EXIT
+        trap "if [ -s \"\$NX_BACKUP\" ]; then mv \"\$NX_BACKUP\" nx.json; else rm -f nx.json; fi; rm -f \"\$NX_BACKUP\"" EXIT
         if [ -f nx.json ]; then
           cp nx.json "$NX_BACKUP"
         fi
         cp "$GITHUB_ACTION_PATH/nx.json" nx.json
 
         # Ensure .nx is gitignored (idempotent — only adds if missing).
-        if [ -f .gitignore ] && ! grep -qxF '.nx' .gitignore; then
-          echo '.nx' >> .gitignore
+        # Match the actual gitignore entry (`.nx/`) rather than `.nx`,
+        # otherwise the anchored match misses and we append duplicates.
+        if [ -f .gitignore ] && ! grep -qF '.nx/' .gitignore; then
+          echo '.nx/' >> .gitignore
         fi
 
         # Resolve parallelism.
@@ -267,10 +272,16 @@ runs:
           SARIF_FINAL="${{ inputs.sarif }}"
           SARIF_DIR=$(dirname "$SARIF_FINAL")
           SARIF_BASE=$(basename "$SARIF_FINAL" .sarif)
+          # Guard against `nx affected` reporting zero projects: in that
+          # case the per-skill SARIF directory was never created and
+          # `fs.readdirSync` would throw ENOENT.
+          mkdir -p "$SARIF_DIR"
           node -e '
             const fs = require("node:fs"), path = require("node:path");
             const [out, dir, base] = process.argv.slice(1);
-            const files = fs.readdirSync(dir).filter(f => f.startsWith(base + "-") && f.endsWith(".sarif"));
+            const files = fs.existsSync(dir)
+              ? fs.readdirSync(dir).filter(f => f.startsWith(base + "-") && f.endsWith(".sarif"))
+              : [];
             const merged = { $schema: "https://json.schemastore.org/sarif-2.1.0.json", version: "2.1.0", runs: [] };
             for (const f of files.sort()) {
               try {
@@ -278,7 +289,6 @@ runs:
                 if (Array.isArray(s.runs)) merged.runs.push(...s.runs);
               } catch {}
             }
-            fs.mkdirSync(path.dirname(out), { recursive: true });
             fs.writeFileSync(out, JSON.stringify(merged, null, 2) + "\n");
             console.log(`Merged ${files.length} per-skill SARIF files into ${out} (${merged.runs.length} runs)`);
           ' "$SARIF_FINAL" "$SARIF_DIR" "$SARIF_BASE"
