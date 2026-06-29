@@ -1,0 +1,43 @@
+{
+  "name": "harvest-skill",
+  "root": ".agents/skills/harvest",
+  "projectType": "library",
+  "targets": {
+    "harvest": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bun .agents/skills/harvest/scripts/harvest-cli.ts"
+      }
+    },
+    "harvest-pr": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bun .agents/skills/harvest/scripts/harvest-cli.ts pr"
+      }
+    },
+    "harvest-batch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bun .agents/skills/harvest/scripts/harvest-cli.ts batch"
+      }
+    },
+    "harvest-resolve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bun .agents/skills/harvest/scripts/harvest-cli.ts resolve"
+      }
+    },
+    "harvest-archive": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bun .agents/skills/harvest/scripts/harvest-cli.ts archive"
+      }
+    },
+    "harvest-test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bun .agents/skills/harvest/scripts/harvest-cli.ts test"
+      }
+    }
+  }
+}
