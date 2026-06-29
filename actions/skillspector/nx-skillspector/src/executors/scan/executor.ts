@@ -91,6 +91,23 @@ export default async function scanExecutor(
 
   const issues = doc.issues ?? [];
 
+  // Rewrite each issue's location.file to a workspace-relative path
+  // before building annotations. Skillspector returns paths relative
+  // to its scan root (e.g. `SKILL.md`, `references/foo.md`); GitHub
+  // workflow commands interpret `file=` as a repo-relative path. If
+  // we emit `file=SKILL.md` directly, GitHub can't resolve it (no
+  // `SKILL.md` at the repo root) and falls back to `.github`, which
+  // is why so many check-run annotations point at `.github` instead
+  // of the actual file. Joining with the scan root fixes this.
+  const skillRootAbs = path.resolve(resolvedPath);
+  for (const issue of issues) {
+    const loc = issue.location;
+    if (!loc || !loc.file) continue;
+    if (path.isAbsolute(loc.file)) continue;
+    const absolute = path.resolve(skillRootAbs, loc.file);
+    loc.file = path.relative(context.root, absolute);
+  }
+
   if (annotations) {
     // Write each annotation line to a shared file rather than
     // echoing it via console.log. Nx prefixes every line of worker
