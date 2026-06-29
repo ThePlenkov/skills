@@ -173,7 +173,7 @@ export default async function scanExecutor(
   if (sarif) {
     const resolvedSarif = path.isAbsolute(sarif)
       ? sarif.replace(/\.sarif$/, `-${context.projectName}.sarif`)
-      : path.resolve(context.root, sarif.replace(/\.sarif$/, `--${context.projectName}.sarif`));
+      : path.resolve(context.root, sarif.replace(/\.sarif$/, `-${context.projectName}.sarif`));
     fs.mkdirSync(path.dirname(resolvedSarif), { recursive: true });
 
     // Merge with any pre-existing SARIF at this path (e.g., a prior
