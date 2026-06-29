@@ -116,32 +116,38 @@ runs:
       run: |
         set -euo pipefail
         target="${{ inputs.path }}"
+
+        # Always emit the same output shape so the next step doesn't
+        # need to discriminate single vs multi. We collect every
+        # candidate path into a tmpfile, then write it as a single
+        # multi-line 'skills<<EOF' GITHUB_OUTPUT block.
+        tmp=$(mktemp)
         if [ -f "${target}/SKILL.md" ]; then
-          # Single-skill: scan the directory itself.
-          printf 'single\t%s\n' "$target" >> "$GITHUB_OUTPUT"
+          # Single-skill: scan the directory itself. No glob needed.
+          printf '%s\n' "$target" >> "$tmp"
         else
-          # Multi-skill: collect sub-directories that contain SKILL.md.
-          tmp=$(mktemp)
-          found=0
+          # Multi-skill: collect immediate sub-directories with SKILL.md.
           for d in "${target}"/*/; do
             [ -d "$d" ] || continue
             if [ -f "${d}SKILL.md" ]; then
               printf '%s\n' "${d%/}" >> "$tmp"
-              found=1
             fi
           done
-          if [ "$found" = "0" ]; then
+          if [ ! -s "$tmp" ]; then
+            rm -f "$tmp"
             echo "::error title=skillspector::no SKILL.md found in ${target} or its sub-directories"
             exit 2
           fi
-          printf 'multi\n' >> "$GITHUB_OUTPUT"
-          {
-            echo "skills<<EOF"
-            cat "$tmp"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-          rm -f "$tmp"
         fi
+
+        count=$(wc -l < "$tmp" | tr -d ' ')
+        {
+          echo "skills<<EOF"
+          cat "$tmp"
+          echo "EOF"
+          echo "skill-count=${count}"
+        } >> "$GITHUB_OUTPUT"
+        rm -f "$tmp"
 
     - name: Run SkillSpector and emit annotations + SARIF
       id: emit
@@ -152,16 +158,13 @@ runs:
       run: |
         set -euo pipefail
 
-        MODE="${{ steps.discover.outputs.single }}"  # "single" or empty
+        MODE="${{ steps.discover.outputs.skill-count }}"
         SKILL_DIRS=()
+        while IFS= read -r line; do
+          SKILL_DIRS+=("$line")
+        done < <(printf '%s\n' "${{ steps.discover.outputs.skills }}")
 
-        if [ -n "$MODE" ]; then
-          SKILL_DIRS=("${{ inputs.path }}")
-        else
-          while IFS= read -r line; do
-            SKILL_DIRS+=("$line")
-          done < <(printf '%s' "${{ steps.discover.outputs.skills }}")
-        fi
+        echo "Discovered ${#SKILL_DIRS[@]} skill(s) to scan"
 
         # Build skillspector flags
         SS_ARGS=()
