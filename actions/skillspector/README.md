@@ -31,6 +31,22 @@ build the GitHub annotation, which then surfaces the tag prefix, the
 human-readable category, the remediation, the code snippet, and the
 confidence.
 
+## Parallel execution
+
+The orchestrator (`scripts/orchestrate.py`) scans skills in parallel
+using `concurrent.futures.ProcessPoolExecutor`, bounded by the
+`parallelism` input — defaulting to `nproc`, i.e. the runner's CPU
+count. Each skill is independent (its own directory with its own
+`SKILL.md`), so concurrent scans are safe and give a near-linear
+speedup on multi-core runners.
+
+Per-skill `emit.py` invocations run with `--no-step-output` so they
+don't race on `$GITHUB_OUTPUT`; the orchestrator aggregates counts
+once at the end and writes a single `error-count` / `warning-count`
+/ `total-count` block. Per-skill SARIF files are written to a tmpdir
+and merged at the end by concatenating `runs[]` into a single
+multi-run SARIF 2.1.0 document.
+
 ## Usage
 
 ### Scan a single skill
@@ -116,6 +132,7 @@ do with the counts.
 | `fail-on-error`       | no       | `"true"`                      | Exit 1 on error-severity findings. Set `"false"` to surface findings without failing.                         |
 | `job-summary`         | no       | `"true"`                      | Append a markdown per-skill summary table to `$GITHUB_STEP_SUMMARY`.                                           |
 | `skillspector-version`| no       | commit SHA pinned in action   | Pinned to a specific commit for reproducibility. Bump on purpose.                                              |
+| `parallelism`         | no       | `""` (uses `nproc`)          | Max concurrent skill scans. Set to `"1"` for sequential scanning (debugging). Each skill is independent, so any value up to the number of skills is safe. |
 
 ## Outputs
 
@@ -161,9 +178,10 @@ will just ignore them; the standard fields (`ruleId`, `level`,
 
 ```
 actions/skillspector/
-├── action.yml         — composite action definition
+├── action.yml              — composite action definition
 ├── scripts/
-│   └── emit.py        — the unified mapping (annotations + SARIF + step outputs)
+│   ├── orchestrate.py      — parallel orchestrator (ProcessPoolExecutor)
+│   └── emit.py             — the unified mapping (annotations + SARIF)
 ├── tests/
 │   ├── test_emit.py
 │   └── fixtures/

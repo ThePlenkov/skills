@@ -355,6 +355,16 @@ def parse_args(argv=None):
         help="Always exit 0, even on error-severity results.",
     )
     p.add_argument(
+        "--no-step-output", action="store_true",
+        help=(
+            "Skip writing to $GITHUB_OUTPUT. Used by the parallel "
+            "orchestrator, which is the sole writer of the final "
+            "aggregated step outputs. When this flag is set, multiple "
+            "emit.py instances can run concurrently without racing on "
+            "$GITHUB_OUTPUT."
+        ),
+    )
+    p.add_argument(
         "--write-summary", action="store_true",
         help="Append a markdown summary to $GITHUB_STEP_SUMMARY (default: off).",
     )
@@ -423,7 +433,8 @@ def main(argv=None):
     total_count = len(issues)
 
     # ----- step outputs (always; no-op outside Actions) -----
-    write_step_outputs(error_count, warning_count, total_count, args.sarif_out)
+    if not args.no_step_output:
+        write_step_outputs(error_count, warning_count, total_count, args.sarif_out)
 
     # ----- job summary (opt-in) -----
     if args.write_summary:

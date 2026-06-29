@@ -265,5 +265,34 @@ class TestRealScan(unittest.TestCase):
                 self.assertIn("category", r["properties"])
 
 
+class TestStepOutputToggle(unittest.TestCase):
+    """--no-step-output suppresses writes to $GITHUB_OUTPUT."""
+
+    def test_no_step_output_with_gh_output(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            gh = __import__('pathlib').Path(tmp) / 'gh_output'
+            gh.write_text('')
+            env = {**__import__('os').environ, 'GITHUB_OUTPUT': str(gh)}
+            proc = __import__('subprocess').run(
+                [__import__('sys').executable, str(EMIT), '--input', str(SYNTH), '--no-step-output'],
+                capture_output=True, text=True, env=env,
+            )
+            self.assertEqual(proc.returncode, 1)  # HIGH → exit 1
+            self.assertEqual(gh.read_text(), '', 'should not have written any step output')
+
+    def test_default_writes_step_output(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            gh = __import__('pathlib').Path(tmp) / 'gh_output'
+            gh.write_text('')
+            env = {**__import__('os').environ, 'GITHUB_OUTPUT': str(gh)}
+            __import__('subprocess').run(
+                [__import__('sys').executable, str(EMIT), '--input', str(SYNTH)],
+                capture_output=True, text=True, env=env, check=False,
+            )
+            self.assertIn('error-count=1', gh.read_text())
+
+
 if __name__ == "__main__":
     unittest.main()
