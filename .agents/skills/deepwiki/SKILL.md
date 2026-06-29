@@ -34,6 +34,10 @@ mcp-exec({"name": "deepwiki__ask_question", "arguments": {"repoName": "owner/rep
 
 ### If DeepWiki is a pre-configured MCP server
 
+The agent runtime already has the DeepWiki MCP server registered (via
+the host's MCP config). Use the standard `mcp_call_tool` runtime API
+to invoke its tools — do **not** read or parse the MCP config file.
+
 Use `mcp_call_tool` directly:
 
 ```

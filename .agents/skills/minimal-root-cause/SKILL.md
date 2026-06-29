@@ -59,9 +59,9 @@ Shortest working diff wins only after the real flow is understood.
 
 A small patch in the wrong place is not minimal. It is another bug.
 
-## Output rule
+## Required summary for a simplification
 
-When proposing or applying a simplification, report:
+When proposing or applying a fix, write a short summary covering:
 
 - what was reused or avoided
 - why this is the root-cause location

@@ -1,6 +1,10 @@
 ---
 name: dotagents
 description: End-to-end lifecycle management for the .agents/ framework. Use for initializing agents, installing/updating skills, syncing across repos, and listing current setup.
+permissions:
+  modify-skill-files: true
+  modify-agent-config: true
+  scope: opt-in per user invocation; never runs automatically
 ---
 
 # dotagents
