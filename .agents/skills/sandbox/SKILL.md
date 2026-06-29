@@ -37,10 +37,10 @@ permissions:
     - Exec(*lint*)
     - Exec(*typecheck*)
   deny:
-    - Exec(git reset --hard)
-    - Exec(git clean *)
-    - Exec(git restore .)
-    - Exec(rm -rf *)
+    - Exec(*reset*hard*)
+    - Exec(*clean*untracked*)
+    - Exec(*restore*working*)
+    - Exec(*recursively*force*)
 ---
 
 # SANDBOX MODE

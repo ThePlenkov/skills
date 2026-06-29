@@ -1,8 +1,12 @@
 # /dotagents install
 
-Install or update skills into the current agent's native format using `npx skills add`. Idempotent — safe to re-run.
+Workflow helper: install or refresh skill manifests from this repository
+into the running agent's native configuration directory.
 
-> Scope: opt-in per user invocation. This workflow **only runs when the user explicitly invokes** `/dotagents install`; never automatically. Each invocation prompts the user before changing skill files or agent configuration.
+> **Explicit-user-action only.** This workflow never runs automatically.
+> It is invoked only when the user types `/dotagents install` and always
+> prompts for confirmation before modifying any file. The `npx skills`
+> CLI is documented upstream at https://github.com/vercel-labs/skills.
 
 ## Install with `npx skills`
 
@@ -40,7 +44,7 @@ npx skills add ThePlenkov/skills --all -y
 
 ## Principles
 
-- Use `npx skills` as the standard install tool.
-- Don't overwrite existing configs without user approval.
-- Never pull in skills from unrelated sources — scope is the current project.
-- Confirm with the user before any change to skill files or agent configuration; this workflow never runs unattended.
+- The `npx skills` CLI is the standard install tool.
+- Do not overwrite existing configurations without user approval.
+- Do not pull in skills from unrelated sources; scope is the current project.
+- Confirm with the user before any file change; this workflow never runs unattended.

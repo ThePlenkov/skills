@@ -60,14 +60,11 @@ def collect_rules(runs):
 
 
 def build_title(tool_name, rule_id, properties, rules_by_id):
-    """Build a richer annotation title.
+    """Compose the title field of a workflow-command annotation.
 
-    Form: <tags?> <tool>[<rule>]: <category or rule name>
-
-    Tags (e.g. OWASP ASI02, CWE-22) come first so they're visible at a
-    glance. Tool and ruleId are the canonical identifier. Category is
-    a human-readable name; falls back to the rule's shortDescription
-    from the SARIF driver.
+    Output shape is: taxonomy tags (if present), then the
+    tool-and-identifier, then a human-readable name pulled from
+    the result's properties or the SARIF descriptor.
     """
     parts = []
 

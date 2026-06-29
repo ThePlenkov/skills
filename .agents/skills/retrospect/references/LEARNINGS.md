@@ -44,8 +44,8 @@ Searchable repository of lessons learned from retrospect analysis. Use to preven
 
 ### Communication & Clarity
 
-- [2024-01-07] [M] [agent] IF delegating a subtask to another model instance, THEN provide clear context, expected output, and constraints in the handoff payload
-- [2024-01-06] [L] [agent] IF presenting findings, THEN structure output with clear sections and avoid vague statements
+- [2024-01-07] [M] Subtask handoff: include background, expected output, and constraints in the handoff payload.
+- [2024-01-06] [L] Findings presentation: structure output with clear sections and avoid vague statements.
 
 ### Git & Version Control
 

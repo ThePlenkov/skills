@@ -48,11 +48,15 @@ If no internal memory tool exists, use the **Memory MCP server** (`mcp/memory` â
   "mcpServers": {
     "memory": {
       "command": "docker",
-      "args": ["run", "-i", "--rm", "-v", "/local-directory:/local-directory", "mcp/memory"]
+      "args": ["run", "-i", "--rm", "-v", "<local-data-dir>:<local-data-dir>", "mcp/memory"]
     }
   }
 }
 ```
+
+(Replace `<local-data-dir>` with the directory where you want the memory
+graph persisted. The above is a JSON config snippet showing the MCP
+invocation shape; the host runtime applies it.)
 
 ### Priority 3: No Memory Available
 
