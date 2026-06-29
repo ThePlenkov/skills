@@ -98,7 +98,11 @@ runs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.11"
+        # Skillspector 2.3.7 requires Python >=3.12,<3.14 (pinned by
+        # its setup.py). 3.12 is the lowest supported version, which
+        # maximizes compatibility with self-hosted runners; the
+        # github-hosted ubuntu-latest image ships 3.12 by default.
+        python-version: "3.12"
 
     - name: Install SkillSpector
       shell: bash
