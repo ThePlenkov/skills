@@ -235,6 +235,16 @@ runs:
           fi
         fi
 
+        # On manual workflow_dispatch, wipe Nx workspace-data so the
+        # project graph is recomputed from the current nx.json + file
+        # system. Without this, a stale cached graph from a prior
+        # run (with different plugin options or file layout) causes
+        # nx to either skip tasks or report "No tasks were run"
+        # even with run-many.
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          rm -rf .nx/workspace-data || true
+        fi
+
         set +e
         "$NX_BIN" "$NX_SUBCMD" -t scan \
           --parallel="$MAX_WORKERS" \
