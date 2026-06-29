@@ -159,7 +159,7 @@ runs:
       uses: nrwl/nx-set-shas@v5
       with:
         main-branch-name: ${{ inputs.base-branch }}
-        workflow-id: ${{ github.workflow }}
+        workflow-id: skill-scan.yml
 
     # Restore the Nx cache from a previous run (if any). The
     # matching save step lives at the very end of this action so
