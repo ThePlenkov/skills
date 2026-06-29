@@ -60,14 +60,18 @@ jobs:
 
           # Scan every skill in the repo. SkillSpector's --recursive flag
           # makes it discover each .agents/skills/<name>/SKILL.md. Default
-          # output format is SARIF 2.1.0; we write to a file so we can both
-          # convert to annotations and upload as an artifact.
+          # output format is SARIF 2.1.0.
+          #
+          # NOTE: with --recursive, the --output FILE flag is silently
+          # ignored in skillspector 2.3.7 — the SARIF document is always
+          # written to stdout. Workaround: redirect stdout to a file
+          # and let stderr (progress) go to the log.
           skillspector scan .agents/skills/ \
             --recursive \
             --no-llm \
             --format sarif \
-            --output skillspector.sarif \
             $BASELINE_ARG \
+            > skillspector.sarif \
             || SS_EXIT=$?
           SS_EXIT="${SS_EXIT:-0}"
 
