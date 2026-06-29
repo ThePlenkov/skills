@@ -32,16 +32,19 @@ jobs:
       - name: Run ShellCheck
         # shellcheck doesn't recurse on its own, so we use `find` to expand
         # the directory into explicit files. Pipe through the annotation
-        # converter so each warning becomes a GitHub PR annotation. Exit
-        # code is gated on shellcheck via PIPESTATUS[0] (the converter
-        # always succeeds).
+        # converter so each warning becomes a GitHub PR annotation.
+        #
+        # Pipeline: find → xargs shellcheck → tee log → converter.
+        # We rely on `set -o pipefail` so the pipeline's exit code is
+        # the rightmost non-zero status (i.e. shellcheck's, via xargs).
+        # We do NOT use ${PIPESTATUS[0]} — that captures `find`'s exit,
+        # which is almost always 0, masking shellcheck failures.
         run: |
           set -o pipefail
           find scripts -type f -name '*.sh' -print0 \
             | xargs -0 shellcheck --severity=warning \
             | tee shellcheck.log \
             | .github/scripts/to-annotations.sh shellcheck
-          exit "${PIPESTATUS[0]}"
 
   markdownlint:
     name: Markdown Lint
@@ -54,13 +57,20 @@ jobs:
         with:
           node-version: '20'
 
+      # Pin the version so CI is reproducible. markdownlint-cli2 v0.22
+      # (markdownlint v0.40) is what we developed against; later versions
+      # may add rules that would cause new failures.
       - name: Install markdownlint-cli2
-        run: npm install -g markdownlint-cli2
+        run: npm install -g markdownlint-cli2@0.22.1
 
       - name: Run markdownlint
+        # Pipeline: markdownlint → tee log → converter.
+        # `set -o pipefail` makes the pipeline's exit code the rightmost
+        # non-zero status (markdownlint's). The converter always succeeds
+        # (it never errors on bad input), so the gate is purely on
+        # markdownlint.
         run: |
           set -o pipefail
           markdownlint-cli2 '**/*.md' --config .markdownlint.json \
             | tee markdownlint.log \
             | .github/scripts/to-annotations.sh markdownlint
-          exit "${PIPESTATUS[0]}"

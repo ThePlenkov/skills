@@ -37,9 +37,14 @@ for line in sys.stdin:
         continue
     m = MSG_RX.match(line)
     if m:
-        print("::error file=" + current + ",title=ajv[frontmatter]::" + m["msg"])
+        # GitHub workflow commands require message and parameter values to
+        # be free of `%` (used for data-section delimiters) and newlines
+        # (would terminate the command). Replace with safe substitutes.
+        msg = m["msg"].replace("%", "%25").replace("\r", " ").replace("\n", " ")
+        print("::error file=" + current + ",title=ajv[frontmatter]::" + msg)
         continue
     m = PATH_RX.match(line)
     if m:
+        path = m["path"].replace("%", "%25").replace("\r", " ").replace("\n", " ")
         print("::notice file=" + current
-              + ",title=ajv[frontmatter path]::" + m["path"])
+              + ",title=ajv[frontmatter path]::" + path)

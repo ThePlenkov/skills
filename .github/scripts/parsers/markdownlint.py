@@ -22,6 +22,12 @@ for raw in sys.stdin:
     if not m:
         continue
     f, ln, col, rule, desc = m["file"], m["line"], m["col"], m["rule"], m["desc"]
-    col_part = "col=" + col + "," if col else ""
-    print("::warning file=" + f + ",line=" + ln + "," + col_part
-          + "title=markdownlint[" + rule + "]::" + desc)
+    # Build the property list as an array and join with commas. Missing
+    # fields (e.g. col) are skipped entirely so we never emit
+    # `file=…,line=…,,title=…` (double comma) which GitHub's workflow-
+    # command parser rejects.
+    props = ["file=" + f, "line=" + ln]
+    if col:
+        props.append("col=" + col)
+    props.append("title=markdownlint[" + rule + "]")
+    print("::warning " + ",".join(props) + "::" + desc)

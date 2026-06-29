@@ -91,6 +91,8 @@ def main():
             title = tool_name + "[" + rule_id + "]"
 
             message = result.get("message", {}).get("text", "(no message)")
+            # Escape `%` in the rule shortDescription too, since it gets
+            # joined into full_msg.
             if rule_short and rule_short != message:
                 full_msg = rule_short + " — " + message
             else:
@@ -112,6 +114,10 @@ def main():
                 end_line = region.get("endLine")
                 end_col = region.get("endColumn")
 
+            # Build the property list as an array and join with commas.
+            # Missing fields (e.g. line) are skipped entirely so we never
+            # emit `file=…,line=…,,title=…` (double comma) which GitHub's
+            # workflow-command parser rejects.
             parts = []
             if file_uri:
                 parts.append("file=" + file_uri)
@@ -126,7 +132,16 @@ def main():
             parts.append("title=" + title)
             props = ",".join(parts)
 
-            out_lines.append("::" + ann_level + " " + props + "::" + full_msg)
+            # Escape `%` (data-section delimiter) and newlines in the
+            # message body, otherwise GitHub truncates or mis-parses the
+            # command.
+            safe_msg = (
+                full_msg
+                .replace("%", "%25")
+                .replace("\r", " ")
+                .replace("\n", " ")
+            )
+            out_lines.append("::" + ann_level + " " + props + "::" + safe_msg)
 
     # Emit to stdout in one go
     sys.stdout.write("\n".join(out_lines))

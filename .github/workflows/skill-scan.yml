@@ -54,9 +54,9 @@ jobs:
         run: |
           set -u
 
-          BASELINE_ARG=""
+          BASELINE_ARGS=()
           if [ -f .skillspector-baseline.yaml ]; then
-            BASELINE_ARG="--baseline .skillspector-baseline.yaml"
+            BASELINE_ARGS=(--baseline .skillspector-baseline.yaml)
           fi
 
           mkdir -p /tmp/skillspector
@@ -74,11 +74,14 @@ jobs:
 
             # Single-skill SARIF output goes to the file via --output.
             # We force the exit code into SS_EXIT and don't abort the loop.
+            # Use array expansion `"${BASELINE_ARGS[@]}"` (quoted, with
+            # `[@]`) to handle the empty/non-empty case correctly without
+            # word-splitting risks from an unquoted string variable.
             skillspector scan "$skill_dir" \
               --no-llm \
               --format sarif \
               --output "$sarif_path" \
-              $BASELINE_ARG \
+              "${BASELINE_ARGS[@]}" \
               || SS_EXIT=$?
             SS_EXIT="${SS_EXIT:-0}"
 
