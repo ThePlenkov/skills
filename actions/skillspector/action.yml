@@ -197,8 +197,14 @@ runs:
           MAX_WORKERS=$(nproc)
         fi
 
-        # Pick `nx affected` or `nx run-many` based on the input.
-        if [ "${{ inputs.affected }}" = "true" ]; then
+        # Pick `nx affected` (PR/push) or `nx run-many` (manual dispatch).
+        # On workflow_dispatch we always want a full scan — there's no
+        # base ref to diff against, and the user clicked "Run workflow"
+        # explicitly to scan everything. For PR/push events, use
+        # `nx affected` so we only re-scan skills whose files changed.
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          NX_SUBCMD="run-many"
+        elif [ "${{ inputs.affected }}" = "true" ]; then
           NX_SUBCMD="affected"
         else
           NX_SUBCMD="run-many"
