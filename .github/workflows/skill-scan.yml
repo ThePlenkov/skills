@@ -51,6 +51,10 @@ jobs:
           path: ./.agents/skills/
           sarif: ${{ github.workspace }}/skillspector.sarif
           job-summary: 'true'
+          # For cascade-of-PRs setups where each PR targets the
+          # previous PR's branch (not main), pass the actual base.
+          # nx-set-shas uses this to compute NX_BASE for `nx affected`.
+          base-branch: ${{ github.event.pull_request.base.ref || 'main' }}
 
       - name: Upload SARIF report
         if: always()
