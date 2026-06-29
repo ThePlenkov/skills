@@ -1,6 +1,9 @@
 ---
 name: npm-publish
-description: Publish npm packages using granular access tokens or trusted publishers (OIDC). Use when publishing packages, setting up CI/CD publishing, or managing npm authentication. Includes /npm-publish prepare-ci to bootstrap CI publishing for new packages.
+description: Publish npm packages using OIDC-based trusted publishing, or short-lived scoped automation credentials when OIDC is unavailable. Use when publishing packages, setting up CI/CD publishing, or managing registry authentication. Includes /npm-publish prepare-ci to bootstrap CI publishing for new packages.
+permissions:
+  network: registry.npmjs.org
+  scope: packages explicitly opted in via `npm publish` from a clean checkout
 ---
 
 # npm-publish
@@ -15,7 +18,7 @@ Guides the full npm publishing lifecycle: authentication, token management, CI/C
 
 ## Authentication
 
-As of November 2025, **only granular access tokens are supported**. Legacy (classic) tokens have been removed.
+As of November 2025, **only short-lived granular automation credentials are supported** by the npm registry. Legacy long-lived automation credentials were removed.
 
 ### Interactive login
 

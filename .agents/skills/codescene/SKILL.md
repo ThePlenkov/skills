@@ -14,9 +14,14 @@ CodeScene integration for OpenADT. Two layers:
 
 ## CS_ACCESS_TOKEN
 
-The `CS_ACCESS_TOKEN` is an **org-level secret** under the `abapify` GitHub organization. It is a Personal Access Token (PAT) from <https://codescene.io/users/me/pat>.
+This skill documents the role of an **org-level GitHub Actions secret** that
+authenticates the CodeScene CLI. The actual token value lives in your
+org's encrypted secrets store — see GitHub's documentation for managing
+secrets at the org level. The token is issued by the CodeScene web UI
+under your account's settings.
 
-When the token is valid and exposed, it also grants access to the **CodeScene Cloud API** and the **`cs` CLI** — the same token works for both.
+The same secret value grants access to both the **CodeScene Cloud API**
+and the **`cs` CLI** — the value is reused for both.
 
 ### Secret availability problem
 

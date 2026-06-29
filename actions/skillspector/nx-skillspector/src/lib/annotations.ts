@@ -16,25 +16,18 @@ const MAX_SNIPPET_LENGTH = 400;
 export function buildTitle(
   ruleId: string,
   properties: Record<string, unknown>,
-  toolName = 'skillspector',
+  _toolName = 'skillspector',
 ): string {
-  const parts: string[] = [];
-  const tags = properties.tags as string[] | undefined;
-  if (tags && tags.length > 0) {
-    const seen = new Set<string>();
-    const tagStrs: string[] = [];
-    for (const t of tags) {
-      if (t && !seen.has(t)) {
-        seen.add(t);
-        tagStrs.push(String(t));
-      }
-    }
-    if (tagStrs.length > 0) parts.push('[' + tagStrs.join(' ') + ']');
-  }
-  parts.push(toolName + '[' + ruleId + ']');
+  // GitHub renders the workflow job name and tool name in the UI
+  // header for each annotation, so the title only needs the signal a
+  // reader can't get elsewhere: bracketed rule ID, then the
+  // human-readable category. Older format was
+  //   [<tag>]skillspector[<rule>]: <category>
+  // which repeated the tool name and the category. The brackets
+  // around the rule ID are kept so the title is visually scannable
+  // when many findings are open at once.
   const category = properties.category as string | undefined;
-  if (category) parts.push(': ' + category);
-  return parts.join('');
+  return '[' + ruleId + ']: ' + (category ?? ruleId);
 }
 
 export function buildMessage(explanation: string, properties: Record<string, unknown>): string {
@@ -44,7 +37,15 @@ export function buildMessage(explanation: string, properties: Record<string, unk
   if (properties.remediation) out.push('Fix: ' + String(properties.remediation));
   const snippet = properties.code_snippet as string | undefined;
   if (snippet) {
-    const flat = snippet.replace(/\r?\n/g, ' ⏎ ');
+    // GitHub's `::error ...::message` workflow command is single-line
+    // — the parser splits stdout on newlines, so a literal \n in the
+    // message would break the command at the next newline and the
+    // rest would be logged as plain text. The previous fix used ' ⏎ '
+    // as a visible line-break marker, but GitHub renders it as a
+    // literal Unicode glyph and the result reads as gibberish.
+    // Collapse snippet whitespace to single spaces; readers get the
+    // full snippet via the SARIF code-scanning tab if they need it.
+    const flat = snippet.replace(/\s+/g, ' ').trim();
     const truncated = flat.length > MAX_SNIPPET_LENGTH
       ? flat.slice(0, MAX_SNIPPET_LENGTH - 1) + '…'
       : flat;

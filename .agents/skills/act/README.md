@@ -13,7 +13,6 @@ wontfix) lives in [`.agents/skills/backlog/`](../backlog/).
 | `SKILL.md` | Agent instructions (load on `/act`) |
 | `scripts/` | gh/bun helpers (`pr-state.sh`, `query-debt`, `plan-debt-batch`, `update-debt-status`, P5 extract/submit, …) |
 | `references/` | `EVALUATE.md` (P6), `RATING_FLOW.md` (P5) |
-| `project.json` | Nx targets (`act-skill:act-debt-*`) |
 
 The shared ledger types/helpers (`scripts/review-debt-{lib,gh,text}.ts`) live in
 [`.agents/skills/harvest/scripts/`](../harvest/scripts/) — the act skill imports

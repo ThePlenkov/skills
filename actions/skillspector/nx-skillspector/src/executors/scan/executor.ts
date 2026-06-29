@@ -91,6 +91,23 @@ export default async function scanExecutor(
 
   const issues = doc.issues ?? [];
 
+  // Rewrite each issue's location.file to a workspace-relative path
+  // before building annotations. Skillspector returns paths relative
+  // to its scan root (e.g. `SKILL.md`, `references/foo.md`); GitHub
+  // workflow commands interpret `file=` as a repo-relative path. If
+  // we emit `file=SKILL.md` directly, GitHub can't resolve it (no
+  // `SKILL.md` at the repo root) and falls back to `.github`, which
+  // is why so many check-run annotations point at `.github` instead
+  // of the actual file. Joining with the scan root fixes this.
+  const skillRootAbs = path.resolve(resolvedPath);
+  for (const issue of issues) {
+    const loc = issue.location;
+    if (!loc?.file) continue;
+    if (path.isAbsolute(loc.file)) continue;
+    const absolute = path.resolve(skillRootAbs, loc.file);
+    loc.file = path.relative(context.root, absolute);
+  }
+
   if (annotations) {
     // Write each annotation line to a shared file rather than
     // echoing it via console.log. Nx prefixes every line of worker
@@ -157,6 +174,54 @@ export default async function scanExecutor(
         `- Error-severity: ${errorCount}\n` +
         `- Warning-severity: ${warningCount}\n`,
     );
+  }
+
+  // Append per-skill findings as Markdown table rows to a shared
+  // file. The workflow's outer step builds the final comment body
+  // by combining these rows with a totals summary, then posts it
+  // to the PR Conversation tab as an idempotent comment.
+  //
+  // Nx runs the executor in parallel (one invocation per skill),
+  // so all 43 invocations append to the same file. We use a
+  // header sentinel on the first writer so the header is only
+  // written once; subsequent invocations just append rows.
+  const summaryPath = process.env.PR_SUMMARY_FILE;
+  if (summaryPath) {
+    fs.mkdirSync(path.dirname(summaryPath), { recursive: true });
+    if (!fs.existsSync(summaryPath)) {
+      fs.writeFileSync(
+        summaryPath,
+        [
+          '<!-- SkillSpector:rows -->',
+          '| Skill | File | Line | Severity | Rule | Summary |',
+          '| :--- | :--- | ---: | :--- | :--- | :--- |',
+          '',
+        ].join('\n'),
+        'utf8',
+      );
+    }
+    const rows: string[] = [];
+    for (const issue of issues) {
+      const sev = (issue.severity ?? '').toUpperCase();
+      const sevBadge =
+        sev === 'HIGH' || sev === 'CRITICAL' ? '❌ error'
+        : sev === 'MEDIUM' || sev === 'WARNING' ? '⚠️ warning'
+        : sev === 'LOW' || sev === 'INFO' ? 'ℹ️ note'
+        : '· ' + sev.toLowerCase();
+      const loc = issue.location;
+      const filePath = loc?.file ?? '?';
+      const line = loc?.start_line ?? '?';
+      const ruleId = issue.id ?? '?';
+      // First line of the explanation as a compact summary; the
+      // full text is available in the SARIF / workflow-command
+      // annotations.
+      const msg = (issue.explanation ?? '').split('\n')[0]?.slice(0, 200) ?? '';
+      const esc = (s: string) => s.replace(/\|/g, '\\|').replace(/\n/g, ' ');
+      rows.push(
+        `| ${esc(skillName)} | ${esc(filePath)} | ${line} | ${sevBadge} | ${esc(ruleId)} | ${esc(msg)} |`,
+      );
+    }
+    if (rows.length) fs.appendFileSync(summaryPath, rows.join('\n') + '\n', 'utf8');
   }
 
   return { success: !failOnError || errorCount === 0 };

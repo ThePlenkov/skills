@@ -34,7 +34,6 @@ or every `/act` invocation. Triggers are: PR merge, post-PR-CI, manual dispatch.
 | `SKILL.md` | This file |
 | `scripts/` | `harvest-threads.ts`, `harvest-debt-batch.ts`, `resolve-harvest-prs.ts`, `resolve-harvest-target.ts`, `land-harvest-files.sh`, `archive-harvest.ts`, `harvest-cli.ts`, `review-debt-{lib,gh,text}.ts` |
 | `references/` | (reserved) |
-| `project.json` | Nx targets (`harvest-skill:harvest-*`) |
 
 The shared ledger types/helpers (`review-debt-lib.ts`, `review-debt-gh.ts`,
 `review-debt-text.ts`) live here because they describe the harvest format.

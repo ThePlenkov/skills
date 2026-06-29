@@ -77,6 +77,9 @@ outputs:
   sarif-path:
     description: "Absolute path to the SARIF file, if `sarif` input was set."
     value: ${{ steps.scan.outputs.sarif-path }}
+  summary-path:
+    description: "Absolute path to the PR-comment summary Markdown file (per-skill rows)."
+    value: /tmp/skillspector-summary.md
   error-count:
     description: "Total error-severity findings across all scanned skills."
     value: ${{ steps.scan.outputs.error-count }}
@@ -129,7 +132,7 @@ runs:
     # usable after a dep upgrade.
     - name: Restore Nx cache
       id: nx-cache
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: .nx/cache
         key: nx-skillspector-${{ runner.os }}-${{ hashFiles('actions/skillspector/package-lock.json', '.agents/skills/**/SKILL.md') }}
@@ -156,6 +159,7 @@ runs:
         SARIF_OUT: ${{ inputs.sarif }}
         ANNOTATIONS_ENABLED: ${{ inputs.annotations }}
         FAIL_ON_ERROR: ${{ inputs.fail-on-error }}
+        PR_SUMMARY_FILE: /tmp/skillspector-summary.md
         JOB_SUMMARY_ENABLED: ${{ inputs.job-summary }}
       run: |
         set -euo pipefail
@@ -211,7 +215,7 @@ runs:
           if [ -n "${NX_BASE:-}" ] \
             && ! git -C "$GITHUB_WORKSPACE" cat-file -e "${NX_BASE}" 2>/dev/null; then
             git -C "$GITHUB_WORKSPACE" fetch --depth=200 origin "${NX_BASE}" 2>/dev/null || \
-              echo "::warning::fetch of NX_BASE SHA failed; nx affected will likely fail too"
+              echo "::warning title=skillspector action:NX_BASE fetch::fetch of NX_BASE SHA failed; nx affected will likely fail too"
           fi
           if [ -z "${NX_BASE:-}" ]; then
             if NX_BASE=$(git -C "$GITHUB_WORKSPACE" merge-base "origin/${BASE_REF}" HEAD 2>/dev/null) && [ -n "$NX_BASE" ]; then
@@ -220,7 +224,7 @@ runs:
             fi
           fi
           if [ -z "${NX_BASE:-}" ]; then
-            echo "::warning::NX_BASE could not be determined; falling back to nx run-many"
+            echo "::warning title=skillspector action:NX_BASE missing::NX_BASE could not be determined; falling back to nx run-many"
             NX_SUBCMD="run-many"
           fi
         fi
@@ -276,21 +280,84 @@ runs:
           # case the per-skill SARIF directory was never created and
           # `fs.readdirSync` would throw ENOENT.
           mkdir -p "$SARIF_DIR"
+          # GitHub's code-scanning API (upload-sarif) rejects SARIF files
+          # with multiple runs that share a category — it stopped
+          # auto-merging runs in July 2025. Since each per-skill scan
+          # produces its own run, naively concatenating would fail with:
+          #   "The CodeQL Action does not support uploading multiple SARIF
+          #    runs with the same category."
+          # Instead, merge all per-skill results into ONE run that shares
+          # a single tool entry (and therefore a single category). The
+          # rule indices are remapped so the SARIF `ruleIndex` references
+          # stay valid.
           node -e '
             const fs = require("node:fs"), path = require("node:path");
             const [out, dir, base] = process.argv.slice(1);
             const files = fs.existsSync(dir)
-              ? fs.readdirSync(dir).filter(f => f.startsWith(base + "-") && f.endsWith(".sarif"))
+              ? fs.readdirSync(dir).filter(f => f.startsWith(base + "-") && f.endsWith(".sarif")).sort()
               : [];
-            const merged = { $schema: "https://json.schemastore.org/sarif-2.1.0.json", version: "2.1.0", runs: [] };
-            for (const f of files.sort()) {
-              try {
-                const s = JSON.parse(fs.readFileSync(path.join(dir, f), "utf8"));
-                if (Array.isArray(s.runs)) merged.runs.push(...s.runs);
-              } catch {}
+            // Aggregate by tool (driver.name). Most SARIF producers
+            // (including ours) use a single driver; merging across
+            // distinct drivers would lose rule semantics.
+            const byDriver = new Map();
+            for (const f of files) {
+              let s;
+              try { s = JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")); } catch { continue; }
+              if (!Array.isArray(s.runs)) continue;
+              for (const run of s.runs) {
+                const name = run?.tool?.driver?.name ?? "unknown";
+                if (!byDriver.has(name)) byDriver.set(name, []);
+                byDriver.get(name).push(run);
+              }
             }
+            const mergedRuns = [];
+            for (const [driverName, runs] of byDriver) {
+              // Use the first run as the template (tool, originalUriBaseIds,
+              // automationDetails, properties).
+              const base = runs[0];
+              // Merge rules from all runs into a deduped list, then
+              // remap each result.ruleIndex to the merged index. Two
+              // rules are considered the same when their `id` matches
+              // (rules within a driver are uniquely identified by id).
+              const mergedRules = [...(base.tool.driver.rules ?? [])];
+              const idToIndex = new Map(mergedRules.map((r, i) => [r.id, i]));
+              for (const run of runs.slice(1)) {
+                for (const r of run.tool?.driver?.rules ?? []) {
+                  if (!idToIndex.has(r.id)) {
+                    idToIndex.set(r.id, mergedRules.length);
+                    mergedRules.push(r);
+                  }
+                }
+              }
+              const mergedResults = [];
+              for (const run of runs) {
+                for (const result of run.results ?? []) {
+                  const oldIdx = result.ruleIndex;
+                  // Drop results whose rule we cannot resolve
+                  // (orphan rules would otherwise produce a SARIF
+                  // pointing at ruleIndex = -1 which code-scanning
+                  // rejects as invalid).
+                  const newIdx = typeof oldIdx === "number" && oldIdx >= 0
+                    ? idToIndex.get(run.tool.driver.rules[oldIdx]?.id)
+                    : -1;
+                  if (newIdx === undefined) continue;
+                  mergedResults.push({ ...result, ruleIndex: newIdx });
+                }
+              }
+              mergedRuns.push({
+                ...base,
+                tool: { ...base.tool, driver: { ...base.tool.driver, rules: mergedRules } },
+                results: mergedResults,
+              });
+            }
+            const merged = {
+              $schema: "https://json.schemastore.org/sarif-2.1.0.json",
+              version: "2.1.0",
+              runs: mergedRuns,
+            };
             fs.writeFileSync(out, JSON.stringify(merged, null, 2) + "\n");
-            console.log(`Merged ${files.length} per-skill SARIF files into ${out} (${merged.runs.length} runs)`);
+            const total = mergedRuns.reduce((s, r) => s + (r.results?.length ?? 0), 0);
+            console.log(`Merged ${files.length} per-skill SARIF files into ${out} (${mergedRuns.length} run, ${total} results)`);
           ' "$SARIF_FINAL" "$SARIF_DIR" "$SARIF_BASE"
         fi
 
@@ -303,7 +370,7 @@ runs:
     # we update the cache entry instead of racing on a new key.
     - name: Save Nx cache
       if: always()
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v6
       with:
         path: .nx/cache
         key: ${{ steps.nx-cache.outputs.cache-primary-key }}

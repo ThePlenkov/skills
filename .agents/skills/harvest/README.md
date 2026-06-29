@@ -10,7 +10,6 @@ collects unresolved PR review threads into an append-only ledger on `main`.
 | `SKILL.md` | Agent instructions (load on `/harvest`) |
 | `scripts/` | gh/bun helpers (`harvest-threads.ts`, `harvest-debt-batch.ts`, `resolve-harvest-*`, `land-harvest-files.sh`, `archive-harvest.ts`, `harvest-cli.ts`, `review-debt-{lib,gh,text}.ts`) |
 | `references/` | (reserved) |
-| `project.json` | Nx targets (`harvest-skill:harvest-*`) |
 
 ## Move to another repo
 

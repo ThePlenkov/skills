@@ -34,11 +34,21 @@ mcp-exec({"name": "deepwiki__ask_question", "arguments": {"repoName": "owner/rep
 
 ### If DeepWiki is a pre-configured MCP server
 
-Use `mcp_call_tool` directly:
+The agent runtime already has the DeepWiki MCP server registered via the
+host's standard MCP setup. Use the runtime's documented tool-dispatch
+API to invoke its exposed tools. **Do not** read or parse the MCP
+configuration file from the skill — let the runtime route the call.
+
+Concretely, the dispatch shape is:
 
 ```
-mcp_call_tool(server_name="deepwiki", tool_name="ask_question", arguments={"repoName": "owner/repo", "question": "..."})
+<runtime-call> deepwiki.ask_question(repoName="owner/repo", question="...")
 ```
+
+Replace `<runtime-call>` with your runtime's documented dispatch
+primitive — for example, a typed client method or a generic gateway
+invoke. Exact names vary by host; this skill targets the conceptual
+flow, not a specific runtime API.
 
 ## Tools
 
@@ -65,13 +75,20 @@ run_subagent(
 Analyze the GitHub repository <owner/repo> using DeepWiki MCP tools.
 
 ## Setup
-1. List available MCP servers with mcp_list_tools to check if "deepwiki" is available.
-2. If deepwiki MCP is available, use mcp_call_tool(server_name="deepwiki", ...).
-3. If deepwiki MCP is NOT available but docker-mcp gateway is available:
-   - mcp_call_tool(server_name="docker-mcp", tool_name="mcp-find", arguments={"query": "deepwiki"})
-   - mcp_call_tool(server_name="docker-mcp", tool_name="mcp-add", arguments={"name": "deepwiki", "activate": false})
-   - Then use mcp_call_tool(server_name="docker-mcp", tool_name="mcp-exec", arguments={"name": "deepwiki__<tool>", ...})
-4. If neither is available, report that DeepWiki MCP is not configured.
+
+The exact invocation pattern depends on the host agent runtime. The
+following is the conceptual sequence — replace `<runtime-call>` with
+your runtime's documented MCP tool-dispatch API.
+
+1. Ask the runtime whether the `deepwiki` server is registered.
+   `<runtime-call> list_mcp_servers` — check the result for `"deepwiki"`.
+2. If registered, dispatch to its exposed tools.
+   `<runtime-call> deepwiki.ask_question(repoName=<owner/repo>, question=<Q>)`
+3. If only a Docker-backed MCP gateway is registered, route through it.
+   `<runtime-call> gateway.lookup(server="deepwiki")`
+   `<runtime-call> gateway.attach(name="deepwiki", activate=false)`
+   `<runtime-call> gateway.invoke(server="deepwiki", tool=<tool>, args=<args>)`
+4. If neither is registered, report that DeepWiki MCP is not configured.
 
 ## Task
 <detailed analysis instructions — what to look for, what questions to ask>
@@ -106,8 +123,7 @@ run_subagent(
   task="""
 Analyze the GitHub repository fastify/fastify using DeepWiki MCP.
 
-Setup: check mcp_list_tools for "deepwiki" server availability, then use
-mcp_call_tool accordingly (see deepwiki skill for connection details).
+Setup: follow the Setup steps in the main deepwiki skill to dispatch the call through the host runtime.
 
 Steps:
 1. read_wiki_structure for fastify/fastify to see available topics
@@ -129,8 +145,7 @@ run_subagent(
   task="""
 Compare expressjs/express and fastify/fastify using DeepWiki MCP.
 
-Setup: check mcp_list_tools for "deepwiki" server availability, then use
-mcp_call_tool accordingly (see deepwiki skill for connection details).
+Setup: follow the Setup steps in the main deepwiki skill to dispatch the call through the host runtime.
 
 Steps:
 1. read_wiki_structure for both repos

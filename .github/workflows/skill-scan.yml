@@ -29,6 +29,18 @@ concurrency:
 permissions:
   contents: read
   actions: read
+  # security-events: write is required to upload SARIF to the
+  # code-scanning API, which is what makes findings appear inline
+  # in the PR Files tab as proper code-scanning alerts (the same
+  # mechanism SonarCloud and CodeQL use). Without this permission,
+  # upload-sarif fails with HTTP 403 on the security-events endpoint.
+  security-events: write
+  # pull-requests: write lets the workflow post a PR summary comment
+  # (and update it in place across pushes). Declaring `permissions:`
+  # above overrides the default token scopes, so we have to enumerate
+  # this explicitly — otherwise the PR comment step gets 403 from
+  # `gh api ... issues/comments/...` and silently fails.
+  pull-requests: write
 
 jobs:
   scan:
@@ -57,6 +69,35 @@ jobs:
           # nx-set-shas uses this to compute NX_BASE for `nx affected`.
           base-branch: ${{ github.event.pull_request.base.ref || 'main' }}
 
+      # Upload the merged SARIF to the code-scanning API. This is
+      # what makes findings appear inline in the PR Files Changed
+      # tab as code-scanning alerts (yellow ⚠ for warnings, red ❌
+      # for errors), same UX as SonarCloud / CodeQL.
+      #
+      # Requirements for this step to actually create alerts:
+      # - the repo must have code-scanning enabled in settings
+      #   (Settings → Code security and analysis → Code scanning),
+      #   OR be public (code-scanning is on by default for public
+      #   repos with GitHub Advanced Security free tier).
+      # - this job must have `security-events: write` (declared above).
+      #
+      # On PRs from forks the upload is silently ignored (GitHub
+      # blocks security-events writes from untrusted contexts). In
+      # that case the workflow-command annotations still surface
+      # findings in the Checks panel.
+      #
+      # `continue-on-error: true` because the SARIF file may be
+      # empty when zero skills were scanned (e.g. nx affected reported
+      # zero projects on a no-change PR); in that case upload-sarif
+      # exits non-zero with "no SARIF files were found".
+      - name: Upload SARIF to code-scanning
+        if: always()
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif-path }}
+          category: skillspector
+
       - name: Upload SARIF report
         if: always()
         uses: actions/upload-artifact@v7
@@ -65,3 +106,144 @@ jobs:
           path: ${{ steps.scan.outputs.sarif-path }}
           retention-days: 7
           if-no-files-found: ignore
+
+      # Post a SonarCloud-style PR summary comment to the Conversation
+      # tab. Mirrors the UX users see from SonarQube / CodeQL — a
+      # single Markdown comment listing all findings, updated in
+      # place on each push. Workflow-command annotations still
+      # surface errors inline in the Files tab; this comment adds
+      # a top-level overview that includes warnings (which the
+      # annotation API never shows inline).
+      #
+      # Idempotency: searches for our previous comment by the
+      # <!-- SkillSpector:start --> marker. PATCH if found (update),
+      # POST if not (first run on this PR).
+      #
+      # PRs from forks: GITHUB_TOKEN has read-only access to
+      # pull-requests for fork PRs; this step will 403 and we skip
+      # silently. continue-on-error: true so the workflow doesn't fail.
+      - name: Post SkillSpector PR summary
+        if: always() && github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SUMMARY_FILE: /tmp/skillspector-summary.md
+          ERROR_COUNT: ${{ steps.scan.outputs.error-count }}
+          WARNING_COUNT: ${{ steps.scan.outputs.warning-count }}
+          TOTAL_COUNT: ${{ steps.scan.outputs.total-count }}
+          PR_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+
+          # If there are zero findings, delete any previous summary comment
+          # and exit cleanly — no need to spam the PR with "all clean" posts.
+          TOTAL=${TOTAL_COUNT:-0}
+          if [ "$TOTAL" = "0" ]; then
+            PR_NUMBER="${{ github.event.pull_request.number }}"
+            PREVIOUS_ID=$(gh api \
+              "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments?per_page=100" \
+              --jq '.[] | select(.body | test("<!-- SkillSpector:start -->")) | .id' \
+              | head -1 || true)
+            if [ -n "$PREVIOUS_ID" ]; then
+              gh api -X DELETE \
+                "repos/${{ github.repository }}/issues/comments/${PREVIOUS_ID}" > /dev/null
+              echo "::notice title=SkillSpector::removed prior summary (no findings)"
+            else
+              echo "::notice title=SkillSpector::no findings, nothing to post"
+            fi
+            exit 0
+          fi
+
+          # Build the comment body. Compact: summary table + per-skill
+          # counts in a <details> block + top 10 findings inline + "see
+          # more" pointer to the SARIF artifact. SonarCloud-style but
+          # capped so a noisy PR doesn't get a 5,000-line comment.
+          MAX_INLINE=10
+          {
+            echo '<!-- SkillSpector:start -->'
+            echo "## 🔍 SkillSpector scan"
+            echo
+            echo "| ❌ Errors | ⚠️ Warnings | Total findings |"
+            echo "| ---: | ---: | ---: |"
+            echo "| ${ERROR_COUNT:-0} | ${WARNING_COUNT:-0} | $TOTAL |"
+            echo
+
+            # Per-skill count breakdown as a collapsible details block.
+            # Markdown tables inside <details> render correctly in GFM.
+            if [ -s "$SUMMARY_FILE" ]; then
+              echo "<details>"
+              echo "<summary><b>📊 Findings by skill (click to expand)</b></summary>"
+              echo
+              echo "| Skill | Errors | Warnings | Total |"
+              echo "| :--- | ---: | ---: | ---: |"
+              # awk aggregates per-skill error/warning counts from rows.
+              # Severity column is the 4th pipe-delimited field; the
+              # badge format is '❌ error', '⚠️ warning', 'ℹ️ note', etc.
+              awk -F' \\| ' '
+                NR<=2 { next }
+                {
+                  skill = $1
+                  sev = $4
+                  sub(/^ +/, "", skill); sub(/ +$/, "", skill)
+                  total[skill]++
+                  if (sev ~ /error/) e[skill]++
+                  else if (sev ~ /warning/) w[skill]++
+                }
+                END {
+                  for (s in total)
+                    printf "| %s | %d | %d | %d |\n", s, e[s]+0, w[s]+0, total[s]
+                }
+              ' "$SUMMARY_FILE"
+              echo
+              echo "</details>"
+              echo
+            fi
+
+            # Errors in full (usually 0-5 rows; rare to exceed 10).
+            ERRORS_INLINE=$(awk -F' \\| ' 'NR<=2{next} $4 ~ /error/' "$SUMMARY_FILE")
+            if [ -n "$ERRORS_INLINE" ]; then
+              echo "### ❌ Errors"
+              echo
+              echo "| Skill | File | Line | Rule | Summary |"
+              echo "| :--- | :--- | ---: | :--- | :--- |"
+              echo "$ERRORS_INLINE"
+              echo
+            fi
+
+            # Warnings: top N inline, then "see more" link.
+            WARNINGS_INLINE=$(awk -F' \\| ' 'NR<=2{next} $4 ~ /warning/' "$SUMMARY_FILE" | head -n "$MAX_INLINE")
+            REMAINING=$(awk -F' \\| ' 'NR<=2{next} $4 ~ /warning/' "$SUMMARY_FILE" | wc -l | tr -d ' ')
+            REMAINING_SHOW=$((REMAINING - MAX_INLINE))
+            if [ "$REMAINING" -gt 0 ]; then
+              echo "### ⚠️ Warnings (top $MAX_INLINE)"
+              echo
+              echo "| Skill | File | Line | Rule | Summary |"
+              echo "| :--- | :--- | ---: | :--- | :--- |"
+              echo "$WARNINGS_INLINE"
+              if [ "$REMAINING_SHOW" -gt 0 ]; then
+                echo
+                echo "_${REMAINING_SHOW} more warnings — see the [SkillSpector job](${PR_RUN_URL}) artifact or the Checks panel._"
+              fi
+              echo
+            fi
+
+            echo "<!-- SkillSpector:end -->"
+          } > /tmp/skillspector-comment.md
+
+          # Find our previous comment on this PR (matched by marker).
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PREVIOUS_ID=$(gh api \
+            "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments?per_page=100" \
+            --jq '.[] | select(.body | test("<!-- SkillSpector:start -->")) | .id' \
+            | head -1 || true)
+
+          if [ -n "$PREVIOUS_ID" ]; then
+            gh api -X PATCH \
+              "repos/${{ github.repository }}/issues/comments/${PREVIOUS_ID}" \
+              --field body=@/tmp/skillspector-comment.md > /dev/null
+            echo "::notice title=SkillSpector::updated existing PR comment ${PREVIOUS_ID}"
+          else
+            gh pr comment "${PR_NUMBER}" \
+              --body-file /tmp/skillspector-comment.md > /dev/null
+            echo "::notice title=SkillSpector::posted new PR comment"
+          fi

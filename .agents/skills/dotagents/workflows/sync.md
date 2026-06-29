@@ -1,6 +1,13 @@
 # /dotagents sync
 
-Install or update skills from one or more remote repositories using `npx skills`.
+Workflow helper: refresh skill manifests from one or more remote
+repositories into the running agent's native configuration directory.
+
+> **Explicit-user-action only.** This workflow never runs automatically.
+> It is invoked only when the user types `/dotagents sync` and always
+> prompts for confirmation before pulling new content or changing
+> agent configuration. The `npx skills` CLI is documented upstream at
+> https://github.com/vercel-labs/skills.
 
 ## Sync with `npx skills`
 

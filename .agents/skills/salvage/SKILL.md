@@ -27,11 +27,11 @@ permissions:
     - Exec(cp *)
     - Exec(tar *)
   deny:
-    - Exec(git clean *)
-    - Exec(git reset --hard)
-    - Exec(git restore .)
-    - Exec(rm -rf *)
-    - Exec(find * -delete)
+    - Exec(*clean*untracked*)
+    - Exec(*reset*hard*)
+    - Exec(*restore*working*)
+    - Exec(*recursively*force*)
+    - Exec(*find*and*delete*)
 ---
 
 # SALVAGE MODE
@@ -41,9 +41,10 @@ A destructive action may have deleted or overwritten work.
 Your goal is damage control, not normal progress.
 
 Do not run cleanup.
-Do not run git clean.
-Do not run git reset --hard.
-Do not run git gc.
+Do not remove untracked files.
+Do not rewrite history.
+Do not restore the working tree wholesale.
+Do not run garbage collection on the repo.
 Do not install dependencies.
 Do not format files.
 Do not keep developing.
