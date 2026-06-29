@@ -32,32 +32,23 @@ PARSERS_DIR="${SCRIPT_DIR}/parsers"
 PY="$(command -v python3 || command -v python || true)"
 
 case "$tool" in
-  shellcheck)
-    if [ -z "$PY" ]; then
-      echo "::error title=to-annotations::python3 not found in PATH" >&2
-      exit 2
-    fi
-    "$PY" "${PARSERS_DIR}/shellcheck.py"
+  # Skillspector uses jq (not Python). Tool names match their Python
+  # script filenames for the three Python-backed parsers, so a single
+  # pattern dispatches all three without duplication.
+  skillspector)
+    jq -rf "${PARSERS_DIR}/skillspector.jq"
     ;;
 
-  markdownlint)
+  shellcheck|markdownlint|ajv)
     if [ -z "$PY" ]; then
       echo "::error title=to-annotations::python3 not found in PATH" >&2
       exit 2
     fi
-    "$PY" "${PARSERS_DIR}/markdownlint.py"
-    ;;
-
-  ajv)
-    if [ -z "$PY" ]; then
-      echo "::error title=to-annotations::python3 not found in PATH" >&2
-      exit 2
-    fi
-    "$PY" "${PARSERS_DIR}/ajv.py"
+    "$PY" "${PARSERS_DIR}/${tool}.py"
     ;;
 
   *)
-    echo "::error title=to-annotations::unknown tool '$tool' (expected: shellcheck|markdownlint|ajv). For SARIF, use .agents/skills/sarif-to-annotations/scripts/to-annotations.py" >&2
+    echo "::error title=to-annotations::unknown tool '$tool' (expected: skillspector|shellcheck|markdownlint|ajv). For SARIF, use .agents/skills/sarif-to-annotations/scripts/to-annotations.py" >&2
     exit 2
     ;;
 esac
