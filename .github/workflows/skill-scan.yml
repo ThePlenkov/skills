@@ -49,9 +49,22 @@ jobs:
       #                        details (only per-skill finding_count)
       #     - --format sarif → emits progress text to stdout, never the
       #                         SARIF document
-      #   The single-skill invocation correctly produces a full SARIF
-      #   document with per-issue details. So we iterate, scan each
-      #   skill individually, capture SARIF, convert to annotations.
+      #   The single-skill invocation correctly produces a full document
+      #   with per-issue details. So we iterate, scan each skill
+      #   individually.
+      #
+      # Why JSON instead of SARIF:
+      #   skillspector's --format json output has a much richer schema
+      #   than its --format sarif output. Per-issue fields that the SARIF
+      #   format drops but JSON keeps: category, confidence (0-1),
+      #   remediation, code_snippet, intent, tags (OWASP/MITRE/CWE
+      #   categories), end_line, pattern. We use --format json as the
+      #   source of truth and route it through a JSON→SARIF wrapper
+      #   (`skillspector-json-to-sarif.py`) that preserves the extra
+      #   fields under SARIF's standard `properties` extension point.
+      #   The downstream `to-annotations.py` reads those properties and
+      #   surfaces them in the GitHub annotation as tag prefix, category
+      #   in the title, remediation, code snippet, and confidence.
       #
       # Why use the sarif-to-annotations skill:
       #   The conversion logic is a reusable skill at
@@ -63,7 +76,7 @@ jobs:
       # Gate: any error-severity SARIF result fails the workflow.
       # The annotation script returns 1 in that case, which we surface
       # as the workflow's exit code.
-      - name: Run per-skill SARIF scan and emit annotations
+      - name: Run per-skill scan (JSON) → enriched SARIF → annotations
         run: |
           set -u
 
@@ -81,34 +94,44 @@ jobs:
             [ -d "$skill_dir" ] || continue
             [ -f "${skill_dir}SKILL.md" ] || continue
             skill=$(basename "$skill_dir")
+            json_path="/tmp/skillspector/${skill}.json"
             sarif_path="/tmp/skillspector/${skill}.sarif"
 
-            echo "::group::Scanning ${skill} (SARIF)"
+            echo "::group::Scanning ${skill} (JSON → SARIF)"
 
-            # Single-skill SARIF output goes to the file via --output.
-            # We force the exit code into SS_EXIT and don't abort the loop.
-            # Use array expansion `"${BASELINE_ARGS[@]}"` (quoted, with
-            # `[@]`) to handle the empty/non-empty case correctly without
-            # word-splitting risks from an unquoted string variable.
+            # Single-skill JSON output goes to stdout. Redirect to a file
+            # so we can both (a) wrap to enriched SARIF, and (b) feed to
+            # the annotation converter.
             skillspector scan "$skill_dir" \
               --no-llm \
-              --format sarif \
-              --output "$sarif_path" \
+              --format json \
               "${BASELINE_ARGS[@]}" \
+              > "$json_path" \
               || SS_EXIT=$?
             SS_EXIT="${SS_EXIT:-0}"
 
-            # Convert SARIF → GitHub annotations. The script accepts a
-            # leading progress-text prefix (skillspector sometimes emits
-            # one before the actual JSON), finds the first '{' and parses
-            # from there.
+            if [ ! -s "$json_path" ]; then
+              echo "  (no JSON produced for $skill)"
+              echo "::endgroup::"
+              continue
+            fi
+
+            # Step 1: JSON → enriched SARIF (preserves category,
+            # confidence, remediation, code_snippet, intent, tags).
+            python3 .agents/skills/sarif-to-annotations/scripts/skillspector-json-to-sarif.py \
+              < "$json_path" \
+              > "$sarif_path" \
+              || true
+
+            # Step 2: SARIF → GitHub annotations. Exit 1 on error-severity
+            # results; we use that as the gate.
             if [ -s "$sarif_path" ]; then
               python3 .agents/skills/sarif-to-annotations/scripts/to-annotations.py \
                 < "$sarif_path" \
                 || ANN_EXIT=$?
               ANN_EXIT="${ANN_EXIT:-0}"
             else
-              echo "  (no SARIF produced for $skill)"
+              echo "  (SARIF conversion produced no output)"
               ANN_EXIT=0
             fi
 
@@ -136,10 +159,10 @@ jobs:
 
           exit $FAILED
 
-      - name: Upload SARIF reports as artifacts
+      - name: Upload reports as artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: skillspector-sarif
+          name: skillspector-reports
           path: /tmp/skillspector/
           retention-days: 7
