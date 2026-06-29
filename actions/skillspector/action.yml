@@ -160,6 +160,14 @@ runs:
       run: |
         set -euo pipefail
 
+        # Put the action's bundled `nx` binary on PATH. `npx nx` resolves
+        # via `node_modules/.bin` of the cwd, which here is the host
+        # repo (no `node_modules`). Without this, npx would fetch a
+        # fresh copy from npm — which has no `@theplenkov/nx-skillspector`
+        # plugin installed and produces an empty project graph
+        # ("project runtime-proof not found").
+        export PATH="$GITHUB_ACTION_PATH/node_modules/.bin:$PATH"
+
         # Stage nx.json: save existing (if any), write action's, restore on exit.
         NX_BACKUP=$(mktemp)
         trap 'if [ -s "$NX_BACKUP" ]; then mv "$NX_BACKUP" nx.json; else rm -f nx.json; fi' EXIT
