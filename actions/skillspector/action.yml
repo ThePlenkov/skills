@@ -313,6 +313,15 @@ runs:
           if ! git rev-parse --verify "origin/${BASE_REF}" >/dev/null 2>&1; then
             git fetch --depth=50 origin "${BASE_REF}" 2>/dev/null || true
           fi
+          # nx-set-shas returns a specific commit SHA for NX_BASE
+          # (not the branch tip). That SHA may lie outside the
+          # shallow `--depth=50` fetch of origin/<base> if the
+          # base ref hasn't received any new commits since the
+          # last successful workflow. Fetch the SHA explicitly
+          # so `nx affected --base` can resolve it.
+          if [ -n "${NX_BASE:-}" ] && ! git -C "$GITHUB_WORKSPACE" cat-file -e "${NX_BASE}" >/dev/null 2>&1; then
+            git fetch --depth=200 origin "${NX_BASE}" 2>/dev/null || true
+          fi
           # Fallback: nx-set-shas can return empty NX_BASE for the
           # first CI run on a branch (or for cascade-of-PRs setups
           # where the base branch has never had a successful build).
