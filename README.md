@@ -3,7 +3,7 @@
 Personal, agent-agnostic skills repository.
 
 ## Layout
-- `.agents/agents/` contains role prompts (tiered filenames like `l0-manager.md`).
+- `.agents/agents/` contains role prompts (one folder per role, e.g. `investigator/`, `patcher/`, `verifier/`).
 - `.agents/skills/` contains all skills.
 
 ## Quick start
@@ -36,7 +36,9 @@ This repository is self-installable as a [GitHub Codespaces dotfiles](https://do
 1. Go to **Settings → Codespaces → Dotfiles** on GitHub.
 2. Select this repository and enable **Automatically install dotfiles**.
 
-When a new codespace starts, `install.sh` runs automatically and installs all skills using `npx skills add`.
+When a new codespace starts, `install.sh` runs automatically and creates the
+`~/.agents/skills/personal` symlink exposing every skill under `.agents/skills/`.
+No re-install is needed when skills are added or updated.
 
 To re-run manually: `bash ~/dotfiles/install.sh`
 
