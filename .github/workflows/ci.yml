@@ -6,25 +6,79 @@ on:
   pull_request:
     branches: [main]
 
+# Cancel duplicate runs on the same ref. Without this, a single push
+# to a PR branch can fire the workflow twice (once for the push event
+# from the underlying git push, once for the pull_request event from
+# GitHub's PR machinery).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   shellcheck:
     name: ShellCheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+
+      - name: Install ShellCheck
+        # Install a recent shellcheck from GitHub releases (apt on Ubuntu 22.04
+        # runners ships shellcheck 0.9.0 which doesn't accept directories as
+        # arguments; we need ≥0.10.0 for `shellcheck scripts/`).
+        run: |
+          set -euo pipefail
+          SC_VERSION="v0.10.0"
+          curl -sSL \
+            "https://github.com/koalaman/shellcheck/releases/download/${SC_VERSION}/shellcheck-${SC_VERSION}.linux.x86_64.tar.xz" \
+            | tar -xJ -C /tmp
+          sudo mv "/tmp/shellcheck-${SC_VERSION}/shellcheck" /usr/local/bin/
+          shellcheck --version
+
       - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@2.0.0
-        with:
-          scandir: './scripts'
-          severity: warning
+        # shellcheck doesn't recurse on its own, so we use `find` to expand
+        # the directory into explicit files. Pipe through the annotation
+        # converter so each warning becomes a GitHub PR annotation.
+        #
+        # Pipeline: find → xargs shellcheck → tee log → converter.
+        # We rely on `set -o pipefail` so the pipeline's exit code is
+        # the rightmost non-zero status (i.e. shellcheck's, via xargs).
+        # We do NOT use ${PIPESTATUS[0]} — that captures `find`'s exit,
+        # which is almost always 0, masking shellcheck failures.
+        run: |
+          set -o pipefail
+          find scripts -type f -name '*.sh' -print0 \
+            | xargs -0 shellcheck --severity=warning \
+            | tee shellcheck.log \
+            | .github/scripts/to-annotations.sh shellcheck
 
   markdownlint:
     name: Markdown Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Run markdownlint
-        uses: DavidAnson/markdownlint-cli2-action@v23
+      - uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
         with:
-          globs: '**/*.md'
-          config: '.markdownlint.json'
+          node-version: '20'
+
+      # Pin the version so CI is reproducible. markdownlint-cli2 v0.22
+      # (markdownlint v0.40) is what we developed against; later versions
+      # may add rules that would cause new failures.
+      - name: Install markdownlint-cli2
+        run: npm install -g markdownlint-cli2@0.22.1
+
+      - name: Run markdownlint
+        # Pipeline: markdownlint → tee log → converter.
+        # `set -o pipefail` makes the pipeline's exit code the rightmost
+        # non-zero status (markdownlint's). The converter always succeeds
+        # (it never errors on bad input), so the gate is purely on
+        # markdownlint.
+        run: |
+          set -o pipefail
+          markdownlint-cli2 '**/*.md' --config .markdownlint.json \
+            | tee markdownlint.log \
+            | .github/scripts/to-annotations.sh markdownlint

@@ -1,0 +1,220 @@
+name: SkillSpector scan
+description: >-
+  Run SkillSpector on a skill (or set of skills) and emit GitHub PR
+  annotations, an optional SARIF file, and structured step outputs.
+
+author: ThePlenkov
+
+branding:
+  icon: shield
+  color: red
+
+
+inputs:
+  path:
+    description: >-
+      Path to scan. If it contains a `SKILL.md`, the action treats it as
+      a single skill. Otherwise it iterates over immediate sub-directories
+      that contain a `SKILL.md` and runs the scan per skill.
+    required: false
+    default: .
+  recursive:
+    description: >-
+      Pass `--recursive` to skillspector. Note: as of skillspector 2.3.7
+      `--recursive --format json` emits a per-skill summary only and drops
+      the per-issue schema (NVIDIA/SkillSpector #228). Default behavior
+      already iterates per skill, so this is usually unnecessary.
+    required: false
+    default: "false"
+  baseline:
+    description: >-
+      Path to a `.skillspector-baseline.yaml` file passed as
+      `--baseline`. Leave empty to skip.
+    required: false
+    default: ""
+  no-llm:
+    description: "Pass `--no-llm` to skillspector (disables LLM meta-analysis)."
+    required: false
+    default: "true"
+  annotations:
+    description: >-
+      Emit GitHub Actions workflow commands for inline PR annotations
+      (the `::error|warning|notice file=…,line=…,title=…::message` form).
+      Set to "false" to suppress annotations but still write SARIF.
+    required: false
+    default: "true"
+  sarif:
+    description: >-
+      Path to write a SARIF 2.1.0 report. Leave empty to skip the SARIF
+      file. When set, the SARIF is also written regardless of
+      `annotations`. The same per-issue schema is preserved under SARIF's
+      standard `properties` extension point, so any SARIF-aware tool
+      (Code Scanning tab, IDE plugins, dashboards) can read the full
+      per-issue context.
+    required: false
+    default: ""
+  fail-on-error:
+    description: >-
+      When "true" (default), the action exits with code 1 if any
+      `error`-severity (HIGH/CRITICAL) finding is emitted. When
+      "false", the action always exits 0 — useful when the same
+      findings are surfaced through SARIF and you want a separate gate.
+    required: false
+    default: "true"
+  job-summary:
+    description: >-
+      When "true", append a markdown summary table to
+      `$GITHUB_STEP_SUMMARY` listing per-skill finding counts.
+    required: false
+    default: "true"
+  skillspector-version:
+    description: >-
+      Skillspector version to install. Default tracks the version this
+      action was last verified against (commit SHA pinned for
+      reproducibility — see the `pip install` step).
+    required: false
+    default: "78be329a7ea9749842e335598132ce171b8717d4"
+  parallelism:
+    description: >-
+      Max concurrent skill scans. Leave empty to use `nproc` (the runner's
+      CPU count). Set to "1" for sequential scanning (useful for debugging
+      or single-core runners). Each skill is independent, so this is
+      safe up to the number of skills.
+    required: false
+    default: ""
+
+
+outputs:
+  sarif-path:
+    description: "Absolute path to the SARIF file, if `sarif` input was set."
+    value: ${{ steps.emit.outputs.sarif-path }}
+  error-count:
+    description: "Total number of error-severity findings across all scanned skills."
+    value: ${{ steps.emit.outputs.error-count }}
+  warning-count:
+    description: "Total number of warning-severity findings across all scanned skills."
+    value: ${{ steps.emit.outputs.warning-count }}
+  total-count:
+    description: "Total number of findings across all scanned skills."
+    value: ${{ steps.emit.outputs.total-count }}
+
+
+runs:
+  using: composite
+  steps:
+
+    - name: Set up Node (LTS)
+      uses: actions/setup-node@v6
+      with:
+        # Pin to the current LTS line so we don't track the runner's
+        # moving default. Without this, composite actions on
+        # github-hosted runners log a deprecation warning as the
+        # default Node version moves past LTS.
+        node-version: "lts/*"
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        # Skillspector 2.3.7 requires Python >=3.12,<3.14 (pinned by
+        # its setup.py). 3.12 is the lowest supported version, which
+        # maximizes compatibility with self-hosted runners; the
+        # github-hosted ubuntu-latest image ships 3.12 by default.
+        python-version: "3.12"
+
+    - name: Install SkillSpector
+      shell: bash
+      run: |
+        set -euo pipefail
+        pip install --quiet "git+https://github.com/NVIDIA/skillspector.git@${{ inputs.skillspector-version }}"
+
+    - name: Discover skills
+      id: discover
+      shell: bash
+      run: |
+        set -euo pipefail
+        target="${{ inputs.path }}"
+
+        # Always emit the same output shape so the next step doesn't
+        # need to discriminate single vs multi. We collect every
+        # candidate path into a tmpfile, then write it as a single
+        # multi-line 'skills<<EOF' GITHUB_OUTPUT block.
+        tmp=$(mktemp)
+        if [ -f "${target}/SKILL.md" ]; then
+          # Single-skill: scan the directory itself. No glob needed.
+          printf '%s\n' "$target" >> "$tmp"
+        else
+          # Multi-skill: collect immediate sub-directories with SKILL.md.
+          for d in "${target}"/*/; do
+            [ -d "$d" ] || continue
+            if [ -f "${d}SKILL.md" ]; then
+              printf '%s\n' "${d%/}" >> "$tmp"
+            fi
+          done
+          if [ ! -s "$tmp" ]; then
+            rm -f "$tmp"
+            echo "::error title=skillspector::no SKILL.md found in ${target} or its sub-directories"
+            exit 2
+          fi
+        fi
+
+        count=$(wc -l < "$tmp" | tr -d ' ')
+        {
+          echo "skills<<EOF"
+          cat "$tmp"
+          echo "EOF"
+          echo "skill-count=${count}"
+        } >> "$GITHUB_OUTPUT"
+        rm -f "$tmp"
+
+    - name: Run SkillSpector scan (parallel)
+      id: emit
+      shell: bash
+      env:
+        GITHUB_OUTPUT: ${{ github.output }}
+        GITHUB_STEP_SUMMARY: ${{ github.summary }}
+      run: |
+        set -euo pipefail
+
+        # Resolve parallelism from the input, falling back to the
+        # runner's CPU count. We honour the user's value if set; an
+        # empty input means "use nproc".
+        if [ -n "${{ inputs.parallelism }}" ]; then
+          MAX_WORKERS="${{ inputs.parallelism }}"
+        else
+          MAX_WORKERS=$(nproc)
+        fi
+
+        # Write the discovered skills to a plain file for the
+        # orchestrator to consume (one path per line, no quoting).
+        SKILLS_FILE=$(mktemp)
+        printf '%s\n' "${{ steps.discover.outputs.skills }}" > "$SKILLS_FILE"
+
+        # Build skillspector's argument list from the action inputs.
+        SS_ARGS=()
+        if [ "${{ inputs.no-llm }}" = "true" ]; then
+          SS_ARGS+=(--no-llm)
+        fi
+        if [ -n "${{ inputs.baseline }}" ]; then
+          SS_ARGS+=(--baseline "${{ inputs.baseline }}")
+        fi
+        if [ "${{ inputs.recursive }}" = "true" ]; then
+          SS_ARGS+=(--recursive)
+        fi
+
+        # The orchestrator reads all options from env. Convert the
+        # action's boolean strings to the values it expects.
+        export SKILLS_FILE
+        export EMIT_SCRIPT="$GITHUB_ACTION_PATH/scripts/emit.py"
+        export OUTPUT_DIR="${RUNNER_TEMP:-/tmp}/skillspector"
+        export MAX_WORKERS
+        export SKILLSPECTOR_ARGS="${SS_ARGS[*]}"
+        export ANNOTATIONS_ENABLED="${{ inputs.annotations }}"
+        export SARIF_OUT="${{ inputs.sarif }}"
+        export FAIL_ON_ERROR="${{ inputs.fail-on-error }}"
+        export JOB_SUMMARY_ENABLED="${{ inputs.job-summary }}"
+
+        mkdir -p "$OUTPUT_DIR"
+
+        python3 "$GITHUB_ACTION_PATH/scripts/orchestrate.py"
+
+        rm -f "$SKILLS_FILE"

@@ -5,3 +5,6 @@ node_modules/
 .env.*
 tmp/
 skillspector.sarif
+# Python bytecode
+**/__pycache__/
+*.pyc

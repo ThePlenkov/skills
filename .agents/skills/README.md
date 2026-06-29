@@ -36,6 +36,7 @@ Skills live directly under `.agents/skills/<skill-name>/`.
 || `npm-publish` | Publish npm packages with granular tokens or OIDC trusted publishing. Includes `prepare-ci` to bootstrap CI publishing for new packages. |
 || `one-shot-patch` | Make exactly one narrow change, then verify it. Prevents stacked fixes, broad refactors, and chaotic iteration. |
 || `retrospect` | Self-correction protocol — persist fixes that prevent recurrence. |
+|| `sarif-to-annotations` | Convert SARIF 2.1.0 reports to GitHub Actions workflow-command annotations. Reusable for any tool that emits SARIF (CodeQL, Snyk, ESLint, etc.) when inline PR annotations are needed. |
 || `runtime-proof` | Prove actual behavior in the target runtime before final completion. Required for HTML, UI, browser JavaScript, hydration, routing, and client-side behavior where curl is not enough. |
 || `safeguard` | Prevent destructive agent actions from deleting user work, untracked files, experimental code, or recoverable evidence. |
 || `salvage` | Emergency recovery mode after accidental deletion, `git clean`, `git restore`, reset, overwrite, or destructive agent action. |

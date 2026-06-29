@@ -1,61 +1,62 @@
 name: SkillSpector Security Scan
 
 on:
+  # Post-merge scan: when code lands on main. The `branches:` filter
+  # restricts push to main only, so PR-branch pushes (handled by the
+  # pull_request event below) don't double-fire this workflow.
   push:
+    branches: [main]
     paths:
       - '.agents/skills/**'
       - '.github/workflows/skill-scan.yml'
-      - '.skillspector-baseline.yaml'
+      - 'actions/skillspector/**'
+  # Pre-merge scan: when a PR is opened or updated. Provides inline
+  # annotations on the PR Files Changed tab.
   pull_request:
     paths:
       - '.agents/skills/**'
       - '.github/workflows/skill-scan.yml'
-      - '.skillspector-baseline.yaml'
+      - 'actions/skillspector/**'
   workflow_dispatch:
+
+# Cancel in-progress runs for the same workflow on the same ref. This
+# prevents duplicate runs when a single commit triggers both a push
+# and a pull_request event (e.g. when a PR branch is force-pushed).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   scan:
     runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      contents: read
-      actions: read
-      pull-requests: read
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
-
-      - name: Install SkillSpector
-        run: uv tool install git+https://github.com/NVIDIA/skillspector.git
-
-      - name: Run security scan (static only, SARIF)
-        run: |
-          BASELINE_ARG=""
-          if [ -f .skillspector-baseline.yaml ]; then
-            BASELINE_ARG="--baseline .skillspector-baseline.yaml"
-          fi
-          skillspector scan .agents/skills/ \
-            --recursive \
-            --no-llm \
-            --format sarif \
-            --output skillspector.sarif \
-            $BASELINE_ARG
-        continue-on-error: true  # allow SARIF upload even if findings exist
-
-      - name: Upload SARIF to GitHub Security
-        uses: github/codeql-action/upload-sarif@v4
-        if: always()
-        continue-on-error: true  # non-fatal if Security tab not available
+      # The action handles installation of skillspector and per-skill
+      # iteration internally. The path is auto-detected: a single
+      # skill (`path/SKILL.md`) is scanned once; a parent directory
+      # is iterated over its `*/SKILL.md` children.
+      #
+      # See actions/skillspector/README.md for the full architecture
+      # rationale (JSON→SARIF translation preserving the per-issue
+      # schema, dual output modes, etc.).
+      - name: Run SkillSpector scan
+        id: scan
+        uses: ./actions/skillspector
         with:
-          sarif_file: skillspector.sarif
+          path: ./.agents/skills/
+          sarif: ${{ github.workspace }}/skillspector.sarif
+          job-summary: 'true'
 
-      - name: Fail on HIGH/CRITICAL findings
-        run: |
-          BASELINE_ARG=""
-          if [ -f .skillspector-baseline.yaml ]; then
-            BASELINE_ARG="--baseline .skillspector-baseline.yaml"
-          fi
-          skillspector scan .agents/skills/ --recursive --no-llm $BASELINE_ARG
+      - name: Upload SARIF report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: skillspector-sarif
+          path: ${{ steps.scan.outputs.sarif-path }}
+          retention-days: 7
+          if-no-files-found: ignore

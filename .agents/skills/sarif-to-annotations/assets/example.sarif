@@ -1,0 +1,60 @@
+{
+  "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "ExampleScanner",
+          "version": "1.0.0",
+          "rules": [
+            {
+              "id": "EX1",
+              "name": "ExampleRule",
+              "shortDescription": {"text": "Demonstrates an error-severity finding."},
+              "helpUri": "https://example.com/rules/EX1"
+            },
+            {
+              "id": "EX2",
+              "name": "AnotherExample",
+              "shortDescription": {"text": "Demonstrates a warning-severity finding."}
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "EX1",
+          "level": "error",
+          "message": {"text": "Variable 'x' is used before assignment."},
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {"uri": "src/example.py"},
+                "region": {"startLine": 12, "startColumn": 5, "endLine": 12, "endColumn": 8}
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "EX2",
+          "level": "warning",
+          "message": {"text": "Function 'foo' is too long (62 lines)."},
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {"uri": "src/example.py"},
+                "region": {"startLine": 42}
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "EX1",
+          "level": "error",
+          "message": {"text": "Result without location — should still be surfaced."}
+        }
+      ]
+    }
+  ]
+}
