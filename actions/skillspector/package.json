@@ -1,0 +1,24 @@
+{
+  "name": "@theplenkov/skillspector-action",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Self-contained Nx workspace for the SkillSpector GitHub Action. Bundles the plugin (createNodesV2 + scan executor); runs entirely in a tmp dir without touching the host repo's tooling.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "scan": "nx run-many -t scan",
+    "build": "node ./scripts/build.mjs",
+    "postinstall": "node ./scripts/build.mjs",
+    "prepublishOnly": "node ./scripts/build.mjs"
+  },
+  "devDependencies": {
+    "@nx/devkit": "23.0.1",
+    "@types/node": "24.0.0",
+    "esbuild": "^0.25.0",
+    "nx": "23.0.1",
+    "typescript": "6.0.3"
+  },
+  "dependencies": {
+    "@theplenkov/nx-skillspector": "file:./nx-skillspector"
+  }
+}

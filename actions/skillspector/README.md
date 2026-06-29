@@ -10,9 +10,29 @@ or on every skill in a directory tree, and emit:
 - **Structured step outputs** (`sarif-path`, `error-count`,
   `warning-count`, `total-count`)
 
-The mapping is done **once**, in `scripts/emit.py`, so the SARIF
-output and the GitHub annotations are guaranteed to be in sync. Both
-can be active at the same time.
+The action is implemented as a self-contained **Nx workspace with a
+plugin**. The plugin (`@theplenkov/nx-skillspector`) infers a `scan`
+target for every directory containing `SKILL.md` — no `project.json`
+files in the host repo, no host-side Nx setup required.
+
+## Why an Nx plugin?
+
+Plugin with `createNodesV2` (inferred tasks) gives us:
+
+1. **Zero host-repo coupling** — the host doesn't need an Nx
+   workspace, project.json files, or any nx config. The action
+   brings its own Nx + plugin.
+2. **Per-skill caching** — Nx hashes the skill's source files
+   (SKILL.md + scripts/ + references/ + assets/) and reuses cached
+   results when nothing changed. Re-runs of the same CI step take
+   milliseconds instead of re-scanning everything.
+3. **Built-in parallelism** — `nx run-many --parallel=N` runs N
+   skills concurrently without writing our own ProcessPoolExecutor.
+4. **TypeScript end-to-end** — Node 22+ runs TypeScript natively
+   (`--experimental-strip-types`), so the plugin has no build step.
+5. **Reusable beyond this action** — the plugin lives in
+   `actions/skillspector/nx-skillspector/` as a local package and
+   can be promoted to npm later for use in other repos.
 
 ## Why not use the upstream `--format sarif`?
 
@@ -24,178 +44,100 @@ The native SARIF output drops the high-signal per-issue fields:
 `tags`, `end_line`. Without them, the GitHub annotation is reduced
 to a bare-bones one-liner.
 
-This action reads `--format json` (the rich output) and synthesizes
-a SARIF document that **preserves all of those fields** under SARIF's
-standard `properties` extension point. The same mapping is used to
-build the GitHub annotation, which then surfaces the tag prefix, the
-human-readable category, the remediation, the code snippet, and the
-confidence.
-
-## Parallel execution
-
-The orchestrator (`scripts/orchestrate.py`) scans skills in parallel
-using `concurrent.futures.ProcessPoolExecutor`, bounded by the
-`parallelism` input — defaulting to `nproc`, i.e. the runner's CPU
-count. Each skill is independent (its own directory with its own
-`SKILL.md`), so concurrent scans are safe and give a near-linear
-speedup on multi-core runners.
-
-Per-skill `emit.py` invocations run with `--no-step-output` so they
-don't race on `$GITHUB_OUTPUT`; the orchestrator aggregates counts
-once at the end and writes a single `error-count` / `warning-count`
-/ `total-count` block. Per-skill SARIF files are written to a tmpdir
-and merged at the end by concatenating `runs[]` into a single
-multi-run SARIF 2.1.0 document.
+The plugin's executor reads `--format json` (the rich output) and
+synthesizes a SARIF document that **preserves all of those fields**
+under SARIF's standard `properties` extension point. The same mapping
+is used to build the GitHub annotation, which surfaces the tag
+prefix, the human-readable category, the remediation, the code
+snippet, and the confidence.
 
 ## Usage
 
-### Scan a single skill
-
 ```yaml
-- uses: ThePlenkov/skills/actions/skillspector@main
-  with:
-    path: ./.agents/skills/act/
-```
-
-The action detects `path/SKILL.md` and treats the directory as a
-single skill.
-
-### Scan every skill in a directory
-
-```yaml
-- uses: ThePlenkov/skills/actions/skillspector@main
+- uses: ThePlenkov/skills/actions/skillspector@ci/workflow-annotations
   with:
     path: ./.agents/skills/
 ```
 
-The action iterates over every sub-directory of `path/` that contains
-a `SKILL.md`, runs SkillSpector on each, and aggregates the findings.
+The plugin auto-detects single-skill vs parent-of-many:
 
-### Write SARIF in addition to annotations
+- `path: ./.agents/skills/act/` — single skill
+- `path: ./.agents/skills/` — every sub-directory with `SKILL.md`
+
+### Write SARIF + annotations
 
 ```yaml
-- uses: ThePlenkov/skills/actions/skillspector@main
+- uses: ThePlenkov/skills/actions/skillspector@ci/workflow-annotations
   with:
     path: ./.agents/skills/
     sarif: ${{ github.workspace }}/skillspector.sarif
-- uses: github/codeql-action/upload-sarif@v3
-  if: always()
-  with:
-    sarif_file: ${{ steps.scan.outputs.sarif-path }}
 ```
 
-`steps.scan.outputs.sarif-path` is set to the absolute path of the
-written SARIF file. The SARIF document carries the full per-issue
-schema in `properties` so any SARIF-aware downstream tool can read
-the full context.
-
-### Suppress annotations but still write SARIF
+### Don't fail on errors (separate gate)
 
 ```yaml
-- uses: ThePlenkov/skills/actions/skillspector@main
+- uses: ThePlenkov/skills/actions/skillspector@ci/workflow-annotations
   with:
     path: ./.agents/skills/
-    annotations: "false"
-    sarif: ${{ github.workspace }}/skillspector.sarif
+    fail-on-error: 'false'
 ```
-
-Useful when SARIF is the only consumer (e.g. the GitHub Code Scanning
-tab on a paid plan).
-
-### Don't fail the workflow on error-severity findings
-
-```yaml
-- uses: ThePlenkov/skills/actions/skillspector@main
-  with:
-    path: ./.agents/skills/
-    fail-on-error: "false"
-- uses: actions/labeler@v5
-  if: steps.scan.outputs.error-count > 0
-  with:
-    add-labels: security-findings
-```
-
-The action still surfaces every finding (annotation, SARIF, step
-outputs); it just doesn't fail. A separate job can decide what to
-do with the counts.
 
 ## Inputs
 
-| Name                  | Required | Default                       | Description                                                                                                    |
-|-----------------------|----------|-------------------------------|----------------------------------------------------------------------------------------------------------------|
-| `path`                | no       | `.`                           | Path to scan. Auto-detects single-skill (`path/SKILL.md` exists) vs multi-skill (iterates `path/*/SKILL.md`).  |
-| `recursive`           | no       | `"false"`                     | Pass `--recursive` to skillspector. **Caveat:** `--recursive --format json` is summary-only upstream — see [NVIDIA/SkillSpector#228](https://github.com/NVIDIA/SkillSpector/issues/228). Default behavior already iterates per skill. |
-| `baseline`            | no       | `""`                          | Path to `.skillspector-baseline.yaml` for known-issue suppression.                                              |
-| `no-llm`              | no       | `"true"`                      | Pass `--no-llm` (recommended for CI; saves time and avoids network).                                          |
-| `annotations`         | no       | `"true"`                      | Emit `::error`/`::warning`/`::notice` lines for inline PR annotations.                                         |
-| `sarif`               | no       | `""`                          | Path to write a SARIF 2.1.0 report. Leave empty to skip.                                                       |
-| `fail-on-error`       | no       | `"true"`                      | Exit 1 on error-severity findings. Set `"false"` to surface findings without failing.                         |
-| `job-summary`         | no       | `"true"`                      | Append a markdown per-skill summary table to `$GITHUB_STEP_SUMMARY`.                                           |
-| `skillspector-version`| no       | commit SHA pinned in action   | Pinned to a specific commit for reproducibility. Bump on purpose.                                              |
-| `parallelism`         | no       | `""` (uses `nproc`)          | Max concurrent skill scans. Set to `"1"` for sequential scanning (debugging). Each skill is independent, so any value up to the number of skills is safe. |
+| Name                   | Required | Default                       | Description                                                                                                    |
+|------------------------|----------|-------------------------------|----------------------------------------------------------------------------------------------------------------|
+| `path`                 | no       | `.`                           | Path to scan. Single skill (has `SKILL.md`) or parent of multiple skills (sub-dirs with `SKILL.md`).           |
+| `recursive`            | no       | `"false"`                     | Pass `--recursive` to skillspector. Caveat documented in NVIDIA/SkillSpector#228.                              |
+| `baseline`             | no       | `""`                          | Path to `.skillspector-baseline.yaml`.                                                                         |
+| `no-llm`               | no       | `"true"`                      | Pass `--no-llm` (recommended for CI).                                                                          |
+| `annotations`          | no       | `"true"`                      | Emit `::error`/`::warning`/`::notice` lines for inline PR annotations.                                         |
+| `sarif`                | no       | `""`                          | Path to write a SARIF 2.1.0 report.                                                                            |
+| `fail-on-error`        | no       | `"true"`                      | Exit 1 on error-severity findings.                                                                             |
+| `job-summary`          | no       | `"true"`                      | Append a markdown per-skill summary table to `$GITHUB_STEP_SUMMARY`.                                          |
+| `skillspector-version` | no       | commit SHA pinned in action   | Pinned for reproducibility. Bump on purpose.                                                                   |
+| `parallelism`          | no       | `""` (uses `nproc`)          | Max concurrent skill scans. Set to `"1"` for sequential.                                                       |
+| `affected`            | no       | `"true"`                     | When `"true"`, use `nx affected` to scan only skills whose files changed since the base SHA. Requires `nx-set-shas` upstream. When `"false"`, always scan every skill. |
 
 ## Outputs
 
 | Name            | Description                                                  |
 |-----------------|--------------------------------------------------------------|
 | `sarif-path`    | Absolute path to the SARIF file (empty if not written).      |
-| `error-count`   | Total `error`-severity (HIGH/CRITICAL) findings across all skills. |
+| `error-count`   | Total `error`-severity (HIGH/CRITICAL) findings.             |
 | `warning-count` | Total `warning`-severity findings.                           |
 | `total-count`   | Total findings of any severity.                              |
 
 ## Annotation format
-
-A typical error-severity finding produces:
 
 ```
 ::error file=SKILL.md,line=1,title=[ASI02]skillspector[LP3]: MCP Least Privilege::Without declared permissions the skill's intent is opaque and cannot be validated. — Fix: Add a 'permissions' field to SKILL.md listing the capabilities this skill requires. — confidence=90
 ```
 
 Title: `[<tags>] <tool>[<rule>]: <category>` — tags come from
-`properties.tags` (OWASP / MITRE / CWE / Agentic Security Index
-categories).
+`properties.tags` (OWASP / MITRE / CWE / Agentic Security Index).
 
 Message: `Intent — Explanation — Fix — Code — Confidence`, joined
-with ` — `. Code snippets are truncated to 400 chars with `⏎`
-markers for embedded newlines.
-
-## SARIF output
-
-The SARIF document is a 1:1 translation of the upstream JSON
-output:
-
-- `tool.driver.rules[].{id, name, shortDescription, fullDescription, help, properties.tags}`
-- `runs[].results[].{ruleId, level, message, locations, properties}`
-- `properties` carries `category`, `confidence`, `remediation`,
-  `code_snippet`, `intent`, `tags`, `pattern`, `finding` — all
-  surfaced faithfully from the source JSON.
-
-A downstream SARIF consumer that doesn't understand `properties`
-will just ignore them; the standard fields (`ruleId`, `level`,
-`message`, `locations`) are still valid SARIF.
+with ` — `. Code snippets truncated to 400 chars; newlines replaced
+with `⏎` markers.
 
 ## Files
 
 ```
 actions/skillspector/
-├── action.yml              — composite action definition
-├── scripts/
-│   ├── orchestrate.py      — parallel orchestrator (ProcessPoolExecutor)
-│   └── emit.py             — the unified mapping (annotations + SARIF)
-├── tests/
-│   ├── test_emit.py
-│   └── fixtures/
-│       ├── synthetic.json
-│       └── act-scan.json
-└── README.md
+├── action.yml                 composite action definition
+├── nx.json                    workspace + plugin registration + cache inputs
+├── package.json               nx 23 + typescript 6 + @nx/devkit + plugin
+└── nx-skillspector/           local plugin package
+    ├── package.json           exports source via @nx/nx-source
+    └── src/
+        ├── plugin.ts          createNodesV2: walks workspace for SKILL.md, infers scan target
+        ├── executors.json     executor config
+        ├── executors/scan/
+        │   ├── executor.ts    child_process.spawn wrapper, SARIF merge, annotation emit
+        │   └── schema.json    executor input schema
+        └── lib/
+            ├── skillspector.ts  CLI wrapper
+            ├── mapping.ts       JSON → SARIF (preserves properties)
+            ├── annotations.ts   JSON → workflow commands
+            └── sarif.ts         SARIF types + schema URL
 ```
-
-## Testing
-
-```bash
-python3 actions/skillspector/tests/test_emit.py
-```
-
-22 unit tests cover: annotation format, SARIF structure, properties
-preservation, step output writing, stdin/file/prefix-tolerance, and
-end-to-end with a real saved scan.

@@ -1,0 +1,30 @@
+{
+  "name": "@theplenkov/nx-skillspector",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Nx plugin for SkillSpector: infers a `scan` target for every directory containing SKILL.md, and runs the SkillSpector CLI with the per-issue schema preserved under SARIF properties.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "@nx/nx-source": "./src/index.ts",
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./plugin": {
+      "@nx/nx-source": "./src/plugin.ts",
+      "types": "./src/plugin.ts",
+      "default": "./dist/plugin.js"
+    },
+    "./executors": "./src/executors.json",
+    "./executors/scan": "./dist/executors/scan/executor.js",
+    "./executors/scan/schema.json": "./src/executors/scan/schema.json",
+    "./package.json": "./package.json"
+  },
+  "peerDependencies": {
+    "@nx/devkit": ">=20.0.0"
+  },
+  "files": "[\"src\",\"dist\",\"executors.json\"]",
+  "executors": "./executors.json"
+}
