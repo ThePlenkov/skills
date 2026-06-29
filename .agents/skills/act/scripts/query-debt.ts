@@ -55,27 +55,42 @@ const FLAG_HANDLERS: Record<string, (args: QueryArgs, argv: string[], i: number)
     return 0
   },
   '--status': (args, argv, i) => {
-    args.status = readOption(argv, i)
-    return 1
+    const val = readOption(argv, i)
+    if (val !== null) {
+      args.status = val
+    }
+    return val !== null ? 1 : 0
   },
   '--area': (args, argv, i) => {
-    args.area = readOption(argv, i)
-    return 1
+    const val = readOption(argv, i)
+    if (val !== null) {
+      args.area = val
+    }
+    return val !== null ? 1 : 0
   },
   '--author': (args, argv, i) => {
-    args.author = readOption(argv, i)
-    return 1
+    const val = readOption(argv, i)
+    if (val !== null) {
+      args.author = val
+    }
+    return val !== null ? 1 : 0
   },
   '--limit': (args, argv, i) => {
-    args.limit = Number(readOption(argv, i))
-    return 1
+    const val = readOption(argv, i)
+    if (val !== null) {
+      args.limit = Number(val)
+    }
+    return val !== null ? 1 : 0
   },
   '--format': (args, argv, i) => {
-    const fmt = coerceOutputFormat(readOption(argv, i))
-    if (fmt) {
-      args.format = fmt
+    const val = readOption(argv, i)
+    if (val !== null) {
+      const fmt = coerceOutputFormat(val)
+      if (fmt) {
+        args.format = fmt
+      }
     }
-    return 1
+    return val !== null ? 1 : 0
   },
 }
 

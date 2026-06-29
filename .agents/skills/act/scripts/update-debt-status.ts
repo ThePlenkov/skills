@@ -66,32 +66,41 @@ const STATUS_FLAG_HANDLERS: Record<
 > = {
   '--thread-id': (state, argv, i) => {
     const id = readOption(argv, i)
-    if (id) {
+    if (id !== null) {
       state.threadIds.push(id)
     }
-    return i + 1
+    return id !== null ? i + 1 : i
   },
   '--threads-file': (state, argv, i) => {
-    state.threadsFile = readOption(argv, i)
-    return i + 1
+    const file = readOption(argv, i)
+    if (file !== null) {
+      state.threadsFile = file
+    }
+    return file !== null ? i + 1 : i
   },
   '--status': (state, argv, i) => {
     const value = readOption(argv, i) as DebtStatus | null
-    if (value && VALID.includes(value)) {
+    if (value !== null && VALID.includes(value)) {
       state.status = value
     }
-    return i + 1
+    return value !== null ? i + 1 : i
   },
   '--fix-pr': (state, argv, i) => {
-    const n = Number(readOption(argv, i))
-    if (Number.isFinite(n)) {
-      state.fixPr = n
+    const val = readOption(argv, i)
+    if (val !== null) {
+      const n = Number(val)
+      if (Number.isFinite(n)) {
+        state.fixPr = n
+      }
     }
-    return i + 1
+    return val !== null ? i + 1 : i
   },
   '--notes': (state, argv, i) => {
-    state.notes = readOption(argv, i)
-    return i + 1
+    const val = readOption(argv, i)
+    if (val !== null) {
+      state.notes = val
+    }
+    return val !== null ? i + 1 : i
   },
 }
 

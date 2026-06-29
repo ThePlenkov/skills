@@ -133,7 +133,7 @@ export function showScenario(scenario: Scenario): void {
 }
 
 type RunSelectionInput = {
-  adapter: ProjectAdapter
+  adapter: E2eProjectAdapter
   selected: Scenario[]
   ctx: RunContext
   suiteId: string
@@ -204,7 +204,7 @@ type PrepareRunInputsArgs = {
   argv: string[]
   opts: CliOptions
   repoRoot: string
-  adapter: ProjectAdapter
+  adapter: E2eProjectAdapter
   projectConfig: ProjectE2eConfig
 }
 

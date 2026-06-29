@@ -28,26 +28,35 @@ function readOption(argv: string[], index: number): string | null {
 
 const PLAN_FLAG_HANDLERS: Record<string, (args: PlanArgs, argv: string[], i: number) => number> = {
   '--limit': (args, argv, i) => {
-    const n = Number(readOption(argv, i))
-    if (Number.isFinite(n) && n > 0) {
-      args.limit = n
+    const val = readOption(argv, i)
+    if (val !== null) {
+      const n = Number(val)
+      if (Number.isFinite(n) && n > 0) {
+        args.limit = n
+      }
     }
-    return 1
+    return val !== null ? 1 : 0
   },
   '--area': (args, argv, i) => {
-    args.area = readOption(argv, i)
-    return 1
+    const val = readOption(argv, i)
+    if (val !== null) {
+      args.area = val
+    }
+    return val !== null ? 1 : 0
   },
   '--status': (args, argv, i) => {
-    const s = readOption(argv, i)
-    if (s) {
-      args.status = s
+    const val = readOption(argv, i)
+    if (val !== null) {
+      args.status = val
     }
-    return 1
+    return val !== null ? 1 : 0
   },
   '--out': (args, argv, i) => {
-    args.outPath = readOption(argv, i)
-    return 1
+    const val = readOption(argv, i)
+    if (val !== null) {
+      args.outPath = val
+    }
+    return val !== null ? 1 : 0
   },
 }
 

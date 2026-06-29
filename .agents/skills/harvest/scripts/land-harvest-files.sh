@@ -16,8 +16,7 @@ git add "${HARVEST_DIR}/"
 git commit -m "${TITLE}"
 
 for attempt in 1 2 3 4 5; do
-  git pull --rebase origin main
-  if git push origin HEAD:main; then
+  if git pull --rebase origin main && git push origin HEAD:main; then
     echo "Landed harvest files on main"
     exit 0
   fi

@@ -21,7 +21,7 @@ import {
   renameSync,
   writeFileSync,
 } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { dirname, join, basename } from 'node:path'
 import {
   listHarvestPaths,
   readDebtRecords,
@@ -119,7 +119,7 @@ function archiveFile(opts: {
   if (opts.dryRun) {
     return { path: opts.path, archivedAt, removedRows: lines.length, liveRows: 0 }
   }
-  const dest = join(archiveDir(), opts.path.split('/').pop()!)
+  const dest = join(archiveDir(), basename(opts.path))
   renameSync(opts.path, dest)
   return { path: dest, archivedAt, removedRows: lines.length, liveRows: 0 }
 }

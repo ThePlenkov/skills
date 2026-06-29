@@ -77,40 +77,61 @@ const BATCH_FLAG_HANDLERS: Record<
     return 0
   },
   '--pr-ids': (state, argv, i) => {
-    state.filters.prIds = parseCsvInts(readOption(argv, i))
-    return 1
+    const val = readOption(argv, i)
+    if (val !== null) {
+      state.filters.prIds = parseCsvInts(val)
+    }
+    return val !== null ? 1 : 0
   },
   '--merged-since': (state, argv, i) => {
-    state.filters.mergedSince = readOption(argv, i)
-    return 1
+    const val = readOption(argv, i)
+    if (val !== null) {
+      state.filters.mergedSince = val
+    }
+    return val !== null ? 1 : 0
   },
   '--merged-until': (state, argv, i) => {
-    state.filters.mergedUntil = readOption(argv, i)
-    return 1
+    const val = readOption(argv, i)
+    if (val !== null) {
+      state.filters.mergedUntil = val
+    }
+    return val !== null ? 1 : 0
   },
   '--last': (state, argv, i) => {
-    const n = Number(readOption(argv, i))
-    state.filters.lastN = Number.isFinite(n) ? n : null
-    return 1
+    const val = readOption(argv, i)
+    if (val !== null) {
+      const n = Number(val)
+      state.filters.lastN = Number.isFinite(n) ? n : null
+    }
+    return val !== null ? 1 : 0
   },
   '--pr-author': (state, argv, i) => {
-    state.filters.prAuthor = readOption(argv, i)
-    return 1
+    const val = readOption(argv, i)
+    if (val !== null) {
+      state.filters.prAuthor = val
+    }
+    return val !== null ? 1 : 0
   },
   '--labels': (state, argv, i) => {
-    state.filters.labels = parseCsvStrings(readOption(argv, i))
-    return 1
+    const val = readOption(argv, i)
+    if (val !== null) {
+      state.filters.labels = parseCsvStrings(val)
+    }
+    return val !== null ? 1 : 0
   },
   '--thread-author': (state, argv, i) => {
-    state.threadAuthor = readOption(argv, i)
-    return 1
+    const val = readOption(argv, i)
+    if (val !== null) {
+      state.threadAuthor = val
+    }
+    return val !== null ? 1 : 0
   },
   '--run-id': (state, argv, i) => {
     const id = readOption(argv, i)
-    if (id) {
+    if (id !== null) {
       state.runId = id
     }
-    return 1
+    return id !== null ? 1 : 0
   },
 }
 
