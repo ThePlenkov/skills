@@ -254,6 +254,14 @@ runs:
         # symlinks (e.g. an `act/act` loop in this repo); prune them
         # so the walker doesn't go in circles.
         cp -r "$GITHUB_WORKSPACE/.agents/skills" "$RUNTIME_WS/skills"
+        # Re-link the host repo's .git dir so `nx affected` can diff
+        # against NX_BASE. RUNTIME_WS is otherwise a bare copy of
+        # .agents/skills; without .git Nx's git-based diffing fails
+        # with "error: Could not access" (the SHA is in the host's
+        # objects, but no git context for Nx to resolve it).
+        if [ -e "$GITHUB_WORKSPACE/.git" ]; then
+          ln -s "$GITHUB_WORKSPACE/.git" "$RUNTIME_WS/.git"
+        fi
         find "$RUNTIME_WS/skills" -type l -exec sh -c \
           'realpath "$1" 2>/dev/null | grep -F "$(dirname "$1")" >/dev/null' _ {} \; -prune -exec rm -f {} + 2>/dev/null || true
         cat > "$RUNTIME_NX" <<EOF
