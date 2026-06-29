@@ -45,18 +45,18 @@ If no internal memory tool exists, use the **Memory MCP server** (`mcp/memory` â
 
 ```json
 {
-  "mcpServers": {
-    "memory": {
-      "command": "docker",
-      "args": ["run", "-i", "--rm", "-v", "<local-data-dir>:<local-data-dir>", "mcp/memory"]
-    }
+  "<server-name>": {
+    "image": "mcp/<server-name>",
+    "mount": "<absolute-path-on-host>:<path-inside-container>"
   }
 }
 ```
 
-(Replace `<local-data-dir>` with the directory where you want the memory
-graph persisted. The above is a JSON config snippet showing the MCP
-invocation shape; the host runtime applies it.)
+The above is a generic shape â€” substitute `<server-name>` with the
+MCP server you want (e.g. `memory`) and `<absolute-path-on-host>`
+with a host directory the server should persist data into. The host
+runtime applies the substitution when wiring MCP into its config;
+this skill does not run the server itself.
 
 ### Priority 3: No Memory Available
 

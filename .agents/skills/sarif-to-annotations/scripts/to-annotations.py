@@ -39,27 +39,27 @@ LEVEL_MAP = {
 }
 
 
-def collect_rules(runs):
+def collect_entries(runs):
     """Index each entry from tool.driver.entries by its identifier."""
-    rules_by_id = {}
+    entries_by_id = {}
     for run in runs:
         driver = run.get("tool", {}).get("driver", {})
         tool_name = driver.get("name", "tool")
-        for rule in driver.get("rules", []) or []:
-            rid = rule.get("id", "")
+        for entry in driver.get("rules", []) or []:
+            rid = entry.get("id", "")
             if not rid:
                 continue
-            help_obj = rule.get("help") or {}
-            rules_by_id[rid] = {
+            help_obj = entry.get("help") or {}
+            entries_by_id[rid] = {
                 "tool":  tool_name,
                 "short": rule.get("shortDescription", {}).get("text", ""),
                 "full":  rule.get("fullDescription", {}).get("text", ""),
                 "help":  help_obj.get("text", ""),
             }
-    return rules_by_id
+    return entries_by_id
 
 
-def build_title(tool_name, rule_id, properties, rules_by_id):
+def build_title(tool_name, rule_id, properties, entries_by_id):
     """Compose the title field of a workflow-command annotation.
 
     Output shape is: taxonomy tags (if present), then the
@@ -85,7 +85,7 @@ def build_title(tool_name, rule_id, properties, rules_by_id):
 
     category = (properties or {}).get("category")
     if not category:
-        rule = rules_by_id.get(rule_id, {})
+        rule = entries_by_id.get(rule_id, {})
         category = rule.get("short") or rule.get("full")
     if category:
         parts.append(": " + category)
@@ -165,7 +165,7 @@ def main():
     if not runs:
         sys.exit(0)
 
-    rules_by_id = collect_rules(runs)
+    entries_by_id = collect_entries(runs)
 
     error_count = 0
     out_lines = []
@@ -185,7 +185,7 @@ def main():
             properties = result.get("properties") or {}
             message = result.get("message", {}).get("text", "(no message)")
 
-            title = build_title(tool_name, rule_id, properties, rules_by_id)
+            title = build_title(tool_name, rule_id, properties, entries_by_id)
             full_msg = build_message(message, properties)
 
             # Get first physical location

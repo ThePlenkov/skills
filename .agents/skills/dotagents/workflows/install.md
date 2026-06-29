@@ -44,7 +44,7 @@ npx skills add ThePlenkov/skills --all -y
 
 ## Principles
 
-- The `npx skills` CLI is the standard install tool.
-- Do not overwrite existing configurations without user approval.
-- Do not pull in skills from unrelated sources; scope is the current project.
+- Prefer the documented `npx skills` CLI for installation.
+- Never replace an existing manifest without explicit user confirmation.
+- Stay within the current project's repository boundary.
 - Confirm with the user before any file change; this workflow never runs unattended.
