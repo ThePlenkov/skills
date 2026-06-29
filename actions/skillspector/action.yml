@@ -1,7 +1,7 @@
 name: SkillSpector scan
 description: >-
-  Run SkillSpector on a skill (or set of skills) and emit GitHub PR
-  annotations, an optional SARIF file, and structured step outputs.
+  Run SkillSpector on every skill in a path and emit GitHub PR annotations,
+  an optional SARIF file, and structured step outputs.
 
 author: ThePlenkov
 
@@ -13,19 +13,11 @@ branding:
 inputs:
   path:
     description: >-
-      Path to scan. If it contains a `SKILL.md`, the action treats it as
-      a single skill. Otherwise it iterates over immediate sub-directories
-      that contain a `SKILL.md` and runs the scan per skill.
+      Path to scan. The plugin discovers every `SKILL.md` beneath this
+      path and infers a `scan` target per skill. Default: the host
+      repo's standard `.agents/skills/` directory.
     required: false
-    default: .
-  recursive:
-    description: >-
-      Pass `--recursive` to skillspector. Note: as of skillspector 2.3.7
-      `--recursive --format json` emits a per-skill summary only and drops
-      the per-issue schema (NVIDIA/SkillSpector #228). Default behavior
-      already iterates per skill, so this is usually unnecessary.
-    required: false
-    default: "false"
+    default: .agents/skills
   baseline:
     description: >-
       Path to a `.skillspector-baseline.yaml` file passed as
@@ -38,66 +30,45 @@ inputs:
     default: "true"
   annotations:
     description: >-
-      Emit GitHub Actions workflow commands for inline PR annotations
-      (the `::error|warning|notice file=…,line=…,title=…::message` form).
+      Emit GitHub Actions workflow commands for inline PR annotations.
       Set to "false" to suppress annotations but still write SARIF.
     required: false
     default: "true"
   sarif:
     description: >-
-      Path to write a SARIF 2.1.0 report. Leave empty to skip the SARIF
-      file. When set, the SARIF is also written regardless of
-      `annotations`. The same per-issue schema is preserved under SARIF's
-      standard `properties` extension point, so any SARIF-aware tool
-      (Code Scanning tab, IDE plugins, dashboards) can read the full
-      per-issue context.
+      Path to write a SARIF 2.1.0 report. Leave empty to skip.
     required: false
     default: ""
   fail-on-error:
     description: >-
       When "true" (default), the action exits with code 1 if any
-      `error`-severity (HIGH/CRITICAL) finding is emitted. When
-      "false", the action always exits 0 — useful when the same
-      findings are surfaced through SARIF and you want a separate gate.
+      error-severity (HIGH/CRITICAL) finding is emitted.
     required: false
     default: "true"
   job-summary:
     description: >-
-      When "true", append a markdown summary table to
-      `$GITHUB_STEP_SUMMARY` listing per-skill finding counts.
+      When "true", append a markdown summary to `$GITHUB_STEP_SUMMARY`.
     required: false
     default: "true"
   skillspector-version:
-    description: >-
-      Skillspector version to install. Default tracks the version this
-      action was last verified against (commit SHA pinned for
-      reproducibility).
+    description: "Pinned SkillSpector commit SHA for reproducibility."
     required: false
     default: "78be329a7ea9749842e335598132ce171b8717d4"
   parallelism:
     description: >-
-      Max concurrent skill scans. Leave empty to use `nproc` (the runner's
-      CPU count). Set to "1" for sequential scanning (useful for debugging
-      or single-core runners). Each skill is independent, so this is safe
-      up to the number of skills.
+      Max concurrent skill scans. Empty = `nproc` (runner CPU count).
     required: false
     default: ""
   affected:
     description: >-
-      When "true" (default), use `nx affected` to scan only skills whose
-      files have changed since the base SHA. Requires `nx-set-shas` to
-      have run earlier in the workflow so `NX_BASE` / `NX_HEAD` are
-      populated. When "false", use `nx run-many` and scan every skill
-      every time (still cached, but always invoked).
+      When "true" (default), use `nx affected` to scan only skills
+      whose files have changed since the base SHA. Requires
+      `nx-set-shas` to have populated `NX_BASE` / `NX_HEAD`.
     required: false
     default: "true"
   base-branch:
     description: >-
-      Branch name used by `nx-set-shas` to determine the base SHA for
-      `nx affected`. Defaults to "main". For cascade-of-PRs setups
-      where each PR targets a feature branch (not main), pass the
-      actual base branch so NX_BASE is set correctly. Ignored when
-      `affected: 'false'`.
+      Branch name used by `nx-set-shas` for `nx affected`.
     required: false
     default: "main"
 
@@ -105,32 +76,28 @@ inputs:
 outputs:
   sarif-path:
     description: "Absolute path to the SARIF file, if `sarif` input was set."
-    value: ${{ steps.emit.outputs.sarif-path }}
+    value: ${{ steps.scan.outputs.sarif-path }}
   error-count:
-    description: "Total number of error-severity findings across all scanned skills."
-    value: ${{ steps.emit.outputs.error-count }}
+    description: "Total error-severity findings across all scanned skills."
+    value: ${{ steps.scan.outputs.error-count }}
   warning-count:
-    description: "Total number of warning-severity findings across all scanned skills."
-    value: ${{ steps.emit.outputs.warning-count }}
+    description: "Total warning-severity findings across all scanned skills."
+    value: ${{ steps.scan.outputs.warning-count }}
   total-count:
-    description: "Total number of findings across all scanned skills."
-    value: ${{ steps.emit.outputs.total-count }}
+    description: "Total findings across all scanned skills."
+    value: ${{ steps.scan.outputs.total-count }}
 
 
 runs:
   using: composite
   steps:
 
-    # The plugin is bundled to JS at install time (esbuild), so
-    # we only need Node LTS — no TypeScript loader required.
+    - uses: actions/checkout@v7
+
     - name: Set up Node (LTS)
       uses: actions/setup-node@v6
       with:
         node-version: "lts/*"
-        # Cache npm using the action's own package-lock.json. The
-        # path is a workspace-relative glob; setup-node v6 rejects
-        # paths starting with `./`, so we use the leading-`actions`
-        # form rather than `github.action_path` (which carries `./`).
         cache: "npm"
         cache-dependency-path: "actions/skillspector/package-lock.json"
 
@@ -138,234 +105,128 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        # The action is self-contained: it brings its own Nx + plugin
-        # into node_modules. This does NOT affect the host repository's
-        # tooling — the install is scoped to this action's directory.
-        cd "$GITHUB_ACTION_PATH"
-        npm ci --no-audit --no-fund
+        npm ci --prefix "$GITHUB_ACTION_PATH" --no-audit --no-fund
 
     - name: Set up Python
       uses: actions/setup-python@v6
       with:
-        # Skillspector 2.3.7 requires Python >=3.12,<3.14.
         python-version: "3.12"
 
-    # Sets NX_BASE / NX_HEAD so `nx affected` knows which commits to
-    # diff against. This is the standard Nx-recommended pattern; the
-    # action handles PR base SHA, push to main, and workflow_dispatch
-    # cases automatically. Required when `affected: 'true'` (default).
+    - name: Install SkillSpector
+      shell: bash
+      run: pip install --quiet "git+https://github.com/NVIDIA/skillspector.git@${{ inputs.skillspector-version }}"
+
     - name: Set Nx SHAs
-      if: ${{ inputs.affected == 'true' }}
+      if: inputs.affected == 'true'
       uses: nrwl/nx-set-shas@v5
       with:
         main-branch-name: ${{ inputs.base-branch }}
         workflow-id: skill-scan.yml
 
-    # Restore the Nx cache from a previous run (if any). The
-    # matching save step lives at the very end of this action so
-    # that Nx has had a chance to populate /tmp/nx-skillspector-cache
-    # before we upload it. Single combined key:
-    #   - actions/skillspector/package-lock.json hash
-    #     (nx version + plugin deps — invalidates on any upgrade)
-    #   - .agents/skills/**/SKILL.md hash
-    #     (skill content — invalidates when any SKILL.md changes)
-    #   - runner.os (cross-platform safety)
-    # restore-keys falls back to the most recent cache for the same
-    # OS even if the exact key misses (e.g. after a dep upgrade).
+    # Cache Nx's default .nx/cache directory in the host repo.
+    # Key: package-lock.json hash + SKILL.md hash + runner.os.
+    # Falling back via restore-keys keeps prior plugin versions
+    # usable after a dep upgrade.
     - name: Restore Nx cache
-      id: nx-cache-restore
+      id: nx-cache
       uses: actions/cache/restore@v4
       with:
-        path: /tmp/nx-skillspector-cache
+        path: .nx/cache
         key: nx-skillspector-${{ runner.os }}-${{ hashFiles('actions/skillspector/package-lock.json', '.agents/skills/**/SKILL.md') }}
         restore-keys: |
           nx-skillspector-${{ runner.os }}-
 
-    - name: Install SkillSpector
-      shell: bash
-      run: |
-        set -euo pipefail
-        pip install --quiet "git+https://github.com/NVIDIA/skillspector.git@${{ inputs.skillspector-version }}"
-
-    - name: Run SkillSpector scan (Nx plugin + inferred tasks)
-      id: emit
+    # Stage the action's nx.json into the host repo for the duration
+    # of the scan. If the host already has an nx.json, save it and
+    # restore on exit (trap). If we created it, delete on exit.
+    #
+    # This is the standard pattern for ad-hoc Nx plugin usage in a
+    # repo that doesn't normally use Nx — no `cd`, no tmp dir, no
+    # symlinks. Nx reads `./nx.json` from cwd (= `$GITHUB_WORKSPACE`).
+    - name: Run SkillSpector scan
+      id: scan
       shell: bash
       env:
         GITHUB_OUTPUT: ${{ github.output }}
         GITHUB_STEP_SUMMARY: ${{ github.summary }}
-        # Nx's task result + project graph cache. Backed by the
-        # actions/cache step above; without these env vars Nx would
-        # write to .nx/cache inside the (tmp) Nx workspace and we'd
-        # lose the cache between runs.
-        #
-        # NX_CACHE_DIRECTORY:          task-result cache
-        # NX_WORKSPACE_DATA_DIRECTORY: project-graph / workspace-data cache
-        # Both point to the same path so a single actions/cache step
-        # captures everything.
-        NX_CACHE_DIRECTORY: /tmp/nx-skillspector-cache
-        NX_WORKSPACE_DATA_DIRECTORY: /tmp/nx-skillspector-cache
-        # Native TS stripping is no longer needed — the plugin is
-        # bundled to JS via esbuild at postinstall. The env var is
-        # kept here for future TS executors; harmless when nothing
-        # imports .ts files.
-        NODE_OPTIONS: "--experimental-strip-types --experimental-require-module --no-warnings"
+        # Make the action's bundled plugin resolvable from cwd.
+        NODE_PATH: ${{ github.action_path }}/node_modules
+        SKILLSPECTOR_BASELINE: ${{ inputs.baseline }}
+        SKILLSPECTOR_NO_LLM: ${{ inputs.no-llm }}
+        SARIF_OUT: ${{ inputs.sarif }}
+        ANNOTATIONS_ENABLED: ${{ inputs.annotations }}
+        FAIL_ON_ERROR: ${{ inputs.fail-on-error }}
+        JOB_SUMMARY_ENABLED: ${{ inputs.job-summary }}
       run: |
         set -euo pipefail
-        cd "$GITHUB_ACTION_PATH"
 
-        # Resolve parallelism from the input, falling back to the
-        # runner's CPU count. We honour the user's value if set; an
-        # empty input means "use nproc".
+        # Invoke the action's bundled `nx` directly. `npx nx` from
+        # `$GITHUB_WORKSPACE` searches `./node_modules/.bin` first
+        # (no node_modules here → miss) and falls back to fetching
+        # a fresh `nx@23.0.1` from npm — which has no
+        # `@theplenkov/nx-skillspector` plugin and produces an empty
+        # project graph ("project <skill> not found").
+        NX_BIN="$GITHUB_ACTION_PATH/node_modules/.bin/nx"
+
+        # Stage nx.json: save existing (if any), write action's, restore on exit.
+        # Trap uses double quotes so $NX_BACKUP expands at exit time
+        # (not at trap-registration time, where it's empty).
+        # Always removes $NX_BACKUP on exit to avoid /tmp leaks.
+        NX_BACKUP=$(mktemp)
+        trap "if [ -s \"\$NX_BACKUP\" ]; then mv \"\$NX_BACKUP\" nx.json; else rm -f nx.json; fi; rm -f \"\$NX_BACKUP\"" EXIT
+        if [ -f nx.json ]; then
+          cp nx.json "$NX_BACKUP"
+        fi
+        cp "$GITHUB_ACTION_PATH/nx.json" nx.json
+
+        # Ensure .nx is gitignored (idempotent — only adds if missing).
+        # Match the actual gitignore entry (`.nx/`) rather than `.nx`,
+        # otherwise the anchored match misses and we append duplicates.
+        if [ -f .gitignore ] && ! grep -qF '.nx/' .gitignore; then
+          echo '.nx/' >> .gitignore
+        fi
+
+        # Resolve parallelism.
         if [ -n "${{ inputs.parallelism }}" ]; then
           MAX_WORKERS="${{ inputs.parallelism }}"
         else
           MAX_WORKERS=$(nproc)
         fi
 
-        # cd into the tmp workspace happens later (after RUNTIME_WS is set up).
-
-        # The plugin's createNodes discovers skills via the glob
-        # pattern (configured in our runtime nx.json below). We copy
-        # the host's .agents/skills into our tmp workspace, symlink
-        # our plugin's node_modules alongside, and run Nx from the tmp
-        # workspace. The host repo is completely untouched.
-        HOST_PATH="$GITHUB_WORKSPACE/${{ inputs.path }}"
-        HOST_PATH="${HOST_PATH%/}"
-
-        # Build a thin nx.json override for the host workspace that
-        # registers our plugin. This file lives only in the runner's
-        # tmp dir; the host repo is not modified.
-        #
-        # Set up a tmp Nx workspace that:
-        #   - has the host's .agents/skills as a real (cp -r) tree
-        #   - has our plugin's node_modules available (via symlink)
-        #   - has our plugin package available (via symlink)
-        # The plugin's createNodes walks the workspace root for
-        # SKILL.md; copying the host's skill dir into a sub-folder
-        # of our tmp workspace lets the walker find them while keeping
-        # the plugin close at hand.
-        RUNTIME_WS=$(mktemp -d -t nx-skillspector-XXXXXX)
-        RUNTIME_NX="$RUNTIME_WS/nx.json"
-        ln -s "$GITHUB_ACTION_PATH/nx-skillspector" "$RUNTIME_WS/nx-skillspector"
-        ln -s "$GITHUB_ACTION_PATH/node_modules" "$RUNTIME_WS/node_modules"
-        # Copy (not symlink) the host's skills. The Nx Rust task hasher
-        # doesn't follow symlinks reliably — paths must resolve to real
-        # files for hashing. The source may contain self-referencing
-        # symlinks (e.g. an `act/act` loop in this repo); prune them
-        # so the walker doesn't go in circles.
-        cp -r "$GITHUB_WORKSPACE/.agents/skills" "$RUNTIME_WS/skills"
-        # Re-link the host repo's .git dir so `nx affected` can diff
-        # against NX_BASE. RUNTIME_WS is otherwise a bare copy of
-        # .agents/skills; without .git Nx's git-based diffing fails
-        # with "error: Could not access" (the SHA is in the host's
-        # objects, but no git context for Nx to resolve it).
-        if [ -e "$GITHUB_WORKSPACE/.git" ]; then
-          ln -s "$GITHUB_WORKSPACE/.git" "$RUNTIME_WS/.git"
-        fi
-        find "$RUNTIME_WS/skills" -type l -exec sh -c \
-          'realpath "$1" 2>/dev/null | grep -F "$(dirname "$1")" >/dev/null' _ {} \; -prune -exec rm -f {} + 2>/dev/null || true
-        cat > "$RUNTIME_NX" <<EOF
-        {
-          "plugins": [
-            {
-              "plugin": "@theplenkov/nx-skillspector",
-              "options": {}
-            }
-          ],
-          "namedInputs": {
-            "skill": [
-              "{projectRoot}/SKILL.md",
-              "{projectRoot}/scripts/**/*",
-              "{projectRoot}/references/**/*",
-              "{projectRoot}/assets/**/*"
-            ]
-          },
-          "targetDefaults": {
-            "scan": {
-              "cache": true,
-              "inputs": ["skill", "^production"]
-            }
-          }
-        }
-        EOF
-        cd "$RUNTIME_WS"
-
-        # Map our action inputs into executor options passed via
-        # --base and --configurationOverride is not ergonomic here.
-        # Instead we set environment variables that the executor
-        # honors, and we let the plugin's createNodes pass the path
-        # through to the executor's `path` option automatically.
-        export SKILLSPECTOR_BIN="${SKILLSPECTOR_BIN:-skillspector}"
-        export SKILLSPECTOR_BASELINE="${{ inputs.baseline }}"
-        export SKILLSPECTOR_NO_LLM="${{ inputs.no-llm }}"
-        export SARIF_OUT="${{ inputs.sarif }}"
-        export ANNOTATIONS_ENABLED="${{ inputs.annotations }}"
-        export FAIL_ON_ERROR="${{ inputs.fail-on-error }}"
-        export JOB_SUMMARY_ENABLED="${{ inputs.job-summary }}"
-
-        # Make our node_modules available when Nx runs from the host
-        # workspace, by adjusting NODE_PATH. (The plugin is resolved
-        # from cwd; this just makes sure require() can find it.)
-        export NODE_PATH="$GITHUB_ACTION_PATH/node_modules${NODE_PATH:+:$NODE_PATH}"
-
-        set +e
         # Pick `nx affected` or `nx run-many` based on the input.
-        # affected: only runs scan for projects whose files changed
-        #           since NX_BASE (set by nx-set-shas). Cached skills
-        #           that didn't change are skipped entirely.
-        # run-many: scans every project regardless. Still uses cache.
         if [ "${{ inputs.affected }}" = "true" ]; then
-          BASE_REF="${{ inputs.base-branch }}"
-          # Ensure origin/<base> is fetched; checkout's default
-          # fetch-depth=1 doesn't always include other refs. Use
-          # the host repo's git dir explicitly because cwd at this
-          # point is the action's checkout (GITHUB_ACTION_PATH).
-          if ! git -C "$GITHUB_WORKSPACE" rev-parse --verify "origin/${BASE_REF}" >/dev/null 2>&1; then
-            git -C "$GITHUB_WORKSPACE" fetch --depth=50 origin "${BASE_REF}" 2>/dev/null || true
-          fi
-          # nx-set-shas returns a specific commit SHA for NX_BASE
-          # (not the branch tip). That SHA may lie outside the
-          # shallow `--depth=50` fetch of origin/<base> if the
-          # base ref hasn't received any new commits since the
-          # last successful workflow. Fetch the SHA explicitly
-          # so `nx affected --base` can resolve it.
-          if [ -n "${NX_BASE:-}" ]; then
-            echo "NX_BASE=${NX_BASE} (looking for it in host repo's objects)"
-            if git -C "$GITHUB_WORKSPACE" cat-file -e "${NX_BASE}" 2>/dev/null; then
-              echo "  -> already present"
-            else
-              echo "  -> not present, fetching from origin"
-              if git -C "$GITHUB_WORKSPACE" fetch --depth=200 origin "${NX_BASE}" 2>&1; then
-                echo "  -> fetch succeeded"
-              else
-                echo "  ::warning::fetch of NX_BASE SHA failed; `nx affected` will likely fail too"
-              fi
-            fi
-          fi
-          # Fallback: nx-set-shas can return empty NX_BASE for the
-          # first CI run on a branch (or for cascade-of-PRs setups
-          # where the base branch has never had a successful build).
-          # In that case, derive NX_BASE from git merge-base with
-          # the configured base branch.
-          if [ -z "$NX_BASE" ]; then
-            if NX_BASE=$(git merge-base "origin/${BASE_REF}" HEAD 2>/dev/null) && [ -n "$NX_BASE" ]; then
-              echo "nx-set-shas left NX_BASE empty; falling back to git merge-base origin/${BASE_REF} → ${NX_BASE}"
-              export NX_BASE
-            fi
-          fi
-          # If still empty (e.g. base branch doesn't exist yet),
-          # fall back to run-many rather than failing.
-          if [ -z "$NX_BASE" ]; then
-            echo "::warning::NX_BASE could not be determined; falling back to nx run-many (full scan)"
-            NX_SUBCMD="run-many"
-          else
-            NX_SUBCMD="affected"
-          fi
+          NX_SUBCMD="affected"
         else
           NX_SUBCMD="run-many"
         fi
-        npx nx "$NX_SUBCMD" -t scan \
-          --configFile="$RUNTIME_NX" \
+
+        # Pre-flight: ensure the base ref is fetchable so `nx affected`
+        # can resolve NX_BASE even on shallow checkouts. Uses the host
+        # repo's git dir (we never `cd` away from it).
+        if [ "$NX_SUBCMD" = "affected" ]; then
+          BASE_REF="${{ inputs.base-branch }}"
+          if ! git -C "$GITHUB_WORKSPACE" rev-parse --verify "origin/${BASE_REF}" >/dev/null 2>&1; then
+            git -C "$GITHUB_WORKSPACE" fetch --depth=50 origin "${BASE_REF}" 2>/dev/null || true
+          fi
+          if [ -n "${NX_BASE:-}" ] \
+            && ! git -C "$GITHUB_WORKSPACE" cat-file -e "${NX_BASE}" 2>/dev/null; then
+            git -C "$GITHUB_WORKSPACE" fetch --depth=200 origin "${NX_BASE}" 2>/dev/null || \
+              echo "::warning::fetch of NX_BASE SHA failed; nx affected will likely fail too"
+          fi
+          if [ -z "${NX_BASE:-}" ]; then
+            if NX_BASE=$(git -C "$GITHUB_WORKSPACE" merge-base "origin/${BASE_REF}" HEAD 2>/dev/null) && [ -n "$NX_BASE" ]; then
+              echo "nx-set-shas left NX_BASE empty; falling back to merge-base origin/${BASE_REF} → ${NX_BASE}"
+              export NX_BASE
+            fi
+          fi
+          if [ -z "${NX_BASE:-}" ]; then
+            echo "::warning::NX_BASE could not be determined; falling back to nx run-many"
+            NX_SUBCMD="run-many"
+          fi
+        fi
+
+        set +e
+        "$NX_BIN" "$NX_SUBCMD" -t scan \
           --parallel="$MAX_WORKERS" \
           --output-style=stream \
           2>&1 | tee /tmp/nx-scan.log
@@ -389,35 +250,38 @@ runs:
         # key=value matching (split on '=' and compare key) so plain
         # prose like "12 findings" doesn't match — only the structured
         # `findings=N` lines the executor emits.
-        TOTAL_FINDINGS=$(awk '{for(i=1;i<=NF;i++) if(split($i,a,"=")==2 && a[1]=="findings") s+=a[2]} END {print s+0}' /tmp/nx-scan.log)
-        TOTAL_ERRORS=$(awk '{for(i=1;i<=NF;i++) if(split($i,a,"=")==2 && a[1]=="errors") s+=a[2]} END {print s+0}' /tmp/nx-scan.log)
-        TOTAL_WARNINGS=$(awk '{for(i=1;i<=NF;i++) if(split($i,a,"=")==2 && a[1]=="warnings") s+=a[2]} END {print s+0}' /tmp/nx-scan.log)
+        TOTAL=$(awk '{for(i=1;i<=NF;i++) if(split($i,a,"=")==2 && a[1]=="findings") s+=a[2]} END {print s+0}' /tmp/nx-scan.log)
+        ERRORS=$(awk '{for(i=1;i<=NF;i++) if(split($i,a,"=")==2 && a[1]=="errors") s+=a[2]} END {print s+0}' /tmp/nx-scan.log)
+        WARNINGS=$(awk '{for(i=1;i<=NF;i++) if(split($i,a,"=")==2 && a[1]=="warnings") s+=a[2]} END {print s+0}' /tmp/nx-scan.log)
 
         {
-          echo "error-count=${TOTAL_ERRORS}"
-          echo "warning-count=${TOTAL_WARNINGS}"
-          echo "total-count=${TOTAL_FINDINGS}"
+          echo "error-count=${ERRORS}"
+          echo "warning-count=${WARNINGS}"
+          echo "total-count=${TOTAL}"
           if [ -n "${{ inputs.sarif }}" ]; then
             echo "sarif-path=${{ inputs.sarif }}"
           fi
         } >> "$GITHUB_OUTPUT"
 
-        # Merge per-skill SARIF files into a single SARIF. Each
-        # executor invocation writes to <sarif>-<skill>.sarif (so
-        # they can run in parallel without racing on a single file).
-        # We aggregate here into the final path the caller asked for.
+        # Merge per-skill SARIF files into a single SARIF.
+        # Each executor invocation writes to <sarif>-<skill>.sarif so
+        # parallel invocations don't race on a single file. The merging
+        # happens here, in the host workspace (cwd), where the executor
+        # wrote them.
         if [ -n "${{ inputs.sarif }}" ]; then
           SARIF_FINAL="${{ inputs.sarif }}"
           SARIF_DIR=$(dirname "$SARIF_FINAL")
           SARIF_BASE=$(basename "$SARIF_FINAL" .sarif)
-          # Concatenate all per-skill files (one valid SARIF per file)
+          # Guard against `nx affected` reporting zero projects: in that
+          # case the per-skill SARIF directory was never created and
+          # `fs.readdirSync` would throw ENOENT.
+          mkdir -p "$SARIF_DIR"
           node -e '
-            const fs = require("node:fs");
-            const path = require("node:path");
-            const out = process.argv[1];
-            const dir = process.argv[2];
-            const base = process.argv[3];
-            const files = fs.readdirSync(dir).filter(f => f.startsWith(base + "-") && f.endsWith(".sarif"));
+            const fs = require("node:fs"), path = require("node:path");
+            const [out, dir, base] = process.argv.slice(1);
+            const files = fs.existsSync(dir)
+              ? fs.readdirSync(dir).filter(f => f.startsWith(base + "-") && f.endsWith(".sarif"))
+              : [];
             const merged = { $schema: "https://json.schemastore.org/sarif-2.1.0.json", version: "2.1.0", runs: [] };
             for (const f of files.sort()) {
               try {
@@ -425,30 +289,21 @@ runs:
                 if (Array.isArray(s.runs)) merged.runs.push(...s.runs);
               } catch {}
             }
-            fs.mkdirSync(path.dirname(out), { recursive: true });
             fs.writeFileSync(out, JSON.stringify(merged, null, 2) + "\n");
             console.log(`Merged ${files.length} per-skill SARIF files into ${out} (${merged.runs.length} runs)`);
           ' "$SARIF_FINAL" "$SARIF_DIR" "$SARIF_BASE"
         fi
 
-        rm -f "$RUNTIME_NX" /tmp/nx-scan.log
+        rm -f /tmp/nx-scan.log
         exit $NX_EXIT
 
-    # Save the Nx cache after the scan. Must be its own step
-    # (rather than the post-step of the restore step above)
-    # because actions/cache's auto-save runs at the END of its
-    # OWN step, when the path is still empty. We need to wait
-    # until Nx has populated /tmp/nx-skillspector-cache with
-    # task results + the project graph, then upload.
-    #
-    # Always-on (`if: always()`) so even failed scans save the
-    # cache — failed scans still produce per-skill SARIFs and
-    # the daemon graph, and a partial cache is better than a
-    # full cold start next time.
+    # Save the Nx cache after the scan. Always-on so failed runs
+    # still save the partial cache (Nx keeps what it produced).
+    # Using the same primary key the restore step resolved ensures
+    # we update the cache entry instead of racing on a new key.
     - name: Save Nx cache
       if: always()
       uses: actions/cache/save@v4
       with:
-        path: /tmp/nx-skillspector-cache
-        key: nx-skillspector-${{ runner.os }}-${{ hashFiles('actions/skillspector/package-lock.json', '.agents/skills/**/SKILL.md') }}
-
+        path: .nx/cache
+        key: ${{ steps.nx-cache.outputs.cache-primary-key }}
