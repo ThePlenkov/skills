@@ -129,7 +129,7 @@ runs:
     # usable after a dep upgrade.
     - name: Restore Nx cache
       id: nx-cache
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: .nx/cache
         key: nx-skillspector-${{ runner.os }}-${{ hashFiles('actions/skillspector/package-lock.json', '.agents/skills/**/SKILL.md') }}
@@ -303,7 +303,7 @@ runs:
     # we update the cache entry instead of racing on a new key.
     - name: Save Nx cache
       if: always()
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v6
       with:
         path: .nx/cache
         key: ${{ steps.nx-cache.outputs.cache-primary-key }}
