@@ -1,8 +1,17 @@
 # Master-Model Rating Flow (P5)
 
 **Goal:** measure which PR review tools are worth keeping. The master model
-running `/act` rates every finding 0–5; ratings accumulate in
-`.agents/act/review_scores.csv` for later notebook analysis.
+running `/act` rates every finding 0–5. Per-run ratings are always captured in
+`tmp/agent_<pid>/scores-report.jsonl` (scratch, gitignored). The persistent
+research dataset at `.agents/act/review_scores.csv` is **OFF by default** and
+updated only when the run explicitly opts in (`--record`, `ACT_RECORD_SCORES=1`,
+or `.agents/act/config.json` `{"record_scores": true}`).
+
+**Why opt-in:** each row is a research artefact, not a project artefact.
+Growing the file on every `/act` runs adds a commit per PR and pollutes
+history for users who are not actively analysing the dataset. The scratch
+JSONL preserves every rating the master model produces; only the persistent
+CSV is gated.
 
 ## Design principle (read first)
 
@@ -59,23 +68,45 @@ impact · **3** correct, real · **4** subtle catch · **5** would prevent an
 incident. No URLs, summaries, tool names, latency, or evaluator-per-row — the
 submit step joins all of that. Write to `tmp/agent_xyz/scores.tsv`.
 
-### 3. Submit — 1 tool call (join + upsert, no network)
+### 3. Submit — 1 tool call (join + scratch always, upsert only when opted in)
 
 ```bash
+# Default (OFF): scratch JSONL written, CSV untouched.
 bun scripts/submit-scores.ts OWNER REPO PR \
+  --evaluator claude-opus-4.8 \
+  --findings tmp/agent_xyz/findings.jsonl \
+  --scores  tmp/agent_xyz/scores.tsv
+
+# Opted in (CSV is updated this run):
+bun scripts/submit-scores.ts OWNER REPO PR --record \
   --evaluator claude-opus-4.8 \
   --findings tmp/agent_xyz/findings.jsonl \
   --scores  tmp/agent_xyz/scores.tsv
 ```
 
 Joins each score onto its finding by `finding_id`, names the evaluator **once**
-via `--evaluator`, and upserts `.agents/act/review_scores.csv`. The upsert key is
+via `--evaluator`, and always writes the scratch JSONL report
+(`tmp/agent_<pid>/scores-report.jsonl`). When CSV recording is opted in, the
+script also upserts `.agents/act/review_scores.csv`. The upsert key is
 `(pr_url, finding_id, evaluator_id)` — re-running `/act` replaces prior rows
 instead of duplicating them. CSV fields are RFC-4180 quoted, so commas and
 quotes in reasoning are safe. Scoring posts **nothing** to GitHub; reactions and
 replies remain the existing P1–P4 flow.
 
 `--dry-run` validates the join and reports the row count without writing.
+
+### Recording switches (priority high → low, first hit wins)
+
+| Switch | Syntax | Lifetime |
+|--------|--------|----------|
+| **CLI flag** | `bun scripts/submit-scores.ts … --record` (positive) or `--no-record` (negative override) | one run |
+| **Env var** | `ACT_RECORD_SCORES=1 bun scripts/submit-scores.ts …` | one shell session |
+| **Config file** | `.agents/act/config.json` with `{"record_scores": true}` | until removed |
+| **Default** | — | — (OFF) |
+
+Truthy values for `ACT_RECORD_SCORES`: `1`, `true`, `yes` (case-insensitive).
+The script prints `RECORDING=on|off (source)` on every run so the resolved
+choice is auditable at a glance.
 
 ## CSV schema
 
@@ -87,6 +118,12 @@ timestamp,pr_url,finding_id,tool_name,finding_type,finding_url,evaluator_id,mast
 disproven.
 
 ## Notebook analysis
+
+The persistent dataset lives in `.agents/act/review_scores.csv` — only populated
+on opted-in runs. Per-run data (one row per finding, JSONL) is always
+available under `tmp/agent_<pid>/scores-report.jsonl` from earlier runs; aggregate
+them with `cat tmp/agent_*/scores-report.jsonl > all-ratings.jsonl` if you want
+analysis without enabling CSV recording.
 
 ```python
 import pandas as pd
@@ -113,5 +150,7 @@ confidence over time.
 ## Wiring
 
 This is **P5** in [SKILL.md](SKILL.md) — after P4 resolve, before P6 evaluation.
-Scratch (`findings.jsonl`, `scores.tsv`) lives under repo **`./tmp/`** (never system `/tmp`, never `scripts/` or repo root). Only
-`review_scores.csv` is committed.
+Scratch (`findings.jsonl`, `scores.tsv`, `scores-report.jsonl`) lives under repo
+**`./tmp/`** (never system `/tmp`, never `scripts/` or repo root). The
+persistent `review_scores.csv` is committed only when the `/act` run was
+explicitly opted in.

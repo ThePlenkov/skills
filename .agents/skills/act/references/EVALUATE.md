@@ -20,6 +20,24 @@ If **any** box is “yes”: write **what / root cause / prevention** and update
 - [ ] **Same rule 2+ times:** same Codacy/Semgrep/rule ID flagged again after a fix commit → verify fix is on **current HEAD** and suppression/answer is in the right sink; do **not** re-merge blindly.
 - [ ] **Empty /act loop:** this is the 2+ `/act` invocation on the same PR with **no new product commits** since last run → **stop** and report cycle; diagnose in retrospective.
 
+## 2b. Critical SAST error annotations (required every /act)
+
+`pr-state.sh` surfaces `SAST_FINDINGS_PENDING=N` (count of
+`annotation_level=failure` entries on FAILING SAST checks). Before merge-ready:
+
+- [ ] **Annotation-level=failure entries were read** for every failing SAST
+      check, not just the check status: `gh api repos/<o>/<r>/check-runs/<id>/annotations`.
+- [ ] **Each `failure` annotation has one of:** (a) a product-code fix on HEAD,
+      (b) a line-specific suppression with a documented reason
+      (`NOSONAR` / `nosemgrep` / `# noqa` / `# @ts-expect-error` with an
+      explanatory comment), or (c) an out-of-scope decision recorded in the
+      in-thread reply + linked backlog/issue.
+- [ ] **No whole-file suppressions** were added when a line-specific one
+      works — per rule per file in the strictest tools (Codacy, SonarCloud).
+- [ ] **`SAST_FINDINGS_PENDING` is 0** at the point you claim merge-ready.
+      If it cannot be 0 (e.g. transient infrastructure), document why in
+      the PR closing summary rather than silently glossing over it.
+
 ## 2a. Efficiency regression (required every /act)
 
 - [ ] **Scriptable cost:** did any step burn more than a few tool calls doing mechanical work (repeated `gh`/`grep`/`read` loops, hand-formatting, re-echoing data) that a `scripts/` helper in this skill could collapse into one call? → file a [backlog](../../backlog/SKILL.md) item (`source:` = this PR). Not required to fix in this `/act`; this is the self-learning loop behind [AGENTS.md → Script over steps](../../../AGENTS.md).
