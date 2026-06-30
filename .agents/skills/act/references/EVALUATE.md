@@ -29,7 +29,7 @@ If **any** box is “yes”: write **what / root cause / prevention** and update
       check, not just the check status: `gh api repos/<o>/<r>/check-runs/<id>/annotations`.
 - [ ] **Each `failure` annotation has one of:** (a) a product-code fix on HEAD,
       (b) a line-specific suppression with a documented reason
-      (`NOSONAR` / `nosemgrep` / `# noqa` / `# @ts-expect-error` with a
+      (`NOSONAR` / `nosemgrep` / `# noqa` / `# @ts-expect-error` with an
       explanatory comment), or (c) an out-of-scope decision recorded in the
       in-thread reply + linked backlog/issue.
 - [ ] **No whole-file suppressions** were added when a line-specific one

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Single-call PR state dump for /act: HEAD SHA, mergeability, open threads (table),
 # required CI status (excluding AI reviewers like cubic / CodeRabbit), and the
-# count of error-level SAST annotations on FAILIING SAST check-runs
+# count of error-level SAST annotations on FAILING SAST check-runs
 # (P0-blocking).
 #
 # Replaces 4-6 separate `gh pr view` / `gh pr checks` invocations per /act run
@@ -134,35 +134,62 @@ ci_required_pending="$(jq -r '
   ] | length
 ' <<<"$checks_json")"
 
-# SAST error annotations on FAILING checks — the P0-ish signal that matters for
-# /act: when a SAST tool fails, its annotation-level=failure entries are the
-# things the agent MUST inspect (and address or suppress with reason) before
-# /act can claim merge-ready. We deliberately scope to **failing** checks:
-# passing SAST runs do not gate /act, and skipped/neutral ones do not produce
-# annotations. Annotations are fetched once per failing SAST run; for an empty
-# run set this loop costs 0 gh calls.
+# Recognised SAST tools by case-insensitive substring match on the check name.
+# Vendor workflow labels frequently prefix these names (e.g. "Trivy - main",
+# "github/codeql-action/analyze"), so we use substring rather than anchored
+# matching.
+is_sast_tool_name() {
+  local lower
+  lower="$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')"
+  case "$lower" in
+    *sonarcloud* | *sonarqube* | \
+    *codacy* | *codescene* | \
+    *codeql* | *semgrep* | *opengrep* | \
+    *trivy* | *snyk* | *skillspector* | *gitguardian* | \
+    *checkov* | *kics* | *tfsec* | *gitleaks*)
+      return 0 ;;
+    *)
+      return 1 ;;
+  esac
+}
+
+# Count annotation_level=failure entries on a single check-run, paging through
+# all pages (default page is 50 annotations; large SARIF uploads can exceed it).
+# Echoes the count; on failure prints the offending run name to stderr and
+# exits non-zero so the caller can surface the failure rather than silently
+# reporting zero.
+count_failure_annotations() {
+  local run_id="$1"
+  local run_name="$2"
+  gh api --paginate "repos/$OWNER/$REPO/check-runs/$run_id/annotations" \
+    --jq '[.[] | select(.annotation_level=="failure")] | length' 2>/dev/null \
+    || { echo "warn: annotations API failed for run $run_id ($run_name)" >&2; return 1; }
+}
+
+# SAST error annotations on FAILING checks. When CI_REQUIRED_PENDING=0 this
+# block is skipped entirely; otherwise each failing SAST run contributes its
+# count of annotation_level=failure entries (the ::error:: equivalent).
 #
-# SAST tools we recognize (case-insensitive substring match on check name):
-#   sonarcloud, codacy, codescene, codeql, opengrep / semgrep, trivy, snyk,
-#   skillspector, gitguardian.
+# We deliberately scope to failing checks: passing SAST runs do not gate
+# /act, and skipped/neutral ones do not produce annotations. Substring
+# matching on the check name lets us handle vendor-prefixed names like
+# "Trivy - main" or "github/codeql-action/analyze (typescript)".
 sast_findings_pending=0
+sast_findings_unknown=0
 if [[ "$ci_required_pending" -gt 0 ]]; then
   while IFS=$'\t' read -r r_name r_bucket r_state r_db_id; do
     [[ "$r_bucket" == "pass" ]] && continue
     [[ "$r_state" == "SKIPPED" || "$r_state" == "NEUTRAL" ]] && continue
-    if ! printf '%s' "$r_name" | grep -qiE 'sonarcloud|codacy|codescene|codeql|semgrep|opengrep|^trivy|snyk|skillspector|gitguardian'; then
-      continue
-    fi
+    is_sast_tool_name "$r_name" || continue
     [[ -z "$r_db_id" || "$r_db_id" == "null" ]] && continue
-    # annotation_level is `notice|warning|failure`. `failure` is the
-    # ::error-equivalent; gating on it keeps us from raising P0 on noise.
-    errs=$(gh api "repos/$OWNER/$REPO/check-runs/$r_db_id/annotations" \
-      --jq '[.[] | select(.annotation_level=="failure")] | length' 2>/dev/null || echo 0)
-    sast_findings_pending=$(( sast_findings_pending + errs ))
+    if errs=$(count_failure_annotations "$r_db_id" "$r_name"); then
+      sast_findings_pending=$(( sast_findings_pending + errs ))
+    else
+      sast_findings_unknown=$(( sast_findings_unknown + 1 ))
+    fi
   done < <(gh pr checks "$PR" --repo "$OWNER/$REPO" \
       --json name,bucket,state,databaseId \
-      --jq '.[] | [.name, .bucket, .state, (.databaseId|tostring)] | @tsv' \
-      2>/dev/null || true)
+      --jq '.[] | [.name, .bucket, .state, (.databaseId|tostring)] | @tsv')
 fi
 
 echo "HEAD_SHA=$head_sha"
@@ -173,6 +200,7 @@ echo "MERGE_STATE=$merge_state"
 echo "OPEN_THREADS=$open_count"
 echo "CI_REQUIRED_PENDING=$ci_required_pending"
 echo "SAST_FINDINGS_PENDING=$sast_findings_pending"
+echo "SAST_FINDINGS_UNKNOWN=$sast_findings_unknown"
 echo
 echo "OPEN_THREADS_TABLE:"
 jq -r '

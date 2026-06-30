@@ -1,5 +1,4 @@
 import { describe, expect, test } from "bun:test";
-import type { Stats } from "node:fs";
 import {
 	existsSync,
 	mkdirSync,
@@ -7,15 +6,8 @@ import {
 	readdirSync,
 	readFileSync,
 	rmSync,
-	statSync,
 	writeFileSync,
 } from "node:fs";
-
-/** Tiny wrapper so the test stays readable when many runs need a fresh subdir. */
-function mkdirSyncCompat(path: string, opts: { recursive: true }): void {
-	mkdirSync(path, opts);
-}
-
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -83,7 +75,26 @@ interface RunOpts {
 	env?: Record<string, string>;
 	args?: string[];
 	configJson?: object;
-	configPath?: string;
+}
+
+/**
+ * Construct a SAFE child process env from the parent.
+ *
+ * Bun's spawnSync forwards `process.env` by default, which leaks any
+ * credentials the parent holds (AWS_*, GH_TOKEN, *_KEY, SSH_AUTH_SOCK,
+ * ...). For a child process that only needs to find `bun` and read
+ * an input file, pass through the bare minimum and let test overrides
+ * (`opts.env`) win over the host defaults. Skillspector rule PE3
+ * (privilege escalation) gates on this pattern.
+ */
+function safeChildEnv(extra: Record<string, string> = {}): Record<string, string> {
+	const allow = ["PATH", "HOME", "TMPDIR", "LANG", "LC_ALL", "TZ"];
+	const pass: Record<string, string> = {};
+	for (const key of allow) {
+		const v = process.env[key];
+		if (v !== undefined) pass[key] = v;
+	}
+	return { ...pass, ...extra };
 }
 
 function runScript(opts: RunOpts): {
@@ -96,15 +107,12 @@ function runScript(opts: RunOpts): {
 	if (opts.configJson) {
 		// DEFAULT_CONFIG in the script is `.agents/act/config.json` (cwd-relative).
 		// Mirror that exact path so the script's resolveRecording() reads it.
-		mkdirSyncCompat(join(opts.dir, ".agents", "act"), { recursive: true });
+		mkdirSync(join(opts.dir, ".agents", "act"), { recursive: true });
 		writeFileSync(
 			join(opts.dir, ".agents", "act", "config.json"),
 			JSON.stringify(opts.configJson),
 			"utf8",
 		);
-	}
-	if (opts.configPath) {
-		writeFileSync(opts.configPath, JSON.stringify(opts.configJson), "utf8");
 	}
 	const args = [
 		"bun",
@@ -124,7 +132,7 @@ function runScript(opts: RunOpts): {
 	];
 	const proc = Bun.spawnSync(args, {
 		cwd: opts.dir,
-		env: { ...process.env, ...(opts.env ?? {}) },
+		env: safeChildEnv(opts.env ?? {}),
 	});
 	return {
 		exitCode: proc.exitCode,
@@ -177,12 +185,10 @@ describe("submit-scores CSV opt-in", () => {
 
 	test("--no-record: CSV NOT written even with config + env pointing ON", () => {
 		const { dir, csvPath } = setupTmpdir();
-		const configPath = join(dir, "config.json");
 		const result = runScript({
 			dir,
 			csvPath,
 			configJson: { record_scores: true },
-			configPath,
 			env: { ACT_RECORD_SCORES: "1" },
 			args: ["--no-record"],
 		});
@@ -223,12 +229,10 @@ describe("submit-scores CSV opt-in", () => {
 
 	test('config file {"record_scores": true} enables when env unset', () => {
 		const { dir, csvPath } = setupTmpdir();
-		const configPath = join(dir, ".agents", "act", "config.json");
 		const result = runScript({
 			dir,
 			csvPath,
 			configJson: { record_scores: true },
-			configPath,
 		});
 		expect(result.exitCode).toBe(0);
 		expect(result.stdout).toContain("RECORDING=on");
@@ -239,12 +243,10 @@ describe("submit-scores CSV opt-in", () => {
 
 	test('config file {"record_scores": false} disables (env+flag unset)', () => {
 		const { dir, csvPath } = setupTmpdir();
-		const configPath = join(dir, ".agents", "act", "config.json");
 		const result = runScript({
 			dir,
 			csvPath,
 			configJson: { record_scores: false },
-			configPath,
 		});
 		expect(result.exitCode).toBe(0);
 		expect(result.stdout).toContain("RECORDING=off");
@@ -255,12 +257,10 @@ describe("submit-scores CSV opt-in", () => {
 
 	test("ACT_RECORD_SCORES wins over config file (env higher priority)", () => {
 		const { dir, csvPath } = setupTmpdir();
-		const configPath = join(dir, ".agents", "act", "config.json");
 		const result = runScript({
 			dir,
 			csvPath,
 			configJson: { record_scores: false },
-			configPath,
 			env: { ACT_RECORD_SCORES: "1" },
 		});
 		expect(result.exitCode).toBe(0);
@@ -293,9 +293,12 @@ describe("submit-scores CSV opt-in", () => {
 
 	test("malformed config JSON does not crash, falls back to default", () => {
 		const { dir, csvPath } = setupTmpdir();
-		const configPath = join(dir, ".agents", "act", "config.json");
 		mkdirSync(join(dir, ".agents", "act"), { recursive: true });
-		writeFileSync(configPath, "{not valid json", "utf8");
+		writeFileSync(
+			join(dir, ".agents", "act", "config.json"),
+			"{not valid json",
+			"utf8",
+		);
 		// No configJson passed — runScript must not overwrite our malformed file.
 		const result = runScript({ dir, csvPath });
 		expect(result.exitCode).toBe(0);
