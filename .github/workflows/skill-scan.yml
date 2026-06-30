@@ -114,9 +114,8 @@ jobs:
       # 1. PREPEND a header to the step summary (executor appends per-skill
       #    blocks, this header caps them with totals + a status badge)
       # 2. POST a minimal one-liner PR comment that links to the run
-      # Build step summary.  Write to a temp file first, then cat it into
-        # GITHUB_STEP_SUMMARY — avoids YAML parser interpreting |
-        # characters in table rows inside the run: block.
+      # Build step summary via a node script (avoids YAML parser interpreting
+        # | characters in Markdown tables inside the run: block).
       - name: Write step summary
         if: always()
         env:
@@ -127,57 +126,48 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           ARTIFACT_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts
         run: |
-          set -euo pipefail
-          ERR=${ERROR_COUNT:-0}
-          WARN=${WARNING_COUNT:-0}
-          TOTAL=${TOTAL_COUNT:-0}
-
-          # Build per-skill table rows.
-          ROWS=""
-          if [ -s "$SUMMARY_FILE" ]; then
-            while IFS='|' read -r skill e w t; do
-              [ -z "$skill" ] && continue
-              ROWS="${ROWS}| ${skill} | ${e} | ${w} | ${t} |\n"
-            done < "$SUMMARY_FILE"
-          fi
-          SKILL_COUNT=$(printf '%b' "$ROWS" | wc -l | tr -d ' ')
-
-          # Write summary to temp file, then cat into GITHUB_STEP_SUMMARY.
-          SUMMARY_TMP=$(mktemp)
-          cat > "$SUMMARY_TMP" << 'EOF_SUMMARY'
-## 🛡️ SkillSpector scan
-EOF_SUMMARY
-
-          if [ "$ERR" -gt 0 ]; then
-            echo '**Status:** ❌ fail — error-severity findings detected' >> "$SUMMARY_TMP"
-          else
-            echo '**Status:** ✅ pass' >> "$SUMMARY_TMP"
-          fi
-          echo >> "$SUMMARY_TMP"
-
-          cat >> "$SUMMARY_TMP" << 'EOF_TABLE'
-| Errors | Warnings | Total | Skills scanned |
-| :---: | :---: | :---: | :---: |
-EOF_TABLE
-          printf '| **%s** | **%s** | **%s** | %s |\n' "$ERR" "$WARN" "$TOTAL" "$SKILL_COUNT" >> "$SUMMARY_TMP"
-
-          if [ -n "$ROWS" ]; then
-            echo >> "$SUMMARY_TMP"
-            echo '<details>' >> "$SUMMARY_TMP"
-            printf '<summary><b>Findings by skill</b> (%s skills with findings)</summary>\n' "$SKILL_COUNT" >> "$SUMMARY_TMP"
-            echo >> "$SUMMARY_TMP"
-            printf '| Skill | Errors | Warnings | Total |\n| :--- | ---: | ---: | ---: |\n' >> "$SUMMARY_TMP"
-            printf '%b' "$ROWS" >> "$SUMMARY_TMP"
-            echo '</details>' >> "$SUMMARY_TMP"
-          else
-            echo >> "$SUMMARY_TMP"
-            echo '> No findings in any skill.' >> "$SUMMARY_TMP"
-          fi
-          echo >> "$SUMMARY_TMP"
-          printf '<sub>📄 <a href="%s">Full report & artifacts</a> · <a href="%s">SARIF artifact</a></sub>\n' "$RUN_URL" "$ARTIFACT_URL" >> "$SUMMARY_TMP"
-
-          cat "$SUMMARY_TMP" >> "$GITHUB_STEP_SUMMARY"
-          rm -f "$SUMMARY_TMP"
+          node -e "
+          const fs = require('fs');
+          const ERR = parseInt(process.env.ERROR_COUNT || '0', 10);
+          const WARN = parseInt(process.env.WARNING_COUNT || '0', 10);
+          const TOTAL = parseInt(process.env.TOTAL_COUNT || '0', 10);
+          const RUN_URL = process.env.RUN_URL;
+          const ARTIFACT_URL = process.env.ARTIFACT_URL;
+          const rows = [];
+          try {
+            const raw = fs.readFileSync(process.env.SUMMARY_FILE, 'utf8').trim();
+            for (const line of raw.split('\\n')) {
+              const [skill, e, w, t] = line.split('|');
+              if (skill) rows.push({ skill, e: +e, w: +w, t: +t });
+            }
+          } catch {}
+          const lines = [];
+          lines.push('## 🛡️ SkillSpector scan');
+          lines.push('');
+          lines.push(ERR > 0
+            ? '**Status:** ❌ fail — error-severity findings detected'
+            : '**Status:** ✅ pass');
+          lines.push('');
+          lines.push('| Errors | Warnings | Total | Skills scanned |');
+          lines.push('| :---: | :---: | :---: | :---: |');
+          lines.push('| **' + ERR + '** | **' + WARN + '** | **' + TOTAL + '** | ' + rows.length + ' |');
+          if (rows.length) {
+            lines.push('');
+            lines.push('<details>');
+            lines.push('<summary><b>Findings by skill</b> (' + rows.length + ' skills with findings)</summary>');
+            lines.push('');
+            lines.push('| Skill | Errors | Warnings | Total |');
+            lines.push('| :--- | ---: | ---: | ---: |');
+            for (const r of rows) lines.push('| ' + r.skill + ' | ' + r.e + ' | ' + r.w + ' | ' + r.t + ' |');
+            lines.push('</details>');
+          } else {
+            lines.push('');
+            lines.push('> No findings in any skill.');
+          }
+          lines.push('');
+          lines.push('<sub>📄 <a href=\"' + RUN_URL + '\">Full report & artifacts</a> · <a href=\"' + ARTIFACT_URL + '\">SARIF artifact</a></sub>');
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\\n') + '\\n');
+          "
 
       # Post a compact PR comment (Conversation tab).
       # Heavy content lives in the Actions run summary.
