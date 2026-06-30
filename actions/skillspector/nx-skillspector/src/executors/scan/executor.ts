@@ -200,7 +200,6 @@ export default async function scanExecutor(
   const findingsFile = process.env.SS_FINDINGS_DIR || summaryDir;
   if (findingsFile) {
     fs.mkdirSync(findingsFile, { recursive: true });
-    const esc = (s: string) => s.replace(/\|/g, '\\|').replace(/\n/g, ' ');
     const entries = issues.map((issue) => {
       const sev = (issue.severity ?? '').toUpperCase();
       const loc = issue.location;
@@ -208,8 +207,10 @@ export default async function scanExecutor(
       const line = loc?.start_line ?? '?';
       const ruleId = issue.id ?? '?';
       const msg = (issue.explanation ?? '').split('\n')[0]?.slice(0, 200) ?? '';
-      const level = sev === 'HIGH' || sev === 'CRITICAL' ? 'error'
-        : sev === 'MEDIUM' || sev === 'WARNING' ? 'warning' : 'info';
+      let level: string;
+      if (sev === 'HIGH' || sev === 'CRITICAL') level = 'error';
+      else if (sev === 'MEDIUM' || sev === 'WARNING') level = 'warning';
+      else level = 'info';
       return { ruleId, level, filePath, line, msg };
     });
     const payload = JSON.stringify({
@@ -220,7 +221,7 @@ export default async function scanExecutor(
     });
     // Use a sequential counter so parallel writers don't collide.
     const idx = String(
-      parseInt(
+      Number.parseInt(
         fs.readdirSync(findingsFile).filter((f) => f.endsWith('.json')).length.toString(),
       ) + 1,
     ).padStart(4, '0');
