@@ -114,10 +114,9 @@ jobs:
       # 1. PREPEND a header to the step summary (executor appends per-skill
       #    blocks, this header caps them with totals + a status badge)
       # 2. POST a minimal one-liner PR comment that links to the run
-      # Build the step summary: a compact, professional report with
-        # totals, severity badges, and a collapsible per-skill table.
-        # The executor appends rows to SUMMARY_FILE during the scan;
-        # this step assembles them into the final report.
+      # Build step summary.  Write to a temp file first, then cat it into
+        # GITHUB_STEP_SUMMARY — avoids YAML parser interpreting |
+        # characters in table rows inside the run: block.
       - name: Write step summary
         if: always()
         env:
@@ -133,7 +132,7 @@ jobs:
           WARN=${WARNING_COUNT:-0}
           TOTAL=${TOTAL_COUNT:-0}
 
-          # Build per-skill table rows from the summary file.
+          # Build per-skill table rows.
           ROWS=""
           if [ -s "$SUMMARY_FILE" ]; then
             while IFS='|' read -r skill e w t; do
@@ -143,37 +142,42 @@ jobs:
           fi
           SKILL_COUNT=$(printf '%b' "$ROWS" | wc -l | tr -d ' ')
 
-          # Compose the step summary.  GitHub renders Markdown, HTML,
-          # and <details> blocks natively — so we use all three.
-          cat > "$GITHUB_STEP_SUMMARY" << 'HEADER'
+          # Write summary to temp file, then cat into GITHUB_STEP_SUMMARY.
+          SUMMARY_TMP=$(mktemp)
+          cat > "$SUMMARY_TMP" << 'EOF_SUMMARY'
 ## 🛡️ SkillSpector scan
-HEADER
+EOF_SUMMARY
 
           if [ "$ERR" -gt 0 ]; then
-            echo "**Status:** ❌ fail — error-severity findings detected" >> "$GITHUB_STEP_SUMMARY"
+            echo '**Status:** ❌ fail — error-severity findings detected' >> "$SUMMARY_TMP"
           else
-            echo "**Status:** ✅ pass" >> "$GITHUB_STEP_SUMMARY"
+            echo '**Status:** ✅ pass' >> "$SUMMARY_TMP"
           fi
-          echo >> "$GITHUB_STEP_SUMMARY"
+          echo >> "$SUMMARY_TMP"
 
-          printf '%s\n' '| Errors | Warnings | Total | Skills scanned |' '| :---: | :---: | :---: | :---: |' "| **${ERR}** | **${WARN}** | **${TOTAL}** | ${SKILL_COUNT} |" >> "$GITHUB_STEP_SUMMARY"
+          cat >> "$SUMMARY_TMP" << 'EOF_TABLE'
+| Errors | Warnings | Total | Skills scanned |
+| :---: | :---: | :---: | :---: |
+EOF_TABLE
+          printf '| **%s** | **%s** | **%s** | %s |\n' "$ERR" "$WARN" "$TOTAL" "$SKILL_COUNT" >> "$SUMMARY_TMP"
 
           if [ -n "$ROWS" ]; then
-            {
-              echo '<details>'
-              echo "<summary><b>Findings by skill</b> (${SKILL_COUNT} skills with findings)</summary>"
-              echo
-              printf '%s\n' '| Skill | Errors | Warnings | Total |' '| :--- | ---: | ---: | ---: |'
-              printf '%b' "$ROWS"
-              echo
-              echo '</details>'
-            } >> "$GITHUB_STEP_SUMMARY"
+            echo >> "$SUMMARY_TMP"
+            echo '<details>' >> "$SUMMARY_TMP"
+            printf '<summary><b>Findings by skill</b> (%s skills with findings)</summary>\n' "$SKILL_COUNT" >> "$SUMMARY_TMP"
+            echo >> "$SUMMARY_TMP"
+            printf '| Skill | Errors | Warnings | Total |\n| :--- | ---: | ---: | ---: |\n' >> "$SUMMARY_TMP"
+            printf '%b' "$ROWS" >> "$SUMMARY_TMP"
+            echo '</details>' >> "$SUMMARY_TMP"
           else
-            echo >> "$GITHUB_STEP_SUMMARY"
-            echo "> No findings in any skill." >> "$GITHUB_STEP_SUMMARY"
+            echo >> "$SUMMARY_TMP"
+            echo '> No findings in any skill.' >> "$SUMMARY_TMP"
           fi
-          echo >> "$GITHUB_STEP_SUMMARY"
-          echo "<sup>📄 [Full report & artifacts](${RUN_URL}) · [SARIF artifact](${ARTIFACT_URL})</sup>" >> "$GITHUB_STEP_SUMMARY"
+          echo >> "$SUMMARY_TMP"
+          printf '<sub>📄 <a href="%s">Full report & artifacts</a> · <a href="%s">SARIF artifact</a></sub>\n' "$RUN_URL" "$ARTIFACT_URL" >> "$SUMMARY_TMP"
+
+          cat "$SUMMARY_TMP" >> "$GITHUB_STEP_SUMMARY"
+          rm -f "$SUMMARY_TMP"
 
       # Post a compact PR comment (Conversation tab).
       # Heavy content lives in the Actions run summary.
