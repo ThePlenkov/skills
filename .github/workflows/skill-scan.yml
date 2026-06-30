@@ -156,17 +156,14 @@ HEADER
           fi
           echo >> "$GITHUB_STEP_SUMMARY"
 
-          echo '| Errors | Warnings | Total | Skills scanned |' >> "$GITHUB_STEP_SUMMARY"
-          echo '| :---: | :---: | :---: | :---: |' >> "$GITHUB_STEP_SUMMARY"
-          echo "| **${ERR}** | **${WARN}** | **${TOTAL}** | ${SKILL_COUNT} |" >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' '| Errors | Warnings | Total | Skills scanned |' '| :---: | :---: | :---: | :---: |' "| **${ERR}** | **${WARN}** | **${TOTAL}** | ${SKILL_COUNT} |" >> "$GITHUB_STEP_SUMMARY"
 
           if [ -n "$ROWS" ]; then
             {
               echo '<details>'
               echo "<summary><b>Findings by skill</b> (${SKILL_COUNT} skills with findings)</summary>"
               echo
-              echo '| Skill | Errors | Warnings | Total |'
-              echo '| :--- | ---: | ---: | ---: |'
+              printf '%s\n' '| Skill | Errors | Warnings | Total |' '| :--- | ---: | ---: | ---: |'
               printf '%b' "$ROWS"
               echo
               echo '</details>'
