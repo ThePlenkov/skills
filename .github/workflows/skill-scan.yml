@@ -114,31 +114,30 @@ jobs:
       # 1. PREPEND a header to the step summary (executor appends per-skill
       #    blocks, this header caps them with totals + a status badge)
       # 2. POST a minimal one-liner PR comment that links to the run
-      # Build step summary via a node script (avoids YAML parser interpreting
-        # | characters in Markdown tables inside the run: block).
+      # Build step summary: tree-style per-skill report with finding details.
       - name: Write step summary
         if: always()
         env:
           ERROR_COUNT: ${{ steps.scan.outputs.error-count }}
           WARNING_COUNT: ${{ steps.scan.outputs.warning-count }}
           TOTAL_COUNT: ${{ steps.scan.outputs.total-count }}
-          SUMMARY_FILE: /tmp/skillspector-summary.md
+          FINDINGS_DIR: /tmp/ss-findings
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           ARTIFACT_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts
         run: |
           node -e "
           const fs = require('fs');
+          const path = require('path');
           const ERR = parseInt(process.env.ERROR_COUNT || '0', 10);
           const WARN = parseInt(process.env.WARNING_COUNT || '0', 10);
-          const TOTAL = parseInt(process.env.TOTAL_COUNT || '0', 10);
           const RUN_URL = process.env.RUN_URL;
           const ARTIFACT_URL = process.env.ARTIFACT_URL;
-          const rows = [];
+          const dir = process.env.FINDINGS_DIR;
+          const skills = [];
           try {
-            const raw = fs.readFileSync(process.env.SUMMARY_FILE, 'utf8').trim();
-            for (const line of raw.split('\\n')) {
-              const [skill, e, w, t] = line.split('|');
-              if (skill) rows.push({ skill, e: +e, w: +w, t: +t });
+            for (const f of fs.readdirSync(dir).sort()) {
+              if (!f.endsWith('.json')) continue;
+              skills.push(JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')));
             }
           } catch {}
           const lines = [];
@@ -148,23 +147,38 @@ jobs:
             ? '**Status:** ❌ fail — error-severity findings detected'
             : '**Status:** ✅ pass');
           lines.push('');
-          lines.push('| Errors | Warnings | Total | Skills scanned |');
-          lines.push('| :---: | :---: | :---: | :---: |');
-          lines.push('| **' + ERR + '** | **' + WARN + '** | **' + TOTAL + '** | ' + rows.length + ' |');
-          if (rows.length) {
-            lines.push('');
-            lines.push('<details>');
-            lines.push('<summary><b>Findings by skill</b> (' + rows.length + ' skills with findings)</summary>');
-            lines.push('');
-            lines.push('| Skill | Errors | Warnings | Total |');
-            lines.push('| :--- | ---: | ---: | ---: |');
-            for (const r of rows) lines.push('| ' + r.skill + ' | ' + r.e + ' | ' + r.w + ' | ' + r.t + ' |');
-            lines.push('</details>');
-          } else {
-            lines.push('');
-            lines.push('> No findings in any skill.');
-          }
+          // Compact skills list — only show scanned skills
+          lines.push('### Scanned skills (' + skills.length + ')');
           lines.push('');
+          for (const s of skills) {
+            const total = s.errors + s.warnings + s.notes;
+            if (total === 0) {
+              lines.push('- ✅ **' + s.skill + '**');
+            } else {
+              // Show finding details in a collapsible block
+              const ruleCounts = {};
+              for (const f of s.findings) {
+                const key = f.level + ':' + f.ruleId;
+                ruleCounts[key] = (ruleCounts[key] || 0) + 1;
+              }
+              const summary = Object.entries(ruleCounts)
+                .map(([k, v]) => k.split(':')[1] + '(' + v + ')')
+                .join(', ');
+              lines.push('- ⚠️ **' + s.skill + '** — ' + total + ' finding' + (total > 1 ? 's' : '') + ': ' + summary);
+              lines.push('  <details>');
+              lines.push('  <summary>' + total + ' finding' + (total > 1 ? 's' : '') + '</summary>');
+              lines.push('');
+              lines.push('  | Rule | Level | File | Summary |');
+              lines.push('  | :--- | :--- | :--- | :--- |');
+              for (const f of s.findings) {
+                const lvl = f.level === 'error' ? '❌' : f.level === 'warning' ? '⚠️' : 'ℹ️';
+                const file = f.filePath + ':' + f.line;
+                lines.push('  | ' + f.ruleId + ' | ' + lvl + ' | ' + file + ' | ' + f.msg.slice(0, 100) + ' |');
+              }
+              lines.push('  </details>');
+            }
+            lines.push('');
+          }
           lines.push('<sub>📄 <a href=\"' + RUN_URL + '\">Full report & artifacts</a> · <a href=\"' + ARTIFACT_URL + '\">SARIF artifact</a></sub>');
           fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\\n') + '\\n');
           "

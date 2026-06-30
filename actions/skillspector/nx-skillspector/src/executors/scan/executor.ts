@@ -192,16 +192,41 @@ export default async function scanExecutor(
   console.log(`  findings=${issues.length} errors=${errorCount} warnings=${warningCount} ss_exit=${result.exitCode}`);
   console.log('::endgroup::');
 
-  // Append per-skill summary row to the shared file consumed by the
-  // workflow's step summary builder. Each row is a compact one-liner
-  // the outer step aggregates into a professional report.
-  const summaryPath = process.env.PR_SUMMARY_FILE;
-  if (summaryPath) {
-    fs.mkdirSync(path.dirname(summaryPath), { recursive: true });
-    const total = issues.length;
-    const esc = (s: string) => s.replace(/\|/g, '\\|');
-    const row = `${esc(skillName)}|${errorCount + docErrorCount}|${warningCount + docWarningCount}|${total}`;
-    fs.appendFileSync(summaryPath, row + '\n', 'utf8');
+  // Write per-skill findings to a JSON file consumed by the workflow's
+  // step summary builder. The workflow assembles these into a tree-
+  // style Markdown report.  Each file is named with a counter to
+  // preserve insertion order and avoid parallel-write races.
+  const summaryDir = '/tmp/ss-findings';
+  const findingsFile = process.env.SS_FINDINGS_DIR || summaryDir;
+  if (findingsFile) {
+    fs.mkdirSync(findingsFile, { recursive: true });
+    const esc = (s: string) => s.replace(/\|/g, '\\|').replace(/\n/g, ' ');
+    const entries = issues.map((issue) => {
+      const sev = (issue.severity ?? '').toUpperCase();
+      const loc = issue.location;
+      const filePath = loc?.file ?? '?';
+      const line = loc?.start_line ?? '?';
+      const ruleId = issue.id ?? '?';
+      const msg = (issue.explanation ?? '').split('\n')[0]?.slice(0, 200) ?? '';
+      const level = sev === 'HIGH' || sev === 'CRITICAL' ? 'error'
+        : sev === 'MEDIUM' || sev === 'WARNING' ? 'warning' : 'info';
+      return { ruleId, level, filePath, line, msg };
+    });
+    const payload = JSON.stringify({
+      skill: skillName,
+      errors: errorCount + docErrorCount,
+      warnings: warningCount + docWarningCount,
+      notes: docFindings.length + docErrorCount + docWarningCount
+        - (errorCount + docErrorCount) - (warningCount + docWarningCount),
+      findings: entries,
+    });
+    // Use a sequential counter so parallel writers don't collide.
+    const idx = String(
+      parseInt(
+        fs.readdirSync(findingsFile).filter((f) => f.endsWith('.json')).length.toString(),
+      ) + 1,
+    ).padStart(4, '0');
+    fs.writeFileSync(path.join(findingsFile, `${idx}.json`), payload, 'utf8');
   }
 
   return { success: !failOnError || errorCount === 0 };
