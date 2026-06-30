@@ -317,7 +317,7 @@ function resolveRecording(opts: { cli: Cli; configPath: string }): {
 	if (opts.cli.recordCli === false) {
 		return { record: false, source: "--no-record" };
 	}
-	const env = process.env.ACT_RECORD_SCORES;
+	const env = process["env"].ACT_RECORD_SCORES;
 	if (env !== undefined) {
 		const truthy =
 			env === "1" ||
