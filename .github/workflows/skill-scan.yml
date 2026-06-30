@@ -125,7 +125,7 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           ARTIFACT_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts
         run: |
-node .github/scripts/build-step-summary.js
+          node .github/scripts/build-step-summary.js
 
       # Post a compact PR comment (Conversation tab).
       # Heavy content lives in the Actions run summary.
