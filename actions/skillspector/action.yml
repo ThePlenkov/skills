@@ -235,6 +235,17 @@ runs:
           fi
         fi
 
+        # Debug: verify workspace state before nx runs
+        echo "::group::Workspace diagnostics"
+        echo "cwd=$(pwd)"
+        echo "NODE_PATH=$NODE_PATH"
+        echo "NX_BIN=$NX_BIN"
+        echo "NX_SUBCMD=$NX_SUBCMD"
+        ls -la nx.json 2>&1 || echo "nx.json MISSING"
+        ls "$GITHUB_ACTION_PATH/node_modules/@theplenkov/nx-skillspector/" >/dev/null 2>&1 || echo "PLUGIN MISSING"
+        "$NX_BIN" --version 2>&1 || echo "NX BINARY BROKEN"
+        echo "::endgroup::"
+
         set +e
         "$NX_BIN" "$NX_SUBCMD" -t scan \
           --parallel="$MAX_WORKERS" \

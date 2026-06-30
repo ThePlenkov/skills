@@ -27,8 +27,6 @@ import {
 } from '../../lib/mapping.ts';
 import { runSkillspector } from '../../lib/skillspector.ts';
 
-const execFileP = promisify(execFile);
-
 const CODE_FILE_RE = /\.(?:ts|tsx|js|jsx|mjs|cjs|py|sh|bash|zsh|yml|yaml|json|go|rs|java|rb|php)$/i;
 
 // Named export alongside default so Nx's CJS-style
@@ -241,34 +239,6 @@ export default async function scanExecutor(
   }
 
   return { success: !failOnError || errorCount === 0 };
-}
-
-async function runSkillspector(opts: {
-  bin: string;
-  path: string;
-  noLlM: boolean;
-  baseline?: string;
-}): Promise<{ exitCode: number; jsonText: string }> {
-  try {
-    const args = ['scan', opts.path, '--format', 'json'];
-    if (opts.noLlM) args.push('--no-llm');
-    if (opts.baseline) {
-      args.push('--baseline', opts.baseline);
-    }
-    const { stdout, stderr } = await execFileP(opts.bin, args, {
-      maxBuffer: 200 * 1024 * 1024,
-    });
-    if (stderr) process.stderr.write(stderr);
-    return { exitCode: 0, jsonText: stdout };
-  } catch (err: unknown) {
-    // execFile rejects on non-zero exit. Skillspector exits non-zero
-    // when findings exist, but still writes JSON to stdout.
-    const e = err as { stdout?: string; stderr?: string; code?: number };
-    return {
-      exitCode: typeof e.code === 'number' ? e.code : 1,
-      jsonText: e.stdout ?? '',
-    };
-  }
 }
 
 export type ScanExecutorOptions = {
