@@ -68,9 +68,9 @@ export interface DebtRecord {
   notes: string | null
 }
 
-export interface DebtConfig {
-  ignore_authors: string[]
-  nit_authors: string[]
+export interface AuthorPolicy {
+  excluded_authors: string[]
+  non_actionable_authors: string[]
 }
 
 export interface ReviewThreadComment {
@@ -100,16 +100,16 @@ export interface DebtSummary {
   oldest_open: string | null
 }
 
-export function loadConfig(): DebtConfig {
-  const fallback: DebtConfig = { ignore_authors: [], nit_authors: [] }
+export function loadConfig(): AuthorPolicy {
+  const fallback: AuthorPolicy = { excluded_authors: [], non_actionable_authors: [] }
   if (!existsSync(configFile())) {
     return fallback
   }
   try {
-    const parsed = JSON.parse(readFileSync(configFile(), 'utf8')) as DebtConfig
+    const parsed = JSON.parse(readFileSync(configFile(), 'utf8')) as AuthorPolicy
     return {
-      ignore_authors: parsed.ignore_authors ?? [],
-      nit_authors: parsed.nit_authors ?? [],
+      excluded_authors: parsed.excluded_authors ?? [],
+      non_actionable_authors: parsed.non_actionable_authors ?? [],
     }
   } catch {
     return fallback
@@ -328,20 +328,20 @@ export function writeSummary(summary: DebtSummary): void {
   writeFileSync(path, `${JSON.stringify(summary, null, 2)}\n`, 'utf8')
 }
 
-export function classifyThread(opts: { author: string; config: DebtConfig }): {
+export function classifyThread(opts: { author: string; config: AuthorPolicy }): {
   priority: DebtPriority
   needs: DebtNeeds
   harvest: boolean
 } {
   const login = opts.author.toLowerCase()
-  if (opts.config.ignore_authors.some((a) => a.toLowerCase() === login)) {
+  if (opts.config.excluded_authors.some((a) => a.toLowerCase() === login)) {
     return { priority: 'noise', needs: 'skip', harvest: false }
   }
   const isBot = login.endsWith('[bot]')
   if (!isBot) {
     return { priority: 'human', needs: 'code_change', harvest: true }
   }
-  if (opts.config.nit_authors.some((a) => a.toLowerCase() === login)) {
+  if (opts.config.non_actionable_authors.some((a) => a.toLowerCase() === login)) {
     return { priority: 'nit', needs: 'code_change', harvest: true }
   }
   return { priority: 'nit', needs: 'code_change', harvest: true }
