@@ -59,3 +59,4 @@ if (clean.length > 0) {
 L.push('');
 L.push('<sub>\uD83D\uDCC4 <a href="' + RUN_URL + '">Full report & artifacts</a> \u00B7 <a href="' + ARTIFACT_URL + '">SARIF artifact</a></sub>');
 fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, L.join('\n') + '\n');
+
