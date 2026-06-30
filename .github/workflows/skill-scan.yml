@@ -156,23 +156,21 @@ HEADER
           fi
           echo >> "$GITHUB_STEP_SUMMARY"
 
-          cat >> "$GITHUB_STEP_SUMMARY" << TABLE
-| <img width="32"> Errors | <img width="32"> Warnings | Total | Skills scanned |
-| :---: | :---: | :---: | :---: |
-| **${ERR}** | **${WARN}** | **${TOTAL}** | ${SKILL_COUNT} |
-TABLE
+          echo '| Errors | Warnings | Total | Skills scanned |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| :---: | :---: | :---: | :---: |' >> "$GITHUB_STEP_SUMMARY"
+          echo "| **${ERR}** | **${WARN}** | **${TOTAL}** | ${SKILL_COUNT} |" >> "$GITHUB_STEP_SUMMARY"
 
           if [ -n "$ROWS" ]; then
-            cat >> "$GITHUB_STEP_SUMMARY" << DETAILS
-
-<details>
-<summary><b>Findings by skill</b> (${SKILL_COUNT} skills with findings)</summary>
-
-| Skill | Errors | Warnings | Total |
-| :--- | ---: | ---: | ---: |
-$(printf '%b' "$ROWS")
-</details>
-DETAILS
+            {
+              echo '<details>'
+              echo "<summary><b>Findings by skill</b> (${SKILL_COUNT} skills with findings)</summary>"
+              echo
+              echo '| Skill | Errors | Warnings | Total |'
+              echo '| :--- | ---: | ---: | ---: |'
+              printf '%b' "$ROWS"
+              echo
+              echo '</details>'
+            } >> "$GITHUB_STEP_SUMMARY"
           else
             echo >> "$GITHUB_STEP_SUMMARY"
             echo "> No findings in any skill." >> "$GITHUB_STEP_SUMMARY"
