@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """
-Claude Skills Manager Agent
+Agent that manages symlinks for Claude Code integration.
 
-Scans ~/.agents/skills for nested skill directories and creates flat symlinks in ~/.claude/skills.
+Discovers prompt definitions under a source root and creates
+corresponding symlinks in the target directory so the IDE can
+load them directly.
 """
 
 import os

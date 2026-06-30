@@ -2,22 +2,8 @@
 /**
  * Entry point for /harvest scripts (`bun run harvest:*`).
  *
- * /harvest collects review threads ("the harvest"). What happens with the
- * harvest downstream — `/backlog` triage, `/act` batch fix, source-PR resolve —
- * is owned by other skills. /harvest only writes
- * `.agents/review-debt/harvests/*.jsonl` and `.agents/review-debt/debt-summary.json`.
- *
- * Commands:
- *   bun run harvest:pr      -- 72 [--dry-run]                       single PR
- *   bun run harvest:batch   -- --pr-ids 72,67 [--dry-run]           filtered batch
- *   bun run harvest:resolve                                                  write
- *                                                                            should_harvest
- *                                                                            outputs
- *                                                                            from a GH
- *                                                                            event
- *   bun run harvest:test                                                  run
- *                                                                            /harvest
- *                                                                            unit tests
+ * Collects unresolved PR review threads into
+ * `.agents/review-debt/harvests/*.jsonl`.
  */
 import { spawnSync } from 'node:child_process'
 
