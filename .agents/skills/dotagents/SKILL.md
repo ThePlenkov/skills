@@ -93,4 +93,3 @@ See [references/subagents.md](references/subagents.md) for roles, delegation rul
 
 - [references/subagents.md](references/subagents.md) — Agent hierarchy and delegation rules
 - [assets/TEMPLATE.md](assets/TEMPLATE.md) — Skill template
-
