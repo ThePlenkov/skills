@@ -199,7 +199,7 @@ export default async function scanExecutor(
   const summaryDir = '/tmp/ss-findings';
   const findingsFile = process.env.SS_FINDINGS_DIR || summaryDir;
   if (findingsFile) {
-    fs.mkdirSync(findingsFile, { recursive: true });
+    fs.mkdirSync(findingsFile, { recursive: true, mode: 0o700 });
     const entries = issues.map((issue) => {
       const sev = (issue.severity ?? '').toUpperCase();
       const loc = issue.location;
