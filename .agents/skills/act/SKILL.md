@@ -17,7 +17,7 @@ Portable skill layout ([agentskills.io](https://agentskills.io/specification)): 
 
 **`/act` means fix the PR, not hide review comments.**
 
-The main work is **P0–P3**: read each review thread, change **product code** (or post a substantive in-thread reply), commit, then close threads.  
+The main work is **P0–P3**: read each review thread, change **product code** (or post a substantive in-thread reply), commit, then close threads. P0 itself now has two halves — **P0a** (CI required-checks green on HEAD) and **P0b** (every `annotation_level=failure` on a failing SAST check is read and either fixed or triaged). Both are non-negotiable.  
 Running the resolve script **without** doing that first is **wrong** — same as clicking "Resolve conversation" on every thread with no code changes.
 
 Applies to `/act`, `/act pr`, `/act plan`, `/act backlog`, `/act harvest`, `@claude /act`, `@codex /act`, `@copilot /act`.
@@ -63,6 +63,8 @@ listing source PRs + thread ids).
 | Only touch `.agents/skills/` or the resolve script | Change `apps/`, `tools/`, `specs/`, `packaging/`, workflows per feedback |
 | "Merge-ready" because `open_threads=0` | Merge-ready only if feedback is **implemented** and CI green on HEAD |
 | Edit PR title/body to track agent progress | Leave author PR summary alone; reply in threads + commits |
+| Pass `--record` (or `ACT_RECORD_SCORES=1`) without an explicit decision to grow the dataset | Default OFF; recording opt-in is a deliberate action, not a habit. The scratch JSONL still has the per-run data |
+| Mark a failing SAST check green without reading its `annotation_level=failure` entries | Inspect annotations via `gh api repos/<o>/<r>/check-runs/<id>/annotations`; fix or suppress with documented reason before claiming P0 done |
 
 ## PR metadata
 
@@ -83,7 +85,7 @@ Thread 1 (path: …): [fix code | reply only] — what you will do
 Thread 2 …
 ```
 
-Do not start the resolve script until every open thread has a planned action and you have executed P0–P3.
+Do not start the resolve script until every open thread has a planned action and you have executed P0a / P0b / P1–P3.
 
 ## Debt context (`/act harvest`, `/act debt`, `/act backlog`)
 
@@ -101,7 +103,7 @@ Use after a `/harvest` cycle (or after `/backlog` triage has written
 | **D6** | Close loop | `bun run act:debt:done -- --status done --fix-pr N --threads-file …` |
 | **D7** | Resolve | `resolve-open-threads.sh` on source PRs only after reply + fix |
 
-Batch PR **merge-ready:** CI green on HEAD + summary of themes fixed. Do **not**
+Batch PR **merge-ready:** CI green on HEAD (`CI_REQUIRED_PENDING=0` AND `SAST_FINDINGS_PENDING=0`) + summary of themes fixed. Do **not**
 require `open_threads=0` on source PRs before the batch PR merges.
 
 Query helpers:
@@ -121,20 +123,58 @@ After the batch PR merges, run `bun run harvest:archive` (or
 
 | Step | What | Done when |
 |------|------|-----------|
-| **P0** | CI / merge blockers on **HEAD** | Required checks green on **current** HEAD |
+| **P0a** | CI / merge blockers on **HEAD** | Required checks green on **current** HEAD (passing **and** failing-blockers resolved) |
+| **P0b** | SAST error annotations on failing checks | For each FAILING SAST check, the agent has read every annotation_level=`failure` entry via `gh api repos/<owner>/<repo>/check-runs/<id>/annotations`, fixed in code or triaged with a documented reason (NOSONAR / suppression / false-positive link) |
 | **P1** | Blocking review ("must fix", changes requested) | **Code fixed** on branch + **reply in that thread** |
 | **P2** | Nits, questions, style | **Fix or answer in thread** (not silent) |
 | **P3** | Inline suggestions | **Applied in code** or declined with reason **in thread** |
-| **P4** | Resolve pass | Only after P0–P3 for **all** open threads |
-| **P5** | Rate findings (research) | Every check-run + review finding scored 0–5 in `review_scores.csv` ([RATING_FLOW.md](references/RATING_FLOW.md)) |
+| **P4** | Resolve pass | Only after P0a / P0b / P1–P3 for **all** open threads |
+| **P5** | Rate findings (research, opt-in) | Every check-run + review finding scored 0–5 in `tmp/agent_<pid>/scores-report.jsonl` (always); `review_scores.csv` only when explicitly opted in ([RATING_FLOW.md](references/RATING_FLOW.md)) |
 | **P6** | Evaluation | Retrospect, update durable knowledge, cycle check — **before** merge-ready |
 
-### P0 — when CI is red, run linters locally first
+### P0a — CI green, no merge blockers
 
 `pr-state.sh` reports `CI_REQUIRED_PENDING=N` for the **required** checks that
-are blocking. Before chasing a Codacy / Semgrep / ShellCheck "N new issues"
-title in the GitHub UI (which the cloud app rarely annotates in detail),
-reproduce the same checks locally and fix in one round trip:
+are blocking. Treat every non-AI-reviewer failing check as P0: green it
+locally, push, or document why it cannot be fixed in this PR.
+
+### P0b — Critical SAST error annotations (obligatory for failing checks)
+
+When a required check fails from a **SAST tool**, the failing run is not the
+whole story. The agent **must** read every annotation_level=`failure` entry it
+produced (these are the inline `::error file=…line=…::…` annotations on the
+PR), then for each one:
+
+1. **Fix in product code** (preferred, same round-trip).
+2. **Suppress with documented reason** (e.g. `// NOSONAR` for Sonar,
+   `// nosemgrep` for Opengrep, `# noqa` for ShellCheck, inline `// @ts-ignore`
+   with a comment for TypeScript) — never a whole-file suppression when a
+   line-specific one works.
+3. **Open an issue / backlog item** and link it in the in-thread reply if
+   out-of-scope for this PR (e.g. a Sonar `security-rating` debt item).
+
+`pr-state.sh` surfaces this as `SAST_FINDINGS_PENDING=N` — count of
+`annotation_level=failure` entries on **failing** SAST runs (zero extra `gh`
+calls when CI is fully green). Recognized SAST tools:
+
+| Tool | Annotation carrier | Why it’s P0 |
+|------|-------------------|-------------|
+| SonarCloud / SonarQube | `repos/<o>/<r>/check-runs/<id>/annotations` | New `BLOCKER` / `CRITICAL` finding on changed code |
+| Codacy | same | Linter finding raised as `failure` annotation |
+| CodeScene | same | Complexity / code-health finding on changed code |
+| CodeQL | same | Security query match on changed code |
+| Opengrep / Semgrep | same | Security rule match on changed code |
+| Trivy / Snyk / Skillspector / GitGuardian | same | CVE / secret / committed-anomaly finding |
+
+**Reading annotations is non-negotiable for failed SAST runs.** A failing
+Codacy "N new issues (0 max.)" gate with `annotations=0` on the check-run
+is the common case the cloud app rarely annotates in detail — in that scenario
+the agent must read the underlying linter output, install the linter locally,
+and reproduce the issue (see [Codacy skill](../codacy/SKILL.md)). A
+failing SAST gate cannot be dismissed as "linter noise" or
+"unclear" without the agent having read the annotations first.
+
+The locally reproducible path (after annotations are read) is:
 
 | Signal in `pr-state.sh` / `gh pr checks`                                | Reproduce locally                                  |
 | ----------------------------------------------------------------------- | -------------------------------------------------- |
@@ -188,12 +228,28 @@ bash scripts/resolve-open-threads.sh --dry-run OWNER REPO NUMBER
 The script only clicks "Resolve conversation" in GitHub — it does **not** implement review fixes.  
 Resolve outdated threads too, but only after the underlying comment was handled on the branch.
 
-## Rate findings (P5 — research dataset)
+## Rate findings (P5 — research dataset, **opt-in**)
 
 After P4, score every tool finding (check-run annotations + inline review
 comments) 0–5 so we can measure which review tools earn their slot. The agent
 only judges; the scripts do the fetch/join/CSV work in two tool calls. Full
 contract: [RATING_FLOW.md](references/RATING_FLOW.md).
+
+**CSV recording is OFF by default.** By default `/act` should not pollute the
+repo with a per-run commit just to grow a research dataset. Per-run data is
+still captured (JSONL scratch under `tmp/agent_<pid>/` — gitignored,
+automatically garbage-collected), so nothing is lost; only the persistent
+`.agents/act/review_scores.csv` upsert is gated. Opt in via any of:
+
+| Switch | Example | Lifetime |
+|--------|---------|----------|
+| CLI flag | `… --record` (or `--no-record` to override) | one run |
+| Env var | `ACT_RECORD_SCORES=1 bun scripts/submit-scores.ts …` | one shell session |
+| Config file | `.agents/act/config.json` `{"record_scores": true}` | until file removed |
+
+Priority: `--record` > `ACT_RECORD_SCORES` > config file > default OFF. The
+script prints `RECORDING=on\|off (source)` on every run so the choice is
+auditable.
 
 ```bash
 # prepare scratch dir once (repo ./tmp/ — never system /tmp)
@@ -202,14 +258,16 @@ mkdir -p tmp/agent_$$
 # 1. one call — dump every finding with full metadata
 bun scripts/extract-findings.ts OWNER REPO PR > tmp/agent_$$/findings.jsonl
 # 2. read findings, write tmp/agent_$$/scores.tsv  (finding_id<TAB>0-5<TAB>why)
-# 3. one call — join + upsert review_scores.csv (no GitHub writes)
+# 3. one call — join + upsert (writes scratch JSONL by default; CSV only if --record)
 bun scripts/submit-scores.ts OWNER REPO PR --evaluator <model-id> \
-  --findings tmp/agent_$$/findings.jsonl --scores tmp/agent_$$/scores.tsv
+  --findings tmp/agent_$$/findings.jsonl --scores tmp/agent_$$/scores.tsv \
+  [--record]                # remove this flag once the research dataset
+                            # is intentionally collected again
 ```
 
-Scoring is **CSV-only** — it posts no reactions or comments (those are P1–P4).
+Scoring is **local-only** — it posts no reactions or comments (those are P1–P4).
 Re-runs upsert on `(pr_url, finding_id, evaluator_id)`, so a second `/act` does
-not duplicate rows.
+not duplicate rows in the persistent CSV.
 
 ## Evaluation (P6 — after P5, before merge-ready)
 
@@ -232,11 +290,12 @@ Follow [EVALUATE.md](references/EVALUATE.md). Durable sinks: [REVIEW.md](../../.
 Say **merge-ready** only when:
 
 1. Review feedback is **done in code** (or explicitly declined in threads with reason).
-2. CI required checks **success on current HEAD**.
-3. `open_threads=0` from final `--dry-run`.
-4. Summary lists **what you changed per theme/file**, not only "resolved N threads".
-5. **P5 done** — `review_scores.csv` upserted and committed on the PR branch. Delegate to a `general` subagent (not the orchestrator) to keep the main context cheap. Pass the `--evaluator` value as the subagent's model name (e.g. `claude-haiku-4-5`). Do NOT re-extract findings after scoring begins — use one `findings.jsonl` per `/act` run.
-6. **P6 passed** — no cycle signals (reopened threads, duplicate rule flags, empty `/act` loop); retrospective + sink update done if anything went wrong this session.
+2. CI required checks **success on current HEAD** (`CI_REQUIRED_PENDING=0`).
+3. **SAST findings clean** — `SAST_FINDINGS_PENDING=0` from final pr-state.sh; every `annotation_level=failure` entry on a failing SAST check has been fixed, suppressed with documented reason, or triaged to backlog (P0b).
+4. `open_threads=0` from final `--dry-run`.
+5. Summary lists **what you changed per theme/file**, not only "resolved N threads".
+6. **P5 done** — per-run scratch report (`tmp/agent_<pid>/scores-report.jsonl`) written; persistent `review_scores.csv` only updated when the run was **opted in** (`--record` / `ACT_RECORD_SCORES=1` / config). When recording IS enabled this row must be committed on the PR branch. Delegate to a `general` subagent (not the orchestrator) to keep the main context cheap. Pass the `--evaluator` value as the subagent's model name (e.g. `claude-haiku-4-5`). Do NOT re-extract findings after scoring begins — use one `findings.jsonl` per `/act` run.
+7. **P6 passed** — no cycle signals (reopened threads, duplicate rule flags, empty `/act` loop); retrospective + sink update done if anything went wrong this session.
 
 ## PR closing summary
 
@@ -244,10 +303,11 @@ Say **merge-ready** only when:
 2. **HEAD** SHA  
 3. **Review fixes** (bullet per theme / file — this is the main section)  
 4. Threads: how many resolved **after** fixes; `open_threads=0`  
-5. CI on HEAD  
-6. **P5:** findings rated (N rows in `review_scores.csv`, committed on branch)  
-7. **P6:** cycle signals (none / blocked — list)  
-8. Left  
+5. CI on HEAD (`CI_REQUIRED_PENDING=0`)  
+6. **SAST (P0b):** `SAST_FINDINGS_PENDING=0`; for each prior `failure` annotation, what changed (fixed / suppressed / backlog link)  
+7. **P5:** findings rated (N rows in scratch; M rows committed to `review_scores.csv` iff recording was opted in this run)  
+8. **P6:** cycle signals (none / blocked — list)  
+9. Left  
 
 ## Idempotency
 
@@ -270,7 +330,7 @@ prefix paths with `.agents/skills/act/` (or use `bun run act:debt:*` for ledger 
 | **Post N thread replies**    | `bash scripts/reply-threads.sh --file tmp/agent/replies.tsv` | N × `gh api graphql addPullRequestReview…` |
 | **Resolve open threads (P4)**| `bash scripts/resolve-open-threads.sh OWNER REPO PR`      | unchanged                                   |
 | **Extract findings (P5)**    | `bun scripts/extract-findings.ts OWNER REPO PR`           | N × `gh api` check-runs/annotations/comments reads |
-| **Submit scores (P5)**       | `bun scripts/submit-scores.ts … --findings F --scores S`   | per-finding parse + CSV writes (local, no API) |
+| **Submit scores (P5)**       | `bun scripts/submit-scores.ts … --findings F --scores S [--record]` | per-finding parse + JSONL scratch always; CSV upsert only with `--record` (or env/config) |
 | **Query debt (D0)**          | `bun run act:debt:query -- --status open --format tsv`    | Reading harvest files by hand |
 | **Plan debt batch (D1)**     | `bun run act:debt:plan -- --limit 25`                     | Hand-grouping ledger rows |
 | **Mark debt done (D6)**      | `bun run act:debt:done -- --status done …`                | Editing `ledger.jsonl` by hand |

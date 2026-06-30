@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 # Single-call PR state dump for /act: HEAD SHA, mergeability, open threads (table),
-# and required CI status (excluding AI reviewers like cubic / CodeRabbit).
+# required CI status (excluding AI reviewers like cubic / CodeRabbit), and the
+# count of error-level SAST annotations on FAILIING SAST check-runs
+# (P0-blocking).
 #
-# Replaces 4-6 separate `gh pr view` / `gh pr checks` invocations per /act run.
+# Replaces 4-6 separate `gh pr view` / `gh pr checks` invocations per /act run
+# plus the manual SAST annotation probe loop. When CI_REQUIRED_PENDING=0 the
+# SAST loop is skipped entirely (cost = 0 extra gh calls).
 #
 # Usage: pr-state.sh OWNER REPO PR_NUMBER
 # Output: key=value lines (HEAD_SHA, HEAD_REF, MERGEABLE, MERGE_STATE,
-#         OPEN_THREADS, CI_REQUIRED_PENDING) followed by a 4-column TSV table
-#         of open threads:
+#         OPEN_THREADS, CI_REQUIRED_PENDING, SAST_FINDINGS_PENDING) followed by
+#         a 4-column TSV table of open threads:
 #           id<TAB>author<TAB>path:line<TAB>body[:120]
 #         (newlines and tabs in the body are collapsed to spaces so each row
 #         stays on a single line; pagination uses pageInfo.hasNextPage.)
@@ -130,6 +134,37 @@ ci_required_pending="$(jq -r '
   ] | length
 ' <<<"$checks_json")"
 
+# SAST error annotations on FAILING checks — the P0-ish signal that matters for
+# /act: when a SAST tool fails, its annotation-level=failure entries are the
+# things the agent MUST inspect (and address or suppress with reason) before
+# /act can claim merge-ready. We deliberately scope to **failing** checks:
+# passing SAST runs do not gate /act, and skipped/neutral ones do not produce
+# annotations. Annotations are fetched once per failing SAST run; for an empty
+# run set this loop costs 0 gh calls.
+#
+# SAST tools we recognize (case-insensitive substring match on check name):
+#   sonarcloud, codacy, codescene, codeql, opengrep / semgrep, trivy, snyk,
+#   skillspector, gitguardian.
+sast_findings_pending=0
+if [[ "$ci_required_pending" -gt 0 ]]; then
+  while IFS=$'\t' read -r r_name r_bucket r_state r_db_id; do
+    [[ "$r_bucket" == "pass" ]] && continue
+    [[ "$r_state" == "SKIPPED" || "$r_state" == "NEUTRAL" ]] && continue
+    if ! printf '%s' "$r_name" | grep -qiE 'sonarcloud|codacy|codescene|codeql|semgrep|opengrep|^trivy|snyk|skillspector|gitguardian'; then
+      continue
+    fi
+    [[ -z "$r_db_id" || "$r_db_id" == "null" ]] && continue
+    # annotation_level is `notice|warning|failure`. `failure` is the
+    # ::error-equivalent; gating on it keeps us from raising P0 on noise.
+    errs=$(gh api "repos/$OWNER/$REPO/check-runs/$r_db_id/annotations" \
+      --jq '[.[] | select(.annotation_level=="failure")] | length' 2>/dev/null || echo 0)
+    sast_findings_pending=$(( sast_findings_pending + errs ))
+  done < <(gh pr checks "$PR" --repo "$OWNER/$REPO" \
+      --json name,bucket,state,databaseId \
+      --jq '.[] | [.name, .bucket, .state, (.databaseId|tostring)] | @tsv' \
+      2>/dev/null || true)
+fi
+
 echo "HEAD_SHA=$head_sha"
 echo "HEAD_REF=$head_ref"
 echo "URL=$url"
@@ -137,6 +172,7 @@ echo "MERGEABLE=$mergeable"
 echo "MERGE_STATE=$merge_state"
 echo "OPEN_THREADS=$open_count"
 echo "CI_REQUIRED_PENDING=$ci_required_pending"
+echo "SAST_FINDINGS_PENDING=$sast_findings_pending"
 echo
 echo "OPEN_THREADS_TABLE:"
 jq -r '
