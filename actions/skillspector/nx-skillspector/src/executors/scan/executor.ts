@@ -192,49 +192,15 @@ export default async function scanExecutor(
   console.log(`  findings=${issues.length} errors=${errorCount} warnings=${warningCount} ss_exit=${result.exitCode}`);
   console.log('::endgroup::');
 
-  if (jobSummary && process.env.GITHUB_STEP_SUMMARY) {
-    // Per-skill block in the step summary. The outer workflow step
-    // adds a header/totals above this; each executor invocation
-    // appends its own block. Format kept terse — the rich design
-    // lives in the consolidated summary built by the workflow step.
-    const totalFindings = issues.length;
-    const allErrors = errorCount + docErrorCount;
-    const allWarnings = warningCount + docWarningCount;
-    fs.appendFileSync(
-      process.env.GITHUB_STEP_SUMMARY,
-      [
-        '',
-        `### ${skillName}`,
-        '',
-        `| Severity (code) | Severity (docs) | Total |`,
-        `| :--- | :--- | ---: |`,
-        `| ❌ ${errorCount} errors / ⚠️ ${warningCount} warnings | ❌ ${docErrorCount} / ⚠️ ${docWarningCount} | ${totalFindings} |`,
-        '',
-      ].join('\n'),
-    );
-  }
-
-  // Append per-skill findings as Markdown table rows to a shared
-  // file. The workflow's outer step builds the final PR comment body
-  // from this — kept minimal (just totals + a link to the run),
-  // because the rich content lives in the step summary, not the PR.
+  // Append per-skill summary row to the shared file consumed by the
+  // workflow's step summary builder. Each row is a compact one-liner
+  // the outer step aggregates into a professional report.
   const summaryPath = process.env.PR_SUMMARY_FILE;
   if (summaryPath) {
     fs.mkdirSync(path.dirname(summaryPath), { recursive: true });
-    if (!fs.existsSync(summaryPath)) {
-      fs.writeFileSync(
-        summaryPath,
-        [
-          '<!-- SkillSpector:rows -->',
-          '| Skill | Code errors | Code warnings | Doc findings |',
-          '| :--- | ---: | ---: | ---: |',
-          '',
-        ].join('\n'),
-        'utf8',
-      );
-    }
-    const esc = (s: string) => s.replace(/\|/g, '\\|').replace(/\n/g, ' ');
-    const row = `| ${esc(skillName)} | ${errorCount} | ${warningCount} | ${docFindings.length + docErrorCount + docWarningCount} |`;
+    const total = issues.length;
+    const esc = (s: string) => s.replace(/\|/g, '\\|');
+    const row = `${esc(skillName)}|${errorCount + docErrorCount}|${warningCount + docWarningCount}|${total}`;
     fs.appendFileSync(summaryPath, row + '\n', 'utf8');
   }
 

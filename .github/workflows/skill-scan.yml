@@ -114,49 +114,75 @@ jobs:
       # 1. PREPEND a header to the step summary (executor appends per-skill
       #    blocks, this header caps them with totals + a status badge)
       # 2. POST a minimal one-liner PR comment that links to the run
-      - name: Write step summary header
+      # Build the step summary: a compact, professional report with
+        # totals, severity badges, and a collapsible per-skill table.
+        # The executor appends rows to SUMMARY_FILE during the scan;
+        # this step assembles them into the final report.
+      - name: Write step summary
         if: always()
         env:
           ERROR_COUNT: ${{ steps.scan.outputs.error-count }}
           WARNING_COUNT: ${{ steps.scan.outputs.warning-count }}
           TOTAL_COUNT: ${{ steps.scan.outputs.total-count }}
+          SUMMARY_FILE: /tmp/skillspector-summary.md
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          ARTIFACT_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts
         run: |
           set -euo pipefail
-          ERROR_COUNT=${ERROR_COUNT:-0}
-          WARNING_COUNT=${WARNING_COUNT:-0}
-          TOTAL_COUNT=${TOTAL_COUNT:-0}
+          ERR=${ERROR_COUNT:-0}
+          WARN=${WARNING_COUNT:-0}
+          TOTAL=${TOTAL_COUNT:-0}
 
-          # Status badge: pass = all green, fail = errors > 0
-          if [ "$ERROR_COUNT" = "0" ]; then
-            BADGE="✅ **PASS**"
-          else
-            BADGE="❌ **FAIL**"
+          # Build per-skill table rows from the summary file.
+          ROWS=""
+          if [ -s "$SUMMARY_FILE" ]; then
+            while IFS='|' read -r skill e w t; do
+              [ -z "$skill" ] && continue
+              ROWS="${ROWS}| ${skill} | ${e} | ${w} | ${t} |\n"
+            done < "$SUMMARY_FILE"
           fi
+          SKILL_COUNT=$(printf '%b' "$ROWS" | wc -l | tr -d ' ')
 
-          # Prepend (the executor appends per-skill blocks AFTER this)
-          {
-            echo "## 🛡️ SkillSpector scan — $BADGE"
-            echo
-            echo "| ❌ Errors | ⚠️ Warnings | Total findings |"
-            echo "| ---: | ---: | ---: |"
-            echo "| $ERROR_COUNT | $WARNING_COUNT | $TOTAL_COUNT |"
-            echo
-            echo "📋 [Open the Actions run for the full report and SARIF artifact]($RUN_URL)"
-            echo
-            echo "---"
-            echo
-            echo "### Per-skill breakdown"
-            echo
-          } > /tmp/skillspector-summary-prefix.md
-          cat /tmp/skillspector-summary-prefix.md "${GITHUB_STEP_SUMMARY:-/dev/null}" > "${GITHUB_STEP_SUMMARY}.new"
-          mv "${GITHUB_STEP_SUMMARY}.new" "${GITHUB_STEP_SUMMARY}"
+          # Compose the step summary.  GitHub renders Markdown, HTML,
+          # and <details> blocks natively — so we use all three.
+          cat > "$GITHUB_STEP_SUMMARY" << 'HEADER'
+## 🛡️ SkillSpector scan
+HEADER
 
-      # Post a MINIMAL one-liner PR comment. Heavy content lives in the
-      # run summary, not here. The comment exists so reviewers see the
-      # scan result without leaving the PR — just totals + a deep link.
-      # No tables, no per-skill rows, no findings.
-      - name: Post SkillSpector PR comment
+          if [ "$ERR" -gt 0 ]; then
+            echo "**Status:** ❌ fail — error-severity findings detected" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "**Status:** ✅ pass" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo >> "$GITHUB_STEP_SUMMARY"
+
+          cat >> "$GITHUB_STEP_SUMMARY" << TABLE
+| <img width="32"> Errors | <img width="32"> Warnings | Total | Skills scanned |
+| :---: | :---: | :---: | :---: |
+| **${ERR}** | **${WARN}** | **${TOTAL}** | ${SKILL_COUNT} |
+TABLE
+
+          if [ -n "$ROWS" ]; then
+            cat >> "$GITHUB_STEP_SUMMARY" << DETAILS
+
+<details>
+<summary><b>Findings by skill</b> (${SKILL_COUNT} skills with findings)</summary>
+
+| Skill | Errors | Warnings | Total |
+| :--- | ---: | ---: | ---: |
+$(printf '%b' "$ROWS")
+</details>
+DETAILS
+          else
+            echo >> "$GITHUB_STEP_SUMMARY"
+            echo "> No findings in any skill." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo >> "$GITHUB_STEP_SUMMARY"
+          echo "<sup>📄 [Full report & artifacts](${RUN_URL}) · [SARIF artifact](${ARTIFACT_URL})</sup>" >> "$GITHUB_STEP_SUMMARY"
+
+      # Post a compact PR comment (Conversation tab).
+      # Heavy content lives in the Actions run summary.
+      - name: Post PR comment
         if: always() && github.event_name == 'pull_request'
         continue-on-error: true
         env:
@@ -171,45 +197,35 @@ jobs:
           ERR=${ERROR_COUNT:-0}
           WARN=${WARNING_COUNT:-0}
 
-          # Zero-finding case: delete any prior summary and exit.
-          if [ "$TOTAL" = "0" ]; then
+          # Zero-finding case: remove prior comment.
+          if [ "$TOTAL" -eq 0 ]; then
             PR_NUMBER="${{ github.event.pull_request.number }}"
-            PREVIOUS_ID=$(gh api \
-              "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments?per_page=100" \
-              --jq '.[] | select(.body | test("<!-- SkillSpector:start -->")) | .id' \
-              | head -1 || true)
-            if [ -n "$PREVIOUS_ID" ]; then
-              gh api -X DELETE \
-                "repos/${{ github.repository }}/issues/comments/${PREVIOUS_ID}" > /dev/null
-            fi
-            echo "::notice title=SkillSpector::no findings, removed prior summary"
+            PREV=$(gh api "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments?per_page=100" \
+              --jq '.[] | select(.body | test("<!-- SkillSpector:tag -->")) | .id' | head -1 || true)
+            [ -n "$PREV" ] && gh api -X DELETE \
+              "repos/${{ github.repository }}/issues/comments/${PREV}" >/dev/null 2>&1 || true
             exit 0
           fi
 
-          # Minimal comment body. The Actions run summary is where the
-          # full report lives (with per-skill tables, badges, links).
-          if [ "$ERR" = "0" ]; then
-            EMOJI="✅"
+          if [ "$ERR" -gt 0 ]; then
+            ICON="❌"
           else
-            EMOJI="❌"
+            ICON="✅"
           fi
-          BODY="$EMOJI **SkillSpector:** $ERR errors, $WARN warnings ([full report →]($RUN_URL))"
 
-          # Idempotent: edit our previous comment if present, else post new.
+          BODY="${ICON} **SkillSpector:** ${ERR} errors · ${WARN} warnings · [details →](${RUN_URL})"
+          MARKER="<!-- SkillSpector:tag -->"
+
           PR_NUMBER="${{ github.event.pull_request.number }}"
-          PREVIOUS_ID=$(gh api \
-            "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments?per_page=100" \
-            --jq '.[] | select(.body | test("<!-- SkillSpector:start -->")) | .id' \
-            | head -1 || true)
+          PREV=$(gh api "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments?per_page=100" \
+            --jq ".[] | select(.body | test(\"${MARKER}\")) | .id" | head -1 || true)
 
-          if [ -n "$PREVIOUS_ID" ]; then
-            printf '%s\n<!-- SkillSpector:start -->\n' "$BODY" \
-              | gh api -X PATCH \
-                "repos/${{ github.repository }}/issues/comments/${PREVIOUS_ID}" \
-                --field body=@- > /dev/null
-            echo "::notice title=SkillSpector::updated PR comment ${PREVIOUS_ID}"
+          if [ -n "$PREV" ]; then
+            gh api -X PATCH \
+              "repos/${{ github.repository }}/issues/comments/${PREV}" \
+              --field body="${BODY}
+          ${MARKER}" >/dev/null 2>&1
           else
-            printf '%s\n<!-- SkillSpector:start -->\n' "$BODY" \
-              | gh pr comment "${PR_NUMBER}" --body-file - > /dev/null
-            echo "::notice title=SkillSpector::posted new PR comment"
+            gh pr comment "${PR_NUMBER}" --body "${BODY}
+          ${MARKER}" >/dev/null 2>&1
           fi
