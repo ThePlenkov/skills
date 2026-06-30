@@ -151,31 +151,22 @@ jobs:
           lines.push('### Scanned skills (' + skills.length + ')');
           lines.push('');
           for (const s of skills) {
-            const total = s.errors + s.warnings + s.notes;
-            if (total === 0) {
+            const n = s.findings.length;
+            if (n === 0) {
               lines.push('- ✅ **' + s.skill + '**');
             } else {
-              // Show finding details in a collapsible block
-              const ruleCounts = {};
-              for (const f of s.findings) {
-                const key = f.level + ':' + f.ruleId;
-                ruleCounts[key] = (ruleCounts[key] || 0) + 1;
-              }
-              const summary = Object.entries(ruleCounts)
-                .map(([k, v]) => k.split(':')[1] + '(' + v + ')')
-                .join(', ');
-              lines.push('- ⚠️ **' + s.skill + '** — ' + total + ' finding' + (total > 1 ? 's' : '') + ': ' + summary);
-              lines.push('  <details>');
-              lines.push('  <summary>' + total + ' finding' + (total > 1 ? 's' : '') + '</summary>');
+              const lvl = s.errors > 0 ? '❌' : '⚠️';
+              lines.push('<details>');
+              lines.push('<summary>' + lvl + ' <b>' + s.skill + '</b> — ' + n + ' finding' + (n > 1 ? 's' : '') + '</summary>');
               lines.push('');
-              lines.push('  | Rule | Level | File | Summary |');
-              lines.push('  | :--- | :--- | :--- | :--- |');
+              lines.push('| Rule | Level | File | Summary |');
+              lines.push('| :--- | :--- | :--- | :--- |');
               for (const f of s.findings) {
-                const lvl = f.level === 'error' ? '❌' : f.level === 'warning' ? '⚠️' : 'ℹ️';
-                const file = f.filePath + ':' + f.line;
-                lines.push('  | ' + f.ruleId + ' | ' + lvl + ' | ' + file + ' | ' + f.msg.slice(0, 100) + ' |');
+                const icon = f.level === 'error' ? '❌' : f.level === 'warning' ? '⚠️' : 'ℹ️';
+                lines.push('| `' + f.ruleId + '` | ' + icon + ' | ' + f.filePath + ':' + f.line + ' | ' + f.msg.slice(0, 120) + ' |');
               }
-              lines.push('  </details>');
+              lines.push('');
+              lines.push('</details>');
             }
             lines.push('');
           }

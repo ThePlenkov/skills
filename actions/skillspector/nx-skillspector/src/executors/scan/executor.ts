@@ -216,8 +216,6 @@ export default async function scanExecutor(
       skill: skillName,
       errors: errorCount + docErrorCount,
       warnings: warningCount + docWarningCount,
-      notes: docFindings.length + docErrorCount + docWarningCount
-        - (errorCount + docErrorCount) - (warningCount + docWarningCount),
       findings: entries,
     });
     // Use a sequential counter so parallel writers don't collide.
