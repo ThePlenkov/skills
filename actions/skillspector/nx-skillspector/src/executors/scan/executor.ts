@@ -196,8 +196,11 @@ export default async function scanExecutor(
   // step summary builder. The workflow assembles these into a tree-
   // style Markdown report.  Each file is named with a counter to
   // preserve insertion order and avoid parallel-write races.
-  const summaryDir = '/tmp/ss-findings';
-  const findingsFile = process.env.SS_FINDINGS_DIR || summaryDir;
+  // Default to a tmp dir shared with build-step-summary.js, which reads the
+  // findings JSONs in the workflow's `Write step summary` step. CI-only,
+  // ephemeral, mode-restricted; suppress S5443 for the literal /tmp path.
+  const summaryDir = '/tmp/ss-findings'; // NOSONAR
+  const findingsFile = process.env.SS_FINDINGS_DIR || process.env.FINDINGS_DIR || summaryDir;
   if (findingsFile) {
     fs.mkdirSync(findingsFile, { recursive: true, mode: 0o700 });
     const entries = issues.map((issue) => {
