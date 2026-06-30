@@ -2,7 +2,7 @@
 /**
  * Entry point for the review-debt side of /act (`bun run act:debt:*`).
  *
- * The harvest side now lives in /harvest (see .agents/skills/harvest/SKILL.md).
+ * The companion collection step now lives in its own skill.
  * Debt here means: read the ledger built by /harvest, batch-fix it on a branch,
  * then update status. Scripts:
  *

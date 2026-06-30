@@ -106,6 +106,10 @@ function relativeConfigPath(configPath: string, repoRoot: string): string {
   return configPath
 }
 
+function resolveE2eSkillPath(): string {
+  return join('.agents', 'skills', 'e2e', 'SKILL.md')
+}
+
 function resolveDispatchScenario(
   projectConfig: ProjectE2eConfig,
   repoRoot: string,
