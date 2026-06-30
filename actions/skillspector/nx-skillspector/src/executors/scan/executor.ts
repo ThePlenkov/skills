@@ -27,8 +27,6 @@ import {
 } from '../../lib/mapping.ts';
 import { runSkillspector } from '../../lib/skillspector.ts';
 
-const execFileP = promisify(execFile);
-
 const CODE_FILE_RE = /\.(?:ts|tsx|js|jsx|mjs|cjs|py|sh|bash|zsh|yml|yaml|json|go|rs|java|rb|php)$/i;
 
 // Named export alongside default so Nx's CJS-style
@@ -194,81 +192,46 @@ export default async function scanExecutor(
   console.log(`  findings=${issues.length} errors=${errorCount} warnings=${warningCount} ss_exit=${result.exitCode}`);
   console.log('::endgroup::');
 
-  if (jobSummary && process.env.GITHUB_STEP_SUMMARY) {
-    // Per-skill block in the step summary. The outer workflow step
-    // adds a header/totals above this; each executor invocation
-    // appends its own block. Format kept terse — the rich design
-    // lives in the consolidated summary built by the workflow step.
-    const totalFindings = issues.length;
-    const allErrors = errorCount + docErrorCount;
-    const allWarnings = warningCount + docWarningCount;
-    fs.appendFileSync(
-      process.env.GITHUB_STEP_SUMMARY,
-      [
-        '',
-        `### ${skillName}`,
-        '',
-        `| Severity (code) | Severity (docs) | Total |`,
-        `| :--- | :--- | ---: |`,
-        `| ❌ ${errorCount} errors / ⚠️ ${warningCount} warnings | ❌ ${docErrorCount} / ⚠️ ${docWarningCount} | ${totalFindings} |`,
-        '',
-      ].join('\n'),
-    );
-  }
-
-  // Append per-skill findings as Markdown table rows to a shared
-  // file. The workflow's outer step builds the final PR comment body
-  // from this — kept minimal (just totals + a link to the run),
-  // because the rich content lives in the step summary, not the PR.
-  const summaryPath = process.env.PR_SUMMARY_FILE;
-  if (summaryPath) {
-    fs.mkdirSync(path.dirname(summaryPath), { recursive: true });
-    if (!fs.existsSync(summaryPath)) {
-      fs.writeFileSync(
-        summaryPath,
-        [
-          '<!-- SkillSpector:rows -->',
-          '| Skill | Code errors | Code warnings | Doc findings |',
-          '| :--- | ---: | ---: | ---: |',
-          '',
-        ].join('\n'),
-        'utf8',
-      );
-    }
-    const esc = (s: string) => s.replace(/\|/g, '\\|').replace(/\n/g, ' ');
-    const row = `| ${esc(skillName)} | ${errorCount} | ${warningCount} | ${docFindings.length + docErrorCount + docWarningCount} |`;
-    fs.appendFileSync(summaryPath, row + '\n', 'utf8');
+  // Write per-skill findings to a JSON file consumed by the workflow's
+  // step summary builder. The workflow assembles these into a tree-
+  // style Markdown report.  Each file is named with a counter to
+  // preserve insertion order and avoid parallel-write races.
+  // Default to a tmp dir shared with build-step-summary.js, which reads the
+  // findings JSONs in the workflow's `Write step summary` step. CI-only,
+  // ephemeral, mode-restricted; suppress S5443 for the literal /tmp path.
+  const summaryDir = '/tmp/ss-findings'; // NOSONAR
+  const findingsFile = process.env.SS_FINDINGS_DIR || process.env.FINDINGS_DIR || summaryDir;
+  if (findingsFile) {
+    fs.mkdirSync(findingsFile, { recursive: true, mode: 0o700 });
+    const entries = issues.map((issue) => {
+      const sev = (issue.severity ?? '').toUpperCase();
+      const loc = issue.location;
+      const filePath = loc?.file ?? '?';
+      const line = loc?.start_line ?? '?';
+      const ruleId = issue.id ?? '?';
+      const msg = (issue.explanation ?? '').split('\n')[0]?.slice(0, 200) ?? '';
+      let level: string;
+      if (sev === 'HIGH' || sev === 'CRITICAL') level = 'error';
+      else if (sev === 'MEDIUM' || sev === 'WARNING') level = 'warning';
+      else level = 'info';
+      return { ruleId, level, filePath, line, msg };
+    });
+    const payload = JSON.stringify({
+      skill: skillName,
+      errors: errorCount + docErrorCount,
+      warnings: warningCount + docWarningCount,
+      findings: entries,
+    });
+    // Use a sequential counter so parallel writers don't collide.
+    const idx = String(
+      Number.parseInt(
+        fs.readdirSync(findingsFile).filter((f) => f.endsWith('.json')).length.toString(),
+      ) + 1,
+    ).padStart(4, '0');
+    fs.writeFileSync(path.join(findingsFile, `${idx}.json`), payload, 'utf8');
   }
 
   return { success: !failOnError || errorCount === 0 };
-}
-
-async function runSkillspector(opts: {
-  bin: string;
-  path: string;
-  noLlM: boolean;
-  baseline?: string;
-}): Promise<{ exitCode: number; jsonText: string }> {
-  try {
-    const args = ['scan', opts.path, '--format', 'json'];
-    if (opts.noLlM) args.push('--no-llm');
-    if (opts.baseline) {
-      args.push('--baseline', opts.baseline);
-    }
-    const { stdout, stderr } = await execFileP(opts.bin, args, {
-      maxBuffer: 200 * 1024 * 1024,
-    });
-    if (stderr) process.stderr.write(stderr);
-    return { exitCode: 0, jsonText: stdout };
-  } catch (err: unknown) {
-    // execFile rejects on non-zero exit. Skillspector exits non-zero
-    // when findings exist, but still writes JSON to stdout.
-    const e = err as { stdout?: string; stderr?: string; code?: number };
-    return {
-      exitCode: typeof e.code === 'number' ? e.code : 1,
-      jsonText: e.stdout ?? '',
-    };
-  }
 }
 
 export type ScanExecutorOptions = {

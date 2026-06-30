@@ -1,4 +1,4 @@
-# AGENTS.md
+# CLAUDE.md
 
 This repository is maintained by an agent that creates and updates skills and role prompts.
 

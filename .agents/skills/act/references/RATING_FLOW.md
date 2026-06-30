@@ -49,9 +49,9 @@ The agent reads `findings.jsonl` (already in context) and writes a **3-column
 TSV** — only what it alone can produce:
 
 ```tsv
-finding_id	rating	reasoning
-scan:101:0	4	Real bug: $VAR unquoted, breaks on spaces
-review:202	2	Valid but low-impact style nit
+finding_id    rating    reasoning
+scan:101:0    4    Real bug: $VAR unquoted, breaks on spaces
+review:202    2    Valid but low-impact style nit
 ```
 
 Rating scale: **0** noise/false-positive · **1** marginal · **2** obvious/low

@@ -106,6 +106,10 @@ function relativeConfigPath(configPath: string, repoRoot: string): string {
   return configPath
 }
 
+function resolveE2eSkillPath(): string {
+  return join('.agents', 'skills', 'e2e', 'SKILL.md')
+}
+
 function resolveDispatchScenario(
   projectConfig: ProjectE2eConfig,
   repoRoot: string,
@@ -202,7 +206,7 @@ export function buildE2eDispatch(
     env,
     prompt,
     evidenceDir,
-    skillPath: '.agents/skills/e2e/SKILL.md',
+    skillPath: resolveE2eSkillPath(),
     specPath: config.projectConfig.specPath ?? '',
     acpDocs: { agents: ACP_AGENTS_URL, getStarted: ACP_GET_STARTED_URL },
     status: 'pending',

@@ -284,7 +284,7 @@ from the body; newlines and tabs in the body must be escaped as `\n` and `\t`
 (the script decodes them before POST):
 
 ```tsv
-<thread_id>	<reply body on a single line; \n for newlines, \t for tabs>
+<thread_id>    <reply body on a single line; \n for newlines, \t for tabs>
 ```
 
 **Gotcha:** `gh api graphql` accepts `-f query=...` + `-F var=val` together, but
