@@ -1,6 +1,6 @@
 ---
 name: pr-handoff
-description: Generate a self-contained handoff for the next agent working on a subagent-driven PR pipeline. Use at the end of each subagent task to produce (1) a docs/handoff/ entry that captures state, lessons, and the next contract, (2) an updated docs/lessons-learned.md, and (3) a scaffold test file + branch + draft PR for the next subagent. Designed for projects where each PR is a self-contained unit (e.g., an 11-PR roadmap) and the next agent must be able to pick up from a fresh context with zero conversation history.
+description: Generate a self-contained handoff for the next agent working on a subagent-driven PR pipeline. Use at the end of each subagent task to produce (1) a docs/handoff/ entry that captures state, lessons, and the next contract, (2) an updated docs/lessons-learned.md, and (3) a scaffold test file + branch + draft PR for the next subagent. Designed for projects where each PR is a self-contained unit and the next agent must be able to pick up from a fresh context with zero conversation history.
 metadata:
   tags:
     - workflow
