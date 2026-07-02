@@ -17,12 +17,79 @@ Portable skill layout ([agentskills.io](https://agentskills.io/specification)): 
 
 **`/act` means fix the PR, not hide review comments.**
 
-The main work is **P0–P3**: read each review thread, change **product code** (or post a substantive in-thread reply), commit, then close threads. P0 itself now has two halves — **P0a** (CI required-checks green on HEAD) and **P0b** (every `annotation_level=failure` on a failing SAST check is read and either fixed or triaged). Both are non-negotiable.  
-Running the resolve script **without** doing that first is **wrong** — same as clicking "Resolve conversation" on every thread with no code changes.
-
 Applies to `/act`, `/act pr`, `/act plan`, `/act backlog`, `/act harvest`, `@claude /act`, `@codex /act`, `@copilot /act`.
 
 **No Playwright** for GitHub PR UI.
+
+## Philosophy — "It's all yours"
+
+**There is no "not my responsibility" in `/act`.** SonarQube, Codacy, CodeScene, CodeQL, Semgrep, Trivy — these are not external services the agent can dismiss. They are part of the code quality surface, and `/act` owns all of it. If a SAST tool flagged something on this PR, it is the agent's problem to fix.
+
+**Priority ladder for SAST findings** (check in this order):
+
+1. **GitHub CI run annotations** — the primary source. Most SAST tools leave inline `::error` / `::warning` annotations on the PR via check-runs. Read these first via `gh api repos/<o>/<r>/check-runs/<id>/annotations`. This is faster and more reliable than SARIF.
+2. **SARIF files** — secondary. Some tools (CodeQL, Snyk, Trivy) produce SARIF artifacts. Download and parse only if annotations are absent or insufficient.
+3. **CLI with env vars** — tertiary. Check if a CLI is available (`which codacy-cli`, `which cs`, `which opengrep`) and if required env vars are set (`CODACY_API_TOKEN`, `CS_ACCESS_TOKEN`, etc.). Attempt to reproduce locally.
+4. **Install and run** — last resort. If no CLI exists, install it (per the relevant skill) and run locally.
+
+**Never skip step 1.** "I don't have access to SonarCloud" is wrong — the annotations are already on the PR via GitHub's check-runs API. The agent has `gh` access. Use it.
+
+## The Loop — `/act` is iterative, not linear
+
+`/act` is not a one-pass code review. It is an **end-to-end iterative loop** that runs until the PR is clean:
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│                                                         │
+│   ┌─── FETCH ───► ANALYSE ───► CONFIRM/REJECT ───┐     │
+│   │                                                │     │
+│   │   FIX ───► REPLY & RESOLVE ───► VERIFY CLEAN ─┘     │
+│   │                                                   │     │
+│   └─── PUSH ───► loop back to FETCH                    │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+| Step | What | Details |
+|------|------|---------|
+| **FETCH** | Get current PR state | HEAD SHA, check-run status, open threads, SAST annotations |
+| **ANALYSE** | Investigate each finding | Read annotations, read threads, understand what changed and why |
+| **CONFIRM / REJECT** | Is this a real issue? | Not every finding is valid — reject false positives with documented reason |
+| **FIX** | Change product code | One logical fix per commit, grouped sensibly |
+| **REPLY & RESOLVE** | Per-thread response + resolve | Reply in thread pointing to commit, then resolve that thread |
+| **VERIFY CLEAN** | Ensure no errors remain | `pr-state.sh` → `SAST_FINDINGS_PENDING=0`, `CI_REQUIRED_PENDING=0` |
+| **PUSH** | Push to branch | Atomic push with clear commit messages |
+| **LOOP** | Start again | Re-fetch state. New CI run may surface new findings. Repeat until clean. |
+
+**There is no arbitrary iteration limit.** The loop runs until the PR is merge-ready or the context window is full. If context is running low, stop and **plan a handoff** (see below) instead of rushing to merge.
+
+**Code review is one step in the loop, not the whole loop.** P0a/P0b (CI/SAST) and P1–P3 (review threads) are all part of the same iterative cycle. The agent does not "finish code review" and then "handle CI" — it does everything in each pass, because a fix may trigger new CI findings.
+
+### Context management and handoff
+
+When the context window is approaching capacity:
+
+1. **Stop the loop.** Do not rush remaining fixes.
+2. **Summarize current state** — what's fixed, what's pending, what CI shows on HEAD.
+3. **Write a handoff file** if more work remains:
+   - PR context: leave a comment on the PR summarizing progress and remaining items.
+   - Batch context: write `.agents/review-debt/harvests/` or `.agents/backlog/` entries for remaining work.
+4. **Report to user** with: "PR is at [state]. Remaining: [list]. Recommend running `/act` again to continue."
+
+### Subagents for context preservation
+
+Use subagents when the main `/act` context is getting large and you need to perform a sub-task without consuming the orchestrator's context window:
+
+- **P5 (rating)**: Delegate to a `general` subagent — scoring is mechanical and does not need the full PR context.
+- **Large SAST investigation**: If reproducing a Codacy/Sonar issue requires reading many files, delegate the investigation to an `investigator` subagent.
+- **Batch debt processing**: For `/act harvest` or `/act backlog` with many threads, process groups in parallel subagents.
+
+The orchestrator (`/act` itself) stays lean — it fetches state, plans, dispatches, and integrates results. Subagents do the deep work and return status.
+
+## The main work — P0–P3
+
+The main work is **P0–P3**: read each review thread, change **product code** (or post a substantive in-thread reply), commit, then close threads. P0 itself now has two halves — **P0a** (CI required-checks green on HEAD) and **P0b** (every `annotation_level=failure` on a failing SAST check is read and either fixed or triaged). Both are non-negotiable.  
+Running the resolve script **without** doing that first is **wrong** — same as clicking "Resolve conversation" on every thread with no code changes.
 
 ## Contexts
 
@@ -65,6 +132,10 @@ listing source PRs + thread ids).
 | Edit PR title/body to track agent progress | Leave author PR summary alone; reply in threads + commits |
 | Pass `--record` (or `ACT_RECORD_SCORES=1`) without an explicit decision to grow the dataset | Default OFF; recording opt-in is a deliberate action, not a habit. The scratch JSONL still has the per-run data |
 | Mark a failing SAST check green without reading its `annotation_level=failure` entries | Inspect annotations via `gh api repos/<o>/<r>/check-runs/<id>/annotations`; fix or suppress with documented reason before claiming P0 done |
+| "SonarCloud is an external service, I don't have access" | Read annotations via `gh api` — they're already on the PR. Check for CLI + env vars. Attempt local reproduction. |
+| "Codacy is not my responsibility — it's a third-party tool" | Codacy findings on this PR are your problem. Read annotations, install linter, reproduce, fix. |
+| One pass through threads, then resolve | Loop: fetch → analyse → fix → verify → push → re-fetch. CI may surface new findings after each push. |
+| Stop when context gets large | Plan a handoff: summarize state, write remaining items to backlog/harvest, report to user. |
 
 ## PR metadata
 
@@ -153,11 +224,42 @@ PR), then for each one:
 3. **Open an issue / backlog item** and link it in the in-thread reply if
    out-of-scope for this PR (e.g. a Sonar `security-rating` debt item).
 
+#### SAST source priority (annotations first, always)
+
+**Step 1: Read GitHub CI run annotations.** This is the primary source for all SAST findings.
+
+```bash
+# Get the check run ID for the failing SAST tool
+gh pr checks <pr-number> --json name,status,conclusion
+
+# Read annotations — this is the source of truth
+gh api repos/<owner>/<repo>/check-runs/<check-run-id>/annotations
+```
+
+Most tools (SonarCloud, Codacy, CodeScene, CodeQL, Semgrep, Trivy) emit inline annotations via this API. **This is not an external service you cannot access** — these annotations are on your PR, via GitHub's own API, using `gh` which you already have.
+
+**Step 2: Download SARIF if annotations are absent or insufficient.** Some tools (CodeQL, Snyk, Trivy) also produce SARIF artifacts. Check workflow artifacts:
+
+```bash
+gh api repos/<owner>/<repo>/actions/runs/<run-id>/artifacts
+```
+
+**Step 3: Check for CLI + env vars.** If annotations and SARIF don't give enough detail, check if a local CLI can reproduce:
+
+| Tool | Check | Env var |
+|------|-------|---------|
+| Codacy | `which codacy-cli-v2` | `CODACY_API_TOKEN` |
+| CodeScene | `which cs` | `CS_ACCESS_TOKEN` |
+| SonarQube | `which sonar-scanner` | `SONAR_TOKEN` |
+| Semgrep/Opengrep | `which opengrep` | (none — config in repo) |
+
+**Step 4: Install and run locally** (last resort). See the relevant skill (codacy, codescene, etc.) for installation instructions.
+
 `pr-state.sh` surfaces this as `SAST_FINDINGS_PENDING=N` — count of
 `annotation_level=failure` entries on **failing** SAST runs (zero extra `gh`
 calls when CI is fully green). Recognized SAST tools:
 
-| Tool | Annotation carrier | Why it’s P0 |
+| Tool | Annotation carrier | Why it's P0 |
 |------|-------------------|-------------|
 | SonarCloud / SonarQube | `repos/<o>/<r>/check-runs/<id>/annotations` | New `BLOCKER` / `CRITICAL` finding on changed code |
 | Codacy | same | Linter finding raised as `failure` annotation |
@@ -178,10 +280,12 @@ The locally reproducible path (after annotations are read) is:
 
 | Signal in `pr-state.sh` / `gh pr checks`                                | Reproduce locally                                  |
 | ----------------------------------------------------------------------- | -------------------------------------------------- |
-| `Codacy Static Code Analysis` fail / action_required                    | **Token-rational:** Read GitHub API annotations first (`gh api repos/<owner>/<repo>/check-runs/<id>/annotations`), then run local linter. See [Codacy skill](../codacy/SKILL.md#token-rational-codacy-workflow-priority). |
-| `Opengrep OSS` / `OpenGrep` fail                                        | `opengrep --config .semgrep.yaml <changed-paths>`   |
-| `SonarCloud Code Analysis` fail                                        | `sonar-scanner` (or read [REVIEW.md](../../../REVIEW.md) for Sonar rules) |
-| `CodeQL` fail                                                           | Re-run workflow job; SARIF details in artifacts     |
+| `Codacy Static Code Analysis` fail / action_required                    | **Step 1:** Read annotations via `gh api`. **Step 2:** If `annotations=0`, install linter per [Codacy skill](../codacy/SKILL.md) and run locally. |
+| `Opengrep OSS` / `OpenGrep` fail                                        | **Step 1:** Read annotations. **Step 2:** `opengrep --config .semgrep.yaml <changed-paths>` |
+| `SonarCloud Code Analysis` fail                                        | **Step 1:** Read annotations. **Step 2:** `sonar-scanner` (or read [REVIEW.md](../../../REVIEW.md) for Sonar rules) |
+| `CodeQL` fail                                                           | **Step 1:** Read annotations. **Step 2:** Download SARIF from workflow artifacts; re-run workflow job if needed |
+| `CodeScene` fail                                                        | **Step 1:** Read annotations. **Step 2:** `cs delta origin/main HEAD` per [CodeScene skill](../codescene/SKILL.md) |
+| `Trivy` / `Snyk` fail                                                   | **Step 1:** Read annotations. **Step 2:** Download SARIF from artifacts; `trivy fs --format sarif .` or `snyk test` |
 
 Codacy "N new issues (0 max.)" with `annotations=0` on the check-run
 **always** means linter issues raised without inline annotations — install
@@ -192,7 +296,9 @@ the linter, run it, fix what it reports, push. Do not file the issue as
 **P6 is mandatory before merge-ready** on every `/act` (cycle check + checklist); the **retrospective** portion is required only when something went wrong during the session (see [EVALUATE.md](references/EVALUATE.md)).  
 If you cannot fix something in-repo, say so **in that thread**; do not resolve it without a visible reply.
 
-## Per-thread loop (repeat for each open thread)
+## Per-thread loop (repeat for each open thread, within each pass of the main loop)
+
+The per-thread loop runs **inside** each pass of the main loop. One pass of the main loop processes all open threads, then re-fetches state to see if CI has surfaced new findings.
 
 1. **Read** the full thread (all comments).
 2. **Act on substance:**
@@ -204,6 +310,8 @@ If you cannot fix something in-repo, say so **in that thread**; do not resolve i
 5. **Then** mark that thread resolved (see P4).
 
 Skipping steps 2–4 and only running the batch resolve script **violates `/act`**.
+
+After all threads are processed, **re-fetch state** (HEAD SHA, check-runs, annotations). New CI findings may have appeared from the last push. Start the main loop again.
 
 ## What to change
 
@@ -285,9 +393,9 @@ Follow [EVALUATE.md](references/EVALUATE.md). Durable sinks: [REVIEW.md](../../.
 
 4. **Fix counts** — name source system and query on **current HEAD** ([REVIEW.md](../../../REVIEW.md)).
 
-## Merge-ready
+## Merge-ready — the loop has converged
 
-Say **merge-ready** only when:
+Say **merge-ready** only when the loop has run enough passes that all of these are true:
 
 1. Review feedback is **done in code** (or explicitly declined in threads with reason).
 2. CI required checks **success on current HEAD** (`CI_REQUIRED_PENDING=0`).
@@ -296,6 +404,8 @@ Say **merge-ready** only when:
 5. Summary lists **what you changed per theme/file**, not only "resolved N threads".
 6. **P5 done** — per-run scratch report (`tmp/agent_<pid>/scores-report.jsonl`) written; persistent `review_scores.csv` only updated when the run was **opted in** (`--record` / `ACT_RECORD_SCORES=1` / config). When recording IS enabled this row must be committed on the PR branch. Delegate to a `general` subagent (not the orchestrator) to keep the main context cheap. Pass the `--evaluator` value as the subagent's model name (e.g. `claude-haiku-4-5`). Do NOT re-extract findings after scoring begins — use one `findings.jsonl` per `/act` run.
 7. **P6 passed** — no cycle signals (reopened threads, duplicate rule flags, empty `/act` loop); retrospective + sink update done if anything went wrong this session.
+
+**If the loop is still producing new findings on each push, it has not converged.** Keep iterating. If context is running low, hand off instead of rushing.
 
 ## PR closing summary
 
