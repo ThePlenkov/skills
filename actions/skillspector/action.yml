@@ -95,7 +95,17 @@ runs:
   using: composite
   steps:
 
+    # fetch-depth: 0 is REQUIRED for `nx affected` on PR events.
+    # `nrwl/nx-set-shas@v5` computes NX_BASE via
+    # `git merge-base origin/${base} HEAD`, which needs a connected
+    # history. The default `fetch-depth: 1` only has the synthetic PR
+    # merge ref (pull/N/merge); the PR head and main's recent commits
+    # are not in the object DB, so the merge-base call returns empty
+    # and the action falls back to `nx run-many` (scans every skill
+    # instead of just the affected one — observed on PR #18).
     - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
 
     - name: Set up Node (LTS)
       uses: actions/setup-node@v6
