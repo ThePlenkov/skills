@@ -60,10 +60,10 @@ The handoff doc must include, in this order:
 1. **TL;DR table** — a row per merged PR so far with: PR #, title, commit SHA, date.
 2. **Next task** — the single line the next agent needs to read first.
 3. **State** — what is on `main` (the recent git log), the repo shape (the directory tree at the granularity the next agent needs), the test count.
-4. **CI state** — which 5 main gates are green, which external services are SUCCESS/FAILURE (CodeScene, Codacy, etc. are often opaque from the sandbox).
+4. **CI state** — which main gates are green, which external services are SUCCESS/FAILURE (e.g., CodeScene, Codacy, etc. are often opaque from the sandbox).
 5. **What landed in the just-merged PR** — files added, what the implementation does, what edge cases the tests cover.
 6. **New patterns** — anything the just-merged PR revealed that is reusable: file-size budgets, sub-entrypoint patterns, etc. Each new pattern becomes a new rule in `lessons-learned.md`.
-7. **The 7+1+1 = 9 (or more) rules from `lessons-learned.md`** — recap with the cross-cutting rules, each with the specific concrete hit and falsification trace.
+7. **The rules from `lessons-learned.md`** — recap with the cross-cutting rules, each with the specific concrete hit and falsification trace.
 8. **Operational contract** — the exact subagent loop (PATCHER → VERIFIER → REVIEWER → iterate → commit → /act → merge).
 9. **Plan for the next subagent** — name, contract doc reference, what to read, the exact verification commands, file scope (allowed + forbidden), settlement rules that apply, hints for what the next subagent is likely to get wrong.
 10. **File history** — list the prior handoff docs in `docs/handoff/`. This is the agent's reading order.
@@ -104,7 +104,7 @@ Verify RED:
 ```bash
 cd packages/<name>  # or wherever the contract says
 npx vitest run src/<path>/<file>.test.ts
-# Expect: "Test Files 1 failed (1) / Tests no tests" — the expected TDD state
+# Expect: Test suite failure or test assertion failures — the expected TDD RED state
 ```
 
 ### Step 6. Commit + push + open draft PR
@@ -136,12 +136,12 @@ The prompt must include:
 - Explicit `git fetch && git checkout` instructions
 - The list of docs to read (with full paths)
 - The contract (public surface + 5+ test names)
-- The 5–9 rules from lessons-learned (or "see docs/lessons-learned.md")
+- The rules from lessons-learned (or "see docs/lessons-learned.md")
 - The exact loop to run
-- The exact verification commands (tsc, vitest, build, vsce)
+- The exact verification commands (e.g., tsc, vitest, build, vsce)
 - The merge instructions
 - The constraints (no new deps, no setTimeout, no rewriting built-ins)
-- The CI caveats (CodeScene + Codacy are opaque)
+- The CI caveats (e.g., CodeScene + Codacy are opaque)
 - The handoff instructions for the next-next agent
 
 The prompt should be ~80-120 lines. Long enough to be complete; short enough to copy-paste.
