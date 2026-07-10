@@ -18,6 +18,7 @@ Skills live directly under `.agents/skills/<skill-name>/`.
 || `critical-thinking` | Sycophancy resistance, evidence-driven evaluation, structured disagreement. |
 || `deepwiki` | Analyze public GitHub repos via DeepWiki AI docs. Spawns background subagent — never blocks. |
 || `dotagents` | Framework lifecycle: `/dotagents init`, `install`, `list`. Includes skill philosophy and subagent hierarchy. |
+|| `docker-agent` | Design, configure, and run multi-agent AI teams using Docker Agent's YAML/HCL config format (`docker agent` CLI plugin). Covers agents, models, toolsets (filesystem, shell, MCP, LSP, fetch, openapi, memory, think, todo, api, a2a), sub-agent delegation, OCI distribution, and the full CLI surface. |
 || `e2e` | Domain-agnostic AI-native scenario runner (e2e-agent CLI). Scenarios are markdown prompts; evidence written by the CLI. Use `/e2e` for live scenario tests. |
 || `git-commit` | Structured git commit workflow with message conventions. |
 || `github` | GitHub workflows with MCP or `gh` CLI fallback. |
