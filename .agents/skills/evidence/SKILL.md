@@ -297,6 +297,23 @@ The user (or a downstream verifier) can `cat` the file and check.
 
 ---
 
+## Security note — `validate.py` path-traversal guard
+
+`scripts/validate.py` reads `artifacts[].path` from disk when cross-checking
+`assertions[].evidence_quote`. A malicious `claim.json` could otherwise point
+`path` at `/etc/passwd`, `~/.ssh/id_rsa`, etc. and have the file contents
+surface in this script's stdout (which is shared in CI logs / PR comments).
+
+The script enforces: a path is **only** read if it resolves to a descendant
+of the claim directory or the current working directory. Absolute paths to
+system files, other users' homes, or anywhere outside the project tree are
+rejected with a clear `path-traversal guard` error and the claim is marked
+invalid. To point at a file outside `claim_dir` / `cwd`, use a relative
+path that resolves into the project tree.
+
+The guard is tested by the included malicious-claim fixture: a claim whose
+sole artifact is `{"path": "/etc/passwd"}` is rejected before any read.
+
 ## How to use this skill (the loop)
 
 1. **Plan** the claims you intend to make at the end of this turn.

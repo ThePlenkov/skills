@@ -24,6 +24,36 @@ from pathlib import Path
 from typing import Iterable
 
 
+# Filesystem roots that a claim.json is allowed to reference. The intent is
+# to block path-traversal exfiltration: a malicious claim could otherwise
+# point artifacts[].path at /etc/passwd, ~/.ssh/id_rsa, etc. and have the
+# file contents surface in this script's stdout (which is shared in CI
+# logs / PR comments).
+#
+# A path is considered safe if, after resolution, it lies within
+#   (a) the claim directory itself, OR
+#   (b) the current working directory itself.
+#
+# We deliberately do NOT walk up to the filesystem root — that would
+# re-allow /etc/passwd via "everything is inside /". The agent can still
+# reference the project tree by using a relative path from the claim dir.
+def is_safe_path(resolved: Path, claim_dir: Path, cwd: Path) -> bool:
+    """True iff `resolved` is a descendant of claim_dir or cwd (after
+    resolution, which follows symlinks and `..` segments). `resolved` is
+    expected to be the result of `Path(...).resolve(strict=False)`."""
+    try:
+        resolved.relative_to(claim_dir.resolve())
+        return True
+    except ValueError:
+        pass
+    try:
+        resolved.relative_to(cwd.resolve())
+        return True
+    except ValueError:
+        pass
+    return False
+
+
 def load_text(path: Path) -> str:
     """Read a text file. Returns '' if it does not exist or is unreadable."""
     try:
@@ -52,13 +82,31 @@ def check_claim(claim_path: Path, claim_dir: Path) -> list[str]:
             if blob:
                 command_blobs.append((f"commands[{i}].{field}", blob))
 
-    # Pre-load all artifact files (read from disk relative to claim_dir)
+    # Pre-load all artifact files (read from disk relative to claim_dir).
+    # Path-traversal check: reject any artifacts[].path that resolves
+    # outside the project tree (claim_dir or cwd or their ancestors).
     artifact_blobs: list[tuple[str, str]] = []
+    cwd = Path.cwd()
     for a in artifacts:
         path = a.get("path") or ""
         if not path:
             continue
-        abs_path = (claim_dir / path).resolve() if not os.path.isabs(path) else Path(path)
+        # Resolve the path the same way the OS would: relative paths
+        # resolve against the claim directory; absolute paths stay as-is.
+        # `.resolve(strict=False)` follows symlinks and `..` segments.
+        try:
+            abs_path = ((claim_dir / path).resolve(strict=False) if not os.path.isabs(path)
+                        else Path(path).resolve(strict=False))
+        except (OSError, RuntimeError) as e:
+            errors.append(f"  artifact path={path!r}: cannot resolve ({e})")
+            continue
+        if not is_safe_path(abs_path, claim_dir, cwd):
+            errors.append(
+                f"  artifact path={path!r} resolves to {abs_path!s} which is "
+                f"outside the project tree (claim_dir={claim_dir!s}, cwd={cwd!s}); "
+                f"refusing to read it (path-traversal guard)"
+            )
+            continue
         text = load_text(abs_path)
         if text:
             artifact_blobs.append((f"artifact:{path}", text))
@@ -117,7 +165,24 @@ def check_claim(claim_path: Path, claim_dir: Path) -> list[str]:
                     f"  db-migration: log artifact {a.get('path')!r} has "
                     f"content_excerpt of {len(ce)} chars (expected ≥ 80)"
                 )
-            on_disk = load_text((claim_dir / a.get("path", "")).resolve()) if a.get("path") else ""
+            # Same path-traversal guard as above.
+            log_path = a.get("path", "")
+            if log_path:
+                try:
+                    log_abs = ((claim_dir / log_path).resolve(strict=False) if not os.path.isabs(log_path)
+                               else Path(log_path).resolve(strict=False))
+                    if not is_safe_path(log_abs, claim_dir, cwd):
+                        errors.append(
+                            f"  db-migration: log artifact path={log_path!r} resolves to "
+                            f"{log_abs!s} which is outside the project tree; refusing to read"
+                        )
+                        continue
+                    on_disk = load_text(log_abs)
+                except (OSError, RuntimeError) as e:
+                    errors.append(f"  db-migration: log artifact path={log_path!r}: cannot resolve ({e})")
+                    continue
+            else:
+                on_disk = ""
             if not on_disk.strip():
                 errors.append(
                     f"  db-migration: log artifact {a.get('path')!r} is empty or unreadable"

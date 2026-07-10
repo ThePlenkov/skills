@@ -60,9 +60,10 @@
   ],
   "artifacts": [
     {
-      "kind": "report",
-      "path": "/workspace/abapdoc-1/packages/parser/test/visibility.test.ts",
-      "sha256": null
+      "kind": "log",
+      "path": "vitest-output.log",
+      "sha256": null,
+      "content_excerpt": "\n ✓ packages/parser/test/visibility.test.ts > PRIVATE SECTION marks class visibility as private  (PASSED, 14 ms)\n ✓ packages/parser/test/visibility.test.ts > PUBLIC SECTION keeps visibility public         (PASSED,  9 ms)\n ✓ packages/parser/test/visibility.test.ts > No SECTION keeps default visibility public     (PASSED,  7 ms)\n\n Test Files  1 passed (1)\n      Tests  3 passed (3)\n   Duration  4.31 s\n"
     }
   ],
   "remaining_gaps": [
