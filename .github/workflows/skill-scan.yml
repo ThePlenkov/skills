@@ -91,14 +91,7 @@ jobs:
       # zero projects on a no-change PR); in that case upload-sarif
       # exits non-zero with "no SARIF files were found".
       - name: Upload SARIF to code-scanning
-        # Skipped on ThePlenkov/skills: this is a private repo and code
-        # scanning is not enabled in its settings, so the upload-sarif
-        # action fails with "Code scanning is not enabled for this
-        # repository" on every push. The workflow file stays a valid
-        # template for other repos (where code-scanning IS on); just
-        # the upload step is skipped here. Re-enable by removing the
-        # `if` line, or by enabling code-scanning in repo settings.
-        if: ${{ always() && github.repository != 'ThePlenkov/skills' }}
+        if: always()
         continue-on-error: true
         uses: github/codeql-action/upload-sarif@v4
         with:
