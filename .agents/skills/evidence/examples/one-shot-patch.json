@@ -35,17 +35,17 @@
     {
       "name": "private-section-marks-class-as-private",
       "passed": true,
-      "evidence_quote": "✓ packages/parser/test/visibility.test.ts > PRIVATE SECTION marks class visibility as private  (PASSED, 14 ms)"
+      "evidence_quote": " ✓ packages/parser/test/visibility.test.ts > PRIVATE SECTION marks class visibility as private  (PASSED, 14 ms)"
     },
     {
       "name": "no-section-defaults-to-public",
       "passed": true,
-      "evidence_quote": "✓ packages/parser/test/visibility.test.ts > No SECTION keeps default visibility public     (PASSED,  7 ms)"
+      "evidence_quote": " ✓ packages/parser/test/visibility.test.ts > No SECTION keeps default visibility public     (PASSED,  7 ms)"
     },
     {
       "name": "typecheck-and-lint-clean",
       "passed": true,
-      "evidence_quote": "typecheck: 0 errors\nlint:      0 warnings, 0 errors"
+      "evidence_quote": " typecheck: 0 errors\n lint:      0 warnings, 0 errors"
     }
   ],
   "files_changed": [

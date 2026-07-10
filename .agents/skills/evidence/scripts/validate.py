@@ -75,8 +75,12 @@ def check_claim(claim_path: Path, claim_dir: Path) -> list[str]:
             errors.append(f"  assertion[{i}] {name!r}: empty evidence_quote")
             continue
 
-        # Quote must appear verbatim in at least one source
-        # Use a 1-line excerpt for short quotes, full text for long ones.
+        # Quote must appear verbatim in at least one source. Each non-empty
+        # line of the quote must be a whole line in the source blob (we split
+        # the source on newlines and require a complete-line match, not just a
+        # substring match). This catches whitespace drift like
+        # 'typecheck: 0 errors' vs ' typecheck: 0 errors' that a pure
+        # substring check would miss.
         quote_lines = [ln for ln in quote.splitlines() if ln.strip()]
         if not quote_lines:
             errors.append(f"  assertion[{i}] {name!r}: evidence_quote has no non-empty line")
@@ -84,7 +88,8 @@ def check_claim(claim_path: Path, claim_dir: Path) -> list[str]:
 
         found_in: list[str] = []
         for src, blob in command_blobs + artifact_blobs:
-            if any(ln in blob for ln in quote_lines):
+            src_lines = blob.splitlines()
+            if all(ql in src_lines for ql in quote_lines):
                 found_in.append(src)
                 # Don't break — collect all sources for transparency.
 

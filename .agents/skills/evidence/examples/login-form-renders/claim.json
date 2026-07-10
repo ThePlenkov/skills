@@ -27,22 +27,22 @@
     {
       "name": "page-renders-without-console-errors",
       "passed": true,
-      "evidence_quote": "✓  1 [chromium] › spec.ts: should render login form, submit, and show success toast (8.4s)"
+      "evidence_quote": "  ✓  1 [chromium] › spec.ts: should render login form, submit, and show success toast (8.4s)"
     },
     {
       "name": "console-array-is-empty",
       "passed": true,
-      "evidence_quote": "✓  1 [chromium] › spec.ts: should render login form, submit, and show success toast (8.4s)"
+      "evidence_quote": "  ✓  1 [chromium] › spec.ts: should render login form, submit, and show success toast (8.4s)"
     },
     {
       "name": "post-200-triggers-success-toast",
       "passed": true,
-      "evidence_quote": "✓  1 [chromium] › spec.ts: should render login form, submit, and show success toast (8.4s)"
+      "evidence_quote": "  ✓  1 [chromium] › spec.ts: should render login form, submit, and show success toast (8.4s)"
     },
     {
       "name": "websocket-stays-open-during-login",
       "passed": true,
-      "evidence_quote": "✓  1 [chromium] › spec.ts: should render login form, submit, and show success toast (8.4s)"
+      "evidence_quote": "  ✓  1 [chromium] › spec.ts: should render login form, submit, and show success toast (8.4s)"
     }
   ],
   "files_changed": [

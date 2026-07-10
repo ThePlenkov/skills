@@ -63,6 +63,7 @@ npx --yes playwright@1.49.0 install chromium
 mkdir -p .evidence/<date>/<task>/<slug>
 cat > .evidence/<date>/<task>/<slug>/spec.ts <<'EOF'
 import { test, expect } from '@playwright/test';
+import { writeFileSync } from 'node:fs';
 test('claim: <paste the claim here>', async ({ page }) => {
   const errors: string[] = [];
   page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
@@ -75,6 +76,10 @@ test('claim: <paste the claim here>', async ({ page }) => {
   await expect(page.getByRole('button', { name: /submit/i })).toBeVisible();
 
   await page.screenshot({ path: '.evidence/<date>/<task>/<slug>/screenshot.png', fullPage: true });
+
+  // Persist the captured console to disk so the evidence skill can verify it.
+  // An empty file IS the proof of zero errors.
+  writeFileSync('.evidence/<date>/<task>/<slug>/console.log', errors.join('\n'));
 
   expect(errors, 'no console / page errors').toEqual([]);
 });
