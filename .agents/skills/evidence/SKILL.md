@@ -56,10 +56,11 @@ minimum run that produces real evidence.** Anything less is `produced`, not `pro
 
 ```bash
 # Install once (agent's job to do this if missing)
-npm i -D @playwright/test
-npx playwright install chromium
+npm i -D @playwright/test@1.49.0
+npx --yes playwright@1.49.0 install chromium
 
 # Write a focused spec
+mkdir -p .evidence/<date>/<task>/<slug>
 cat > .evidence/<date>/<task>/<slug>/spec.ts <<'EOF'
 import { test, expect } from '@playwright/test';
 test('claim: <paste the claim here>', async ({ page }) => {
@@ -80,7 +81,7 @@ test('claim: <paste the claim here>', async ({ page }) => {
 EOF
 
 # Run it
-npx playwright test .evidence/<date>/<task>/<slug>/spec.ts --reporter=line
+npx --yes playwright@1.49.0 test .evidence/<date>/<task>/<slug>/spec.ts --reporter=line
 ```
 
 **Forbidden as evidence for browser claims:**
@@ -128,11 +129,16 @@ The evidence file MUST list:
 ### CLI / script
 
 ```bash
-# Run the actual binary, capture both streams, check exit code
-./dist/cli.js do-thing --input fixtures/x.json > out.stdout 2> out.stderr
+# Run the actual binary, capture both streams into the evidence dir, check exit code.
+# mkdir -p is mandatory — the evidence dir is the canonical home for these artifacts.
+mkdir -p .evidence/<date>/<task>/<slug>
+./dist/cli.js do-thing --input fixtures/x.json \
+  > .evidence/<date>/<task>/<slug>/out.stdout \
+  2> .evidence/<date>/<task>/<slug>/out.stderr
 EC=$?
 test "$EC" -eq 0 || { echo "FAIL exit=$EC"; exit 1; }
-grep -q "expected marker" out.stdout || { echo "FAIL: marker missing"; exit 1; }
+grep -q "expected marker" .evidence/<date>/<task>/<slug>/out.stdout \
+  || { echo "FAIL: marker missing"; exit 1; }
 ```
 
 The evidence file MUST list: command, cwd, `exit_code`, both stdout AND stderr excerpt.
@@ -143,7 +149,7 @@ The evidence file MUST list: command, cwd, `exit_code`, both stdout AND stderr e
 
 ```bash
 # If no test exists, write one. The fix is not done if the test did not exist before the fix.
-npx vitest run packages/foo/test/bar.test.ts --reporter=verbose
+npx --yes vitest@2.1.5 run packages/foo/test/bar.test.ts --reporter=verbose
 ```
 
 **Forbidden as evidence for library claims:**
@@ -181,14 +187,20 @@ you claim to have changed.
 ### Database migration
 
 ```bash
-# Run migration against a throwaway DB
-psql $TEST_DATABASE_URL -f migrations/0007_add_foo.sql
-# Assert the column exists, the data shape matches, the down-migration works
-psql $TEST_DATABASE_URL -c "\d widgets" | grep -q "foo_bar"
+# Run migration against a throwaway DB and capture log into the evidence dir.
+# The schema requires this log to have a content_excerpt with a real schema dump
+# (e.g. the `Column | --- | Table` markers psql emits from `\d widgets`).
+mkdir -p .evidence/<date>/<task>/<slug>
+psql $TEST_DATABASE_URL -f migrations/0007_add_foo.sql \
+  > .evidence/<date>/<task>/<slug>/migration.log 2>&1
+# Assert the column exists, the data shape matches
+psql $TEST_DATABASE_URL -c "\d widgets" | tee -a .evidence/<date>/<task>/<slug>/migration.log | grep -q "foo_bar"
 psql $TEST_DATABASE_URL -c "SELECT 1 FROM widgets LIMIT 1;"  # queryable
 # Down
-psql $TEST_DATABASE_URL -f migrations/0007_add_foo.down.sql
-psql $TEST_DATABASE_URL -c "\d widgets" | grep -vq "foo_bar" || { echo "FAIL: down did not remove"; exit 1; }
+psql $TEST_DATABASE_URL -f migrations/0007_add_foo.down.sql \
+  >> .evidence/<date>/<task>/<slug>/migration.log 2>&1
+psql $TEST_DATABASE_URL -c "\d widgets" | tee -a .evidence/<date>/<task>/<slug>/migration.log | grep -vq "foo_bar" \
+  || { echo "FAIL: down did not remove"; exit 1; }
 ```
 
 ---
@@ -285,13 +297,19 @@ The user (or a downstream verifier) can `cat` the file and check.
 1. **Plan** the claims you intend to make at the end of this turn.
 2. **Pick the per-env recipe** from this file that matches `target_environment`.
 3. **Run the recipe** — do not paraphrase, do not skip steps. Capture full stdout/stderr OR
-   copy to `.evidence/.../out.stdout` etc.
+   copy to `.evidence/.../out.stdout` etc. Use pinned versions for any `npx` invocation
+   (e.g. `npx --yes vitest@2.1.5`) — unpinned `npx` is a known rug-pull vector.
 4. **Write the evidence dir** — `mkdir -p .evidence/<date>/<task>/<slug>` then `claim.json`
    plus any per-env artifacts.
-5. **Self-recheck** — re-read the file. For each assertion, locate the `evidence_quote` inside
+5. **Validate structurally** — `python3 .agents/skills/evidence/scripts/validate.py .evidence/.../claim.json`
+   exits non-zero on (a) JSON-schema violations, (b) any `assertions[].evidence_quote` that
+   does not appear verbatim in `commands[*].stdout_excerpt` / `stderr_excerpt` / a referenced
+   artifact file, (c) any `db-migration` log artifact that is empty or has a stub
+   `content_excerpt`. The script is the only thing that can promote `produced` to `checked`.
+6. **Self-recheck** — re-read the file. For each assertion, locate the `evidence_quote` inside
    the captured output. Set `self_recheck.result`.
-6. **Report** — only now state the claim, with the four-line proof block.
-7. **Carry over** between turns with `@see <previous-claim-slug>` references; do not re-evidence
+7. **Report** — only now state the claim, with the four-line proof block.
+8. **Carry over** between turns with `@see <previous-claim-slug>` references; do not re-evidence
    the same fact twice.
 
 ---

@@ -15,7 +15,7 @@
   ],
   "commands": [
     {
-      "cmd": "npx vitest run packages/parser/test/visibility.test.ts --reporter=verbose",
+      "cmd": "npx --yes vitest@2.1.5 run packages/parser/test/visibility.test.ts --reporter=verbose",
       "cwd": "/workspace/abapdoc-1",
       "exit_code": 0,
       "duration_ms": 4312,

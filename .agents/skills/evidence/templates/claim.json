@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.invalid/evidence.v1.schema.json",
   "title": "evidence.claim.v1",
-  "description": "One physical evidence directory per claim. NO claim is reported without this file. Empty commands or empty assertions is structurally invalid — JSON Schema validation will fail.",
+  "description": "One physical evidence directory per claim. NO claim is reported without this file. Empty commands or empty assertions is structurally invalid; scripts/validate.py cross-checks that every assertions[].evidence_quote appears verbatim in commands[].stdout_excerpt or in a referenced artifact file. (See inline comments on lines 5 and 209 below for context on the SkillSpector false positives this schema has triggered.)",
   "type": "object",
   "required": [
     "version",
@@ -92,7 +92,7 @@
     "assertions": {
       "type": "array",
       "minItems": 1,
-      "description": "Each assertion name MUST map to a literal line in commands[].stdout_excerpt or in a sibling artifact. Names without a matching quote fail validation downstream.",
+      "description": "Each assertion name MUST map to a literal line in commands[].stdout_excerpt or in a sibling artifact. The runtime cross-check (scripts/validate.py) verifies the evidence_quote appears verbatim in at least one such source; an empty or fabricated quote is rejected.",
       "items": {
         "type": "object",
         "required": ["name", "passed", "evidence_quote"],
@@ -103,7 +103,7 @@
           "evidence_quote": {
             "type": "string",
             "minLength": 1,
-            "description": "Exact line from output that made you mark it passed/failed."
+            "description": "Exact line from output that made you mark it passed/failed. Cross-checked at runtime against commands[*].stdout_excerpt / stderr_excerpt and referenced artifact files."
           }
         }
       }
@@ -126,7 +126,25 @@
     },
     "artifacts": {
       "type": "array",
-      "description": "For browser: MUST include ≥ 1 screenshot or trace. For db-migration: MUST include ≥ 1 log with post-migration schema."
+      "minItems": 1,
+      "description": "For browser: MUST include ≥ 1 screenshot/trace AND ≥ 1 log. For db-migration: MUST include ≥ 1 log with non-empty content_excerpt. Per-environment constraints live under allOf.",
+      "items": {
+        "type": "object",
+        "required": ["kind", "path"],
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": ["screenshot", "trace", "e2e-evidence", "log", "report", "bundle", "network"]
+          },
+          "path": { "type": "string", "minLength": 1 },
+          "sha256": { "type": ["string", "null"] },
+          "content_excerpt": {
+            "type": ["string", "null"],
+            "description": "For kind=log artifacts, the runtime-relevant excerpt that proves the claim (e.g. the post-migration \\d dump). When present, the runtime cross-check uses this AND the on-disk file."
+          }
+        }
+      }
     },
     "remaining_gaps": {
       "type": "array",
@@ -152,7 +170,7 @@
   },
   "allOf": [
     {
-      "description": "Browser claims MUST include a screenshot or trace artifact (curl alone is NOT evidence for browser behaviour).",
+      "description": "Browser claims MUST include (1) a screenshot/trace/e2e-evidence artifact AND (2) a log artifact for the captured console. The log artifact is required even if it is empty — its presence means the agent captured it; the runtime cross-check verifies it is empty (zero console errors).",
       "if": {
         "properties": { "target_environment": { "const": "browser" } },
         "required": ["target_environment"]
@@ -160,20 +178,41 @@
       "then": {
         "properties": {
           "artifacts": {
-            "minItems": 1,
+            "minItems": 2,
             "contains": {
               "type": "object",
               "required": ["kind"],
               "properties": {
                 "kind": { "enum": ["screenshot", "trace", "e2e-evidence"] }
               }
-            }
+            },
+            "allOf": [
+              {
+                "description": "Browser claims require a log artifact (console capture).",
+                "contains": {
+                  "type": "object",
+                  "required": ["kind"],
+                  "properties": { "kind": { "const": "log" } }
+                }
+              },
+              {
+                "description": "Browser claims with WebSocket / SSE / long-poll should also reference a network artifact. The schema does not require it (cannot infer protocol from target_environment alone); the runtime cross-check warns if a browser claim has no `network` kind AND uses verification_method=browser-automation.",
+                "if": { "properties": { "verification_method": { "const": "browser-automation" } } },
+                "then": {
+                  "contains": {
+                    "type": "object",
+                    "required": ["kind"],
+                    "properties": { "kind": { "const": "network" } }
+                  }
+                }
+              }
+            ]
           }
         }
       }
     },
     {
-      "description": "DB-migration claims MUST include a log artifact with the post-migration schema.",
+      "description": "DB-migration claims MUST include a log artifact with a content_excerpt that contains a post-migration schema dump marker (Column | Table | ---). The runtime cross-check (scripts/validate.py) opens the log file and verifies the excerpt is not just a stub.",
       "if": {
         "properties": { "target_environment": { "const": "db-migration" } },
         "required": ["target_environment"]
@@ -184,15 +223,22 @@
             "minItems": 1,
             "contains": {
               "type": "object",
-              "required": ["kind"],
-              "properties": { "kind": { "const": "log" } }
+              "required": ["kind", "path", "content_excerpt"],
+              "properties": {
+                "kind": { "const": "log" },
+                "content_excerpt": {
+                  "type": "string",
+                  "minLength": 80,
+                  "pattern": "(Column|Table|---|\\bd\\s+\\w+|CREATE|ALTER|index\\s+\\w+)"
+                }
+              }
             }
           }
         }
       }
     },
     {
-      "description": "Static-analysis claims MUST have ≥ 1 assertion whose evidence_quote is a literal line containing '0 errors' or '0 warnings' from one of the tools.",
+      "description": "Static-analysis claims MUST have ≥ 1 assertion whose evidence_quote is a literal line containing a zero-error / zero-warning marker from one of the tools. (The pattern below matches '0 errors' / '0 warnings' / 'no errors' / 'no warnings' — this is the anti-fabrication check: the agent must CITE the line that proves the linter/typechecker reported nothing, not just claim 'lint clean'.)",
       "if": {
         "properties": { "target_environment": { "const": "static-analysis" } },
         "required": ["target_environment"]
