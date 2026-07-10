@@ -27,7 +27,7 @@
     "claim": {
       "type": "string",
       "minLength": 1,
-      "description": "The exact sentence you intend to send to the user. Mirror it verbatim in the report."
+      "description": "The exact sentence that will appear in the final report. Mirror it verbatim in the four-line proof block."
     },
     "slug": {
       "type": "string",
