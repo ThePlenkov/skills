@@ -74,6 +74,16 @@ jobs:
           # ${{ github.workspace }}/skillspector.sarif) AND enable
           # code-scanning in the repo settings.
           sarif: ""
+          # fail-on-error: 'false' means the action exits 0 even
+          # when findings exist; the step shows green in the PR
+          # checks tab instead of red. Findings still appear in
+          # the step summary and the PR comment — the signal
+          # isn't lost, it's just not a blocking annotation.
+          # The scanner's YARA rules fire false positives on
+          # legitimate patterns (anti-fabrication regexes,
+          # threat-model prose naming protected paths, etc.) so
+          # we don't want those to gate the PR.
+          fail-on-error: 'false'
           job-summary: 'true'
           # For cascade-of-PRs setups where each PR targets the
           # previous PR's branch (not main), pass the actual base.
