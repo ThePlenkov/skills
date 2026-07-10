@@ -211,15 +211,16 @@ runs:
         # input. The caller (workflow) is the single source of truth:
         #   affected = "true"  →  `nx affected`  (only changed skills)
         #   affected = "false" →  `nx run-many`  (every skill)
-        # Pre-2026-07 this branch forced `run-many` on `workflow_dispatch`
+        # Previously this branch forced `run-many` on `workflow_dispatch`
         # under the assumption that manual runs should always be full.
-        # That was changed when the workflow started exposing
-        # `workflow_dispatch.inputs.full-scan` — the workflow now passes
-        # `affected = "false"` for full scans and `affected = "true"` for
-        # affected scans on dispatch, so the dispatch special-case is no
-        # longer needed. If `nx affected` later fails to resolve NX_BASE
-        # the block below falls back to `run-many` automatically.
-        if [ "${{ inputs.affected }}" = "true" ]; then
+        # That was updated so the workflow can toggle between full and
+        # affected scans via `workflow_dispatch.inputs.full-scan`; the
+        # workflow now passes `affected = "false"` for full scans and
+        # `affected = "true"` for affected scans on dispatch, so the
+        # dispatch special-case is no longer needed. If `nx affected`
+        # later fails to resolve NX_BASE the block below falls back to
+        # `run-many` automatically.
+        if [[ "${{ inputs.affected }}" == "true" ]]; then
           NX_SUBCMD="affected"
         else
           NX_SUBCMD="run-many"
