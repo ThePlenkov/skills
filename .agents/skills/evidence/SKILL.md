@@ -1,7 +1,11 @@
 ---
 name: evidence
-description: Producer-side "say-nothing-without-a-run" discipline. ANY claim of done/fixed/passing/verified/green by a coder agent MUST be backed by a real executed command + `.evidence/.../claim.json` on disk. JSON-Schema rejects fake evidence (empty commands/assertions, curl-only for browser, static-analysis without "0 errors" quote). Pairs with runtime-proof; layers on /e2e.
+description: Producer-side "say-nothing-without-a-run" discipline. ANY claim of done/fixed/passing/verified/green by a coder agent MUST be backed by a real executed command + `.evidence/.../claim.json` on disk. JSON-Schema rejects fake evidence (empty commands/assertions, curl-only for browser, static-analysis without a clean-tool quote). Pairs with runtime-proof; layers on /e2e.
 allowed-tools: read, grep, glob, write, exec
+permissions:
+  bash: ask
+  edit: ask
+  write: ask
 argument-hint: "<task or claim to evidence>"
 triggers: ["user", "model"]
 ---
@@ -301,8 +305,9 @@ The user (or a downstream verifier) can `cat` the file and check.
 
 `scripts/validate.py` reads `artifacts[].path` from disk when cross-checking
 `assertions[].evidence_quote`. A malicious `claim.json` could otherwise point
-`path` at `/etc/passwd`, `~/.ssh/id_rsa`, etc. and have the file contents
-surface in this script's stdout (which is shared in CI logs / PR comments).
+`path` at a file outside the project tree (system files, credential stores,
+other users' homes) and have the file contents surface in this script's
+stdout (which is shared in CI logs / PR comments).
 
 The script enforces: a path is **only** read if it resolves to a descendant
 of the claim directory or the current working directory. Absolute paths to
@@ -312,7 +317,8 @@ invalid. To point at a file outside `claim_dir` / `cwd`, use a relative
 path that resolves into the project tree.
 
 The guard is tested by the included malicious-claim fixture: a claim whose
-sole artifact is `{"path": "/etc/passwd"}` is rejected before any read.
+sole artifact references an absolute path outside the project is rejected
+before any read.
 
 ## How to use this skill (the loop)
 
