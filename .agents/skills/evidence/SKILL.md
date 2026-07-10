@@ -1,6 +1,6 @@
 ---
 name: evidence
-description: Producer-side "say-nothing-without-a-run" discipline. ANY claim of done / fixed / passing / verified / green by a coder agent MUST be backed by a physical evidence file on disk BEFORE the claim is reported, AND the file MUST contain real executed commands with real exit codes and real output. Use when an agent risks talking about work it has not actually run; or invoke directly as /evidence. Pairs with runtime-proof (method) and the verifier agent (independent re-check); layers on top of /e2e scenarios.
+description: Producer-side "say-nothing-without-a-run" discipline. ANY claim of done/fixed/passing/verified/green by a coder agent MUST be backed by a real executed command + `.evidence/.../claim.json` on disk. JSON-Schema rejects fake evidence (empty commands/assertions, curl-only for browser, static-analysis without "0 errors" quote). Pairs with runtime-proof; layers on /e2e.
 allowed-tools: read, grep, glob, write, exec
 argument-hint: "<task or claim to evidence>"
 triggers: ["user", "model"]
@@ -84,15 +84,15 @@ npx playwright test .evidence/<date>/<task>/<slug>/spec.ts --reporter=line
 ```
 
 **Forbidden as evidence for browser claims:**
-- `curl http://localhost:3000` and seeing `<html>` in the body (HTML presence ≠ JS executed)
-- `node -e "require('./build')"` (node ≠ browser — no DOM, no WebSocket, no layout)
-- Lint passing on the new component (lint ≠ runtime behaviour)
-- "Manually checked in Chrome" (not reproducible, not in evidence file)
++ `curl http://localhost:3000` and seeing `<html>` in the body (HTML presence ≠ JS executed)
++ `node -e "require('./build')"` (node ≠ browser — no DOM, no WebSocket, no layout)
++ Lint passing on the new component (lint ≠ runtime behaviour)
++ "Manually checked in Chrome" (not reproducible, not in evidence file)
 
 The evidence file MUST list under `artifacts`:
-- `screenshot.png` (or full-page trace)
-- `console.log` (zero errors)
-- For WebSocket / SSE / long-poll: a `network.har` or explicit connection log
++ `screenshot.png` (or full-page trace)
++ `console.log` (zero errors)
++ For WebSocket / SSE / long-poll: a `network.har` or explicit connection log
 
 ### Backend / API (HTTP service, RPC, queue consumer)
 
@@ -119,11 +119,11 @@ psql $DATABASE_URL -tAc "SELECT direction FROM widgets WHERE id='w-1';" | grep -
 ```
 
 The evidence file MUST list:
-- The seed step
-- The exact request (method, URL, headers, body)
-- The status code, response excerpt
-- The side-effect assertion (DB row, queue message, log line)
-- One assertion that, if false, falsifies the claim
++ The seed step
++ The exact request (method, URL, headers, body)
++ The status code, response excerpt
++ The side-effect assertion (DB row, queue message, log line)
++ One assertion that, if false, falsifies the claim
 
 ### CLI / script
 
@@ -147,10 +147,10 @@ npx vitest run packages/foo/test/bar.test.ts --reporter=verbose
 ```
 
 **Forbidden as evidence for library claims:**
-- "I read the code and it looks right"
-- The test exists but was not run this turn (commit `.test.ts` separately, link to test run that
++ "I read the code and it looks right"
++ The test exists but was not run this turn (commit `.test.ts` separately, link to test run that
   covered it)
-- TypeScript compiles but no test was executed
++ TypeScript compiles but no test was executed
 
 ### Static analysis (typecheck, lint, format)
 
@@ -164,8 +164,8 @@ The evidence file MUST list **each** tool's output under `commands[*].stdout_exc
 "0 errors / 0 warnings" line quoted.
 
 **Forbidden as evidence for "lint clean" claims:**
-- Only quoting typecheck but claiming "lint clean"
-- Quoting a summary line without the tool name in the same output
++ Only quoting typecheck but claiming "lint clean"
++ Quoting a summary line without the tool name in the same output
 
 ### Docs / config change
 
@@ -233,19 +233,19 @@ psql $TEST_DATABASE_URL -c "\d widgets" | grep -vq "foo_bar" || { echo "FAIL: do
 
 See [`templates/claim.json`](./templates/claim.json). Mandatory keys + rules:
 
-- `claim` — exact sentence you intend to send
-- `slug` — kebab-case, matches the dir name
-- `agent`, `session_id`, `produced_at`
-- `target_environment` — `backend | cli | frontend | browser | integration | static-analysis | test-suite | db-migration | docs | other`
-- `verification_method` — `command | test-suite | browser-automation | static-analysis | manual | e2e-scenario`
-- `preconditions` — non-empty list of what was true before the claim
-- `commands` — **≥ 1 entry, each with `cmd`, `cwd`, `exit_code`, `duration_ms`, `stdout_excerpt`, `stderr_excerpt`**. Empty `commands` is structurally invalid.
-- `assertions` — **≥ 1 entry, each with `name`, `passed`, `evidence_quote`**. `evidence_quote` MUST be an exact line from one of the `commands[*].stdout_excerpt` or from a sibling artifact. A name without a quote is structurally invalid.
-- `files_changed` — absolute paths
-- `artifacts` — log / screenshot / trace / report / bundle with `path` + `sha256`. **For `target_environment=browser`, `artifacts` MUST include ≥ 1 entry with `kind` in {`screenshot`, `trace`}. For `target_environment=db-migration`, ≥ 1 entry with `kind=log` showing the post-migration schema.**
-- `remaining_gaps` — honest, non-decorative list (can be empty)
-- `self_recheck.performed` — MUST be `true`
-- `self_recheck.result` — `still-holds | drifted | invalid`
++ `claim` — exact sentence you intend to send
++ `slug` — kebab-case, matches the dir name
++ `agent`, `session_id`, `produced_at`
++ `target_environment` — `backend | cli | frontend | browser | integration | static-analysis | test-suite | db-migration | docs | other`
++ `verification_method` — `command | test-suite | browser-automation | static-analysis | manual | e2e-scenario`
++ `preconditions` — non-empty list of what was true before the claim
++ `commands` — **≥ 1 entry, each with `cmd`, `cwd`, `exit_code`, `duration_ms`, `stdout_excerpt`, `stderr_excerpt`**. Empty `commands` is structurally invalid.
++ `assertions` — **≥ 1 entry, each with `name`, `passed`, `evidence_quote`**. `evidence_quote` MUST be an exact line from one of the `commands[*].stdout_excerpt` or from a sibling artifact. A name without a quote is structurally invalid.
++ `files_changed` — absolute paths
++ `artifacts` — log / screenshot / trace / report / bundle with `path` + `sha256`. **For `target_environment=browser`, `artifacts` MUST include ≥ 1 entry with `kind` in {`screenshot`, `trace`}. For `target_environment=db-migration`, ≥ 1 entry with `kind=log` showing the post-migration schema.**
++ `remaining_gaps` — honest, non-decorative list (can be empty)
++ `self_recheck.performed` — MUST be `true`
++ `self_recheck.result` — `still-holds | drifted | invalid`
 
 ### The three-state rule
 
@@ -298,15 +298,15 @@ The user (or a downstream verifier) can `cat` the file and check.
 
 ## Integration with other skills
 
-- **/e2e** — when the verification is a scenario, `e2e-agent run …` writes
++ **/e2e** — when the verification is a scenario, `e2e-agent run …` writes
   `E2E_EVIDENCE_FILE=...`. Reference that path as `artifacts[].path` inside your evidence file.
   /evidence wraps /e2e; it does not replace it.
-- **runtime-proof** — runtime-proof chooses *how* to verify (target env, browser vs API,
++ **runtime-proof** — runtime-proof chooses *how* to verify (target env, browser vs API,
   curl-vs-not). /evidence then *records* the proof. Stack them in this order.
-- **verifier agent** — independent second pair of eyes. Producers SHOULD NOT delegate
++ **verifier agent** — independent second pair of eyes. Producers SHOULD NOT delegate
   verification to themselves and call it done; if only the producer ran the check, the claim is
   `produced`/`checked`, not `proved`-in-the-PR-sense.
-- **/act, pr-handoff, mr-address-review, github-pr-review, triage-issue** — every
++ **/act, pr-handoff, mr-address-review, github-pr-review, triage-issue** — every
   "fixed" / "resolved" / "verified" / "green" sentence in a reply must reference its evidence
   file path.
 

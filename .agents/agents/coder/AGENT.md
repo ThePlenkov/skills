@@ -120,11 +120,11 @@ For each claim, write one evidence directory:
 ```
 
 The schema enforces:
-- `commands` is non-empty, each entry has real `exit_code` + `duration_ms` + `stdout_excerpt`
-- `assertions` is non-empty, each `evidence_quote` is a literal line from the captured output
-- For `target_environment=browser`: `artifacts` MUST include a `screenshot` or `trace`
-- For `target_environment=db-migration`: `artifacts` MUST include a `log`
-- For `target_environment=static-analysis`: at least one assertion quote contains
++ `commands` is non-empty, each entry has real `exit_code` + `duration_ms` + `stdout_excerpt`
++ `assertions` is non-empty, each `evidence_quote` is a literal line from the captured output
++ For `target_environment=browser`: `artifacts` MUST include a `screenshot` or `trace`
++ For `target_environment=db-migration`: `artifacts` MUST include a `log`
++ For `target_environment=static-analysis`: at least one assertion quote contains
   `0 errors` or `0 warnings`
 
 After writing, validate the JSON against the schema:
@@ -160,21 +160,21 @@ from the captured output alone.
 
 ## 4. Forbidden
 
-- **Asking the parent which skill to use** — you discover them yourself in step 1.
-- **Claiming completion, fix, verification, passing, green, no-regression** — without a
++ **Asking the parent which skill to use** — you discover them yourself in step 1.
++ **Claiming completion, fix, verification, passing, green, no-regression** — without a
   matching `.evidence/.../claim.json` written this turn, validated against the schema, with
   `self_recheck.result: "still-holds"`.
-- **Reporting before step 7** — even a one-line "done" without a validated evidence file is
++ **Reporting before step 7** — even a one-line "done" without a validated evidence file is
   a violation.
-- **Bundling N claims into one file** — one directory per claim, always.
-- **Pretending a check happened** — `commands[*].exit_code` must be the real exit code of the
++ **Bundling N claims into one file** — one directory per claim, always.
++ **Pretending a check happened** — `commands[*].exit_code` must be the real exit code of the
   command you ran, in this session. Schema validation will catch `exit_code: 0` paired with
   a stdout_excerpt that contains "FAIL".
-- **Self-declaring the root task resolved** — that is the parent's call, not yours.
-- **Stacked fixes in one turn** — one logical change per turn; loop again for the next.
-- **Destructive commands** — without `@skills:safeguard`.
-- **Curl-as-evidence for browser claims** — the schema rejects it; do not try.
-- **"Tests pass" without the test name in stdout_excerpt** — the schema requires an
++ **Self-declaring the root task resolved** — that is the parent's call, not yours.
++ **Stacked fixes in one turn** — one logical change per turn; loop again for the next.
++ **Destructive commands** — without `@skills:safeguard`.
++ **Curl-as-evidence for browser claims** — the schema rejects it; do not try.
++ **"Tests pass" without the test name in stdout_excerpt** — the schema requires an
   evidence_quote that is a literal line from the captured output; vague quotes fail.
 
 ---
