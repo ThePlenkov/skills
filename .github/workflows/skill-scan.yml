@@ -62,7 +62,18 @@ jobs:
         uses: ./actions/skillspector
         with:
           path: ./.agents/skills/
-          sarif: ${{ github.workspace }}/skillspector.sarif
+          # sarif: "" disables SARIF output from the action. The
+          # upload-sarif step below would otherwise fail with
+          # "Code scanning is not enabled for this repository"
+          # because this is a private repo without code-scanning
+          # on. Setting sarif to empty (= boolean off per the
+          # action's input contract) makes the action skip writing
+          # the file; the upload steps become no-ops via
+          # `if: steps.scan.outputs.sarif-path != ''`.
+          # To re-enable: set this to a path (e.g. the previous
+          # ${{ github.workspace }}/skillspector.sarif) AND enable
+          # code-scanning in the repo settings.
+          sarif: ""
           job-summary: 'true'
           # For cascade-of-PRs setups where each PR targets the
           # previous PR's branch (not main), pass the actual base.
@@ -91,7 +102,11 @@ jobs:
       # zero projects on a no-change PR); in that case upload-sarif
       # exits non-zero with "no SARIF files were found".
       - name: Upload SARIF to code-scanning
-        if: always()
+        # Skip when the scan didn't produce a SARIF file (see the
+        # `sarif: ""` on the scan step). upload-sarif would otherwise
+        # fail with "no SARIF files were found" or "Code scanning is
+        # not enabled for this repository" — both are dead-code here.
+        if: ${{ always() && steps.scan.outputs.sarif-path != '' }}
         continue-on-error: true
         uses: github/codeql-action/upload-sarif@v4
         with:
@@ -99,7 +114,7 @@ jobs:
           category: skillspector
 
       - name: Upload SARIF report
-        if: always()
+        if: ${{ always() && steps.scan.outputs.sarif-path != '' }}
         uses: actions/upload-artifact@v7
         with:
           name: skillspector-sarif
