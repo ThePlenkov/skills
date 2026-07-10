@@ -130,9 +130,16 @@ The schema enforces:
 After writing, validate the JSON against the schema:
 
 ```bash
-python3 -c "import json, jsonschema; jsonschema.validate(json.load(open('.evidence/<date>/<task>/<slug>/claim.json')), json.load(open('.agents/skills/evidence/templates/claim.json')))" \
-  || { echo "EVIDENCE INVALID — fix before reporting"; exit 1; }
+python3 .agents/skills/evidence/scripts/validate.py \
+  .evidence/<date>/<task>/<slug>/claim.json \
+  || { echo "EVIDENCE INVALID (schema or evidence_quote cross-check failed) — fix before reporting"; exit 1; }
 ```
+
+The `validate.py` script enforces:
++ JSON-Schema structural checks (everything in `templates/claim.json`).
++ **Runtime cross-check** that every `assertions[].evidence_quote` appears verbatim in
+  `commands[*].stdout_excerpt` / `stderr_excerpt` or in a referenced artifact file —
+  a fabricated quote is rejected even if the schema is otherwise valid.
 
 Then `self_recheck` each file by re-reading it. Then report with the four-line proof block
 per claim. The peer (verifier agent or parent) can `cat` the file and re-derive every claim
@@ -181,7 +188,10 @@ from the captured output alone.
 
 ## 5. Required output format
 
-Every turn that makes a claim ends with **one four-line block per claim**:
+The four-line proof block format is owned by `@skills:evidence/SKILL.md`
+("Required report"). When this contract conflicts with the upstream skill,
+the upstream skill wins. If the upstream section is missing or vague, fall
+back to:
 
 ```
 claim:        <one line, identical to file.claim>
@@ -216,20 +226,9 @@ emit code, diffs, or "done" claims before both lines are present.
 
 ---
 
-## 7. Self-check before sending (copy-paste this verbatim)
+## 7. Pre-send self-check
 
-```
-Before I report "done/fixed/passing/verified":
-
-  [ ] I have one .evidence/<date>/<task>/<slug>/ per claim.
-  [ ] Each claim.json validates against templates/claim.json (jsonschema).
-  [ ] Each claim.json has ≥ 1 command with a REAL exit_code I captured this turn.
-  [ ] Each assertion has an evidence_quote that is a literal line from the captured output.
-  [ ] For browser claims: screenshot.png and console.log are inside the slug dir, console is empty.
-  [ ] For API claims: I seeded data, I hit the endpoint, I asserted response + side effect.
-  [ ] For static-analysis claims: I quoted the actual "0 errors" line from each tool.
-  [ ] I can name the killing assertion out loud.
-  [ ] My report ends with one four-line block per claim.
-
-If any box is unchecked: I am about to lie. Downgrade to "produced" or run more.
-```
+The pre-send checklist is owned by `@skills:evidence/SKILL.md`
+("Self-check before sending"). Do not duplicate it here — copy-paste drift
+is a known failure mode. Apply the upstream checklist; if any box is
+unchecked, downgrade the claim to `produced` and run more before reporting.
