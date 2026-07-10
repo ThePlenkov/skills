@@ -2,16 +2,13 @@
 name: docker-agent
 description: >-
   Design, configure, and run multi-agent AI teams using Docker Agent's
-  YAML/HCL configuration format (the `docker agent` CLI plugin). Use when
-  the user is creating a `docker agent` config, building a coding or
-  investigation team with sub-agents, or needs the canonical schema for
-  agents, models, toolsets, sessions, distribution, and CLI usage. Covers
-  the agent definition fields, built-in toolsets (filesystem, shell, MCP,
-  LSP, fetch, openapi, memory, think, todo, api, a2a), multi-agent
-  delegation patterns, OCI distribution (`docker agent share push/pull`),
-  and the full CLI surface (run, serve api/chat/mcp/a2a, eval, alias,
-  share). Do NOT use for general Docker CLI work or for non-Docker
-  agent frameworks (LangChain, CrewAI, etc.).
+  YAML/HCL config (the `docker agent` CLI plugin). Use when creating
+  a `docker agent` config, building a sub-agent team, or needing
+  the canonical schema for agents, models, toolsets, distribution,
+  and CLI. Covers built-in toolsets (filesystem, shell, MCP, LSP,
+  fetch, openapi, memory, think, todo, api, a2a), OCI distribution,
+  and the CLI surface (run, serve api/chat/mcp/a2a). Not for general
+  CLI or non-Docker agent frameworks.
 ---
 
 # Docker Agent — Configuration & Runtime
@@ -97,11 +94,11 @@ Patterns:
 
 - **Direct model name** — `model: openai/gpt-4o` or `model: anthropic/claude-sonnet-4-5` uses a specific provider/model pair.
 - **Named model** — define models in a separate `models:` section and reference them by name to reuse options and routing rules.
-- **Auto-selection** — `model: auto` triggers an automatic provider selection based on available API keys, with a fixed priority order (Gateway, Anthropic, OpenAI, Google, etc.).
+- **Auto-selection** — `model: auto` triggers an automatic provider selection based on available API keys, with a fixed priority order (Anthropic → OpenAI → Google → Mistral → Amazon Bedrock → Docker Model Runner).
 
 The configuration reference documents additional model parameters such as
 temperature, max tokens, and thinking/effort budgets for reasoning models. Model
-fallback behaviour is configured either per agent or via shared model
+fallback behavior is configured either per agent or via shared model
 settings, allowing the runtime to switch to backup models on errors or rate
 limits, with cooldowns to avoid thrashing.
 
@@ -140,7 +137,7 @@ Key points:
 - MCP toolsets are declared with `type: mcp` and a reference, e.g. `ref: docker:duckduckgo` or `ref: docker:github-official`.
 - Docker Agent can run MCP servers locally (via stdio), inside Docker, or connect to remote MCP servers over HTTP/SSE, often with OAuth2.
 - MCP toolsets use lifecycle supervision with automatic restart and state reporting, and they expose tools discovered from the MCP server as agent tools.
-- Agents can also use a built-in MCP catalog toolset to search and enable remote MCP servers dynamically from a curated catalog.
+- Agents can also use a built-in `mcp_catalog` toolset (the "MCP Catalog" in the docs) to search and enable remote MCP servers dynamically from a curated catalog.
 
 ## Sessions, memory, and RAG
 
