@@ -19,6 +19,7 @@ Skills live directly under `.agents/skills/<skill-name>/`.
 || `deepwiki` | Analyze public GitHub repos via DeepWiki AI docs. Spawns background subagent — never blocks. |
 || `dotagents` | Framework lifecycle: `/dotagents init`, `install`, `list`. Includes skill philosophy and subagent hierarchy. |
 || `e2e` | Domain-agnostic AI-native scenario runner (e2e-agent CLI). Scenarios are markdown prompts; evidence written by the CLI. Use `/e2e` for live scenario tests. |
+|| `evidence` | Producer-side "say-nothing-without-a-run" discipline. ANY claim of done/fixed/passing/verified/green by a coder agent MUST be backed by a real executed command + matching `.evidence/.../claim.json` on disk. JSON-Schema enforces: empty `commands` or `assertions` is invalid; browser claims without screenshot/trace are invalid; static-analysis claims without a "0 errors" quote are invalid. Pairs with `runtime-proof` (method) and the `verifier` agent (independent re-check). |
 || `git-commit` | Structured git commit workflow with message conventions. |
 || `github` | GitHub workflows with MCP or `gh` CLI fallback. |
 || `github-pr-review` | Write a code review for a GitHub PR — context → diff → prioritised findings → post back via `gh`. |
