@@ -207,14 +207,19 @@ runs:
           MAX_WORKERS=$(nproc)
         fi
 
-        # Pick `nx affected` (PR/push) or `nx run-many` (manual dispatch).
-        # On workflow_dispatch we always want a full scan — there's no
-        # base ref to diff against, and the user clicked "Run workflow"
-        # explicitly to scan everything. For PR/push events, use
-        # `nx affected` so we only re-scan skills whose files changed.
-        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-          NX_SUBCMD="run-many"
-        elif [ "${{ inputs.affected }}" = "true" ]; then
+        # Pick `nx affected` or `nx run-many` based on the `affected`
+        # input. The caller (workflow) is the single source of truth:
+        #   affected = "true"  →  `nx affected`  (only changed skills)
+        #   affected = "false" →  `nx run-many`  (every skill)
+        # Pre-2026-07 this branch forced `run-many` on `workflow_dispatch`
+        # under the assumption that manual runs should always be full.
+        # That was changed when the workflow started exposing
+        # `workflow_dispatch.inputs.full-scan` — the workflow now passes
+        # `affected = "false"` for full scans and `affected = "true"` for
+        # affected scans on dispatch, so the dispatch special-case is no
+        # longer needed. If `nx affected` later fails to resolve NX_BASE
+        # the block below falls back to `run-many` automatically.
+        if [ "${{ inputs.affected }}" = "true" ]; then
           NX_SUBCMD="affected"
         else
           NX_SUBCMD="run-many"
