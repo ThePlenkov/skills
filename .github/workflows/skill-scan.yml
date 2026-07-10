@@ -97,10 +97,17 @@ jobs:
           #   workflow_dispatch.inputs.full-scan = true  →  affected = false  →  `nx run-many`  (full scan)
           #   workflow_dispatch.inputs.full-scan = false →  affected = true   →  `nx affected`  (changed skills only)
           # On push / pull_request events the workflow_dispatch input is
-          # empty, so the expression falls through to `affected = true`
-          # (affected-only) — that is the pre-existing behaviour for
-          # those triggers and is what we want.
-          affected: ${{ inputs.full-scan == 'true' && 'false' || 'true' }}
+          # empty (falsy in GHA), so the expression falls through to
+          # `affected = true` (affected-only) — that is the pre-existing
+          # behaviour for those triggers and is what we want.
+          #
+          # Implementation note: do NOT compare the boolean input to a
+          # string literal (`== 'true'`). GHA coerces booleans to 1/0 and
+          # non-numeric strings to NaN, so `true == 'true'` evaluates to
+          # `1 == NaN` → false, breaking the inversion. The
+          # `&& / ||` short-circuit form below uses GHA's actual
+          # truthiness rules and works for all three input shapes.
+          affected: ${{ inputs.full-scan && 'false' || 'true' }}
 
       # Upload the merged SARIF to the code-scanning API. This is
       # what makes findings appear inline in the PR Files Changed
