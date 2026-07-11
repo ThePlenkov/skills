@@ -1,6 +1,6 @@
 ---
 description: Push commits to remote with validation of target and scope
-argument-hint: [--check] [--fix] <target>
+argument-hint: "--check --fix <target>"
 ---
 
 Push commits to remote after analyzing target, validating branch, commit scope, and optionally running local CI checks before pushing.

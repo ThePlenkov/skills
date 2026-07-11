@@ -1,6 +1,6 @@
 ---
 description: Commit changes with validation of documentation and project structure
-argument-hint: [--check] [--fix] <subject>
+argument-hint: "--check --fix <subject>"
 ---
 
 Commit changes after analyzing git tree, validating documentation updates and project structure compliance, and optionally running local CI checks.
