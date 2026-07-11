@@ -9,6 +9,8 @@ description: Analyze CI/CD pipeline configuration and run checks locally before 
 
 This skill analyzes CI/CD pipeline configuration (GitHub Actions, GitLab CI, Azure Pipelines, etc.) and runs validation checks locally before committing or pushing. When checks fail, it attempts to auto-fix ANY issue that can be resolved programmatically - not just linting, but also build errors, test failures, type errors, and more.
 
+**For GitHub Actions, this skill uses [gh-act](https://github.com/nektos/gh-act) when available** - a tool that runs GitHub Actions workflows locally using Docker. This provides the most accurate local CI execution, including matrix builds, services, caching, and all GitHub Actions features.
+
 ## Workflow
 
 ### 1. Detect CI/CD Configuration
@@ -30,6 +32,16 @@ test -f .circleci/config.yml && echo ".circleci/config.yml"
 
 # Jenkins
 test -f Jenkinsfile && echo "Jenkinsfile"
+```
+
+**For GitHub Actions, check if gh-act is available:**
+
+```bash
+# Check if act is installed
+act --version 2>/dev/null
+
+# If available, prefer act for most accurate local execution
+# If not available, fall back to manual command extraction
 ```
 
 **If no CI configuration found:**
@@ -132,7 +144,90 @@ test:
 
 ### 5. Execute Local Checks
 
-**Run checks in order:**
+#### Option A: Using gh-act (GitHub Actions only, preferred)
+
+**If `act` is available and GitHub Actions detected:**
+
+```bash
+# List all available jobs
+gh act --list
+
+# Run all workflows
+gh act
+
+# Run specific workflow
+gh act -W .github/workflows/ci.yml
+
+# Run specific job(s)
+gh act -j lint
+gh act -j shellcheck -j markdownlint
+
+# Dry run (see what would execute without running)
+gh act --dryrun
+
+# Run with secrets
+gh act --secret-file .secrets
+
+# Run specific event
+gh act push
+gh act pull_request
+```
+
+**Benefits of gh-act:**
+- ✅ Runs actual GitHub Actions workflows (100% accuracy)
+- ✅ Supports matrix builds, services, caching
+- ✅ Uses same Docker images as GitHub runners
+- ✅ Handles secrets, environment variables, artifacts
+- ✅ No need to parse YAML or extract commands
+- ✅ Fast feedback loop (no push to GitHub needed)
+
+**Best practices:**
+- Use `--dryrun` first to verify what will execute
+- Create `.actrc` to avoid interactive prompts
+- Use Medium image for best compatibility/size balance
+- Run specific jobs (`-j`) to save time
+- Keep Docker running for faster execution
+
+**Installation (if not available):**
+
+**Recommended: GitHub CLI Extension (easiest)**
+```bash
+gh extension install nektos/gh-act
+```
+
+**Alternative methods:**
+```bash
+# macOS
+brew install act
+
+# Windows (using Chocolatey)
+choco install act-cli
+
+# Linux
+curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
+
+# Manual: Download from https://github.com/nektos/act/releases
+```
+
+**Configuration (skip interactive prompt):**
+Create `.actrc` in project root:
+```
+-P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest
+```
+
+**Image options:**
+- **Micro** (~200MB): `node:16-buster-slim` - NodeJS only, limited compatibility
+- **Medium** (~500MB): `ghcr.io/catthehacker/ubuntu:act-latest` - Recommended, most compatible
+- **Large** (~18GB): `ghcr.io/catthehacker/ubuntu:full-latest` - Full GitHub runner snapshot
+
+**Requirements:**
+- Docker must be installed and running
+- Sufficient disk space for runner images (500MB-18GB depending on image)
+- First run downloads selected image
+
+#### Option B: Manual Command Extraction (fallback)
+
+**If `act` is not available or for non-GitHub Actions CI:**
 
 ```bash
 # Install dependencies if needed
@@ -199,6 +294,13 @@ Use --fix flag to attempt auto-fix, or fix manually before committing.
 ```
 
 ### 7. Auto-Fix (if --fix flag)
+
+**Note on gh-act compatibility:**
+When using `act` to run workflows, auto-fix works by:
+1. Running workflow with `act` to detect failures
+2. Parsing `act` output for error messages
+3. Applying fixes using strategies below
+4. Re-running workflow with `act` to verify fixes
 
 **Attempt to fix ANY issue that can be resolved programmatically:**
 
@@ -405,7 +507,36 @@ npm update
 
 ### GitHub Actions
 
-**Parse `.github/workflows/*.yml`:**
+**Primary Method: gh-act (nektos/act)**
+
+When `act` is available, use it to run GitHub Actions workflows locally:
+
+```bash
+# Run all workflows
+act
+
+# Run specific workflow
+act -W .github/workflows/ci.yml
+
+# Run specific job
+act -j test
+
+# List available jobs
+act -l
+
+# Dry run
+act --dryrun
+```
+
+**Benefits:**
+- Runs actual workflows (no parsing needed)
+- Supports all GitHub Actions features
+- Uses same Docker images as GitHub runners
+- Handles matrix builds, services, secrets, artifacts
+
+**Fallback Method: Manual Parsing**
+
+If `act` is not available, parse `.github/workflows/*.yml`:
 - Extract `jobs.<job-id>.steps[].run` commands
 - Detect `actions/setup-*` for environment setup
 - Identify validation jobs (lint, test, build)
@@ -490,6 +621,46 @@ This skill works with:
 - `.agents/rules/documentation.md` - Validate docs in CI
 - `.agents/rules/project-structure.md` - Validate structure in CI
 
+## Troubleshooting gh-act
+
+### Interactive Prompt on First Run
+**Problem:** `act` prompts for Docker image selection on first run
+
+**Solution:** Create `.actrc` in project root:
+```
+-P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest
+```
+
+### Docker Not Running
+**Problem:** `act` fails with "Cannot connect to Docker daemon"
+
+**Solution:** 
+- Start Docker Desktop (Windows/Mac)
+- Or start Docker service: `sudo systemctl start docker` (Linux)
+
+### Image Pull Timeout
+**Problem:** Docker image download times out or is very slow
+
+**Solution:**
+- Use smaller image (Medium instead of Large)
+- Check network connection
+- Use `--pull=false` to skip pull if image exists
+
+### Permission Denied
+**Problem:** `act` fails with permission errors
+
+**Solution:**
+- Add user to docker group: `sudo usermod -aG docker $USER`
+- Or run with sudo (not recommended)
+
+### Workflow Not Found
+**Problem:** `act` reports "no workflows found"
+
+**Solution:**
+- Verify `.github/workflows/` directory exists
+- Check workflow files have `.yml` or `.yaml` extension
+- Ensure workflows have valid YAML syntax
+
 ## Anti-Patterns
 
 - Running all CI checks locally (some require cloud resources)
@@ -498,6 +669,8 @@ This skill works with:
 - Running slow checks (E2E tests) by default
 - Not caching dependencies between checks
 - Assuming only linting can be auto-fixed
+- Not creating `.actrc` (causes interactive prompts)
+- Using Large image when Medium suffices (wastes disk space)
 
 ## Related Skills and Commands
 

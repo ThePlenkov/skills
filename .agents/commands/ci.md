@@ -3,9 +3,13 @@ description: Run local CI checks without committing or pushing
 argument-hint: --fix
 ---
 
+⚠️ **CRITICAL**: This command ONLY runs local CI checks. It does NOT commit, push, or perform ANY git operations. Use `/commit` and `/push` separately when needed.
+
 Run local CI validation checks without committing or pushing. Detects CI configuration, runs checks locally, and optionally auto-fixes issues.
 
 **This command wraps the `ci-local` skill workflow.**
+
+**For GitHub Actions:** Uses [gh-act](https://github.com/nektos/act) when available for most accurate local execution. Falls back to manual command extraction if not installed.
 
 ## Usage
 
