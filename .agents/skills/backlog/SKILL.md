@@ -29,7 +29,7 @@ source: <path to memory/experience entry or PR URL>
 
 ## Rules
 
-1. **Actionable only** — every item must have a concrete "Proposed action". Vague ideas go to `.agents/memory/observations/`.
+1. **Actionable only** — every item must have a concrete "Proposed action". Vague ideas go to `.memory/observations/`.
 2. **Link to source** — if the item came from a retrospective or experience, reference it in `source:`.
 3. **One item per file** — keep atomic, easy to close by deleting the file.
 4. **Close by deleting** — when done, remove the file (git tracks history).

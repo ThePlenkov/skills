@@ -10,3 +10,6 @@ skillspector.sarif
 # Python bytecode
 **/__pycache__/
 *.pyc
+# Transient memory files
+
+.bob

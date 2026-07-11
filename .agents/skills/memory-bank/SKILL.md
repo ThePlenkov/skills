@@ -2,13 +2,13 @@
 name: memory-bank
 description: >-
   Unified agent memory. Use /remember to store facts, experience, observations,
-  and mental-models in .agents/memory/.
+  and mental-models in .memory/.
 ---
 
 # Memory Bank
 
 Unified agent memory inspired by [Hindsight](https://hindsight.vectorize.io/).
-All entries are markdown files in `.agents/memory/`.
+All entries are markdown files in `.memory/`.
 
 ## Memory types
 
@@ -36,7 +36,7 @@ When reasoning, check mental-models first (curated), then observations (consolid
 /remember <type> — <content>
 ```
 
-Write to `.agents/memory/<type>/YYYY-MM-DD-<slug>.md`:
+Write to `.memory/<type>/YYYY-MM-DD-<slug>.md`:
 
 ```yaml
 ---
@@ -51,7 +51,7 @@ Frontmatter is minimal: only `date` and `tags`. Add `context: <URL>` when there'
 
 ### recall — retrieve memories
 
-Before starting work, scan `.agents/memory/` for relevant entries. Read mental-models first, then observations, then facts/experience as needed.
+Before starting work, scan `.memory/` for relevant entries. Read mental-models first, then observations, then facts/experience as needed.
 
 ### reflect — consolidate knowledge
 

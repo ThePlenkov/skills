@@ -179,7 +179,7 @@ cat opengrep.sarif
 
 ## Memory reminder template
 
-When encountering new Codacy patterns, add to `.agents/memory/experience/`:
+When encountering new Codacy patterns, add to `.memory/experience/`:
 
 ```markdown
 ---

@@ -6,6 +6,9 @@ Personal, agent-agnostic skills repository.
 
 - `.agents/agents/` contains role prompts (one folder per role, e.g. `investigator/`, `patcher/`, `verifier/`).
 - `.agents/skills/` contains all skills.
+- `.agents/commands/` contains command definitions (e.g. `/drill`, `/undrill`, `/recall`, `/retain`, `/reflect`).
+- `.agents/rules/` contains agent behavior rules (e.g. `agent-memory.md`, `drill-troubleshooting.md`).
+- `.memory/` contains transient memory files (facts, experience, observations, mental-models).
 
 ## Quick start
 
