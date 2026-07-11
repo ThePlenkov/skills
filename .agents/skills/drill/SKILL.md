@@ -1,4 +1,4 @@
-﻿---
+---
 name: drill
 description: Scoped descent primitive for agent systems. Creates isolated execution frames with filesystem materialization, session tracking, and controlled context flow. Each drill narrows scope, materializes as a directory tree, and enables delegation with strict leak control.
 metadata:
