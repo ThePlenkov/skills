@@ -11,6 +11,7 @@ Documentation varies by project, but commonly includes:
 - `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`
 - `docs/` directory contents
 - `AGENTS.md`, `CLAUDE.md` (agent-specific)
+- `SPEC.md`, `DESIGN.md`, `REVIEW.md` (design and review documents)
 - API documentation (OpenAPI/Swagger specs, JSDoc, etc.)
 - Architecture Decision Records (ADRs)
 - Inline code comments describing public APIs
