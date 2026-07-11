@@ -1,6 +1,6 @@
 ---
 description: Run local CI checks without committing or pushing
-argument-hint: "--fix"
+argument-hint: --fix
 ---
 
 Run local CI validation checks without committing or pushing. Detects CI configuration, runs checks locally, and optionally auto-fixes issues.

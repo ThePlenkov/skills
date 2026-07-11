@@ -1,6 +1,6 @@
-﻿---
+---
 description: Close drill frame and reintegrate results - upward traversal with session restoration
-argument-hint: [--merge=summary|structured|full] [--trace=none|light|full] [--conflicts=resolve|surface|ignore]
+argument-hint: --merge=summary|structured|full --trace=none|light|full --conflicts=resolve|surface|ignore
 ---
 
 Close current drill frame and safely reintegrate results into parent context. Alias for `/drill { direction = up }`.

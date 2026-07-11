@@ -43,6 +43,26 @@ This repository is maintained by an agent that creates and updates skills and ro
 - Do not repeat the full system overview in each role prompt.
 
 ## Retrospect
+## Command file syntax (Bob Shell)
+
+Command files in `.agents/commands/` use YAML frontmatter. The `argument-hint` field must be a plain string without quotes or square brackets:
+
+**❌ Wrong (causes validation error):**
+```yaml
+argument-hint: "--fix"                    # Quotes cause array interpretation
+argument-hint: [--fix]                    # Square brackets are arrays
+```
+
+**✅ Correct:**
+```yaml
+argument-hint: --fix
+argument-hint: --check --fix <subject>
+argument-hint: pr|plan|backlog|harvest pr-number
+```
+
+Use plain text for optional arguments, `|` for alternatives, `<name>` for placeholders, and `--flag=value1|value2` for flag options.
+
+
 
 - Use the `retrospect` skill after mistakes or friction to capture learnings.
 - It is secondary to an agent’s own tools and memory.

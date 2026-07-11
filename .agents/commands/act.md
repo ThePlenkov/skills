@@ -1,6 +1,6 @@
-﻿---
+---
 description: Fix PR review threads and CI issues - iterative loop until merge-ready
-argument-hint: [pr|plan|backlog|harvest] [pr-number]
+argument-hint: pr|plan|backlog|harvest pr-number
 ---
 
 Use the `/act` skill to resolve review threads and CI issues on a pull request.
