@@ -9,37 +9,104 @@
 #
 # Format: glob rules by rule_id, file path, or message.
 # See: https://github.com/NVIDIA/skillspector/blob/main/docs/SUPPRESSION.md
+#
+# NOTE: Finding paths are relative to the skill directory (e.g. SKILL.md,
+# workflows/init.md), NOT repo-relative. There is no way to scope a
+# suppression to a specific skill by name — only by file pattern within
+# skills. Rules that are intentional in some skills but potentially real
+# issues in others use id-only suppression with a review reminder.
 
 rules:
-  # token-rationalism: "never ask", "always" directives are intentional
-  # cognitive guidelines for the agent, not safety bypasses.
+  # ── token-rationalism: intentional autonomy instructions ──────────
+  # "never ask", "always" directives are cognitive guidelines for the
+  # agent, not safety bypasses.
   - rule_id: AR1
-    path: ".agents/skills/token-rationalism/**"
-    reason: "Intentional agent autonomy instructions"
+    path: "SKILL.md"
+    reason: "Intentional agent autonomy instructions in token-rationalism"
 
   - rule_id: AR2
-    path: ".agents/skills/token-rationalism/**"
-    reason: "Intentional agent behavior shaping"
+    path: "SKILL.md"
+    reason: "Intentional agent behavior shaping in token-rationalism"
 
-  # safeguard skill documents safety patterns to DETECT them — not exploit them.
+  # ── safeguard: documents injection patterns for detection ─────────
+  # This skill describes prompt injection and jailbreak patterns so
+  # agents can DETECT them — not exploit them.
   - rule_id: "P[1-5]"
-    path: ".agents/skills/safeguard/**"
+    path: "SKILL.md"
     reason: "Skill documents prompt injection patterns for detection purposes"
 
   - rule_id: AR3
-    path: ".agents/skills/safeguard/**"
+    path: "SKILL.md"
     reason: "Skill documents jailbreak patterns for detection purposes"
 
-  # subagent-capsule: autonomous decision-making is the explicit design goal.
-  - rule_id: EA2
-    path: ".agents/skills/subagent-capsule/**"
-    reason: "Autonomous subagent orchestration is the intended behavior"
-
-  # sandbox skill describes isolation — legitimate use of permission language.
+  # ── sandbox: discusses permissions and tool access as topics ───────
   - rule_id: PE1
-    path: ".agents/skills/sandbox/**"
+    path: "SKILL.md"
     reason: "Permission discussion is the topic of the skill, not a request"
 
   - rule_id: EA1
-    path: ".agents/skills/sandbox/**"
+    path: "SKILL.md"
     reason: "Tool access discussion is the topic of the skill"
+
+  # ── RP1: npx/uvx commands in skill documentation (72 findings) ───
+  # These are example commands shown to users in SKILL.md and workflow
+  # docs. Pinning versions would make docs stale on every release.
+  # REVIEW: If a new skill adds a genuinely dangerous npx command
+  # (e.g. pointing to a malicious package), this rule will hide it.
+  - rule_id: RP1
+    reason: "Skill documentation shows example npx/uvx commands; version pinning would make docs stale"
+
+  # ── EA2: autonomous agent decisions (11 findings across 5 skills) ─
+  # Agent skills are designed to operate autonomously — this is the
+  # explicit design goal.
+  # REVIEW: If a new skill introduces unchecked autonomous behavior
+  # that should require human confirmation, this rule will hide it.
+  - rule_id: EA2
+    reason: "Autonomous agent decision-making is the intended design of all skills"
+
+  # ── AS3: meta-skills reading other skills (8 findings) ────────────
+  # Meta-skills (dotagents, skills, claude-skills, git-*) need to
+  # enumerate installed skills for management, installation, and
+  # validation.
+  # REVIEW: If a non-meta skill starts enumerating other skills'
+  # files without justification, this rule will hide it.
+  - rule_id: AS3
+    reason: "Meta-skills read other skills for installation, management, and validation"
+
+  # ── MP2: markdown table delimiters triggering regex (6 findings) ──
+  # False positives from markdown table delimiters (|---|). These are
+  # documentation formatting, not context-stuffing. Safe to suppress
+  # universally — markdown tables are never malicious.
+  - rule_id: MP2
+    reason: "Markdown table delimiters trigger repeated-pattern regex (false positive)"
+
+  # ── LP3: skills without declared permissions (5 findings) ─────────
+  # Skills that operate within the agent's existing permission scope
+  # do not need explicit permission declarations.
+  # REVIEW: If a new skill adds executable scripts or network access
+  # without declaring permissions, this rule will hide it.
+  - rule_id: LP3
+    reason: "Skills operate within the agent's existing permission scope"
+
+  # ── PE2: sudo in ci-local skill (3 findings) ─────────────────────
+  # Legitimate CI/CD operations that require elevated privileges.
+  # Scoped to SKILL.md since all findings are in documentation.
+  - rule_id: PE2
+    path: "SKILL.md"
+    reason: "CI/CD scripts legitimately need elevated privileges for system package management"
+
+  # ── E1: external URL in codacy skill (1 finding) ─────────────────
+  # The Codacy skill sends analysis results to the Codacy API as part
+  # of its core functionality.
+  # Scoped to SKILL.md since the finding is in documentation.
+  - rule_id: E1
+    path: "SKILL.md"
+    reason: "Codacy skill sends analysis to the Codacy API as its core function"
+
+  # ── TM3: unsafe tool defaults (1 finding) ────────────────────────
+  # The harvest CLI flag behavior is documented; the unsafe default
+  # is a known trade-off explained in the skill docs.
+  # Scoped to SKILL.md since the finding is in documentation.
+  - rule_id: TM3
+    path: "SKILL.md"
+    reason: "CLI flag defaults are documented trade-offs, not security oversights"

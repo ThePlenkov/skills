@@ -69,7 +69,7 @@
     {
       "kind": "network",
       "path": ".evidence/2026-07-09/web-7421/login-form-renders/network.har",
-      "sha256": "f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3",
+      "sha256": "5c881774040995b4a16c058013776b94041aa77cbf6792ed46a97adae11a3a77",
       "content_excerpt": "[{\"request\":{\"url\":\"ws://localhost:3000/ws\"},\"response\":{\"status\":101,\"statusText\":\"Switching Protocols\"}}]"
     }
   ],
