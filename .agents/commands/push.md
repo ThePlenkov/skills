@@ -44,9 +44,14 @@ Push commits to remote after analyzing target, validating branch, commit scope, 
 
 ### --fix
 
-**Auto-fix issues before pushing:**
+**Auto-fix ANY failing check that can be fixed programmatically:**
 - Implies --check (runs CI checks first)
-- Attempts to fix linting issues automatically
+- Attempts to fix ALL types of failures:
+  - **Linting**: Code formatting, import sorting, unused code
+  - **Type errors**: Missing annotations, type imports, type mismatches
+  - **Test failures**: Outdated snapshots, assertion updates, mock data
+  - **Build errors**: Missing dependencies, import paths, module resolution
+  - **Dependencies**: Security vulnerabilities, outdated packages, conflicts
 - Re-runs checks after auto-fix
 - **Commits fixes separately**
 - **Includes fix commits in push**
@@ -54,11 +59,11 @@ Push commits to remote after analyzing target, validating branch, commit scope, 
 - **Aborts push if auto-fix fails**
 
 **Use when:**
-- You have linting issues that can be auto-fixed
+- You have any CI failures that can be auto-fixed
 - You want to ensure clean pushes
-- You're confident in auto-fix tools
+- You're confident in auto-fix strategies
 
-**Note:** Auto-fix only works for linting. Type errors and test failures must be fixed manually.
+**Note:** Not all failures can be auto-fixed. Complex logic errors, design issues, and some test failures require manual intervention.
 
 ## Workflow
 
@@ -70,7 +75,7 @@ The agent will:
    - Run checks locally
    - Report results
 3. **Auto-fix issues** (if --fix flag)
-   - Attempt to fix linting issues
+   - Attempt to fix linting, type errors, tests, build, dependencies
    - Re-run checks
    - Commit fixes separately
 4. **Validate current branch** - Ensure not on main/master/protected branches
@@ -156,7 +161,7 @@ Before pushing, agent validates:
 - [ ] Not on protected branch
 - [ ] Target resolved correctly (branch/PR/remote/fork/submodule)
 - [ ] Local CI checks passed (if --check flag)
-- [ ] Auto-fixes applied (if --fix flag)
+- [ ] Auto-fixes applied for ALL check types (if --fix flag)
 - [ ] Commits follow conventional commits format
 - [ ] Documentation updated (per documentation.md rule)
 - [ ] Structure maintained (per project-structure.md rule)
@@ -169,7 +174,7 @@ See `.agents/skills/git-push/SKILL.md` for the complete workflow including:
 
 - Target analysis and resolution (branch, PR, remote, fork, submodule)
 - Local CI checks (--check flag)
-- Auto-fix workflow (--fix flag)
+- Auto-fix workflow for ALL check types (--fix flag)
 - Branch validation and recovery procedures
 - Push target validation
 - Commit scope validation and secret scanning
@@ -190,6 +195,6 @@ This command enforces:
 ## Related
 
 - `.agents/skills/git-push/SKILL.md` - Full workflow implementation
-- `.agents/skills/ci-local/SKILL.md` - Local CI checks
+- `.agents/skills/ci-local/SKILL.md` - Local CI checks and auto-fix
 - `.agents/rules/branch-workflow.md` - Branch workflow enforcement
 - `.agents/skills/git-commit/SKILL.md` - Commit workflow

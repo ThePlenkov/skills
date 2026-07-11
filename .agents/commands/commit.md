@@ -42,20 +42,25 @@ Commit changes after analyzing git tree, validating documentation updates and pr
 
 ### --fix
 
-**Auto-fix issues before committing:**
+**Auto-fix ANY failing check that can be fixed programmatically:**
 - Implies --check (runs CI checks first)
-- Attempts to fix linting issues automatically
+- Attempts to fix ALL types of failures:
+  - **Linting**: Code formatting, import sorting, unused code
+  - **Type errors**: Missing annotations, type imports, type mismatches
+  - **Test failures**: Outdated snapshots, assertion updates, mock data
+  - **Build errors**: Missing dependencies, import paths, module resolution
+  - **Dependencies**: Security vulnerabilities, outdated packages, conflicts
 - Re-runs checks after auto-fix
 - **Includes fixes in commit**
 - Mentions fixes in commit message body
 - **Aborts commit if auto-fix fails**
 
 **Use when:**
-- You have linting issues that can be auto-fixed
+- You have any CI failures that can be auto-fixed
 - You want to ensure clean commits
-- You're confident in auto-fix tools
+- You're confident in auto-fix strategies
 
-**Note:** Auto-fix only works for linting. Type errors and test failures must be fixed manually.
+**Note:** Not all failures can be auto-fixed. Complex logic errors, design issues, and some test failures require manual intervention.
 
 ## Workflow
 
@@ -67,7 +72,7 @@ The agent will:
    - Run checks locally
    - Report results
 3. **Auto-fix issues** (if --fix flag)
-   - Attempt to fix linting issues
+   - Attempt to fix linting, type errors, tests, build, dependencies
    - Re-run checks
    - Stage fixed files
 4. **Validate changes** against documentation and structure rules
@@ -90,7 +95,9 @@ The agent generates commit messages following:
 <type>(<scope>): <subject>
 
 <body>
-- Auto-fixed linting issues (if --fix flag)
+- Auto-fixed linting issues (3 errors)
+- Auto-fixed type errors (2 missing annotations)
+- Updated test snapshots (1 snapshot)
 
 <footer>
 ```
@@ -114,7 +121,7 @@ See `.agents/skills/git-commit/SKILL.md` for the complete workflow including:
 
 - Git tree analysis and change categorization
 - Local CI checks (--check flag)
-- Auto-fix workflow (--fix flag)
+- Auto-fix workflow for ALL check types (--fix flag)
 - Pre-commit validation checklist (documentation + structure)
 - Conventional commits format and examples
 - Component-based commit strategy
@@ -133,6 +140,6 @@ This command enforces:
 ## Related
 
 - `.agents/skills/git-commit/SKILL.md` - Full workflow implementation
-- `.agents/skills/ci-local/SKILL.md` - Local CI checks
+- `.agents/skills/ci-local/SKILL.md` - Local CI checks and auto-fix
 - `.agents/rules/documentation.md` - Documentation validation rules
 - `.agents/rules/project-structure.md` - Structure validation rules

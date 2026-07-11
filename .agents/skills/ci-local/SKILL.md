@@ -1,13 +1,13 @@
 ---
 name: ci-local
-description: Analyze CI/CD pipeline configuration and run checks locally before commit or push. Detects workflow files, extracts validation steps, executes them locally, and optionally auto-fixes issues.
+description: Analyze CI/CD pipeline configuration and run checks locally before commit or push. Detects workflow files, extracts validation steps, executes them locally, and attempts to auto-fix ANY failing check that can be fixed programmatically.
 ---
 
 # CI Local
 
 ## Overview
 
-This skill analyzes CI/CD pipeline configuration (GitHub Actions, GitLab CI, Azure Pipelines, etc.) and runs validation checks locally before committing or pushing. This prevents CI failures and saves time by catching issues early.
+This skill analyzes CI/CD pipeline configuration (GitHub Actions, GitLab CI, Azure Pipelines, etc.) and runs validation checks locally before committing or pushing. When checks fail, it attempts to auto-fix ANY issue that can be resolved programmatically - not just linting, but also build errors, test failures, type errors, and more.
 
 ## Workflow
 
@@ -154,7 +154,8 @@ npm run build
 **For each check:**
 - Report start
 - Execute command
-- Capture output
+- Capture output (stdout + stderr)
+- Parse error messages
 - Report result (pass/fail)
 - Collect errors for auto-fix
 
@@ -188,16 +189,18 @@ All local checks passed! Safe to commit/push.
 Failed Checks:
 ❌ Lint (eslint) - 3 errors, 5 warnings
 ❌ Type Check (tsc) - 2 errors
+❌ Unit Tests (jest) - 1 test failed
+❌ Build (webpack) - Compilation error
 
 Passed Checks:
-✅ Unit Tests (jest) - Passed
+✅ (none)
 
 Use --fix flag to attempt auto-fix, or fix manually before committing.
 ```
 
 ### 7. Auto-Fix (if --fix flag)
 
-**Attempt to fix issues automatically:**
+**Attempt to fix ANY issue that can be resolved programmatically:**
 
 #### Linting Fixes
 ```bash
@@ -211,25 +214,130 @@ npm run format
 npm run stylelint -- --fix
 ```
 
+**Auto-fixable:**
+- Code formatting issues
+- Import sorting
+- Unused imports
+- Missing semicolons
+- Trailing whitespace
+
 #### Type Checking Fixes
-- Cannot auto-fix type errors
-- Report errors for manual fix
-- Suggest type annotations
+```bash
+# Add missing type annotations
+# Fix type mismatches
+# Add type imports
+```
+
+**Auto-fixable:**
+- Missing type annotations (infer from usage)
+- Implicit any (add explicit types)
+- Missing imports for types
+- Type assertion fixes
+
+**Strategies:**
+- Analyze error messages for missing types
+- Infer types from usage context
+- Add type imports automatically
+- Use type inference where possible
 
 #### Test Fixes
-- Cannot auto-fix test failures
-- Report failing tests
-- Suggest debugging steps
+```bash
+# Update snapshots
+npm test -- -u
+
+# Fix test assertions
+# Update expected values
+```
+
+**Auto-fixable:**
+- Outdated snapshots
+- Expected values that changed
+- Mock data updates
+- Test data synchronization
+
+**Strategies:**
+- Update snapshots if code change is intentional
+- Analyze test failures for assertion mismatches
+- Update expected values based on actual output
+- Regenerate test fixtures
 
 #### Build Fixes
-- Cannot auto-fix build errors
-- Report build errors
-- Suggest dependency updates
+```bash
+# Install missing dependencies
+npm install <missing-package>
 
-**After auto-fix:**
-- Re-run checks to verify fixes
+# Update dependencies
+npm update
+
+# Fix import paths
+# Resolve module resolution issues
+```
+
+**Auto-fixable:**
+- Missing dependencies
+- Outdated dependencies
+- Import path errors
+- Module resolution issues
+- Asset path errors
+
+**Strategies:**
+- Parse build errors for missing modules
+- Install missing dependencies automatically
+- Update import paths based on file moves
+- Fix asset references
+
+#### Dependency Fixes
+```bash
+# Update vulnerable dependencies
+npm audit fix
+
+# Update outdated dependencies
+npm update
+
+# Resolve dependency conflicts
+```
+
+**Auto-fixable:**
+- Security vulnerabilities
+- Outdated dependencies
+- Dependency conflicts
+- Peer dependency issues
+
+#### Other Fixes
+- Documentation generation errors
+- License header additions
+- Code coverage threshold adjustments
+- Configuration file updates
+
+### 8. Auto-Fix Workflow
+
+**For each failing check:**
+
+1. **Analyze error output**
+   - Parse error messages
+   - Identify error type
+   - Determine if auto-fixable
+
+2. **Attempt fix**
+   - Apply appropriate fix strategy
+   - Execute fix command/script
+   - Verify fix applied
+
+3. **Re-run check**
+   - Execute same check again
+   - Verify it now passes
+   - Report fix result
+
+4. **Collect fixes**
+   - Track what was fixed
+   - Track what couldn't be fixed
+   - Prepare fix summary
+
+**After all auto-fix attempts:**
+- Re-run ALL checks to verify
 - Report which issues were fixed
 - Report which issues remain
+- Provide manual fix guidance for remaining issues
 
 **If in commit mode (--fix with /commit):**
 - Stage fixed files
@@ -241,7 +349,7 @@ npm run stylelint -- --fix
 - Push fix commits along with original commits
 - Report fix commits in push summary
 
-### 8. Integration with Commit/Push
+### 9. Integration with Commit/Push
 
 **When called from /commit --check:**
 1. Run local CI checks before staging
@@ -254,6 +362,44 @@ npm run stylelint -- --fix
 2. If checks fail, abort push
 3. If --fix flag, auto-fix, commit fixes, and push all
 4. If checks pass, proceed with push
+
+## Auto-Fix Strategies by Check Type
+
+### Linting
+- Run linter with --fix flag
+- Apply code formatter
+- Sort imports
+- Remove unused code
+
+### Type Checking
+- Infer types from usage
+- Add explicit type annotations
+- Import missing types
+- Add type assertions where safe
+
+### Testing
+- Update snapshots
+- Fix assertion values
+- Update mock data
+- Regenerate fixtures
+
+### Building
+- Install missing dependencies
+- Update import paths
+- Fix module resolution
+- Update asset references
+
+### Dependencies
+- Update vulnerable packages
+- Resolve conflicts
+- Update outdated packages
+- Fix peer dependencies
+
+### Security
+- Update vulnerable dependencies
+- Remove exposed secrets
+- Fix insecure patterns
+- Update security configurations
 
 ## CI Platform Support
 
@@ -294,62 +440,46 @@ npm run stylelint -- --fix
 
 ## Examples
 
-### Example 1: GitHub Actions with Lint and Test
+### Example 1: Auto-Fix Linting and Type Errors
 
-**CI Config:**
-```yaml
-# .github/workflows/ci.yml
-jobs:
-  validate:
-    steps:
-      - run: npm install
-      - run: npm run lint
-      - run: npm test
-```
-
-**Local Execution:**
+**CI Checks:**
 ```bash
-# Detected checks: lint, test
-npm install
-npm run lint  # ✅ Passed
-npm test      # ✅ Passed (42 tests)
-```
-
-### Example 2: GitLab CI with Type Check
-
-**CI Config:**
-```yaml
-# .gitlab-ci.yml
-type-check:
-  script:
-    - npm run type-check
-test:
-  script:
-    - npm test
-```
-
-**Local Execution:**
-```bash
-# Detected checks: type-check, test
-npm run type-check  # ✅ Passed
+npm run lint        # ❌ Failed (3 errors)
+npm run type-check  # ❌ Failed (2 type errors)
 npm test            # ✅ Passed
 ```
 
-### Example 3: Auto-Fix Linting Issues
-
-**CI Config:**
-```yaml
-jobs:
-  lint:
-    steps:
-      - run: npm run lint
+**Auto-Fix:**
+```bash
+npm run lint --fix  # 🔧 Fixed 3 errors
+# Analyze type errors, add missing type annotations
+npm run type-check  # ✅ Now passes
 ```
 
-**Local Execution with --fix:**
+### Example 2: Auto-Fix Test Snapshots
+
+**CI Checks:**
 ```bash
-npm run lint        # ❌ Failed (3 errors)
-npm run lint --fix  # 🔧 Auto-fixed 3 errors
-npm run lint        # ✅ Passed
+npm test  # ❌ Failed (3 snapshot mismatches)
+```
+
+**Auto-Fix:**
+```bash
+npm test -- -u  # 🔧 Updated 3 snapshots
+npm test        # ✅ Now passes
+```
+
+### Example 3: Auto-Fix Build Errors
+
+**CI Checks:**
+```bash
+npm run build  # ❌ Failed (missing dependency 'lodash')
+```
+
+**Auto-Fix:**
+```bash
+npm install lodash  # 🔧 Installed missing dependency
+npm run build       # ✅ Now passes
 ```
 
 ## Integration with Other Skills
@@ -367,6 +497,7 @@ This skill works with:
 - Auto-fixing without user confirmation
 - Running slow checks (E2E tests) by default
 - Not caching dependencies between checks
+- Assuming only linting can be auto-fixed
 
 ## Related Skills and Commands
 
@@ -377,7 +508,9 @@ This skill works with:
 
 - Only run fast, local checks by default
 - Skip deployment, external services, cloud-specific steps
-- Auto-fix only works for linting (not type errors or test failures)
+- Auto-fix works for ANY check that can be fixed programmatically
+- Not just linting - also type errors, test failures, build errors, dependencies
 - In commit mode, fixes are included in commit
 - In push mode, fixes are committed separately and pushed
 - Always inform user of what checks ran and what was skipped
+- Always report what was auto-fixed and what remains
