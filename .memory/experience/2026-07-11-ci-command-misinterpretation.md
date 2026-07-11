@@ -34,7 +34,8 @@ argument-hint: --fix
 ## Prevention Rules
 
 ### Universal Rule (All Commands)
-**CRITICAL: Always read command description before executing**
+
+#### CRITICAL: Always read command description before executing
 
 Commands have specific purposes defined in YAML frontmatter. Never interpret a command as permission for unrelated actions.
 

@@ -62,7 +62,5 @@ argument-hint: pr|plan|backlog|harvest pr-number
 
 Use plain text for optional arguments, `|` for alternatives, `<name>` for placeholders, and `--flag=value1|value2` for flag options.
 
-
-
 - Use the `retrospect` skill after mistakes or friction to capture learnings.
 - It is secondary to an agent’s own tools and memory.

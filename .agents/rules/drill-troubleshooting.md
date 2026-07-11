@@ -5,7 +5,7 @@ This rule provides troubleshooting guidance for the drill/undrill system for con
 ## Quick Reference
 
 - **Skill**: `~/.agents/skills/drill/SKILL.md` - Full specification
-- **Commands**: 
+- **Commands**:
   - `/drill` - `~/.bob/commands/drill.md` - Create isolated execution frame
   - `/undrill` - `~/.bob/commands/undrill.md` - Close frame and reintegrate
 
@@ -261,7 +261,7 @@ Before undrilling:
 ## Related Documentation
 
 - **Full Specification**: `~/.agents/skills/drill/SKILL.md`
-- **Command Reference**: 
+- **Command Reference**:
   - `/drill`: `~/.bob/commands/drill.md`
   - `/undrill`: `~/.bob/commands/undrill.md`
 - **Related Skills**:

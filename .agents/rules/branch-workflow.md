@@ -148,7 +148,7 @@ This rule works with:
 
 ## Exceptions
 
-**Only exception: Emergency hotfixes**
+### Only exception: Emergency hotfixes
 
 If production is broken and immediate fix is needed:
 1. Create hotfix branch: `git checkout -b hotfix/<description>`

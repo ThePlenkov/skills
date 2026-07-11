@@ -1,6 +1,6 @@
 ---
 description: Collect unresolved PR review threads into review-debt harvests
-argument-hint: "pr-number"
+argument-hint: pr-number
 ---
 
 Collect unresolved PR review threads into `.agents/review-debt/harvests/*.jsonl` for later triage and fixing.

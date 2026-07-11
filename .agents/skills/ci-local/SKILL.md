@@ -190,7 +190,8 @@ gh act pull_request
 
 **Installation (if not available):**
 
-**Recommended: GitHub CLI Extension (easiest)**
+### Recommended: GitHub CLI Extension (easiest)
+
 ```bash
 gh extension install nektos/gh-act
 ```
@@ -507,7 +508,7 @@ npm update
 
 ### GitHub Actions
 
-**Primary Method: gh-act (nektos/act)**
+### Primary Method: gh-act (nektos/act)
 
 When `act` is available, use it to run GitHub Actions workflows locally:
 
@@ -534,7 +535,7 @@ act --dryrun
 - Uses same Docker images as GitHub runners
 - Handles matrix builds, services, secrets, artifacts
 
-**Fallback Method: Manual Parsing**
+### Fallback Method: Manual Parsing
 
 If `act` is not available, parse `.github/workflows/*.yml`:
 - Extract `jobs.<job-id>.steps[].run` commands
@@ -634,7 +635,7 @@ This skill works with:
 ### Docker Not Running
 **Problem:** `act` fails with "Cannot connect to Docker daemon"
 
-**Solution:** 
+**Solution:**
 - Start Docker Desktop (Windows/Mac)
 - Or start Docker service: `sudo systemctl start docker` (Linux)
 
