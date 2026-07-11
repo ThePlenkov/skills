@@ -32,7 +32,7 @@ Skills live directly under `.agents/skills/<skill-name>/`.
 || `harvest` | Collect unresolved PR review threads into `.agents/review-debt/harvests/*.jsonl` on PR merge. One-way: collects, never fixes. |
 || `investigate-first` | Inspect, search, and reproduce before any patch. Prevents chaotic edits. |
 || `memory` | Persistent memory enforcement — recall before acting, persist after learning. |
-|| `memory-bank` | Unified agent memory — facts, experience, observations, mental-models under `.agents/memory/`. Use `/remember <type> — <content>`. |
+|| `memory-bank` | Unified agent memory — facts, experience, observations, mental-models under `.memory/`. Use `/remember <type> — <content>`. |
 || `minimal-root-cause` | Climb the laziness ladder before editing — avoid overengineering and symptom patches. |
 || `mr-address-review` | End-to-end GitLab MR review-comment remediation — acknowledge, fix, verify, commit, push, reply, react, and resolve discussions. |
 || `npm-publish` | Publish npm packages with granular tokens or OIDC trusted publishing. Includes `prepare-ci` to bootstrap CI publishing for new packages. |

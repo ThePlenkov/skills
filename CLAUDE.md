@@ -4,12 +4,11 @@ This repository is maintained by an agent that creates and updates skills and ro
 
 ## Layout
 
-- `.agents/agents/` role prompts (tiered filenames only, role text without tiers).
-- `.agents/skills/` skills (each skill is a folder with `SKILL.md`).
+See [`AGENTS.md`](AGENTS.md) for the canonical layout description and repository rules.
 
 ## Repository rules
 
-- Do not create new top-level folders under `.agents/` besides `agents/` and `skills/`.
+- Do not create new top-level folders under `.agents/` besides `agents/`, `skills/`, `commands/`, and `rules/`. Transient data (memory, backlog, plans) lives outside `.agents/` to keep it static.
 - Keep skills agent-agnostic.
 - Avoid hardcoded absolute paths in skills or prompts.
 - Use project-relative defaults when needed (for example `./docs/planning`).

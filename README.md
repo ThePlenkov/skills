@@ -4,8 +4,7 @@ Personal, agent-agnostic skills repository.
 
 ## Layout
 
-- `.agents/agents/` contains role prompts (one folder per role, e.g. `investigator/`, `patcher/`, `verifier/`).
-- `.agents/skills/` contains all skills.
+See [`AGENTS.md`](AGENTS.md) for the canonical layout description and repository rules.
 
 ## Quick start
 

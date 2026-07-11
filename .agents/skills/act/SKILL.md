@@ -382,8 +382,8 @@ not duplicate rows in the persistent CSV.
 Follow [EVALUATE.md](references/EVALUATE.md). Durable sinks: [REVIEW.md](../../../REVIEW.md).
 
 1. **Retain** — record what happened using the [memory-bank skill](../memory-bank/SKILL.md):
-   - Mistake or debugging session → `.agents/memory/experience/`
-   - Observable project fact → `.agents/memory/facts/`
+   - Mistake or debugging session → `.memory/experience/`
+   - Observable project fact → `.memory/facts/`
 2. **Retrospect** — run `/retrospect --plan` ([retrospect skill](../retrospect/SKILL.md)) to record experience and create actionable [backlog](../backlog/SKILL.md) items.
 3. **Cycle guard** — if any signal fires, **do not merge**; escalate to the user with evidence:
 

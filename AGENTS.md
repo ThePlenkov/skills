@@ -6,10 +6,13 @@ This repository is maintained by an agent that creates and updates skills and ro
 
 - `.agents/agents/` role prompts (tiered filenames only, role text without tiers).
 - `.agents/skills/` skills (each skill is a folder with `SKILL.md`).
+- `.agents/commands/` command definitions (e.g. `/drill`, `/undrill`, `/recall`, `/retain`, `/reflect`).
+- `.agents/rules/` agent behavior rules (e.g. `agent-memory.md`, `drill-troubleshooting.md`).
+- `.memory/` transient memory files (facts, experience, observations, mental-models).
 
 ## Repository rules
 
-- Do not create new top-level folders under `.agents/` besides `agents/` and `skills/`.
+- Do not create new top-level folders under `.agents/` besides `agents/`, `skills/`, `commands/`, and `rules/`. Transient data (memory, backlog, plans) lives outside `.agents/` to keep it static.
 - Keep skills agent-agnostic.
 - Avoid hardcoded absolute paths in skills or prompts.
 - Use project-relative defaults when needed (for example `./docs/planning`).
@@ -40,6 +43,24 @@ This repository is maintained by an agent that creates and updates skills and ro
 - Do not repeat the full system overview in each role prompt.
 
 ## Retrospect
+## Command file syntax (Bob Shell)
+
+Command files in `.agents/commands/` use YAML frontmatter. The `argument-hint` field must be a plain string without quotes or square brackets:
+
+**❌ Wrong (causes validation error):**
+```yaml
+argument-hint: "--fix"                    # Quotes cause array interpretation
+argument-hint: [--fix]                    # Square brackets are arrays
+```
+
+**✅ Correct:**
+```yaml
+argument-hint: --fix
+argument-hint: --check --fix <subject>
+argument-hint: pr|plan|backlog|harvest pr-number
+```
+
+Use plain text for optional arguments, `|` for alternatives, `<name>` for placeholders, and `--flag=value1|value2` for flag options.
 
 - Use the `retrospect` skill after mistakes or friction to capture learnings.
 - It is secondary to an agent’s own tools and memory.
