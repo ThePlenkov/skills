@@ -4,10 +4,10 @@ This rule provides troubleshooting guidance for the drill/undrill system for con
 
 ## Quick Reference
 
-- **Skill**: `~/.agents/skills/drill/SKILL.md` - Full specification
+- **Skill**: `.agents/skills/drill/SKILL.md` - Full specification
 - **Commands**:
-  - `/drill` - `~/.bob/commands/drill.md` - Create isolated execution frame
-  - `/undrill` - `~/.bob/commands/undrill.md` - Close frame and reintegrate
+  - `/drill` - `.agents/commands/drill.md` - Create isolated execution frame
+  - `/undrill` - `.agents/commands/undrill.md` - Close frame and reintegrate
 
 ## Common Issues
 
@@ -33,7 +33,7 @@ cat .drills/cursor
 
 **Symptom**: Cannot find drill directory for SHA in cursor
 
-**Cause**: Cursor contains SHA that doesn''t match any drill directory
+**Cause**: Cursor contains SHA that doesn't match any drill directory
 
 **Solution**:
 ```bash
@@ -54,7 +54,7 @@ echo "a1b2c3" > .drills/cursor  # use actual SHA
 **Cause**: Child drill broadens or pivots instead of narrowing
 
 **Solution**:
-- Review parent drill''s scope in frontmatter
+- Review parent drill's scope in frontmatter
 - Ensure child focuses on ONE aspect:
   - One subsystem
   - One hypothesis
@@ -104,7 +104,7 @@ session:
 **Cause**: Evidence files exist but not referenced in drill
 
 **Solution**:
-- Add relative links in drill''s Evidence section:
+- Add relative links in drill's Evidence section:
 ```md
 # Evidence
 
@@ -189,8 +189,8 @@ session:
    - Time-bounded if possible
 
 3. **Define boundaries**
-   - What''s included
-   - What''s excluded
+   - What's included
+   - What's excluded
    - Why boundary is appropriate
 
 ### Managing Evidence
@@ -260,10 +260,10 @@ Before undrilling:
 
 ## Related Documentation
 
-- **Full Specification**: `~/.agents/skills/drill/SKILL.md`
+- **Full Specification**: `.agents/skills/drill/SKILL.md`
 - **Command Reference**:
-  - `/drill`: `~/.bob/commands/drill.md`
-  - `/undrill`: `~/.bob/commands/undrill.md`
+  - `/drill`: `.agents/commands/drill.md`
+  - `/undrill`: `.agents/commands/undrill.md`
 - **Related Skills**:
   - `investigate-first`: Narrow scope through investigation
   - `unwind`: Expand scope by collapsing branches

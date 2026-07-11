@@ -11,5 +11,6 @@ skillspector.sarif
 **/__pycache__/
 *.pyc
 # Transient memory files
+.memory/
 
 .bob

@@ -65,11 +65,8 @@ git remote | grep <target>
 
 **If --check flag is provided**, run local CI checks before pushing:
 
-1. **Invoke ci-local skill** (see `.agents/skills/ci-local/SKILL.md`)
-2. **Detect CI configuration** (GitHub Actions, GitLab CI, etc.)
-3. **Parse and extract validation steps** (lint, type-check, test, build)
-4. **Run checks locally** (skip deployment/cloud-specific steps)
-5. **Report results** (pass/fail for each check)
+1. **Invoke ci-local skill** — see `.agents/skills/ci-local/SKILL.md` for full details
+2. **Report results** (pass/fail for checks that ran)
 
 **If checks fail:**
 - Report which checks failed
@@ -87,9 +84,7 @@ git remote | grep <target>
 
 1. **Attempt auto-fix** (see ci-local skill for details)
    - Linting: `npm run lint --fix`, `npm run format`
-   - Type checking: Cannot auto-fix, report errors
-   - Tests: Cannot auto-fix, report failures
-   - Build: Cannot auto-fix, report errors
+   - Other types (type checking, tests, build) may require manual intervention
 
 2. **Re-run checks** after auto-fix
 3. **Commit fixes** separately with descriptive message
@@ -173,8 +168,8 @@ git remote remove temp-push
 cd submodules/my-submodule
 git push origin HEAD
 cd ../..
-git add submodules/my-submodule
-git commit -m "chore: update submodule reference"
+# Note: Use /commit to create the parent-repo commit for the submodule update
+# Do not auto-commit - wait for explicit /commit command
 ```
 
 ### 6. Validate Push Target
@@ -245,6 +240,16 @@ git push <remote> <branch>
 - Normal workflow push
 
 #### Force Push (Use with Caution)
+
+**Before force pushing**, create a checkpoint:
+```bash
+# Save current state before force push
+git tag backup/force-push-$(date +%Y%m%d-%H%M%S)
+# Or create a backup branch
+git branch backup/force-push-$(date +%Y%m%d-%H%M%S)
+```
+
+**Then force push:**
 ```bash
 git push <remote> <branch> --force-with-lease
 ```

@@ -12,7 +12,7 @@ This repository is maintained by an agent that creates and updates skills and ro
 
 ## Repository rules
 
-- Do not create new top-level folders under `.agents/` besides `agents/` and `skills/`. Transient data (memory, backlog, plans) lives outside `.agents/` to keep it static.
+- Do not create new top-level folders under `.agents/` besides `agents/`, `skills/`, `commands/`, and `rules/`. Transient data (memory, backlog, plans) lives outside `.agents/` to keep it static.
 - Keep skills agent-agnostic.
 - Avoid hardcoded absolute paths in skills or prompts.
 - Use project-relative defaults when needed (for example `./docs/planning`).

@@ -117,4 +117,4 @@ session:
 
 Must be closed with `/undrill` to reintegrate results.
 
-Full specification: `~/.agents/skills/drill/SKILL.md`
+Full specification: `.agents/skills/drill/SKILL.md`

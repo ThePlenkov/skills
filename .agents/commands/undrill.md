@@ -106,7 +106,7 @@ Before moving upward, verify:
 
 **Example:**
 ```
-/undrill --merge=structured --trace=compressed --conflicts=surface
+/undrill --merge=structured --trace=light --conflicts=surface
 ```
 
 **Stack Example:**
@@ -120,4 +120,4 @@ Root (a1b2c3)
 **Mental Model:**
 `/undrill` = finalize + extract + compress + restore parent session
 
-Full specification: `~/.agents/skills/drill/SKILL.md`
+Full specification: `.agents/skills/drill/SKILL.md`

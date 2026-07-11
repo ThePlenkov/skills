@@ -32,7 +32,7 @@ Commit changes after analyzing git tree, validating documentation updates and pr
 - Detects CI configuration (GitHub Actions, GitLab CI, Azure Pipelines, etc.)
 - Parses validation steps (lint, type-check, test, build)
 - Runs checks locally (skips deployment/cloud-specific steps)
-- Reports results for each check
+- Reports results for checks that ran (ci-local stops on first failure unless --fix is set)
 - **Aborts commit if checks fail** (unless --fix flag)
 
 **Use when:**
@@ -42,14 +42,11 @@ Commit changes after analyzing git tree, validating documentation updates and pr
 
 ### --fix
 
-**Auto-fix ANY failing check that can be fixed programmatically:**
+**Auto-fix failing checks where possible:**
 - Implies --check (runs CI checks first)
-- Attempts to fix ALL types of failures:
+- Attempts to fix failures that can be addressed programmatically:
   - **Linting**: Code formatting, import sorting, unused code
-  - **Type errors**: Missing annotations, type imports, type mismatches
-  - **Test failures**: Outdated snapshots, assertion updates, mock data
-  - **Build errors**: Missing dependencies, import paths, module resolution
-  - **Dependencies**: Security vulnerabilities, outdated packages, conflicts
+  - **Other types** (type errors, tests, build) may require manual intervention
 - Re-runs checks after auto-fix
 - **Includes fixes in commit**
 - Mentions fixes in commit message body
@@ -72,7 +69,7 @@ The agent will:
    - Run checks locally
    - Report results
 3. **Auto-fix issues** (if --fix flag)
-   - Attempt to fix linting, type errors, tests, build, dependencies
+   - Attempt to fix linting and other auto-fixable failures
    - Re-run checks
    - Stage fixed files
 4. **Validate changes** against documentation and structure rules
@@ -121,7 +118,7 @@ See `.agents/skills/git-commit/SKILL.md` for the complete workflow including:
 
 - Git tree analysis and change categorization
 - Local CI checks (--check flag)
-- Auto-fix workflow for ALL check types (--fix flag)
+- Auto-fix workflow for auto-fixable check types (--fix flag)
 - Pre-commit validation checklist (documentation + structure)
 - Conventional commits format and examples
 - Component-based commit strategy

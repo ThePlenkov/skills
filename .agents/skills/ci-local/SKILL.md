@@ -37,11 +37,15 @@ test -f Jenkinsfile && echo "Jenkinsfile"
 **For GitHub Actions, check if gh-act is available:**
 
 ```bash
-# Check if act is installed
+# Check if gh-act extension is installed
+gh extension list 2>/dev/null | grep nektos/gh-act
+
+# Or check if standalone act is available
 act --version 2>/dev/null
 
-# If available, prefer act for most accurate local execution
-# If not available, fall back to manual command extraction
+# If gh-act is available, prefer it for most accurate local execution
+# If standalone act is available, use it as fallback
+# If neither is available, fall back to manual command extraction
 ```
 
 **If no CI configuration found:**
@@ -146,7 +150,7 @@ test:
 
 #### Option A: Using gh-act (GitHub Actions only, preferred)
 
-**If `act` is available and GitHub Actions detected:**
+**If `gh act` (nektos/gh-act extension) is available and GitHub Actions detected:**
 
 ```bash
 # List all available jobs
@@ -173,7 +177,7 @@ gh act push
 gh act pull_request
 ```
 
-**Benefits of gh-act:**
+**Benefits of gh-act (nektos/gh-act extension):**
 - ✅ Runs actual GitHub Actions workflows (100% accuracy)
 - ✅ Supports matrix builds, services, caching
 - ✅ Uses same Docker images as GitHub runners

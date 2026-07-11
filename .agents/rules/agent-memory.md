@@ -19,7 +19,7 @@ This rule is built on top of the **memory skill** which provides the complete im
 The memory system implements three cognitive operations aligned with the memory skill protocol:
 
 ### 1. **Recall** (Retrieval)
-**Before starting any task**, search memory for prior context using the memory skill''s recall protocol:
+**Before starting any task**, search memory for prior context using the memory skill's recall protocol:
 
 - Extract key terms from the task (project name, file paths, feature names, error messages)
 - Search memory using available backend (internal tool > MCP server > session notes)
@@ -27,13 +27,13 @@ The memory system implements three cognitive operations aligned with the memory 
 - Treat retrospect findings as high-priority context
 
 **Query patterns:**
-- "What are the user''s coding preferences?"
+- "What are the user's coding preferences?"
 - "What did we discuss about [project/feature]?"
 - "What patterns does this project use?"
 - "What retrospect findings exist for [component]?"
 
 ### 2. **Retain** (Encoding)
-**During work**, persist significant findings immediately using the memory skill''s persistence protocol:
+**During work**, persist significant findings immediately using the memory skill's persistence protocol:
 
 Store information with appropriate structure:
 - **What**: The fact, preference, or knowledge (atomic and actionable)
@@ -71,7 +71,7 @@ Periodically review and consolidate memories:
 
 ## Memory Backend Priority
 
-Follow the memory skill''s backend resolution order:
+Follow the memory skill's backend resolution order:
 
 1. **Internal Memory Tool** (if available)
    - Native agent capability (`save_memory`, `recall`, `memorize`)
@@ -107,9 +107,9 @@ During recall, treat retrospect entities as high-priority:
 ## Best Practices
 
 1. **Always recall before acting** - Check memory first, even if you think you know
-2. **Persist immediately** - Don''t batch learnings to end of session
+2. **Persist immediately** - Don't batch learnings to end of session
 3. **Be atomic and actionable** - One fact per observation, specific and clear
-4. **Update, don''t duplicate** - Search before creating new entities
+4. **Update, don't duplicate** - Search before creating new entities
 5. **Respect privacy** - Never store secrets or credentials
 6. **Trust code over memory** - Memory is context, code is truth
 7. **Clean up regularly** - Delete outdated observations and completed tasks

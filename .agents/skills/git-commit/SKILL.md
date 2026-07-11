@@ -37,7 +37,7 @@ git diff --name-only
 2. **Detect CI configuration** (GitHub Actions, GitLab CI, etc.)
 3. **Parse and extract validation steps** (lint, type-check, test, build)
 4. **Run checks locally** (skip deployment/cloud-specific steps)
-5. **Report results** (pass/fail for each check)
+5. **Report results** (pass/fail for checks that ran — ci-local stops on first failure unless --fix is set)
 
 **If checks fail:**
 - Report which checks failed
@@ -55,9 +55,7 @@ git diff --name-only
 
 1. **Attempt auto-fix** (see ci-local skill for details)
    - Linting: `npm run lint --fix`, `npm run format`
-   - Type checking: Cannot auto-fix, report errors
-   - Tests: Cannot auto-fix, report failures
-   - Build: Cannot auto-fix, report errors
+   - Other types (type checking, tests, build) may require manual intervention
 
 2. **Re-run checks** after auto-fix
 3. **Stage fixed files** for inclusion in commit

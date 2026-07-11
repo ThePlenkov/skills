@@ -106,7 +106,7 @@ git push origin --delete <branch-name>
 
 4. **If already pushed to origin/main, force push reset:**
    ```bash
-   git push origin main --force
+   git push origin main --force-with-lease
    ```
 
 5. **Push feature branch and create PR:**

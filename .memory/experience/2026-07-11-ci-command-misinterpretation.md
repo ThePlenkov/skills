@@ -1,8 +1,10 @@
-# Retrospect: /ci Command Misinterpretation
+---
+date: 2026-07-11
+tags: [ci, command, retrospect, git-push]
+severity: high
+---
 
-**Date:** 2026-07-11  
-**Type:** Command Interpretation Error  
-**Severity:** High (caused unintended git push)
+# Retrospect: /ci Command Misinterpretation
 
 ## What Went Wrong
 

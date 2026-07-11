@@ -34,7 +34,7 @@ Push commits to remote after analyzing target, validating branch, commit scope, 
 - Detects CI configuration (GitHub Actions, GitLab CI, Azure Pipelines, etc.)
 - Parses validation steps (lint, type-check, test, build)
 - Runs checks locally (skips deployment/cloud-specific steps)
-- Reports results for each check
+- Reports results for checks that ran (ci-local stops on first failure unless --fix is set)
 - **Aborts push if checks fail** (unless --fix flag)
 
 **Use when:**
@@ -44,14 +44,11 @@ Push commits to remote after analyzing target, validating branch, commit scope, 
 
 ### --fix
 
-**Auto-fix ANY failing check that can be fixed programmatically:**
+**Auto-fix failing checks where possible:**
 - Implies --check (runs CI checks first)
-- Attempts to fix ALL types of failures:
+- Attempts to fix failures that can be addressed programmatically:
   - **Linting**: Code formatting, import sorting, unused code
-  - **Type errors**: Missing annotations, type imports, type mismatches
-  - **Test failures**: Outdated snapshots, assertion updates, mock data
-  - **Build errors**: Missing dependencies, import paths, module resolution
-  - **Dependencies**: Security vulnerabilities, outdated packages, conflicts
+  - **Other types** (type errors, tests, build) may require manual intervention
 - Re-runs checks after auto-fix
 - **Commits fixes separately**
 - **Includes fix commits in push**
@@ -75,7 +72,7 @@ The agent will:
    - Run checks locally
    - Report results
 3. **Auto-fix issues** (if --fix flag)
-   - Attempt to fix linting, type errors, tests, build, dependencies
+   - Attempt to fix linting and other auto-fixable failures
    - Re-run checks
    - Commit fixes separately
 4. **Validate current branch** - Ensure not on main/master/protected branches
