@@ -27,40 +27,80 @@ if ! command -v jq >/dev/null 2>&1; then
   exit 1
 fi
 
-list_query='query($o:String!,$r:String!,$pr:Int!) {
-  repository(owner:$o, name:$r) {
-    pullRequest(number:$pr) {
-      reviewThreads(first:100) {
-        nodes { id isResolved isOutdated path }
-      }
-    }
-  }
-}'
-
 resolve_mutation='mutation($id:ID!) {
   resolveReviewThread(input:{threadId:$id}) {
     thread { isResolved }
   }
 }'
 
-threads_json="$(
-  gh api graphql -f query="$list_query" -f o="$OWNER" -f r="$REPO" -F pr="$PR" 2>&1
-)" || {
-  echo "$threads_json" >&2
-  exit 1
-}
+# Page through reviewThreads (default 100 per page) to avoid silent truncation
+# past 100. Mirrors the pagination loop in pr-state.sh — `gh api graphql
+# --paginate` does not work for arbitrary connections, so we loop manually
+# using `pageInfo.endCursor`.
+#
+# Each page passes the cursor as a literal embedded in the query string
+# (GraphQL accepts only double-quoted cursors) rather than as a $-prefixed
+# variable, which would trigger an "unused variable" error.
+threads_json_all='[]'
+cursor=""
+has_next=true
+while [[ "$has_next" == "true" ]]; do
+  if [[ -z "$cursor" ]]; then
+    # shellcheck disable=SC2016  # GraphQL $-prefixed variables are literal.
+    var_decls='$o:String!,$r:String!,$pr:Int!,$n:Int!'
+    after_clause=""
+  else
+    # Escape backslashes and double-quotes in the cursor for embedding in a
+    # double-quoted string.
+    esc_cursor="${cursor//\\/\\\\}"
+    esc_cursor="${esc_cursor//\"/\\\"}"
+    # shellcheck disable=SC2016  # GraphQL $-prefixed variables are literal.
+    var_decls='$o:String!,$r:String!,$pr:Int!,$n:Int!'
+    after_clause=", after: \"$esc_cursor\""
+  fi
 
-if echo "$threads_json" | jq -e '.errors' >/dev/null 2>&1; then
-  echo "$threads_json" | jq -c '.errors' >&2
-  exit 1
-fi
+  page_query=$(cat <<EOF
+query($var_decls) {
+  repository(owner: \$o, name: \$r) {
+    pullRequest(number: \$pr) {
+      reviewThreads(first: \$n$after_clause) {
+        pageInfo { hasNextPage endCursor }
+        nodes { id isResolved isOutdated path }
+      }
+    }
+  }
+}
+EOF
+)
+
+  args=( -f query="$page_query" -f o="$OWNER" -f r="$REPO" -F pr="$PR" -F n=100 )
+  state_json="$(gh api graphql "${args[@]}" 2>&1)" || { echo "$state_json" >&2; exit 1; }
+  if echo "$state_json" | jq -e '.errors' >/dev/null 2>&1; then
+    echo "$state_json" | jq -c '.errors' >&2; exit 1
+  fi
+  # Use `?.` so a null `.data.repository` (private/inaccessible repo) returns
+  # null instead of a cryptic "Cannot index null with string" jq error.
+  if echo "$state_json" | jq -e '.data.repository?.pullRequest == null' >/dev/null 2>&1; then
+    echo "error: pull request #$PR not found in $OWNER/$REPO" >&2; exit 1
+  fi
+
+  threads_json_all="$(jq -s '.[0] + .[1].data.repository.pullRequest.reviewThreads.nodes' \
+    <(echo "$threads_json_all") <(echo "$state_json"))"
+  has_next="$(echo "$state_json" | jq -r '.data.repository.pullRequest.reviewThreads.pageInfo.hasNextPage')"
+  cursor="$(echo "$state_json" | jq -r '.data.repository.pullRequest.reviewThreads.pageInfo.endCursor // empty')"
+  # If GitHub says there's another page but doesn't return a cursor, fail loudly
+  # rather than spinning on the same first page forever.
+  if [[ "$has_next" == "true" && -z "$cursor" ]]; then
+    echo "error: GraphQL response missing endCursor despite hasNextPage=true" >&2; exit 1
+  fi
+done
 
 open_ids=()
 while IFS= read -r line; do
   [[ -n "$line" ]] && open_ids+=("$line")
 done < <(
-  echo "$threads_json" | jq -r '
-    .data.repository.pullRequest.reviewThreads.nodes[]
+  echo "$threads_json_all" | jq -r '
+    .[]
     | select(.isResolved == false)
     | .id
   '
@@ -74,8 +114,8 @@ if [[ "$open_count" -eq 0 ]]; then
   exit 0
 fi
 
-echo "$threads_json" | jq -r '
-  .data.repository.pullRequest.reviewThreads.nodes[]
+echo "$threads_json_all" | jq -r '
+  .[]
   | select(.isResolved == false)
   | "\(.id)\toutdated=\(.isOutdated)\t\(.path // "-")"
 '
