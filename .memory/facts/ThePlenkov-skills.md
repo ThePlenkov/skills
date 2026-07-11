@@ -15,6 +15,10 @@
 - **Skill-scan cache** keys on
   `actions/skillspector/package-lock.json` +
   `.agents/skills/**/SKILL.md` hashes. Restored into `.nx/cache`.
+- **SkillSpector baseline paths** are relative to the skill directory
+  (e.g. `SKILL.md`, `workflows/init.md`), NOT repo-relative
+  (`.agents/skills/act/SKILL.md`). Use `*` or `**` in baseline rules,
+  not full repo paths.
 - **Reviewers used on this repo**: cubic-dev-ai, gemini-code-assist,
   amazon-q-developer, kilo-code-bot, coderabbitai (rate-limited),
   qodo-code-review (paused).
