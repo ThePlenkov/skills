@@ -1,6 +1,6 @@
 ---
 name: git-push
-description: Push commits to remote with validation of target and scope. Analyzes target to determine if it's a branch, PR, external project, fork, or submodule. Enforces branch workflow rules and prevents accidental pushes to protected branches.
+description: Push commits to remote with validation of target and scope. Analyzes target to determine if it's a branch, PR, external project, fork, or submodule. Enforces branch workflow rules and prevents accidental pushes to protected branches. Supports --check flag to run CI checks locally and --fix flag to auto-fix issues before pushing.
 ---
 
 # Git Push
@@ -61,7 +61,51 @@ git remote | grep <target>
 - Use upstream tracking if set
 - Default to `origin/<current-branch>`
 
-### 2. Validate Current Branch
+### 2. Run Local CI Checks (if --check flag)
+
+**If --check flag is provided**, run local CI checks before pushing:
+
+1. **Invoke ci-local skill** (see `.agents/skills/ci-local/SKILL.md`)
+2. **Detect CI configuration** (GitHub Actions, GitLab CI, etc.)
+3. **Parse and extract validation steps** (lint, type-check, test, build)
+4. **Run checks locally** (skip deployment/cloud-specific steps)
+5. **Report results** (pass/fail for each check)
+
+**If checks fail:**
+- Report which checks failed
+- Show error details
+- If --fix flag NOT provided: **Abort push**
+- If --fix flag provided: **Proceed to auto-fix**
+
+**If checks pass:**
+- Report success
+- Proceed with push workflow
+
+### 3. Auto-Fix Issues (if --fix flag)
+
+**If --fix flag is provided and checks failed:**
+
+1. **Attempt auto-fix** (see ci-local skill for details)
+   - Linting: `npm run lint --fix`, `npm run format`
+   - Type checking: Cannot auto-fix, report errors
+   - Tests: Cannot auto-fix, report failures
+   - Build: Cannot auto-fix, report errors
+
+2. **Re-run checks** after auto-fix
+3. **Commit fixes** separately with descriptive message
+4. **Report what was fixed**
+
+**If auto-fix succeeds:**
+- Create fix commit(s)
+- Include fix commits in push
+- Report fix commits in push summary
+
+**If auto-fix fails:**
+- Report remaining issues
+- **Abort push**
+- User must fix manually
+
+### 4. Validate Current Branch
 
 **Before pushing**, verify the current branch:
 
@@ -82,7 +126,7 @@ git branch --show-current
 5. Reset main to origin
 6. Push feature branch instead
 
-### 3. Resolve Target to Remote and Branch
+### 5. Resolve Target to Remote and Branch
 
 **Based on target type, determine:**
 - Remote name (e.g., `origin`, `upstream`, `fork`)
@@ -133,7 +177,7 @@ git add submodules/my-submodule
 git commit -m "chore: update submodule reference"
 ```
 
-### 4. Validate Push Target
+### 6. Validate Push Target
 
 **Target validation:**
 - [ ] **Remote exists or can be created** - Valid remote URL
@@ -148,7 +192,7 @@ git commit -m "chore: update submodule reference"
 - `production`
 - `release/*`
 
-### 5. Validate Commit Scope
+### 7. Validate Commit Scope
 
 **Review commits to be pushed:**
 
@@ -176,7 +220,7 @@ git diff <remote>/<branch>..HEAD | grep -iE '(password|secret|token|api[_-]?key|
 git diff <remote>/<branch>..HEAD --name-only | grep -E '(\.env|credentials|secrets)'
 ```
 
-### 6. Determine Push Strategy
+### 8. Determine Push Strategy
 
 **Choose appropriate push strategy:**
 
@@ -217,7 +261,7 @@ git push <remote> <branch> --force-with-lease
 - After PR is created and reviewed
 - Main/master/protected branches (blocked anyway)
 
-### 7. Execute Push
+### 9. Execute Push
 
 **Push with appropriate strategy:**
 
@@ -232,7 +276,7 @@ else
 fi
 ```
 
-### 8. Verify Push Success
+### 10. Verify Push Success
 
 **After push, verify:**
 
@@ -250,7 +294,7 @@ git log <remote>/<branch> --oneline -5
 - [ ] No errors or warnings
 - [ ] Upstream tracking set (if first push)
 
-### 9. Next Steps
+### 11. Next Steps
 
 **After successful push:**
 
@@ -273,34 +317,78 @@ gh pr comment <pr-number> --body "Updated with latest changes"
 gh pr create --repo <upstream-repo> --head <fork>:<branch> --base main
 ```
 
+### 12. Report
+
+**Report push summary:**
+- Commits pushed
+- Remote and branch
+- CI checks run (if --check flag)
+- Auto-fixes applied (if --fix flag)
+- PR created/updated (if applicable)
+
+## Flags
+
+### --check
+
+**Run local CI checks before pushing:**
+- Detects CI configuration (GitHub Actions, GitLab CI, etc.)
+- Runs validation steps locally (lint, type-check, test, build)
+- Aborts push if checks fail (unless --fix flag)
+- Reports which checks ran and results
+
+**Usage:**
+```
+/push --check
+/push --check <target>
+```
+
+### --fix
+
+**Auto-fix issues before pushing:**
+- Requires --check flag (implied if not provided)
+- Attempts to fix linting issues automatically
+- Re-runs checks after auto-fix
+- **Commits fixes separately**
+- **Includes fix commits in push**
+- Reports fix commits in push summary
+- Aborts push if auto-fix fails
+
+**Usage:**
+```
+/push --fix
+/push --check --fix <target>
+```
+
 ## Target Examples
 
 **Push to current branch's remote:**
 ```
 /push
+/push --check
 ```
 
 **Push to specific branch:**
 ```
 /push feat/my-feature
+/push --check feat/my-feature
 ```
 
 **Push to PR:**
 ```
 /push #123
-/push 123
+/push --fix #123
 ```
 
 **Push to different remote:**
 ```
 /push upstream
-/push fork
+/push --check upstream
 ```
 
 **Push to external project:**
 ```
 /push username/repo
-/push https://github.com/username/repo
+/push --check --fix username/repo
 ```
 
 **Push submodule:**
@@ -318,6 +406,7 @@ Never:
 - Push without validating branch and scope
 - Skip secret scanning
 - Push build artifacts or credentials
+- Skip CI checks (if --check flag)
 
 ## Integration with Other Rules
 
@@ -326,6 +415,7 @@ This skill works with:
 - `.agents/rules/documentation.md` - Documentation validation
 - `.agents/rules/project-structure.md` - Structure validation
 - `.agents/skills/git-commit/SKILL.md` - Commit validation
+- `.agents/skills/ci-local/SKILL.md` - Local CI checks
 
 ## Anti-Patterns
 
@@ -335,6 +425,7 @@ This skill works with:
 - Skipping secret scanning
 - Force pushing shared branches
 - Pushing before CI passes locally
+- Skipping --check flag on important branches
 
 ## Recovery Scenarios
 
@@ -379,6 +470,7 @@ Follow recovery procedure from `.agents/rules/branch-workflow.md`:
 - `.agents/rules/branch-workflow.md` - Branch workflow enforcement
 - `.agents/commands/push.md` - Command wrapper for this skill
 - `.agents/skills/git-commit/SKILL.md` - Commit workflow
+- `.agents/skills/ci-local/SKILL.md` - Local CI checks
 
 ## Notes
 
@@ -388,3 +480,6 @@ Follow recovery procedure from `.agents/rules/branch-workflow.md`:
 - Never push directly to protected branches
 - Create PR after first push
 - Agent determines target type (branch, PR, remote, fork, submodule)
+- Use --check flag to catch CI failures before pushing
+- Use --fix flag to auto-fix and commit fixes before pushing
+- In push mode, fixes are committed separately and pushed together

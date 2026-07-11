@@ -1,9 +1,9 @@
 ---
 description: Commit changes with validation of documentation and project structure
-argument-hint: <subject>
+argument-hint: [--check] [--fix] <subject>
 ---
 
-Commit changes after analyzing git tree, validating documentation updates and project structure compliance.
+Commit changes after analyzing git tree, validating documentation updates and project structure compliance, and optionally running local CI checks.
 
 **This command wraps the `git-commit` skill workflow.**
 
@@ -11,23 +11,70 @@ Commit changes after analyzing git tree, validating documentation updates and pr
 
 ```
 /commit <subject>
+/commit --check <subject>
+/commit --fix <subject>
+/commit --check --fix <subject>
 ```
 
 **Examples:**
 ```
 /commit user authentication
-/commit API refactoring
-/commit documentation updates
-/commit memory migration
+/commit --check API refactoring
+/commit --fix documentation updates
+/commit --check --fix memory migration
 ```
+
+## Flags
+
+### --check
+
+**Run local CI checks before committing:**
+- Detects CI configuration (GitHub Actions, GitLab CI, Azure Pipelines, etc.)
+- Parses validation steps (lint, type-check, test, build)
+- Runs checks locally (skips deployment/cloud-specific steps)
+- Reports results for each check
+- **Aborts commit if checks fail** (unless --fix flag)
+
+**Use when:**
+- You want to catch CI failures before pushing
+- You're working on a project with strict CI requirements
+- You want to ensure code quality before committing
+
+### --fix
+
+**Auto-fix issues before committing:**
+- Implies --check (runs CI checks first)
+- Attempts to fix linting issues automatically
+- Re-runs checks after auto-fix
+- **Includes fixes in commit**
+- Mentions fixes in commit message body
+- **Aborts commit if auto-fix fails**
+
+**Use when:**
+- You have linting issues that can be auto-fixed
+- You want to ensure clean commits
+- You're confident in auto-fix tools
+
+**Note:** Auto-fix only works for linting. Type errors and test failures must be fixed manually.
+
+## Workflow
 
 The agent will:
 1. **Analyze git tree** to determine what changed
-2. **Validate changes** against documentation and structure rules
-3. **Generate commit message** following conventional commits and project rules
-4. **Stage appropriate files** (respecting .gitignore)
-5. **Create commit(s)** - may break into component-based commits for monorepos
-6. **Report commit hash(es)** and summary
+2. **Run local CI checks** (if --check flag)
+   - Detect CI configuration
+   - Parse validation steps
+   - Run checks locally
+   - Report results
+3. **Auto-fix issues** (if --fix flag)
+   - Attempt to fix linting issues
+   - Re-run checks
+   - Stage fixed files
+4. **Validate changes** against documentation and structure rules
+5. **Generate commit message** following conventional commits and project rules
+6. **Stage appropriate files** (respecting .gitignore)
+7. **Create commit(s)** - may break into component-based commits for monorepos
+8. **Report commit hash(es)** and summary
 
 ## Commit Message Generation
 
@@ -36,12 +83,14 @@ The agent generates commit messages following:
 - **Project-specific rules** from CONTRIBUTING.md, AGENTS.md, README.md
 - **Ticket references** (Jira, GitHub, GitLab, Azure DevOps) when applicable
 - **Component scopes** for monorepos (triggers semver automation)
+- **Auto-fix mentions** (if --fix flag used)
 
 **Message format:**
 ```
 <type>(<scope>): <subject>
 
 <body>
+- Auto-fixed linting issues (if --fix flag)
 
 <footer>
 ```
@@ -64,6 +113,8 @@ This triggers correct semver bumps per component (Nx, Lerna, Changesets).
 See `.agents/skills/git-commit/SKILL.md` for the complete workflow including:
 
 - Git tree analysis and change categorization
+- Local CI checks (--check flag)
+- Auto-fix workflow (--fix flag)
 - Pre-commit validation checklist (documentation + structure)
 - Conventional commits format and examples
 - Component-based commit strategy
@@ -75,11 +126,13 @@ See `.agents/skills/git-commit/SKILL.md` for the complete workflow including:
 This command enforces:
 - `.agents/rules/documentation.md` - Documentation must be updated
 - `.agents/rules/project-structure.md` - Structure must be maintained
+- `.agents/skills/ci-local/SKILL.md` - Local CI checks (if --check flag)
 
 **Never skip validation.** If validation fails, fix issues before committing.
 
 ## Related
 
 - `.agents/skills/git-commit/SKILL.md` - Full workflow implementation
+- `.agents/skills/ci-local/SKILL.md` - Local CI checks
 - `.agents/rules/documentation.md` - Documentation validation rules
 - `.agents/rules/project-structure.md` - Structure validation rules
