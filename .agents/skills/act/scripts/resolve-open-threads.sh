@@ -78,7 +78,9 @@ EOF
   if echo "$state_json" | jq -e '.errors' >/dev/null 2>&1; then
     echo "$state_json" | jq -c '.errors' >&2; exit 1
   fi
-  if echo "$state_json" | jq -e '.data.repository.pullRequest == null' >/dev/null 2>&1; then
+  # Use `?.` so a null `.data.repository` (private/inaccessible repo) returns
+  # null instead of a cryptic "Cannot index null with string" jq error.
+  if echo "$state_json" | jq -e '.data.repository?.pullRequest == null' >/dev/null 2>&1; then
     echo "error: pull request #$PR not found in $OWNER/$REPO" >&2; exit 1
   fi
 
@@ -86,6 +88,11 @@ EOF
     <(echo "$threads_json_all") <(echo "$state_json"))"
   has_next="$(echo "$state_json" | jq -r '.data.repository.pullRequest.reviewThreads.pageInfo.hasNextPage')"
   cursor="$(echo "$state_json" | jq -r '.data.repository.pullRequest.reviewThreads.pageInfo.endCursor // empty')"
+  # If GitHub says there's another page but doesn't return a cursor, fail loudly
+  # rather than spinning on the same first page forever.
+  if [[ "$has_next" == "true" && -z "$cursor" ]]; then
+    echo "error: GraphQL response missing endCursor despite hasNextPage=true" >&2; exit 1
+  fi
 done
 
 open_ids=()
