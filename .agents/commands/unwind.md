@@ -1,6 +1,6 @@
-﻿---
+---
 description: Collapse solved branch into main plan, rebuild from proven state, continue automatically
-argument-hint: [optional root objective or direction]
+argument-hint: "optional root objective or direction"
 ---
 
 Collapse a completed narrow branch into the parent/root task, rebuild execution plan from proven state, and continue automatically.
