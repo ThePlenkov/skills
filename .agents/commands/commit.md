@@ -42,11 +42,11 @@ Commit changes after analyzing git tree, validating documentation updates and pr
 
 ### --fix
 
-**Auto-fix failing checks where possible:**
+**Auto-fix linting failures:**
 - Implies --check (runs CI checks first)
-- Attempts to fix failures that can be addressed programmatically:
+- Attempts to fix linting/formatting issues:
   - **Linting**: Code formatting, import sorting, unused code
-  - **Other types** (type errors, tests, build) may require manual intervention
+  - **Type errors, tests, and build are NOT auto-fixed** — these still abort the commit
 - Re-runs checks after auto-fix
 - **Includes fixes in commit**
 - Mentions fixes in commit message body
@@ -68,8 +68,8 @@ The agent will:
    - Parse validation steps
    - Run checks locally
    - Report results
-3. **Auto-fix issues** (if --fix flag)
-   - Attempt to fix linting and other auto-fixable failures
+3. **Auto-fix linting** (if --fix flag)
+   - Fix linting and formatting issues
    - Re-run checks
    - Stage fixed files
 4. **Validate changes** against documentation and structure rules
