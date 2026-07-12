@@ -8,7 +8,7 @@ See [`AGENTS.md`](AGENTS.md) for the canonical layout description and repository
 
 ## Repository rules
 
-- Do not create new top-level folders under `.agents/` besides `agents/`, `skills/`, `commands/`, and `rules/`. Transient data (memory, backlog, plans) lives outside `.agents/` to keep it static.
+- Skills live in `skills/<category>/<skill-name>/`, NOT in `.agents/skills/`.
 - Keep skills agent-agnostic.
 - Avoid hardcoded absolute paths in skills or prompts.
 - Use project-relative defaults when needed (for example `./docs/planning`).
@@ -16,16 +16,26 @@ See [`AGENTS.md`](AGENTS.md) for the canonical layout description and repository
 
 ## Skill creation workflow
 
-1. Create a new skill folder under `.agents/skills/<skill-name>/`.
-2. Add `SKILL.md` with a clear description and workflow.
-3. Add `assets/`, `references/`, or `scripts/` only if needed.
-4. Update `.agents/skills/README.md` with a short description.
-5. Installation is automatic for agents on this machine: `~/.agents/skills/personal`
-   is a symlink to `.agents/skills/`, so every skill here is immediately available
-   as `~/.agents/skills/personal/<name>`. Run `scripts/install.sh` once per machine
+1. Pick a category under `skills/<category>/`.
+2. Create a new skill folder: `skills/<category>/<skill-name>/`.
+3. Add `SKILL.md` with a clear description and workflow.
+4. Add `assets/`, `references/`, or `scripts/` only if needed.
+5. Update the category description in `.claude-plugin/marketplace.json`.
+6. Installation is automatic for agents on this machine: `~/.agents/skills/personal`
+   is a symlink to `skills/`, so every skill here is immediately available
+   as `~/.agents/skills/personal/<category>/<name>`. Run `scripts/install.sh` once per machine
    to create that symlink (idempotent). Do NOT run `npx skills add . --all -y` here
-   — it has a destructive bug that empties `.agents/skills/*/SKILL.md` in the source
+   — it has a destructive bug that empties `SKILL.md` files in the source
    tree. Use `npx skills add ThePlenkov/skills --all` only when consuming from outside.
+
+## Skill references
+
+When one skill references another, use `$skill{name}` notation:
+
+```markdown
+See $skill{evidence} for proof requirements.
+Use $skill{safeguard} before destructive operations.
+```
 
 ## Optional UI metadata
 
@@ -41,4 +51,4 @@ See [`AGENTS.md`](AGENTS.md) for the canonical layout description and repository
 ## Retrospect
 
 - Use the `retrospect` skill after mistakes or friction to capture learnings.
-- It is secondary to an agent’s own tools and memory.
+- It is secondary to an agent's own tools and memory.

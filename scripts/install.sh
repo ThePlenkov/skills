@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Install all skills from this repo by symlinking
-#   ~/.agents/skills/personal → <repo>/.agents/skills
+#   ~/.agents/skills/personal → <repo>/skills
 #
-# One symlink exposes every skill folder under .agents/skills/ as
-# ~/.agents/skills/personal/<name>. New skills added to this repo appear
+# One symlink exposes every skill folder under skills/ as
+# ~/.agents/skills/personal/<category>/<name>. New skills added to this repo appear
 # automatically; no re-run needed.
 #
 # Usage:
@@ -12,7 +12,7 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SOURCE_DIR="${REPO_ROOT}/.agents/skills"
+SOURCE_DIR="${REPO_ROOT}/skills"
 PERSONAL_LINK="${HOME}/.agents/skills/personal"
 
 DRY_RUN=0
@@ -50,5 +50,5 @@ else
 fi
 
 echo "✓ linked $PERSONAL_LINK → $SOURCE_DIR"
-count=$(find "$SOURCE_DIR" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l)
+count=$(find "$SOURCE_DIR" -mindepth 2 -maxdepth 4 -name SKILL.md | wc -l)
 echo "  skills available: $count"

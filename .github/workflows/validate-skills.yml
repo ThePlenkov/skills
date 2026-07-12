@@ -4,13 +4,13 @@ on:
   push:
     branches: [main]
     paths:
-      - '.agents/skills/**/SKILL.md'
+      - 'skills/**/SKILL.md'
       - '.github/skill-schema.json'
       - '.github/workflows/validate-skills.yml'
       - '.github/scripts/**'
   pull_request:
     paths:
-      - '.agents/skills/**/SKILL.md'
+      - 'skills/**/SKILL.md'
       - '.github/skill-schema.json'
       - '.github/workflows/validate-skills.yml'
       - '.github/scripts/**'
@@ -77,6 +77,6 @@ jobs:
               FAILED=1
             fi
             rm -f "$tmpjson" /tmp/ajv.out
-          done < <(find .agents/skills -name 'SKILL.md' -print0)
+          done < <(find skills -name 'SKILL.md' -print0)
 
           exit $FAILED

@@ -1,0 +1,111 @@
+{
+  "name": "theplenkov-claude",
+  "owner": {
+    "name": "Petr Plenkov"
+  },
+  "description": "Personal, agent-agnostic skills for AI coding agents",
+  "plugins": [
+    {
+      "name": "skills",
+      "source": "./",
+      "skills": ["./skills/"],
+      "description": "All skills"
+    },
+    {
+      "name": "coaching",
+      "source": "./",
+      "skills": ["./skills/coaching"],
+      "description": "Agent coaching and user guidance"
+    },
+    {
+      "name": "behavior",
+      "source": "./",
+      "skills": ["./skills/behavior"],
+      "description": "Evidence-based behavior, code quality, critical thinking"
+    },
+    {
+      "name": "methodology",
+      "source": "./",
+      "skills": ["./skills/methodology"],
+      "description": "Development methodologies (SDD, TDD, Agile)"
+    },
+    {
+      "name": "orchestration",
+      "source": "./",
+      "skills": ["./skills/orchestration"],
+      "description": "Subagent coordination and context management"
+    },
+    {
+      "name": "planning",
+      "source": "./",
+      "skills": ["./skills/planning"],
+      "description": "Planning, triage, and session persistence"
+    },
+    {
+      "name": "integrations",
+      "source": "./",
+      "skills": ["./skills/integrations"],
+      "description": "External tool integrations (GitHub, GitLab, Codacy, etc.)"
+    },
+    {
+      "name": "testing",
+      "source": "./",
+      "skills": ["./skills/testing"],
+      "description": "CI/CD testing and E2E scenarios"
+    },
+    {
+      "name": "tools",
+      "source": "./",
+      "skills": ["./skills/tools"],
+      "description": "Development tools and utilities"
+    },
+    {
+      "name": "troubleshooting",
+      "source": "./",
+      "skills": ["./skills/troubleshooting"],
+      "description": "Scoped descent, safety, and recovery"
+    },
+    {
+      "name": "experimentation",
+      "source": "./",
+      "skills": ["./skills/experimentation"],
+      "description": "Sandboxed experimentation"
+    },
+    {
+      "name": "git",
+      "source": "./",
+      "skills": ["./skills/git"],
+      "description": "Git workflow operations"
+    },
+    {
+      "name": "code-review",
+      "source": "./",
+      "skills": ["./skills/code-review"],
+      "description": "PR/MR review and remediation"
+    },
+    {
+      "name": "self-learning",
+      "source": "./",
+      "skills": ["./skills/self-learning"],
+      "description": "Memory and retrospective learning"
+    },
+    {
+      "name": "debt-management",
+      "source": "./",
+      "skills": ["./skills/debt-management"],
+      "description": "Review debt collection and management"
+    },
+    {
+      "name": "research",
+      "source": "./",
+      "skills": ["./skills/research"],
+      "description": "Research and documentation tools"
+    },
+    {
+      "name": "agents",
+      "source": "./",
+      "skills": ["./skills/agents"],
+      "description": "Agent configuration and management"
+    }
+  ]
+}

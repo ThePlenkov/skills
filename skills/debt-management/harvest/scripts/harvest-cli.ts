@@ -1,0 +1,99 @@
+#!/usr/bin/env bun
+/**
+ * Entry point for /harvest scripts (`bun run harvest:*`).
+ *
+ * Collects unresolved PR review threads into
+ * `.agents/review-debt/harvests/*.jsonl`.
+ */
+import { spawnSync } from 'node:child_process'
+
+const SCRIPT_DIR = import.meta.dir
+const BUN = process.execPath
+
+const SUBCOMMANDS = {
+  pr: 'harvest-threads.ts',
+  batch: 'harvest-debt-batch.ts',
+  resolve: 'resolve-harvest-target.ts',
+  archive: 'archive-harvest.ts',
+} as const
+
+type Subcommand = keyof typeof SUBCOMMANDS
+
+function usage(): never {
+  console.error(`Usage:
+  bun run harvest:<cmd> -- [args…]
+
+Commands:
+  pr        Harvest one merged PR (positional: PR_NUMBER, --merged-sha, --run-id)
+  batch     Batch harvest merged PRs (--pr-ids, --merged-since, --last, …)
+  resolve   Resolve PR + merge SHA from a GH Actions event (writes outputs)
+  archive   Move fully-triaged harvests/*.jsonl into archive/ (used by /backlog harvest)
+  test      Run /harvest unit tests
+
+Examples:
+  bun run harvest:pr -- 72 --dry-run
+  bun run harvest:batch -- --pr-ids 72,67 --dry-run
+  bun run harvest:batch -- --merged-since 2026-06-09 --last 5
+  bun run harvest:archive -- --dry-run`)
+  process.exit(1)
+}
+
+function runBun(script: string, args: string[]): number {
+  const result = spawnSync(BUN, [`${SCRIPT_DIR}/${script}`, ...args], {
+    stdio: 'inherit',
+  })
+  if (result.error) {
+    throw result.error
+  }
+  return result.status ?? 1
+}
+
+function runTests(): number {
+  const tests = [
+    'review-debt-lib.test.ts',
+    'resolve-harvest-prs.test.ts',
+    'resolve-harvest-target.test.ts',
+    'archive-harvest.test.ts',
+  ]
+  const paths = tests.map((t) => `${SCRIPT_DIR}/${t}`)
+  const result = spawnSync(BUN, ['test', ...paths], { stdio: 'inherit' })
+  if (result.error) {
+    throw result.error
+  }
+  return result.status ?? 1
+}
+
+function wantsUsage(cmd: string | undefined): boolean {
+  if (!cmd) {
+    return true
+  }
+  return cmd === '--help' || cmd === '-h'
+}
+
+function subcommandScript(cmd: string): string {
+  const script = SUBCOMMANDS[cmd as Subcommand]
+  if (!script) {
+    console.error(`Unknown command: ${cmd}`)
+    usage()
+  }
+  return script
+}
+
+function runCommand(cmd: string, rest: string[]): number {
+  if (cmd === 'test') {
+    return runTests()
+  }
+  return runBun(subcommandScript(cmd), rest)
+}
+
+function main(): void {
+  const [cmd, ...rest] = process.argv.slice(2)
+  if (wantsUsage(cmd)) {
+    usage()
+  }
+  process.exit(runCommand(cmd!, rest))
+}
+
+if (import.meta.main) {
+  main()
+}
