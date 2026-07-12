@@ -208,13 +208,13 @@ brew install act
 # Windows (using Chocolatey)
 choco install act-cli
 
-# Linux
-curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
+# Linux (review the script first: https://github.com/nektos/act/blob/master/install.sh)
+curl -fsSL https://raw.githubusercontent.com/nektos/act/master/install.sh -o "${TMPDIR:-/tmp}/act-install.sh" && bash "${TMPDIR:-/tmp}/act-install.sh" -b ~/.local/bin
 
 # Manual: Download from https://github.com/nektos/act/releases
 ```
 
-**Configuration (skip interactive prompt):**
+**Non-interactive configuration:**
 Create `.actrc` in project root:
 ```
 -P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest

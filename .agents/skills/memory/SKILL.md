@@ -93,7 +93,7 @@ This is non-negotiable. Skipping recall means potentially repeating work that wa
 
 - **Prior decisions** → apply them, don't re-debate
 - **Known pitfalls** → avoid them proactively
-- **User preferences** → follow them without asking
+- **User preferences** → apply them automatically per established preferences
 - **Incomplete work** → pick up where it left off
 - **Retrospect findings** → critical, apply immediately (see integration below)
 

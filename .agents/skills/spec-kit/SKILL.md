@@ -37,6 +37,7 @@ uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME
 ### Upgrade
 
 ```bash
+# Use --force to reinstall if already installed
 uv tool install specify-cli --force --from git+https://github.com/github/spec-kit.git
 ```
 

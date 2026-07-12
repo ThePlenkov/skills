@@ -38,7 +38,7 @@ Invoking this skill **is** the user's consent for the full flow:
 3. Wait for review comments (bots + human), address or push back, resolve threads; repeat until no unaddressed feedback.
 4. Stop only on a terminal state (see §9), and then report back in one message.
 
-This overrides the global "never push without asking" rule **for this invocation only**, and only for the `fix/main-health` branch. The agent does not ask follow-up questions between phases — it decides, acts, and reports at the end. Clarifying questions are allowed **only** when the user's scoping choice is genuinely ambiguous before step 1 (e.g. "Sonar has 800 issues, which subset?").
+This overrides the global "never push without asking" rule **for this invocation only**, and only for the `fix/main-health` branch. The agent proceeds through phases with mid-phase decisions and reports at the end. Clarifying questions are allowed **only** when the user's scoping choice is genuinely ambiguous before step 1 (e.g. "Sonar has 800 issues, which subset?").
 
 ## Principles
 

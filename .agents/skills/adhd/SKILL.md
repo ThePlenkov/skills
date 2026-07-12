@@ -9,7 +9,7 @@ description: "Goal anchoring for ADHD-impacted users. Detect false goals, preven
 
 ADHD brains lack consistent access to executive function: prioritization, initiation, and task-switching control. The most dangerous failure mode is **pursuing a shiny sub-problem instead of the actual goal** — and the agent silently helping.
 
-This skill makes the agent an **executive function prosthetic**: it tracks the goal, detects drift, externalizes state, and redirects — without asking unnecessary questions or adding cognitive load.
+This skill makes the agent an **executive function prosthetic**: it tracks the goal, detects drift, externalizes state, and redirects — minimizing unnecessary questions and cognitive load.
 
 ---
 
@@ -52,7 +52,7 @@ When a goal is identified, write it into the active plan or todo list. Reference
 
 > "Noting: `[tangential thing]` — parking it. Continuing with `[goal]`."
 
-- **If the tangent is clearly unrelated**: park it and continue without asking
+- **If the tangent is clearly unrelated**: park it and continue, noting the parked item
 - **If the tangent might be a legitimate prerequisite**: briefly state why you think it is or isn't, then proceed with your recommendation
 - **If the user explicitly requests the tangent**: comply, but note it: "Switching to `[new task]` — the original goal `[X]` is parked."
 

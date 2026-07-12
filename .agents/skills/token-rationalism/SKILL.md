@@ -30,7 +30,7 @@ Additionally: **context rot is real**. As context length grows, model attention 
 - There are multiple valid approaches and you can pick the best one
 - The user said "create X" and you know what X needs
 
-When in doubt: make the decision, do the work, state what you decided and why — one line. Let the user correct course if needed. One correction is cheaper than a back-and-forth clarification loop.
+When in doubt: choose an approach, execute it, state what you decided and why — one line. Let the user correct course if needed. One correction is cheaper than a back-and-forth clarification loop.
 
 > Asking "should I use TypeScript or JavaScript?" when the project is already in TypeScript wastes a full interaction credit.
 

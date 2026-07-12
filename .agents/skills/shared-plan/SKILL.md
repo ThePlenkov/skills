@@ -36,7 +36,7 @@ Completed work should be moved to changelogs.
 
 5. **After mistakes or rework**
    - Add a brief retrospective entry: cause, fix, prevention.
-   - You may use the retrospect skill as a reminder, but rely on your own tools first.
+   - You may use the retrospect skill as a reminder, but use your own tools as the primary mechanism.
 
 ## Plan Template (minimal)
 

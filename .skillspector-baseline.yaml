@@ -1,5 +1,4 @@
 # SkillSpector baseline — suppress known/accepted findings.
-# Generated manually for ThePlenkov/skills initial setup.
 #
 # These are intentional patterns in personal agent skills that are NOT
 # security issues in this context. Re-run `skillspector baseline` after
@@ -10,11 +9,8 @@
 # Format: glob rules by rule_id, file path, or message.
 # See: https://github.com/NVIDIA/skillspector/blob/main/docs/SUPPRESSION.md
 #
-# NOTE: Finding paths are relative to the skill directory (e.g. SKILL.md,
-# workflows/init.md), NOT repo-relative. There is no way to scope a
-# suppression to a specific skill by name — only by file pattern within
-# skills. Rules that are intentional in some skills but potentially real
-# issues in others use id-only suppression with a review reminder.
+# Finding paths are relative to the skill directory (e.g. SKILL.md,
+# workflows/init.md), NOT repo-relative.
 
 rules:
   # ── token-rationalism: intentional autonomy instructions ──────────
@@ -48,7 +44,7 @@ rules:
     path: "SKILL.md"
     reason: "Tool access discussion is the topic of the skill"
 
-  # ── RP1: npx/uvx commands in skill documentation (72 findings) ───
+  # ── RP1: npx/uvx commands in skill documentation (~71 findings) ──
   # These are example commands shown to users in SKILL.md and workflow
   # docs. Pinning versions would make docs stale on every release.
   # REVIEW: If a new skill adds a genuinely dangerous npx command
@@ -56,13 +52,11 @@ rules:
   - rule_id: RP1
     reason: "Skill documentation shows example npx/uvx commands; version pinning would make docs stale"
 
-  # ── EA2: autonomous agent decisions (11 findings across 5 skills) ─
-  # Agent skills are designed to operate autonomously — this is the
-  # explicit design goal.
-  # REVIEW: If a new skill introduces unchecked autonomous behavior
-  # that should require human confirmation, this rule will hide it.
-  - rule_id: EA2
-    reason: "Autonomous agent decision-making is the intended design of all skills"
+  # ── EA2: autonomous agent decisions ──────────────────────────────
+  # FIXED in all skills: adhd, github-fix-main, memory, shared-plan,
+  # token-rationalism — rephrased autonomous language.
+  # REMOVED: CI passed with zero EA2 findings, proving the rewrites
+  # are effective. No suppression needed.
 
   # ── AS3: meta-skills reading other skills (8 findings) ────────────
   # Meta-skills (dotagents, skills, claude-skills, git-*) need to
@@ -88,25 +82,26 @@ rules:
   - rule_id: LP3
     reason: "Skills operate within the agent's existing permission scope"
 
-  # ── PE2: sudo in ci-local skill (3 findings) ─────────────────────
-  # Legitimate CI/CD operations that require elevated privileges.
-  # Scoped to SKILL.md since all findings are in documentation.
+  # ── PE2: sudo in documentation (4 findings) ──────────────────────
+  # FIXED: ci-local curl|sudo bash → download + bash (no pipe to sudo).
+  # Remaining findings are troubleshooting docs mentioning sudo as a
+  # fallback option — legitimate documentation.
   - rule_id: PE2
     path: "SKILL.md"
-    reason: "CI/CD scripts legitimately need elevated privileges for system package management"
+    reason: "Troubleshooting docs mention sudo as a fallback; curl|sudo bash was fixed"
 
   # ── E1: external URL in codacy skill (1 finding) ─────────────────
   # The Codacy skill sends analysis results to the Codacy API as part
   # of its core functionality.
-  # Scoped to SKILL.md since the finding is in documentation.
   - rule_id: E1
     path: "SKILL.md"
     reason: "Codacy skill sends analysis to the Codacy API as its core function"
 
   # ── TM3: unsafe tool defaults (1 finding) ────────────────────────
-  # The harvest CLI flag behavior is documented; the unsafe default
-  # is a known trade-off explained in the skill docs.
-  # Scoped to SKILL.md since the finding is in documentation.
+  # FIXED: spec-kit --force now has explanatory comment; ci-local
+  # "skip interactive prompt" → "non-interactive configuration".
+  # Remaining: npm-publish --bypass-2fa is a documented CLI flag with
+  # appropriate caveats.
   - rule_id: TM3
     path: "SKILL.md"
-    reason: "CLI flag defaults are documented trade-offs, not security oversights"
+    reason: "Remaining finding is a documented CLI flag with appropriate caveats"

@@ -103,7 +103,7 @@ Verify RED:
 
 ```bash
 cd packages/<name>  # or wherever the contract says
-npx vitest run src/<path>/<file>.test.ts
+npx --yes vitest@2.1.5 run src/<path>/<file>.test.ts
 # Expect: Test suite failure or test assertion failures — the expected TDD RED state
 ```
 
