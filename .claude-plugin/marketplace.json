@@ -8,7 +8,7 @@
     {
       "name": "skills",
       "source": "./",
-      "skills": ["./skills/"],
+      "skills": ["./skills/agents","./skills/behavior","./skills/coaching","./skills/code-review","./skills/debt-management","./skills/experimentation","./skills/git","./skills/integrations","./skills/methodology","./skills/orchestration","./skills/planning","./skills/research","./skills/self-learning","./skills/testing","./skills/tools","./skills/troubleshooting"],
       "description": "All skills"
     },
     {

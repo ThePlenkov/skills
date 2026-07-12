@@ -1,8 +1,21 @@
 #!/usr/bin/env bash
 # Mark open PR review threads as resolved in GitHub (GraphQL only).
 # Does NOT implement review feedback — run only after code fixes / in-thread replies (/act P4).
-# Requires: gh, jq, gh auth. Usage: resolve-open-threads.sh [--dry-run] OWNER REPO PR_NUMBER
+# Requires: gh, jq, gh auth, git. Usage: resolve-open-threads.sh [--dry-run] [OWNER REPO PR_NUMBER | PR_NUMBER]
 set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+for bin in gh jq git; do
+  if ! command -v "$bin" >/dev/null 2>&1; then
+    echo "error: $bin required" >&2
+    exit 1
+  fi
+done
+if ! gh auth status >/dev/null 2>&1; then
+  echo "error: gh not authenticated (run: gh auth login)" >&2
+  exit 1
+fi
 
 DRY_RUN=false
 if [[ "${1:-}" == "--dry-run" ]]; then
@@ -10,23 +23,21 @@ if [[ "${1:-}" == "--dry-run" ]]; then
   shift
 fi
 
-OWNER="${1:?owner}"
-REPO="${2:?repo}"
-PR="${3:?pr number}"
-
-if ! command -v gh >/dev/null 2>&1; then
-  echo "error: gh CLI required" >&2
-  exit 1
-fi
-if ! gh auth status >/dev/null 2>&1; then
-  echo "error: gh not authenticated (run: gh auth login)" >&2
-  exit 1
-fi
-if ! command -v jq >/dev/null 2>&1; then
-  echo "error: jq required" >&2
-  exit 1
+if [[ $# -eq 0 ]]; then
+  read -r OWNER REPO PR < <("$SCRIPT_DIR/pr-from-context.sh")
+elif [[ $# -eq 1 ]]; then
+  read -r OWNER REPO < <(gh repo view --json owner,name --jq '[.owner.login, .name] | @tsv')
+  PR="$1"
+elif [[ $# -eq 3 ]]; then
+  OWNER="$1"
+  REPO="$2"
+  PR="$3"
+else
+  echo "usage: resolve-open-threads.sh [--dry-run] [OWNER REPO PR_NUMBER | PR_NUMBER]" >&2
+  exit 2
 fi
 
+# shellcheck disable=SC2016  # GraphQL $-prefixed variables are literal.
 resolve_mutation='mutation($id:ID!) {
   resolveReviewThread(input:{threadId:$id}) {
     thread { isResolved }

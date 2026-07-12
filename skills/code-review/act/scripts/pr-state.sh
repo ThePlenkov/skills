@@ -8,7 +8,9 @@
 # plus the manual SAST annotation probe loop. When CI_REQUIRED_PENDING=0 the
 # SAST loop is skipped entirely (cost = 0 extra gh calls).
 #
-# Usage: pr-state.sh OWNER REPO PR_NUMBER
+# Usage: pr-state.sh [OWNER REPO PR_NUMBER | PR_NUMBER]
+#   If no arguments are given, the PR is resolved from the conversation context
+#   using pr-from-context.sh (current branch, then most-recently-updated open PR).
 # Output: key=value lines (HEAD_SHA, HEAD_REF, MERGEABLE, MERGE_STATE,
 #         OPEN_THREADS, CI_REQUIRED_PENDING, SAST_FINDINGS_PENDING) followed by
 #         a 4-column TSV table of open threads:
@@ -17,14 +19,26 @@
 #         stays on a single line; pagination uses pageInfo.hasNextPage.)
 set -euo pipefail
 
-OWNER="${1:?owner}"
-REPO="${2:?repo}"
-PR="${3:?pr number}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-for bin in gh jq; do
+for bin in gh jq git; do
   command -v "$bin" >/dev/null 2>&1 || { echo "error: $bin required" >&2; exit 1; }
 done
 gh auth status >/dev/null 2>&1 || { echo "error: gh not authenticated" >&2; exit 1; }
+
+if [[ $# -eq 0 ]]; then
+  read -r OWNER REPO PR < <("$SCRIPT_DIR/pr-from-context.sh")
+elif [[ $# -eq 1 ]]; then
+  read -r OWNER REPO < <(gh repo view --json owner,name --jq '[.owner.login, .name] | @tsv')
+  PR="$1"
+elif [[ $# -eq 3 ]]; then
+  OWNER="$1"
+  REPO="$2"
+  PR="$3"
+else
+  echo "usage: pr-state.sh [OWNER REPO PR_NUMBER | PR_NUMBER]" >&2
+  exit 2
+fi
 
 # Page through reviewThreads (default 100 per page) to avoid silent truncation.
 # `gh api graphql --paginate` does not work for arbitrary connections, so loop
@@ -60,6 +74,7 @@ query($var_decls) {
       headRefOid
       headRefName
       mergeable
+      mergeStateStatus
       state
       url
       reviewThreads(first: \$n$after_clause) {
@@ -88,13 +103,17 @@ EOF
     <(echo "$threads_json_all") <(echo "$state_json"))"
   has_next="$(echo "$state_json" | jq -r '.data.repository.pullRequest.reviewThreads.pageInfo.hasNextPage')"
   cursor="$(echo "$state_json" | jq -r '.data.repository.pullRequest.reviewThreads.pageInfo.endCursor // empty')"
+  if [[ "$has_next" == "true" && -z "$cursor" ]]; then
+    echo "error: GraphQL response missing endCursor despite hasNextPage=true" >&2; exit 1
+  fi
 done
 
-read -r head_sha head_ref mergeable url <<<"$(jq -r '
+IFS=$'\t' read -r head_sha head_ref mergeable merge_state url <<<"$(jq -r '
   [
     .data.repository.pullRequest.headRefOid,
     .data.repository.pullRequest.headRefName,
     (.data.repository.pullRequest.mergeable // "UNKNOWN" | ascii_downcase),
+    (.data.repository.pullRequest.mergeStateStatus // "UNKNOWN"),
     .data.repository.pullRequest.url
   ] | @tsv
 ' <<<"$state_json")"
@@ -106,11 +125,10 @@ case "$mergeable" in
   *) mergeable="${mergeable^^}" ;;
 esac
 
-# mergeStateStatus comes from the REST Checks API (not in the GraphQL PR object).
-rest_json="$(gh pr view "$PR" --repo "$OWNER/$REPO" --json mergeStateStatus 2>&1)" || {
-  echo "$rest_json" >&2; exit 1;
-}
-merge_state="$(echo "$rest_json" | jq -r '.mergeStateStatus // "UNKNOWN"')"
+# mergeStateStatus is now fetched from the same GraphQL query as the PR state.
+if [[ -z "$merge_state" || "$merge_state" == "null" ]]; then
+  merge_state="UNKNOWN"
+fi
 
 # gh pr checks exits 1 with "no checks reported" when no checks have run yet.
 checks_json="$(gh pr checks "$PR" --repo "$OWNER/$REPO" --json name,state,bucket 2>&1)" || {
@@ -161,8 +179,8 @@ is_sast_tool_name() {
 count_failure_annotations() {
   local run_id="$1"
   local run_name="$2"
-  gh api --paginate "repos/$OWNER/$REPO/check-runs/$run_id/annotations" \
-    --jq '[.[] | select(.annotation_level=="failure")] | length' 2>/dev/null \
+  gh api --paginate "repos/$OWNER/$REPO/check-runs/$run_id/annotations" 2>/dev/null \
+    | jq -s '[.[] | .[] | select(.annotation_level=="failure")] | length' \
     || { echo "warn: annotations API failed for run $run_id ($run_name)" >&2; return 1; }
 }
 

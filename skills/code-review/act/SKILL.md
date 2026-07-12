@@ -1,14 +1,15 @@
 ---
 name: act
 description: >-
-  Use when the user invokes /act on a PR/MR or /act <context> with
+  Use when the user invokes /act on a PR/MR, /act with no arguments
+  (uses the PR in the current conversation context), or /act <context> with
   context ∈ {pr, plan, backlog, harvest}. Resolves threads in product code
   (or posts a substantive in-thread reply), commits, then closes threads.
   Never resolve-only. Harvest (collecting threads) lives in /harvest;
   triage (priority / grouping / wontfix) lives in /backlog. /act is the
   fix loop, not the collect or triage.
 disable-model-invocation: true
-compatibility: Requires gh, jq, bun.
+compatibility: Requires gh, jq, git, bun.
 ---
 
 # /act
@@ -97,7 +98,7 @@ Running the resolve script **without** doing that first is **wrong** — same as
 
 | Context | Command | Source | Owner of the source |
 | ------- | ------- | ------ | ------------------- |
-| **`pr`** (default when a PR is in context) | `/act` · `/act pr` · `/act 42` | Open threads on a single PR | Live PR |
+| **`pr`** (default when a PR is in context) | `/act` (no arg) · `/act pr` · `/act 42` · `/act <url>` | Open threads on a single PR | Live PR |
 | **`plan`** | `/act plan` | `.agents/plans/*.md` | `/plan` (future) |
 | **`backlog`** | `/act backlog` | `.agents/backlog/*.md` | `/backlog` |
 | **`harvest`** | `/act harvest` | `.agents/review-debt/harvests/*.jsonl` | `/harvest` |
@@ -146,8 +147,9 @@ Do not replace the author's summary with checklists, thread counts, or CI notes.
 ## On start
 
 1. React 👀 (or 👍).
-2. **HEAD SHA** — `gh pr view NUMBER --json headRefOid,statusCheckRollup,url`.
-3. **Resolve the context** (see table above) and **inventory threads** — for each unresolved thread, capture: file/line, reviewer ask, whether it needs a **code change** or a **written answer**.
+2. **Resolve the PR context**. If the user supplied a number or URL, use it. If the user said `/act` with no PR, run `scripts/pr-from-context.sh` to fall back to the current branch's PR (or the most recently updated open PR). If ambiguous, ask the user before proceeding.
+3. **HEAD SHA** — use `scripts/pr-state.sh` (with no arguments it resolves the PR from context) or `gh pr view NUMBER --json headRefOid,statusCheckRollup,url`.
+4. **Inventory threads** — for each unresolved thread, capture: file/line, reviewer ask, whether it needs a **code change** or a **written answer**.
 
 Build a short **thread plan** before editing (can be in your working notes / final summary):
 
@@ -466,9 +468,9 @@ is cached (computed asynchronously by GitHub's merge-queue worker; see
 gh-cli #9583). Note that `mergeable` (merge conflict status:
 `MERGEABLE`/`CONFLICTING`) and `mergeStateStatus` (overall merge button
 state: `CLEAN`/`BLOCKED`/`DIRTY`/etc.) are **separate** GraphQL fields and
-must not be conflated. The script already reads `mergeStateStatus` from
-`gh pr view --json` (which itself uses GraphQL) on every run, so a stale
-`mergeable` value does not block `/act` decisions.
+must not be conflated. The script reads `mergeStateStatus` from the same
+GraphQL query as the other PR fields, so a stale `mergeable` value does not
+block `/act` decisions.
 
 ## Runtime extras
 
