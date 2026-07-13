@@ -7,7 +7,7 @@
   "properties": {
     "path": {
       "type": "string",
-      "description": "Path to the skill directory to scan (must contain SKILL.md).",
+      "description": "Reserved for future use. Currently not wired to the scan — the Nx plugin discovers all SKILL.md files via the **/SKILL.md glob in nx.json.",
       "default": "."
     },
     "sarif": {

@@ -86,7 +86,7 @@ The plugin auto-detects single-skill vs parent-of-many:
 
 | Name                   | Required | Default                       | Description                                                                                                    |
 |------------------------|----------|-------------------------------|----------------------------------------------------------------------------------------------------------------|
-| `path`                 | no       | `.`                           | Path to scan. Single skill (has `SKILL.md`) or parent of multiple skills (sub-dirs with `SKILL.md`).           |
+| `path`                 | no       | `.`                           | Reserved for future use. Currently the Nx plugin discovers all `SKILL.md` files via the `**/SKILL.md` glob in `nx.json`, so this input is not wired to the scan. Kept for backwards compatibility. |
 | `recursive`            | no       | `"false"`                     | Pass `--recursive` to skillspector. Caveat documented in NVIDIA/SkillSpector#228.                              |
 | `baseline`             | no       | `""`                          | Path to `.skillspector-baseline.yaml`.                                                                         |
 | `no-llm`               | no       | `"true"`                      | Pass `--no-llm` (recommended for CI).                                                                          |

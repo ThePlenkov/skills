@@ -13,9 +13,10 @@ branding:
 inputs:
   path:
     description: >-
-      Path to scan. The plugin discovers every `SKILL.md` beneath this
-      path and infers a `scan` target per skill. Default: the host
-      repo's standard `.agents/skills/` directory.
+      Reserved for future use. Currently the Nx plugin discovers all
+      `SKILL.md` files across the workspace via the `**/SKILL.md` glob
+      in `nx.json`, so this input is not wired to the scan. The default
+      is kept for backwards compatibility.
     required: false
     default: .agents/skills
   baseline:
@@ -145,7 +146,7 @@ runs:
       uses: actions/cache/restore@v6
       with:
         path: .nx/cache
-        key: nx-skillspector-${{ runner.os }}-${{ hashFiles('actions/skillspector/package-lock.json', '.agents/skills/**/SKILL.md') }}
+        key: nx-skillspector-${{ runner.os }}-${{ hashFiles('actions/skillspector/package-lock.json', 'skills/**') }}
         restore-keys: |
           nx-skillspector-${{ runner.os }}-
 
