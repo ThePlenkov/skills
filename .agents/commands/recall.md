@@ -26,4 +26,4 @@ Search memory for prior context, decisions, and learnings before starting any ta
 
 **Always recall before acting** - this prevents repeating work and mistakes.
 
-Apply the recall protocol from `~/.agents/skills/memory/SKILL.md`.
+Apply the recall protocol from `.agents/skills/memory/SKILL.md`.

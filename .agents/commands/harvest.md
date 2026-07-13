@@ -42,4 +42,4 @@ PR merge → /harvest → harvests/*.jsonl → /backlog (triage) → /act (fix) 
 **Row schema:**
 Each row has: thread_id, thread_url, status, priority, needs, source_pr, fingerprint, area, harvested_at
 
-Apply the full harvest protocol from `~/.agents/skills/harvest/SKILL.md`.
+Apply the full harvest protocol from `.agents/skills/harvest/SKILL.md`.

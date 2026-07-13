@@ -45,4 +45,4 @@ When something goes wrong, stop and capture the learning to prevent recurrence.
 - Blame the user
 - Continue without acknowledging mistake
 
-Apply the full retrospect protocol from `~/.agents/skills/retrospect/SKILL.md`.
+Apply the full retrospect protocol from `.agents/skills/retrospect/SKILL.md`.

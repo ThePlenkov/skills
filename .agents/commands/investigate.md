@@ -50,4 +50,4 @@ Use before editing when bug, task, or code area is not yet understood. Narrow sc
 
 **Allowed tools:** read, grep, glob, exec (no editing)
 
-Apply the full investigate-first protocol from `~/.agents/skills/investigate-first/SKILL.md`.
+Apply the full investigate-first protocol from `.agents/skills/investigate-first/SKILL.md`.

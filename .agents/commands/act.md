@@ -51,4 +51,4 @@ Use the `/act` skill to resolve review threads and CI issues on a pull request.
 - open_threads=0
 - P5 and P6 complete
 
-Apply the full `/act` skill protocol from `~/.agents/skills/act/SKILL.md`.
+Apply the full `/act` skill protocol from `.agents/skills/act/SKILL.md`.

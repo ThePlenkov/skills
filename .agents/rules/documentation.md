@@ -26,7 +26,7 @@ Documentation varies by project, but commonly includes:
 
 ### Project-Specific Documentation
 Each project may have unique documentation patterns:
-- Skills repository: `.agents/skills/README.md` (skill index)
+- Skills repository: `.agents/skills/` (generated flat symlinks) and `AGENTS.md`
 - Monorepos: workspace configuration, dependency graphs
 - Libraries: usage examples, migration guides
 - APIs: endpoint documentation, request/response examples
@@ -76,7 +76,7 @@ Before committing, review changes and check:
 **Change**: Rename `git-commit` skill to `conventional-commit`
 
 **Documentation Impact**:
-- Update `.agents/skills/README.md` index
+- Run `scripts/install.sh` to update `.agents/skills/` symlinks
 - Update any skills that reference it
 - Update any agent prompts that mention it
 - Update installation examples in README
@@ -186,7 +186,7 @@ Files updated:
 ## Project-Specific Patterns
 
 ### Skills Repository
-- Always update `.agents/skills/README.md` when adding/removing skills
+- Always run `scripts/install.sh` to update `.agents/skills/` symlinks when adding/removing skills
 - Update `AGENTS.md` when changing repository structure
 - Update skill references when renaming or moving skills
 - Keep layout sections synchronized across AGENTS.md, CLAUDE.md, README.md

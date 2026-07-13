@@ -23,10 +23,16 @@ Manages the `.agents/` framework lifecycle — from bootstrapping a new agent to
 
 ## Skill Management
 
-Skills are installed and managed using the [`npx skills` CLI](https://github.com/vercel-labs/skills):
+For `.agents` agents (Cursor, Codex, etc.), create or refresh the flat `.agents/skills/<skill-name>/` symlinks:
 
 ```bash
-# Install all skills from this repo to all detected agents
+bash scripts/install.sh
+```
+
+For other agents (Claude Code, Windsurf, etc.), use the [`npx skills` CLI](https://github.com/vercel-labs/skills):
+
+```bash
+# For other agents (Claude Code, Windsurf, etc.)
 npx skills add ThePlenkov/skills --all -y
 
 # Check for updates
@@ -76,7 +82,7 @@ See [assets/TEMPLATE.md](assets/TEMPLATE.md) for a skill template.
 2. Choose the appropriate category folder under `skills/`
 3. Create `<skill-name>/SKILL.md` with YAML frontmatter (`name`, `description`)
 4. Optional: add `references/`, `assets/`, or `scripts/`
-5. Run `npx skills add . --all` to install updated skills
+5. Run `scripts/install.sh` to update `.agents/skills/` symlinks
 
 ## Scope Rules
 

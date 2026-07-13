@@ -1,7 +1,7 @@
 # Agent Memory Rule
 
 ## Overview
-Agents must maintain persistent memory across sessions to improve context retention, learning, and decision-making. This rule enforces the memory protocol defined in the `memory` skill (`~/.agents/skills/memory/SKILL.md`).
+Agents must maintain persistent memory across sessions to improve context retention, learning, and decision-making. This rule enforces the memory protocol defined in the `memory` skill (`.agents/skills/memory/SKILL.md`).
 
 ## Memory Skill Integration
 
@@ -12,7 +12,7 @@ This rule is built on top of the **memory skill** which provides the complete im
 - Entity types and naming conventions
 - Session lifecycle management
 
-**Reference**: `~/.agents/skills/memory/SKILL.md`
+**Reference**: `.agents/skills/memory/SKILL.md`
 
 ## Mental Models
 
@@ -143,8 +143,8 @@ During recall, treat retrospect entities as high-priority:
 
 ## Related Skills and Rules
 
-- **Memory Skill**: `~/.agents/skills/memory/SKILL.md` (authoritative protocol)
-- **Retrospect Skill**: `~/.agents/skills/retrospect/SKILL.md` (mistake capture)
+- **Memory Skill**: `.agents/skills/memory/SKILL.md` (authoritative protocol)
+- **Retrospect Skill**: `.agents/skills/retrospect/SKILL.md` (mistake capture)
 - `agent-context.md`: Context management and awareness
 - `agent-learning.md`: Continuous learning and adaptation
 - `agent-privacy.md`: Data privacy and security guidelines

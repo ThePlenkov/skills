@@ -73,17 +73,17 @@ retry, unique filename per run → no bot PR).
 
 ```bash
 # single PR
-bun .agents/skills/personal/debt-management/harvest/scripts/harvest-threads.ts OWNER REPO PR --merged-sha SHA --run-id local
+bun .agents/skills/harvest/scripts/harvest-threads.ts OWNER REPO PR --merged-sha SHA --run-id local
 
 # batch with filters (mirrors workflow_dispatch inputs)
-bun .agents/skills/personal/debt-management/harvest/scripts/harvest-debt-batch.ts OWNER REPO \
+bun .agents/skills/harvest/scripts/harvest-debt-batch.ts OWNER REPO \
   --pr-ids 72,67 --dry-run
-bun .agents/skills/personal/debt-management/harvest/scripts/harvest-debt-batch.ts OWNER REPO \
+bun .agents/skills/harvest/scripts/harvest-debt-batch.ts OWNER REPO \
   --merged-since 2026-06-09 --last 5
 
 # archive fully-triaged files (called by /backlog harvest, safe to call by hand)
-bun .agents/skills/personal/debt-management/harvest/scripts/archive-harvest.ts --dry-run
-bun .agents/skills/personal/debt-management/harvest/scripts/archive-harvest.ts
+bun .agents/skills/harvest/scripts/archive-harvest.ts --dry-run
+bun .agents/skills/harvest/scripts/archive-harvest.ts
 
 # convenience targets (root package.json)
 bun run harvest:pr      -- 72 --dry-run

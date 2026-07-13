@@ -92,8 +92,8 @@ After cloning this repo, run once per machine:
 bash scripts/install.sh
 ```
 
-This creates `~/.agents/skills/personal → <repo>/skills/`.
-Every skill you add to this repo is instantly available to all your agents — no re-run needed.
+This creates `.agents/skills/<skill-name>` symlinks pointing to `skills/<category>/<skill-name>/` (categories may be nested).
+Re-run `scripts/install.sh` after adding or removing skills to update the symlinks.
 
 To verify:
 
@@ -103,7 +103,7 @@ bash scripts/install.sh --dry-run
 
 ## Creating a skill
 
-1. Pick a category under `skills/<category>/`.
+1. Pick a category under `skills/<category>/` (categories may be nested).
 2. Create a new folder: `skills/<category>/<skill-name>/`.
 3. Add `SKILL.md` with YAML frontmatter (`name`, `description`).
 4. Add `assets/`, `references/`, or `scripts/` only if needed.
@@ -127,14 +127,14 @@ repository.
 1. Go to **Settings → Codespaces → Dotfiles** on GitHub.
 2. Select this repository and enable **Automatically install dotfiles**.
 
-When a new codespace starts, `install.sh` runs automatically and creates the
-`~/.agents/skills/personal` symlink exposing every skill under `skills/`.
-No re-install is needed when skills are added or updated.
+When a new codespace starts, `install.sh` runs automatically and creates flat
+`~/.agents/skills/<skill-name>` symlinks pointing to the `skills/` directory in this repo.
+Re-run `install.sh` after pulling new skills to create their symlinks.
 
 To re-run manually:
 
 ```bash
-bash ~/dotfiles/scripts/install.sh
+bash ~/dotfiles/install.sh
 ```
 
 ## Notes

@@ -79,6 +79,15 @@ jobs:
         # markdownlint.
         run: |
           set -o pipefail
-          markdownlint-cli2 '**/*.md' --config .markdownlint.json \
+          markdownlint-cli2 '**/*.md' '!.agents/skills/**' --config .markdownlint.json \
             | tee markdownlint.log \
             | .github/scripts/to-annotations.sh markdownlint
+
+  dotagents-skills:
+    name: Verify .agents/skills symlinks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check .agents/skills is in sync
+        run: ./scripts/install.sh --check

@@ -121,7 +121,7 @@ Before committing, verify:
 ```
 .agents/
   agents/     - Role prompts
-  skills/     - Skills (each in own folder)
+  skills/     - Generated flat symlinks to skills/<category>/<skill-name>/ (categories may be nested)
   commands/   - Command definitions
   rules/      - Agent behavior rules
 .memory/      - Transient memory files
@@ -131,7 +131,7 @@ scripts/      - Helper scripts
 **Rules:**
 - No new top-level folders under `.agents/` besides `agents/`, `skills/`, `commands/`, `rules/`
 - Transient data (memory, backlog, plans) lives outside `.agents/`
-- Skills go in `.agents/skills/<skill-name>/`
+- Skills are exposed as `.agents/skills/<skill-name>/` (generated symlinks to `skills/<category>/<skill-name>/`)
 - Helper scripts go in `scripts/`
 
 **Violations:**

@@ -8,7 +8,7 @@
  * Usage:
  *   bun run act:debt:harvest-pr -- PR --merged-sha SHA --run-id RUN_ID
  *   bun run act:debt:harvest-pr -- 81 --dry-run
- *   bun .agents/skills/act/scripts/harvest-threads.ts OWNER REPO PR --merged-sha SHA
+ *   bun .agents/skills/harvest/scripts/harvest-threads.ts OWNER REPO PR --merged-sha SHA
  */
 import {
   buildSummary,

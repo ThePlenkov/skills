@@ -54,4 +54,4 @@ Collapse a completed narrow branch into the parent/root task, rebuild execution 
 - Undo working code
 - Claim root task solved when only branch is solved
 
-Apply the full unwind protocol from `~/.agents/skills/unwind/SKILL.md`.
+Apply the full unwind protocol from `.agents/skills/unwind/SKILL.md`.

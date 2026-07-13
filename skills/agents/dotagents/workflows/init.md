@@ -25,7 +25,7 @@ The current agent bootstraps itself into the `.agents/` framework.
 
 ### 3. Install Skills
 
-Run `npx skills add . --all -y` or `/dotagents install` to set up skills in own native format.
+Run `scripts/install.sh` to set up `.agents/skills/` symlinks, or use `/dotagents install` for other agents.
 
 ### 4. Configure Subagents
 
@@ -57,7 +57,13 @@ Use web search to find:
 
 ### 2. Discover Skills to Install
 
-Use `npx skills add` to install from the current project:
+For `.agents` agents (Codex, Cursor), use the install script to set up symlinks:
+
+```bash
+bash scripts/install.sh
+```
+
+For other agents, use the [`npx skills` CLI](https://github.com/vercel-labs/skills):
 
 ```bash
 # List available skills first
@@ -71,7 +77,9 @@ The key rule: **only install skills that belong to or are configured for this pr
 
 ### 3. Install Skills for the Target Agent
 
-Use the [`npx skills` CLI](https://github.com/vercel-labs/skills) to install skills in the target agent's native format:
+For `.agents` agents, `scripts/install.sh` already creates the correct flat symlink structure.
+
+For other agents, use the [`npx skills` CLI](https://github.com/vercel-labs/skills) to install skills in the target agent's native format:
 
 ```bash
 # Install to a specific agent
@@ -80,7 +88,6 @@ npx skills add . -a <agent-name> -y
 # Examples:
 npx skills add . -a claude-code -y
 npx skills add . -a windsurf -y
-npx skills add . -a codex -y
 ```
 
 The CLI automatically creates the correct directory structure for each agent.
