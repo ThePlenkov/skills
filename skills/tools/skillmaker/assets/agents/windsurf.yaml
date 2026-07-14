@@ -1,0 +1,6 @@
+agent: windsurf
+source: https://docs.codeium.com/windsurf
+commands: []
+note: >
+  Uses .windsurf/skills/ and .windsurf/rules for skill/rule loading.
+  No documented built-in slash command namespace.

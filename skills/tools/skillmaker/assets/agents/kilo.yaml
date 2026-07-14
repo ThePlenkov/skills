@@ -1,0 +1,6 @@
+agent: kilo
+source: https://kilo.ai/docs
+commands: []
+note: >
+  Kilo uses skills loaded from .kilo/skills/ and .agents/skills/.
+  No built-in slash commands beyond standard agent tool invocation.

@@ -6,12 +6,6 @@
   "description": "Personal, agent-agnostic skills for AI coding agents",
   "plugins": [
     {
-      "name": "skills",
-      "source": "./",
-      "skills": ["./skills/agents","./skills/behavior","./skills/coaching","./skills/code-review","./skills/debt-management","./skills/experimentation","./skills/git","./skills/integrations","./skills/methodology","./skills/orchestration","./skills/planning","./skills/research","./skills/self-learning","./skills/testing","./skills/tools","./skills/troubleshooting"],
-      "description": "All skills"
-    },
-    {
       "name": "coaching",
       "source": "./",
       "skills": ["./skills/coaching"],

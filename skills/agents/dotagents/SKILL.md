@@ -42,7 +42,7 @@ npx skills check
 npx skills update
 ```
 
-See the $skill{skills} for full CLI reference.
+See the $skill{skills-cli} for full CLI reference.
 
 ## What Are Skills?
 

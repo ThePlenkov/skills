@@ -1,0 +1,6 @@
+agent: copilot
+source: https://docs.github.com/en/copilot
+commands:
+  - "@terminal"
+  - "@vscode"
+  - "@workspace"

@@ -1,5 +1,5 @@
 ---
-name: memory
+name: persistent-memory
 description: "Persistent memory enforcement for AI agents. Before starting any task, recall prior work and findings. After completing work, persist learnings. Use always — this governs how the agent accumulates and retrieves knowledge across sessions."
 ---
 

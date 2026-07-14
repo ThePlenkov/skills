@@ -1,10 +1,9 @@
 {
   "name": "skills",
-  "displayName": "All skills",
-  "description": "Personal, agent-agnostic skills for AI coding agents",
+  "displayName": "Skills metadata",
+  "description": "Personal, agent-agnostic skills for AI coding agents. Install via marketplace categories or .agents/skills/ symlinks.",
   "version": "1.0.0",
   "author": {
     "name": "Petr Plenkov"
-  },
-  "skills": ["./skills/agents","./skills/behavior","./skills/coaching","./skills/code-review","./skills/debt-management","./skills/experimentation","./skills/git","./skills/integrations","./skills/methodology","./skills/orchestration","./skills/planning","./skills/research","./skills/self-learning","./skills/testing","./skills/tools","./skills/troubleshooting"]
+  }
 }

@@ -1,0 +1,6 @@
+agent: cursor
+source: https://docs.cursor.com
+commands: []
+note: >
+  Uses .cursorrules and .cursor/skills/ for skill loading.
+  No documented built-in slash command namespace.

@@ -1,5 +1,5 @@
 ---
-name: sandbox
+name: sandboxed
 description: Isolate risky agent experiments in a dedicated git branch or git worktree, create explicit checkpoint commits, and prevent the agent from breaking the user's active working directory. Use before architecture experiments, dependency changes, framework rewrites, config changes, large refactors, generated-file changes, migration attempts, or any task where the agent may need to try multiple approaches.
 argument-hint: "[optional experiment name or root objective]"
 triggers:

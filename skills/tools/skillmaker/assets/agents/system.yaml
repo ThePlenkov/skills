@@ -1,0 +1,7 @@
+agent: system
+source: agent-agnostic system concepts
+commands:
+  - /agents
+  - /plugins
+  - /subagents
+  - /worktrees

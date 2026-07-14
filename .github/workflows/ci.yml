@@ -91,3 +91,19 @@ jobs:
 
       - name: Check .agents/skills is in sync
         run: ./scripts/install.sh --check
+
+  reserved-names:
+    name: Check reserved skill names
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Generate and validate reserved names
+        run: |
+          ./skills/tools/skillmaker/scripts/collect-reserved.sh
+          ./scripts/validate-reserved-names.sh

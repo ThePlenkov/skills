@@ -1,0 +1,6 @@
+agent: aider
+source: https://aider.chat/docs/usage.html
+commands:
+  - /ask
+  - /chat
+  - /code

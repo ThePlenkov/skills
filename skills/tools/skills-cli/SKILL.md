@@ -1,5 +1,5 @@
 ---
-name: skills
+name: skills-cli
 description: Install and manage agent skills using the `npx skills` CLI (vercel-labs/skills).
 ---
 

@@ -14,3 +14,5 @@ skillspector.sarif
 .memory/
 
 .bob
+# Generated from skills/tools/skillmaker/assets/agents/*.yaml
+scripts/reserved-names.sh

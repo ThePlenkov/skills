@@ -80,3 +80,11 @@ jobs:
           done < <(find skills -name 'SKILL.md' -print0)
 
           exit $FAILED
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Check reserved skill names
+        run: ./scripts/validate-reserved-names.sh
