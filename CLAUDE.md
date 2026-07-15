@@ -30,12 +30,7 @@ See [`AGENTS.md`](AGENTS.md) for the canonical layout description and repository
 
 ## Skill references
 
-When one skill references another, use `$skill{name}` notation:
-
-```markdown
-See $skill{evidence} for proof requirements.
-Use $skill{safeguard} before destructive operations.
-```
+See [AGENTS.md § Skill references](AGENTS.md#skill-references) for the canonical guidance.
 
 ## Optional UI metadata
 

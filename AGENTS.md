@@ -55,11 +55,12 @@ skills/
 
 ## Skill references
 
-When one skill references another, use `$skill{name}` notation:
+When one skill references another, use `$name` or `$skill{name}` notation. Integration and tool skills are typically referenced by bare `$name` (e.g. `$github`, `$gitlab`, `$glab`); other skills may use `$skill{name}`:
 
 ```markdown
 See $skill{evidence} for proof requirements.
 Use $skill{safeguard} before destructive operations.
+See $github for authentication.
 ```
 
 ## Optional UI metadata
@@ -74,6 +75,10 @@ Use $skill{safeguard} before destructive operations.
 - Do not repeat the full system overview in each role prompt.
 
 ## Retrospect
+
+- Use the $skill{retrospect} skill after mistakes or friction to capture learnings.
+- It is secondary to an agent's own tools and memory.
+
 ## Command file syntax (Bob Shell)
 
 Command files in `.agents/commands/` use YAML frontmatter. The `argument-hint` field must be a plain string without quotes or square brackets:
@@ -92,6 +97,3 @@ argument-hint: pr|plan|backlog|harvest pr-number
 ```
 
 Use plain text for optional arguments, `|` for alternatives, `<name>` for placeholders, and `--flag=value1|value2` for flag options.
-
-- Use the $skill{retrospect} skill after mistakes or friction to capture learnings.
-- It is secondary to an agent's own tools and memory.
