@@ -22,6 +22,8 @@ Applies to `/act`, `/act pr`, `/act plan`, `/act backlog`, `/act harvest`, `@cla
 
 **No Playwright** for GitHub PR UI.
 
+**`bun` is required.** The helper scripts in `scripts/` use `Bun`-specific APIs (e.g. `Bun.spawnSync`, `bun:test`, `#!/usr/bin/env bun`). Do not attempt to run them with Node.js/npx. Install `bun` first if it is missing.
+
 ## Philosophy — "It's all yours"
 
 **There is no "not my responsibility" in `/act`.** SonarQube, Codacy, CodeScene, CodeQL, Semgrep, Trivy — these are not external services the agent can dismiss. They are part of the code quality surface, and `/act` owns all of it. If a SAST tool flagged something on this PR, it is the agent's problem to fix.
@@ -147,9 +149,13 @@ Do not replace the author's summary with checklists, thread counts, or CI notes.
 ## On start
 
 1. React 👀 (or 👍).
-2. **Resolve the PR context**. If the user supplied a number or URL, use it. If the user said `/act` with no PR, run `scripts/pr-from-context.sh` to fall back to the current branch's PR (or the most recently updated open PR). If ambiguous, ask the user before proceeding.
-3. **HEAD SHA** — use `scripts/pr-state.sh` (with no arguments it resolves the PR from context) or `gh pr view NUMBER --json headRefOid,statusCheckRollup,url`.
-4. **Inventory threads** — for each unresolved thread, capture: file/line, reviewer ask, whether it needs a **code change** or a **written answer**.
+2. **Verify environment preconditions** before any state work:
+   - `gh auth status` must succeed. If `GH_TOKEN` is missing or invalid, request the secret and stop; do not proceed.
+   - If the runtime enforces a network allowlist, ensure it includes `api.github.com`, `github.com`, and any package registries the repo needs (e.g. `registry.npmjs.org`). Request access if missing.
+   - `jq`, `git`, `gh`, and `bun` must be available. `bun` is required for the helper scripts in this skill; install it before proceeding.
+3. **Resolve the PR context**. If the user supplied a number or URL, use it. If the user said `/act` with no PR, run `scripts/pr-from-context.sh` to fall back to the current branch's PR (or the most recently updated open PR). If ambiguous, ask the user before proceeding.
+4. **HEAD SHA** — use `scripts/pr-state.sh` (with no arguments it resolves the PR from context) or `gh pr view NUMBER --json headRefOid,statusCheckRollup,url`.
+5. **Inventory threads** — for each unresolved thread, capture: file/line, reviewer ask, whether it needs a **code change** or a **written answer**.
 
 Build a short **thread plan** before editing (can be in your working notes / final summary):
 

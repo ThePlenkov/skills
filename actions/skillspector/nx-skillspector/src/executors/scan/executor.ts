@@ -196,7 +196,7 @@ export default async function scanExecutor(
   // step summary builder. The workflow assembles these into a tree-
   // style Markdown report.  Each file is named with a counter to
   // preserve insertion order and avoid parallel-write races.
-  // Default to a tmp dir shared with build-step-summary.js, which reads the
+  // Default to a tmp dir shared with build-step-summary.mjs, which reads the
   // findings JSONs in the workflow's `Write step summary` step. CI-only,
   // ephemeral, mode-restricted; suppress S5443 for the literal /tmp path.
   const summaryDir = '/tmp/ss-findings'; // NOSONAR
@@ -222,13 +222,30 @@ export default async function scanExecutor(
       warnings: warningCount + docWarningCount,
       findings: entries,
     });
-    // Use a sequential counter so parallel writers don't collide.
-    const idx = String(
-      Number.parseInt(
-        fs.readdirSync(findingsFile).filter((f) => f.endsWith('.json')).length.toString(),
-      ) + 1,
-    ).padStart(4, '0');
-    fs.writeFileSync(path.join(findingsFile, `${idx}.json`), payload, 'utf8');
+    // Use an atomic create-and-write with a sequential fallback so
+    // parallel executor processes do not overwrite the same filename.
+    // `flag: 'wx'` fails with EEXIST if another process won the race.
+    let idx = fs.readdirSync(findingsFile).filter((f) => f.endsWith('.json')).length + 1;
+    const maxAttempts = idx + 9999;
+    while (idx < maxAttempts) {
+      const candidate = path.join(findingsFile, `${String(idx).padStart(4, '0')}.json`);
+      try {
+        fs.writeFileSync(candidate, payload, { flag: 'wx', encoding: 'utf8' });
+        break;
+      } catch (err: unknown) {
+        const code = (err as NodeJS.ErrnoException)?.code;
+        if (code === 'EEXIST') {
+          idx++;
+          continue;
+        }
+        throw err;
+      }
+    }
+    if (idx >= maxAttempts) {
+      throw new Error(
+        `SkillSpector could not write findings file for ${skillName}: all candidate filenames from ${maxAttempts - 9999} to ${maxAttempts - 1} were in use.`,
+      );
+    }
   }
 
   return { success: !failOnError || errorCount === 0 };

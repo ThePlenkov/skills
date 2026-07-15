@@ -1,7 +1,6 @@
 #!/usr/bin/env node
-'use strict';
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
 const ERR = parseInt(process.env.ERROR_COUNT || '0', 10);
 const WARN = parseInt(process.env.WARNING_COUNT || '0', 10);
 const RUN_URL = process.env.RUN_URL;
