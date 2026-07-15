@@ -30,4 +30,4 @@ If pattern emerges (same mistake recurring):
 - Delete obsolete before adding new
 - Link related entities
 
-Apply the reflection protocol from `.agents/skills/memory/SKILL.md`.
+Apply the reflection protocol from `.agents/skills/persistent-memory/SKILL.md`.

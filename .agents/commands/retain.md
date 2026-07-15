@@ -32,4 +32,4 @@ Bad: "The build system is complex..."
 - Never store secrets or credentials
 - Persist immediately when learning occurs
 
-Apply the persist protocol from `.agents/skills/memory/SKILL.md`.
+Apply the persist protocol from `.agents/skills/persistent-memory/SKILL.md`.

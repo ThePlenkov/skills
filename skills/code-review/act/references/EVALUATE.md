@@ -4,7 +4,7 @@ Run **after P4 resolve**, before claiming merge-ready. Takes ~2 minutes.
 
 ## 1. Session retrospective (required if anything went wrong)
 
-Answer in your closing summary or write to `.memory/experience/` per [memory-bank](../../memory-bank/SKILL.md). Then run `/retrospect --plan` ([retrospect](../../retrospect/SKILL.md)) to produce [backlog](../../backlog/SKILL.md) items:
+Answer in your closing summary or write to `.memory/experience/` per the [persistent-memory](../../../self-learning/persistent-memory/SKILL.md) skill. Then run `/retrospect --plan` ([retrospect](../../../self-learning/retrospect/SKILL.md)) to produce [backlog](../../../planning/backlog/SKILL.md) items:
 
 - [ ] Did we confuse review tools (Codacy vs GitHub Code Scanning vs Dependabot vs Copilot review)?
 - [ ] Did we resolve threads without code fixes or in-thread replies?
@@ -40,7 +40,7 @@ If **any** box is “yes”: write **what / root cause / prevention** and update
 
 ## 2a. Efficiency regression (required every /act)
 
-- [ ] **Scriptable cost:** did any step burn more than a few tool calls doing mechanical work (repeated `gh`/`grep`/`read` loops, hand-formatting, re-echoing data) that a `scripts/` helper in this skill could collapse into one call? → file a [backlog](../../backlog/SKILL.md) item (`source:` = this PR). Not required to fix in this `/act`; this is the self-learning loop behind [AGENTS.md → Script over steps](../../../AGENTS.md).
+- [ ] **Scriptable cost:** did any step burn more than a few tool calls doing mechanical work (repeated `gh`/`grep`/`read` loops, hand-formatting, re-echoing data) that a `scripts/` helper in this skill could collapse into one call? → file a [backlog](../../../planning/backlog/SKILL.md) item (`source:` = this PR). Not required to fix in this `/act`; this is the self-learning loop behind [AGENTS.md → Script over steps](../../../AGENTS.md).
 
 ## 3. Durable knowledge (optional unless retrospective triggered)
 

@@ -389,7 +389,7 @@ not duplicate rows in the persistent CSV.
 
 Follow [EVALUATE.md](references/EVALUATE.md). Durable sinks: REVIEW.md.
 
-1. **Retain** — record what happened using the $memory-bank:
+1. **Retain** — record what happened using the $persistent-memory:
    - Mistake or debugging session → `.memory/experience/`
    - Observable project fact → `.memory/facts/`
 2. **Retrospect** — run `/retrospect --plan` ($retrospect) to record experience and create actionable $backlog items.
