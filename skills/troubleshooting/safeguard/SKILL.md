@@ -4,6 +4,7 @@ description: "Prevent destructive agent actions from deleting user work, untrack
 argument-hint: "[optional reason for destructive action]"
 triggers:
   - user
+  - model
 allowed-tools:
   - read
   - grep
@@ -24,6 +25,7 @@ permissions:
     - Exec(mkdir -p *)
     - Exec(cp *)
     - Exec(tar *)
+    - Exec(git branch checkpoint/*)
   deny:
     # Block destructive operations by signature, not by exact
     # command — safer because it covers aliases, PATH-shadowed
@@ -39,6 +41,8 @@ permissions:
 ---
 
 # SAFEGUARD MODE
+
+This skill is the canonical protocol for destructive operations. Other rules and skills must reference it rather than duplicate its procedure.
 
 You are not allowed to destroy or discard repository state until you have preserved it and received explicit approval.
 
@@ -94,6 +98,16 @@ If outside-repo creation is not possible, use:
 
 .agent-checkpoints/YYYYMMDD-HHMMSS-REASON/
 
+1. Preserve commit objects (when needed).
+
+If the destructive operation may remove or rewrite commits (for example, `git reset`, `git rebase`, or `git filter-branch`), create a git checkpoint branch so the commit graph can be recovered:
+
+```bash
+git branch checkpoint/safeguard-$(date +%Y%m%d-%H%M%S)
+```
+
+For git resets and similar history-rewriting operations, this branch preserves the full commit chain. For operations that only affect the working tree, this step can be omitted.
+
 1. Save tracked changes.
 
 Run:
@@ -136,6 +150,7 @@ Output:
 
 [SAFEGUARD CHECKPOINT]
 Checkpoint path:
+Git checkpoint branch:
 Tracked patch:
 Staged patch:
 Untracked archive:
@@ -155,6 +170,14 @@ Required approval wording:
 Prefer targeted restore:
 
 git restore path/to/file
+
+If a git checkpoint branch was created, it can be restored with:
+
+```bash
+git checkout <checkpoint-branch>
+```
+
+To make an existing branch point to the checkpoint, use `git branch -f <branch> <checkpoint-branch>` or `git reset --hard <checkpoint-branch>` only with explicit user approval and a temporary lift of the `*reset*hard*` deny rule.
 
 Never use broad commands unless explicitly approved:
 
@@ -204,6 +227,7 @@ Nested repos checked:
 
 [CHECKPOINT CREATED]
 Path:
+Git checkpoint branch:
 Tracked patch:
 Staged patch:
 Untracked archive:
