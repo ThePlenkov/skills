@@ -6,22 +6,24 @@ This repository is maintained by an agent that creates and updates skills and ro
 
 ```
 skills/
-├── coaching/           # Agent coaching and user guidance
-├── behavior/           # Evidence, code quality, critical thinking
-├── methodology/        # Development methodologies (SDD, TDD, Agile)
-├── orchestration/      # Subagent coordination and context management
-├── planning/           # Planning, triage, session persistence
-├── integrations/       # External tool integrations
-├── testing/            # CI/CD testing and E2E scenarios
-├── tools/              # Development tools and utilities
-├── troubleshooting/    # Scoped descent, safety, recovery
-├── experimentation/    # Sandboxed experimentation
-├── git/                # Git workflow operations
-├── code-review/        # PR/MR review and remediation
-├── self-learning/      # Memory and retrospective learning
-├── debt-management/    # Review debt collection
-├── research/           # Research and documentation tools
-└── agents/             # Agent configuration and management
+├── foundation/         # Always-on behavioral primitives (token economy, memory)
+├── methodology/        # Development methodology (patching, critical thinking, code home, SDD)
+├── verification/       # Runtime proof (evidence)
+├── safety/             # Destructive operation protection (safeguard, salvage)
+├── orchestration/      # Agent coordination, isolation, and session state
+├── workflow/           # Development workflow (git, testing, planning, debt)
+│   ├── git/                # commit, push, reset
+│   ├── testing/            # ci-local, e2e
+│   ├── planning/           # shared-plan, backlog
+│   └── debt/               # harvest
+├── code-review/        # PR/MR review and remediation (act, triage-issue, etc.)
+├── integrations/       # Platform connectors (GitHub, GitLab, Atlassian, Codacy, ...)
+├── tools/              # Dev tools (skillmaker, skills-cli, docker-agent-config, ...)
+├── research/           # Codebase analysis (deepwiki)
+├── coaching/           # User guidance (adhd)
+├── self-learning/      # Retrospective learning (retrospect)
+├── experimentation/    # Sandboxed experimentation (sandboxed)
+└── agents/             # Framework management (dotagents, claude-skills)
 ```
 
 - `skills/<category>/<skill-name>/` — each skill is a folder with `SKILL.md` (categories may be nested).

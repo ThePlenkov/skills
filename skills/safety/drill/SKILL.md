@@ -112,6 +112,6 @@ The materialized tree doubles as a project knowledge base. Later runs can retrie
 - `$skill{investigate-first}` — narrow scope before editing.
 - `$skill{unwind}` — expand scope by collapsing solved branches.
 - `$skill{retrospect}` — capture learnings from mistakes.
-- `$skill{memory-bank}` — persistent knowledge across sessions.
+- `$skill{persistent-memory}` — persistent knowledge across sessions.
 
 For templates, frontmatter fields, full example workflows, validation rules, scope rules, error handling, state machine, merge/trace policies, and recommended defaults — see [references/templates.md](references/templates.md) and [references/troubleshooting.md](references/troubleshooting.md).

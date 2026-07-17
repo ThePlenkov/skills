@@ -112,9 +112,9 @@ find_sync_main() {
   local candidate
   for candidate in \
     "$repo_root/.agents/skills/shadow-fork/scripts/sync-main" \
-    "$repo_root/skills/git/shadow-fork/scripts/sync-main" \
+    "$repo_root/skills/workflow/git/shadow-fork/scripts/sync-main" \
     "$script_dir/../../shadow-fork/scripts/sync-main" \
-    "$script_dir/../../../git/shadow-fork/scripts/sync-main"; do
+    "$script_dir/../../../workflow/git/shadow-fork/scripts/sync-main"; do
     if [ -n "$candidate" ] && [ -x "$candidate" ]; then
       printf '%s' "$candidate"
       return 0

@@ -12,64 +12,58 @@
       "description": "Agent coaching and user guidance"
     },
     {
-      "name": "behavior",
+      "name": "foundation",
       "source": "./",
-      "skills": ["./skills/behavior"],
-      "description": "Evidence-based behavior, code quality, critical thinking"
+      "skills": ["./skills/foundation"],
+      "description": "Always-on behavioral primitives (token economy, memory)"
     },
     {
       "name": "methodology",
       "source": "./",
       "skills": ["./skills/methodology"],
-      "description": "Development methodologies (SDD, TDD, Agile)"
+      "description": "Development methodology (patching discipline, critical thinking, code home, spec-driven dev)"
+    },
+    {
+      "name": "verification",
+      "source": "./",
+      "skills": ["./skills/verification"],
+      "description": "Runtime proof and evidence-backed claims"
     },
     {
       "name": "orchestration",
       "source": "./",
       "skills": ["./skills/orchestration"],
-      "description": "Subagent coordination and context management"
+      "description": "Subagent coordination, isolation, and context management"
     },
     {
-      "name": "planning",
+      "name": "workflow",
       "source": "./",
-      "skills": ["./skills/planning"],
-      "description": "Planning, triage, and session persistence"
+      "skills": ["./skills/workflow"],
+      "description": "Development workflow (git, testing, planning, review debt)"
     },
     {
       "name": "integrations",
       "source": "./",
       "skills": ["./skills/integrations"],
-      "description": "External tool integrations (GitHub, GitLab, Codacy, etc.)"
-    },
-    {
-      "name": "testing",
-      "source": "./",
-      "skills": ["./skills/testing"],
-      "description": "CI/CD testing and E2E scenarios"
+      "description": "External platform connectors (GitHub, GitLab, Atlassian, Codacy, etc.)"
     },
     {
       "name": "tools",
       "source": "./",
       "skills": ["./skills/tools"],
-      "description": "Development tools and utilities"
+      "description": "Agent development utilities (skills, publishing, SARIF, docker-agent config)"
     },
     {
-      "name": "troubleshooting",
+      "name": "safety",
       "source": "./",
-      "skills": ["./skills/troubleshooting"],
-      "description": "Scoped descent, safety, and recovery"
+      "skills": ["./skills/safety"],
+      "description": "Destructive operation protection and recovery"
     },
     {
       "name": "experimentation",
       "source": "./",
       "skills": ["./skills/experimentation"],
       "description": "Sandboxed experimentation"
-    },
-    {
-      "name": "git",
-      "source": "./",
-      "skills": ["./skills/git"],
-      "description": "Git workflow operations"
     },
     {
       "name": "code-review",
@@ -81,13 +75,7 @@
       "name": "self-learning",
       "source": "./",
       "skills": ["./skills/self-learning"],
-      "description": "Memory and retrospective learning"
-    },
-    {
-      "name": "debt-management",
-      "source": "./",
-      "skills": ["./skills/debt-management"],
-      "description": "Review debt collection and management"
+      "description": "Retrospective learning"
     },
     {
       "name": "research",
