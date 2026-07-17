@@ -1,0 +1,391 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+shadow-pr - create paired shadow and upstream PRs/MRs from one fork feature branch
+
+Usage:
+  shadow-pr --provider github|gitlab|generic --upstream-repo REPO --fork-repo REPO [options]
+
+Required for hosted providers:
+  --provider github|gitlab|generic
+  --upstream-repo REPO      canonical repo, e.g. org/project or group/project
+  --fork-repo REPO          personal fork repo, e.g. user/project or user/project-fork
+
+Common options:
+  --upstream-remote NAME    git remote for the upstream repo (default: upstream)
+  --fork-remote NAME        git remote for the personal fork (default: origin)
+  --branch NAME             base/default branch (default: main)
+  --feature-branch NAME     feature branch to use as PR/MR head (default: current branch)
+  --title TEXT              PR/MR title (default: branch name)
+  --body-file FILE          markdown body to append under the generated workflow block
+  --draft-shadow            create the shadow PR/MR as draft (default)
+  --no-draft-shadow         create the shadow PR/MR as ready
+  --draft-upstream          create the upstream PR/MR as draft
+  --allow-dirty             allow uncommitted local changes while creating PRs
+  --allow-personal-config   allow suspicious personal review-agent config files in the diff
+  --dry-run                 validate and print actions, but do not push or create PRs/MRs
+  -h, --help                show this help
+
+Provider behavior:
+  github  uses gh pr create and gh pr edit
+  gitlab  uses glab mr create and glab mr update
+  generic validates git state, syncs fork main, pushes the branch unless --dry-run,
+          and writes manual PR/MR instructions without calling a hosting CLI
+USAGE
+}
+
+log() { printf '%s\n' "$*" >&2; }
+die() { log "error: $*"; exit 1; }
+need_cmd() { command -v "$1" >/dev/null 2>&1 || die "required command not found: $1"; }
+
+preflight_provider() {
+  case "$provider" in
+    github) [ "$dry_run" -eq 1 ] || need_cmd gh ;;
+    gitlab) [ "$dry_run" -eq 1 ] || need_cmd glab ;;
+    generic) ;;
+  esac
+}
+
+script_dir="$(
+  CDPATH=''
+  cd -- "$(dirname -- "$0")"
+  pwd
+)"
+provider="auto"
+upstream_repo=""
+fork_repo=""
+upstream_remote="upstream"
+fork_remote="origin"
+base_branch="main"
+feature_branch=""
+title=""
+body_file=""
+dry_run=0
+draft_shadow=1
+draft_upstream=0
+allow_dirty=0
+allow_personal_config=0
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --provider)
+      provider="${2:-}"; shift 2 ;;
+    --upstream-repo)
+      upstream_repo="${2:-}"; shift 2 ;;
+    --fork-repo)
+      fork_repo="${2:-}"; shift 2 ;;
+    --upstream-remote)
+      upstream_remote="${2:-}"; shift 2 ;;
+    --fork-remote)
+      fork_remote="${2:-}"; shift 2 ;;
+    --branch)
+      base_branch="${2:-}"; shift 2 ;;
+    --feature-branch)
+      feature_branch="${2:-}"; shift 2 ;;
+    --title)
+      title="${2:-}"; shift 2 ;;
+    --body-file)
+      body_file="${2:-}"; shift 2 ;;
+    --draft-shadow)
+      draft_shadow=1; shift ;;
+    --no-draft-shadow)
+      draft_shadow=0; shift ;;
+    --draft-upstream)
+      draft_upstream=1; shift ;;
+    --allow-dirty)
+      allow_dirty=1; shift ;;
+    --allow-personal-config)
+      allow_personal_config=1; shift ;;
+    --dry-run)
+      dry_run=1; shift ;;
+    -h|--help)
+      usage; exit 0 ;;
+    *)
+      die "unknown argument: $1" ;;
+  esac
+done
+
+run_or_print() {
+  if [ "$dry_run" -eq 1 ]; then
+    printf '+ ' >&2
+    printf '%q ' "$@" >&2
+    printf '\n' >&2
+  else
+    "$@"
+  fi
+}
+
+capture_or_print_url() {
+  local label="$1"; shift
+  if [ "$dry_run" -eq 1 ]; then
+    printf '+ ' >&2
+    printf '%q ' "$@" >&2
+    printf '\n' >&2
+    printf 'dry-run:%s\n' "$label"
+  else
+    "$@"
+  fi
+}
+
+remote_url() {
+  git remote get-url "$1" 2>/dev/null || true
+}
+
+remote_slug() {
+  local url="$1"
+  url="${url%.git}"
+  case "$url" in
+    git@*:*)
+      printf '%s\n' "${url#*:}" ;;
+    ssh://*@*/*|https://*/*|http://*/*)
+      url="${url#*://}"
+      url="${url#*@}"
+      printf '%s\n' "${url#*/}" ;;
+    *)
+      printf '%s\n' "$url" ;;
+  esac
+}
+
+remote_host() {
+  local url="$1"
+  case "$url" in
+    git@*:*)
+      url="${url#git@}"; printf '%s\n' "${url%%:*}" ;;
+    ssh://*@*/*|https://*/*|http://*/*)
+      url="${url#*://}"; url="${url#*@}"; printf '%s\n' "${url%%/*}" ;;
+    *)
+      printf '%s\n' "" ;;
+  esac
+}
+
+infer_provider() {
+  local host="$1"
+  case "$host" in
+    *github*) printf 'github\n' ;;
+    *gitlab*) printf 'gitlab\n' ;;
+    *) printf 'generic\n' ;;
+  esac
+}
+
+owner_from_repo_for_github_head() {
+  local repo="$1"
+  local slash_count
+  slash_count="$(printf '%s' "$repo" | awk -F/ '{print NF-1}')"
+  if [ "$slash_count" -ge 2 ]; then
+    printf '%s\n' "$(printf '%s' "$repo" | awk -F/ '{print $(NF-1)}')"
+  else
+    printf '%s\n' "${repo%%/*}"
+  fi
+}
+
+extract_first_url() {
+  awk 'match($0, /https?:\/\/[^[:space:]]+/) { print substr($0, RSTART, RLENGTH); exit }'
+}
+
+mr_iid_from_gitlab_url() {
+  local url="$1"
+  case "$url" in
+    */-/merge_requests/*)
+      url="${url##*/-/merge_requests/}"
+      printf '%s\n' "${url%%[^0-9]*}" ;;
+    *)
+      printf '%s\n' "" ;;
+  esac
+}
+
+append_user_body() {
+  local target="$1"
+  if [ -n "$body_file" ]; then
+    [ -f "$body_file" ] || die "body file not found: $body_file"
+    {
+      printf '\n## Description\n\n'
+      cat "$body_file"
+      printf '\n'
+    } >> "$target"
+  fi
+}
+
+scan_personal_config() {
+  local base_ref="refs/remotes/$upstream_remote/$base_branch"
+  local changed suspicious
+  changed="$(git diff --name-only "$base_ref...$feature_ref" 2>/dev/null || true)"
+  suspicious="$(printf '%s\n' "$changed" | grep -E '^(\.coderabbit\.ya?ml$|\.cursor/|\.aider|\.reviewagent|\.review-agent|\.github/copilot-instructions\.md$)' || true)"
+  if [ -n "$suspicious" ]; then
+    log "blocked: suspicious personal review-agent config appears in the upstream diff"
+    printf '%s\n' "$suspicious" >&2
+    log "resolution: remove/move these files, or pass --allow-personal-config if they are intentionally part of the upstream change"
+    exit 30
+  fi
+}
+
+write_body() {
+  local target="$1"
+  local kind="$2"
+  local pair_label="$3"
+  local pair_url="$4"
+  cat > "$target" <<BODY
+## Shadow Fork Workflow
+
+This $kind was created from the same source branch as its paired review request.
+
+- Source branch: \`$fork_repo:$feature_branch\`
+- Base branch: \`$base_branch\`
+- Shadow target: \`$fork_repo:$base_branch\`
+- Upstream target: \`$upstream_repo:$base_branch\`
+- $pair_label: $pair_url
+
+Rules:
+- Treat \`$fork_repo:$base_branch\` as a mirror of \`$upstream_repo:$base_branch\`.
+- Do not push feature commits directly to \`$fork_repo:$base_branch\`.
+- Do not merge the shadow review before the upstream review unless explicitly overriding the workflow.
+- New commits must be pushed to \`$fork_repo:$feature_branch\`; both reviews update from that same head branch.
+BODY
+  append_user_body "$target"
+}
+
+git rev-parse --is-inside-work-tree >/dev/null 2>&1 || die "not inside a git work tree"
+git remote get-url "$upstream_remote" >/dev/null 2>&1 || die "remote '$upstream_remote' does not exist"
+git remote get-url "$fork_remote" >/dev/null 2>&1 || die "remote '$fork_remote' does not exist"
+
+if [ -z "$feature_branch" ]; then
+  feature_branch="$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
+fi
+[ -n "$feature_branch" ] || die "cannot determine feature branch; pass --feature-branch"
+[ "$feature_branch" != "$base_branch" ] || die "feature branch must not be the base branch '$base_branch'"
+feature_ref="refs/heads/$feature_branch"
+git rev-parse --verify "$feature_ref^{commit}" >/dev/null 2>&1 || die "local feature branch '$feature_branch' does not exist"
+
+if [ -z "$title" ]; then
+  title="$feature_branch"
+fi
+
+if [ "$allow_dirty" -ne 1 ]; then
+  if [ -n "$(git status --porcelain)" ]; then
+    die "working tree has uncommitted changes; commit/stash them or pass --allow-dirty"
+  fi
+fi
+
+if [ -z "$upstream_repo" ]; then
+  upstream_repo="$(remote_slug "$(remote_url "$upstream_remote")")"
+fi
+if [ -z "$fork_repo" ]; then
+  fork_repo="$(remote_slug "$(remote_url "$fork_remote")")"
+fi
+[ -n "$upstream_repo" ] || die "cannot infer upstream repo; pass --upstream-repo"
+[ -n "$fork_repo" ] || die "cannot infer fork repo; pass --fork-repo"
+
+if [ "$provider" = "auto" ]; then
+  provider="$(infer_provider "$(remote_host "$(remote_url "$upstream_remote")")")"
+fi
+case "$provider" in
+  github|gitlab|generic) ;;
+  *) die "provider must be github, gitlab, generic, or auto" ;;
+esac
+
+log "provider: $provider"
+log "upstream repo: $upstream_repo"
+log "fork repo: $fork_repo"
+log "base branch: $base_branch"
+log "feature branch: $feature_branch"
+
+sync_args=("$script_dir/sync-main" --upstream-remote "$upstream_remote" --fork-remote "$fork_remote" --branch "$base_branch")
+if [ "$dry_run" -eq 1 ]; then
+  sync_args+=(--dry-run)
+fi
+"${sync_args[@]}"
+
+if [ "$allow_personal_config" -ne 1 ]; then
+  scan_personal_config
+fi
+
+preflight_provider
+
+log "pushing feature branch to fork remote"
+run_or_print git push "$fork_remote" "$feature_ref:refs/heads/$feature_branch"
+
+tmpdir="$(mktemp -d 2>/dev/null || mktemp -d -t shadow-fork)"
+if [ "$provider" = "generic" ] && [ "$dry_run" -ne 1 ]; then
+  log "writing manual review bodies under $tmpdir"
+else
+  trap 'rm -rf "$tmpdir"' EXIT
+fi
+shadow_body="$tmpdir/shadow-body.md"
+upstream_body="$tmpdir/upstream-body.md"
+shadow_body_linked="$tmpdir/shadow-body-linked.md"
+upstream_body_linked="$tmpdir/upstream-body-linked.md"
+
+write_body "$shadow_body" "shadow review" "Upstream review" "pending"
+write_body "$upstream_body" "upstream review" "Shadow review" "pending"
+
+case "$provider" in
+  generic)
+    log "generic provider selected: no hosted PR/MR CLI will be called"
+    log "create these two reviews manually:"
+    printf '\nShadow review:\n  head: %s:%s\n  base: %s:%s\n  title: %s\n  body: %s\n' "$fork_repo" "$feature_branch" "$fork_repo" "$base_branch" "$title" "$shadow_body"
+    printf '\nUpstream review:\n  head: %s:%s\n  base: %s:%s\n  title: %s\n  body: %s\n' "$fork_repo" "$feature_branch" "$upstream_repo" "$base_branch" "$title" "$upstream_body"
+    ;;
+  github)
+    fork_owner="$(owner_from_repo_for_github_head "$fork_repo")"
+    shadow_cmd=(gh pr create --repo "$fork_repo" --base "$base_branch" --head "$feature_branch" --title "$title" --body-file "$shadow_body")
+    [ "$draft_shadow" -eq 1 ] && shadow_cmd+=(--draft)
+    upstream_cmd=(gh pr create --repo "$upstream_repo" --base "$base_branch" --head "$fork_owner:$feature_branch" --title "$title" --body-file "$upstream_body")
+    [ "$draft_upstream" -eq 1 ] && upstream_cmd+=(--draft)
+
+    log "creating shadow PR"
+    shadow_out="$(capture_or_print_url shadow-pr "${shadow_cmd[@]}")"
+    shadow_url="$(printf '%s\n' "$shadow_out" | extract_first_url)"
+    [ -n "$shadow_url" ] || shadow_url="$shadow_out"
+
+    log "creating upstream PR"
+    upstream_out="$(capture_or_print_url upstream-pr "${upstream_cmd[@]}")"
+    upstream_url="$(printf '%s\n' "$upstream_out" | extract_first_url)"
+    [ -n "$upstream_url" ] || upstream_url="$upstream_out"
+
+    write_body "$shadow_body_linked" "shadow review" "Upstream review" "$upstream_url"
+    write_body "$upstream_body_linked" "upstream review" "Shadow review" "$shadow_url"
+
+    log "cross-linking PR bodies"
+    run_or_print gh pr edit "$shadow_url" --repo "$fork_repo" --body-file "$shadow_body_linked"
+    run_or_print gh pr edit "$upstream_url" --repo "$upstream_repo" --body-file "$upstream_body_linked"
+
+    printf '\nShadow PR: %s\nUpstream PR: %s\n' "$shadow_url" "$upstream_url"
+    ;;
+  gitlab)
+    shadow_desc="$(cat "$shadow_body")"
+    upstream_desc="$(cat "$upstream_body")"
+
+    shadow_cmd=(glab mr create --repo "$fork_repo" --source-branch "$feature_branch" --target-branch "$base_branch" --title "$title" --description "$shadow_desc" --yes)
+    [ "$draft_shadow" -eq 1 ] && shadow_cmd+=(--draft)
+    upstream_cmd=(glab mr create --repo "$upstream_repo" --head "$fork_repo" --source-branch "$feature_branch" --target-branch "$base_branch" --title "$title" --description "$upstream_desc" --yes)
+    [ "$draft_upstream" -eq 1 ] && upstream_cmd+=(--draft)
+
+    log "creating shadow MR"
+    shadow_out="$(capture_or_print_url shadow-mr "${shadow_cmd[@]}")"
+    shadow_url="$(printf '%s\n' "$shadow_out" | extract_first_url)"
+    [ -n "$shadow_url" ] || shadow_url="$shadow_out"
+
+    log "creating upstream MR"
+    upstream_out="$(capture_or_print_url upstream-mr "${upstream_cmd[@]}")"
+    upstream_url="$(printf '%s\n' "$upstream_out" | extract_first_url)"
+    [ -n "$upstream_url" ] || upstream_url="$upstream_out"
+
+    write_body "$shadow_body_linked" "shadow review" "Upstream review" "$upstream_url"
+    write_body "$upstream_body_linked" "upstream review" "Shadow review" "$shadow_url"
+
+    shadow_iid="$(mr_iid_from_gitlab_url "$shadow_url")"
+    upstream_iid="$(mr_iid_from_gitlab_url "$upstream_url")"
+    if [ -n "$shadow_iid" ] && [ -n "$upstream_iid" ]; then
+      log "cross-linking MR descriptions"
+      run_or_print glab mr update "$shadow_iid" --repo "$fork_repo" --description "$(cat "$shadow_body_linked")" --yes
+      run_or_print glab mr update "$upstream_iid" --repo "$upstream_repo" --description "$(cat "$upstream_body_linked")" --yes
+    else
+      log "warning: could not parse GitLab MR IDs; update descriptions manually with:"
+      log "  shadow body: $shadow_body_linked"
+      log "  upstream body: $upstream_body_linked"
+    fi
+
+    printf '\nShadow MR: %s\nUpstream MR: %s\n' "$shadow_url" "$upstream_url"
+    ;;
+esac

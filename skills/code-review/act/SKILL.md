@@ -154,8 +154,9 @@ Do not replace the author's summary with checklists, thread counts, or CI notes.
    - If the runtime enforces a network allowlist, ensure it includes `api.github.com`, `github.com`, and any package registries the repo needs (e.g. `registry.npmjs.org`). Request access if missing.
    - `jq`, `git`, `gh`, and `bun` must be available. `bun` is required for the helper scripts in this skill; install it before proceeding.
 3. **Resolve the PR context**. If the user supplied a number or URL, use it. If the user said `/act` with no PR, run `scripts/pr-from-context.sh` to fall back to the current branch's PR (or the most recently updated open PR). If ambiguous, ask the user before proceeding.
-4. **HEAD SHA** — use `scripts/pr-state.sh` (with no arguments it resolves the PR from context) or `gh pr view NUMBER --json headRefOid,statusCheckRollup,url`.
-5. **Inventory threads** — for each unresolved thread, capture: file/line, reviewer ask, whether it needs a **code change** or a **written answer**.
+4. **Shadow-fork guard (PR context only).** If the repo is a fork and the PR base branch is the default branch (usually `main`), treat it as a shadow fork and run `bash scripts/shadow-fork-check.sh` before any git rebase, merge, or conflict resolution. Stop and ask the user to clarify scope if it exits `20` (fork `main` is ahead of upstream — not a shadow fork) or `21` (diverged). Exit `0` means the fork branch is already equal or has been fast-forwarded to upstream. This prevents upstream commits from being accidentally pulled into the PR.
+5. **HEAD SHA** — use `scripts/pr-state.sh` (with no arguments it resolves the PR from context) or `gh pr view NUMBER --json headRefOid,statusCheckRollup,url`.
+6. **Inventory threads** — for each unresolved thread, capture: file/line, reviewer ask, whether it needs a **code change** or a **written answer**.
 
 Build a short **thread plan** before editing (can be in your working notes / final summary):
 
