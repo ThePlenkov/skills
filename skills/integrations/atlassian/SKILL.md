@@ -1,6 +1,6 @@
 ---
 name: atlassian
-description: Work with Atlassian Jira and Confluence. Use when interacting with Atlassian or MCP tools, or when you need a CLI fallback.
+description: Work with Atlassian Jira and Confluence. Use when using the `acli` CLI, Jira/Confluence Cloud REST API endpoints (`*.atlassian.net`), or Atlassian MCP tools. NOT for general project management discussion or non-Atlassian trackers.
 ---
 
 # Atlassian

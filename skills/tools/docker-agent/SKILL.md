@@ -1,14 +1,6 @@
 ---
 name: docker-agent
-description: >-
-  Design, configure, and run multi-agent AI teams using Docker Agent's
-  YAML/HCL config (the `docker agent` CLI plugin). Use when creating
-  a `docker agent` config, building a sub-agent team, or needing
-  the canonical schema for agents, models, toolsets, distribution,
-  and CLI. Covers built-in toolsets (filesystem, shell, MCP, LSP,
-  fetch, openapi, memory, think, todo, api, a2a), OCI distribution,
-  and the CLI surface (run, serve api/chat/mcp/a2a). Not for general
-  CLI or non-Docker agent frameworks.
+description: "Design, configure, and run multi-agent AI teams using the Docker Agent CLI plugin. Use when creating docker agent YAML/HCL configs, building sub-agent teams, or needing the schema for agents, models, toolsets, distribution, and CLI. NOT for general Docker, docker-compose, or non-Docker frameworks."
 ---
 
 # Docker Agent — Configuration & Runtime

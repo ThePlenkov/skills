@@ -1,6 +1,6 @@
 ---
 name: github
-description: Work with GitHub repositories, issues, pull requests, releases, and Actions. Use when interacting with GitHub or GitHub MCP tools, or when you need a CLI fallback.
+description: Work with GitHub repositories, issues, pull requests, releases, and Actions. Use when using `gh` CLI, GitHub API endpoints (`api.github.com`), or GitHub MCP tools. NOT for general git operations or non-GitHub hosts.
 ---
 
 # GitHub

@@ -1,10 +1,6 @@
 ---
 name: save-session
-description: >-
-  Perform a durable end-of-work save when the user says phrases like "сохранись", "save the session",
-  "зафиксируй", or "сделай сейв". Also generates self-contained handoffs for subagent-driven PR
-  pipelines. Use whenever the user wants the current work preserved across code, plans, memory, and
-  documentation, or when handing off to the next agent in a PR pipeline.
+description: "Save work durably when the user says a save-session trigger phrase, or generate a self-contained handoff for the next agent in a PR pipeline. NOT for ordinary git commits, pushes, or memory-only saves."
 metadata:
   tags:
     - productivity
