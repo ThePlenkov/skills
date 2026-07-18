@@ -5,8 +5,11 @@
   "type": "module",
   "scripts": {
     "generate": "tsx scripts/generate-skills-index.ts",
-    "validate": "scripts/validate-skills-index.sh",
-    "typecheck": "tsc --noEmit"
+    "validate": "tsx scripts/run.ts scripts/validate-skills-index.sh",
+    "validate:update": "tsx scripts/run.ts scripts/validate-skills-index.sh --update",
+    "install:skills": "tsx scripts/run.ts scripts/install.sh",
+    "typecheck": "tsc --noEmit",
+    "check:os": "tsx scripts/check-os-independence.ts"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

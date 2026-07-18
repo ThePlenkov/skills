@@ -36,7 +36,7 @@ exact switch priority.
 
 ## Pipeline gating (P0 = CI + critical SAST)
 
-[pr-state.sh](scripts/pr-state.sh) surfaces two P0-relevant signals:
+[pr-state.sh](scripts/pr-state.sh) (`npx tsx scripts/run.ts skills/code-review/act/scripts/pr-state.sh`) surfaces two P0-relevant signals:
 
 - `CI_REQUIRED_PENDING=N` — required non-AI-reviewer checks that are not
   passing.

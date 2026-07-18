@@ -97,12 +97,12 @@ jobs:
           python-version: '3.x'
 
       - name: Check reserved skill names
-        run: ./scripts/validate-reserved-names.sh
+        run: npx --yes tsx scripts/run.ts scripts/validate-reserved-names.sh
 
       - name: Validate agent manifests
         if: success() || failure()
-        run: ./scripts/validate-agent-manifests.sh
+        run: npx --yes tsx scripts/run.ts scripts/validate-agent-manifests.sh
 
       - name: Check Tier 0 always-on budget
         if: success() || failure()
-        run: ./scripts/check-tier-0-budget.sh
+        run: npx --yes tsx scripts/run.ts scripts/check-tier-0-budget.sh

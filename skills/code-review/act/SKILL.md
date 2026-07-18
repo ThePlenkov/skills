@@ -153,9 +153,9 @@ Do not replace the author's summary with checklists, thread counts, or CI notes.
    - `gh auth status` must succeed. If `GH_TOKEN` is missing or invalid, request the secret and stop; do not proceed.
    - If the runtime enforces a network allowlist, ensure it includes `api.github.com`, `github.com`, and any package registries the repo needs (e.g. `registry.npmjs.org`). Request access if missing.
    - `jq`, `git`, `gh`, and `bun` must be available. `bun` is required for the helper scripts in this skill; install it before proceeding.
-3. **Resolve the PR context**. If the user supplied a number or URL, use it. If the user said `/act` with no PR, run `scripts/pr-from-context.sh` to fall back to the current branch's PR (or the most recently updated open PR). If ambiguous, ask the user before proceeding.
-4. **Shadow-fork guard (PR context only).** If the repo is a fork and the PR base branch is the default branch (usually `main`), treat it as a shadow fork and run `bash scripts/shadow-fork-check.sh` before any git rebase, merge, or conflict resolution. Stop and ask the user to clarify scope if it exits `20` (fork `main` is ahead of upstream — not a shadow fork) or `21` (diverged). Exit `0` means the fork branch is already equal or has been fast-forwarded to upstream. This prevents upstream commits from being accidentally pulled into the PR.
-5. **HEAD SHA** — use `scripts/pr-state.sh` (with no arguments it resolves the PR from context) or `gh pr view NUMBER --json headRefOid,statusCheckRollup,url`.
+3. **Resolve the PR context**. If the user supplied a number or URL, use it. If the user said `/act` with no PR, run `npx tsx scripts/run.ts .agents/skills/act/scripts/pr-from-context.sh` to fall back to the current branch's PR (or the most recently updated open PR). If ambiguous, ask the user before proceeding.
+4. **Shadow-fork guard (PR context only).** If the repo is a fork and the PR base branch is the default branch (usually `main`), treat it as a shadow fork and run `npx tsx scripts/run.ts .agents/skills/act/scripts/shadow-fork-check.sh` before any git rebase, merge, or conflict resolution. Stop and ask the user to clarify scope if it exits `20` (fork `main` is ahead of upstream — not a shadow fork) or `21` (diverged). Exit `0` means the fork branch is already equal or has been fast-forwarded to upstream. This prevents upstream commits from being accidentally pulled into the PR.
+5. **HEAD SHA** — use `npx tsx scripts/run.ts .agents/skills/act/scripts/pr-state.sh` (with no arguments it resolves the PR from context) or `gh pr view NUMBER --json headRefOid,statusCheckRollup,url`.
 6. **Inventory threads** — for each unresolved thread, capture: file/line, reviewer ask, whether it needs a **code change** or a **written answer**.
 
 Build a short **thread plan** before editing (can be in your working notes / final summary):
@@ -326,7 +326,7 @@ After all threads are processed, **re-fetch state** (HEAD SHA, check-runs, annot
 
 **In scope:** `apps/`, `tools/`, `specs/`, `packaging/`, `.github/workflows/`, etc.
 
-**Out of scope for "addressing review":** `.agents/skills/`, `resolve-open-threads.sh` — unless the script literally cannot run (`bash -n` fails).
+**Out of scope for "addressing review":** `.agents/skills/`, `resolve-open-threads.sh` — unless the script literally cannot run (`npx tsx scripts/run.ts .agents/skills/act/scripts/resolve-open-threads.sh --dry-run` fails).
 
 ## Resolve pass (P4 only)
 
@@ -336,10 +336,10 @@ After all threads are processed, **re-fetch state** (HEAD SHA, check-runs, annot
 - `gh auth status` succeeds.
 
 ```bash
-bash -n scripts/resolve-open-threads.sh
-bash scripts/resolve-open-threads.sh --dry-run OWNER REPO NUMBER
-bash scripts/resolve-open-threads.sh OWNER REPO NUMBER
-bash scripts/resolve-open-threads.sh --dry-run OWNER REPO NUMBER
+npx tsx scripts/run.ts .agents/skills/act/scripts/resolve-open-threads.sh --dry-run OWNER REPO NUMBER
+npx tsx scripts/run.ts .agents/skills/act/scripts/resolve-open-threads.sh OWNER REPO NUMBER
+# Final verification dry-run: must report open_threads=0 before the PR is merge-ready
+npx tsx scripts/run.ts .agents/skills/act/scripts/resolve-open-threads.sh --dry-run OWNER REPO NUMBER
 ```
 
 The script only clicks "Resolve conversation" in GitHub — it does **not** implement review fixes.  
@@ -444,10 +444,10 @@ prefix paths with `.agents/skills/act/` (or use `bun run act:debt:*` for ledger 
 
 | Step                         | Use                                                       | Replaces                                    |
 | ---------------------------- | --------------------------------------------------------- | ------------------------------------------- |
-| **PR state + open threads**  | `bash scripts/pr-state.sh OWNER REPO PR`                  | `gh pr view --json ...` ×4 + `gh pr checks` |
+| **PR state + open threads**  | `npx tsx scripts/run.ts .agents/skills/act/scripts/pr-state.sh OWNER REPO PR`                  | `gh pr view --json ...` ×4 + `gh pr checks` |
 | **Verify a CLI claim**       | `bun scripts/derive-cli-surface.ts --check "openadt X"`   | `grep` across `apps/**.java` + reads        |
-| **Post N thread replies**    | `bash scripts/reply-threads.sh --file tmp/agent/replies.tsv` | N × `gh api graphql addPullRequestReview…` |
-| **Resolve open threads (P4)**| `bash scripts/resolve-open-threads.sh OWNER REPO PR`      | unchanged                                   |
+| **Post N thread replies**    | `npx tsx scripts/run.ts .agents/skills/act/scripts/reply-threads.sh --file tmp/agent/replies.tsv` | N × `gh api graphql addPullRequestReview…` |
+| **Resolve open threads (P4)**| `npx tsx scripts/run.ts .agents/skills/act/scripts/resolve-open-threads.sh OWNER REPO PR`      | unchanged                                   |
 | **Extract findings (P5)**    | `bun scripts/extract-findings.ts OWNER REPO PR`           | N × `gh api` check-runs/annotations/comments reads |
 | **Submit scores (P5)**       | `bun scripts/submit-scores.ts … --findings F --scores S [--record]` | per-finding parse + JSONL scratch always; CSV upsert only with `--record` (or env/config) |
 | **Query debt (D0)**          | `bun run act:debt:query -- --status open --format tsv`    | Reading harvest files by hand |

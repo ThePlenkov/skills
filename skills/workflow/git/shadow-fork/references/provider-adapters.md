@@ -16,7 +16,7 @@ Then compare:
 - Fork ahead upstream: block.
 - Fork diverged from upstream: block.
 
-The bundled `scripts/sync-main` implements this without checking out or rewriting the local branch.
+The bundled `npx tsx scripts/run.ts .agents/skills/shadow-fork/scripts/sync-main` implements this without checking out or rewriting the local branch.
 
 ## GitHub adapter
 

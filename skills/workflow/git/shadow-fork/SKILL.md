@@ -36,11 +36,11 @@ The feature branch is the single source of truth. New commits pushed to that bra
 ## Workflow decision tree
 
 1. User asks to check or repair fork main sync:
-   - Use `scripts/sync-main`.
+   - Use `npx tsx scripts/run.ts .agents/skills/shadow-fork/scripts/sync-main`.
 2. User asks to create paired shadow/upstream PRs or MRs:
-   - Use `scripts/shadow-pr`; it runs `sync-main` first.
+   - Use `npx tsx scripts/run.ts .agents/skills/shadow-fork/scripts/shadow-pr`; it runs `sync-main` first.
 3. User is on an unsupported host or no hosting CLI is available:
-   - Use `scripts/shadow-pr --provider generic` to validate git state, sync/push when possible, and print manual review instructions.
+   - Use `npx tsx scripts/run.ts .agents/skills/shadow-fork/scripts/shadow-pr --provider generic` to validate git state, sync/push when possible, and print manual review instructions.
 4. User asks conceptual or policy questions:
    - Answer using the invariants above and the reference docs.
 
@@ -66,7 +66,7 @@ Run bundled scripts from a local git checkout with the user's authenticated git 
 ### Sync fork main only
 
 ```bash
-scripts/sync-main \
+npx tsx scripts/run.ts .agents/skills/shadow-fork/scripts/sync-main \
   --upstream-remote upstream \
   --fork-remote origin \
   --branch main
@@ -77,7 +77,7 @@ This fetches both remotes, compares remote tracking branches, and only fast-forw
 Use dry-run when preparing a command plan:
 
 ```bash
-scripts/sync-main --upstream-remote upstream --fork-remote origin --branch main --dry-run
+npx tsx scripts/run.ts .agents/skills/shadow-fork/scripts/sync-main --upstream-remote upstream --fork-remote origin --branch main --dry-run
 ```
 
 ### Create paired reviews
@@ -85,7 +85,7 @@ scripts/sync-main --upstream-remote upstream --fork-remote origin --branch main 
 GitHub:
 
 ```bash
-scripts/shadow-pr \
+npx tsx scripts/run.ts .agents/skills/shadow-fork/scripts/shadow-pr \
   --provider github \
   --upstream-repo org/project \
   --fork-repo user/project \
@@ -97,7 +97,7 @@ scripts/shadow-pr \
 GitLab:
 
 ```bash
-scripts/shadow-pr \
+npx tsx scripts/run.ts .agents/skills/shadow-fork/scripts/shadow-pr \
   --provider gitlab \
   --upstream-repo group/project \
   --fork-repo user/project \
@@ -109,7 +109,7 @@ scripts/shadow-pr \
 Generic host/manual mode:
 
 ```bash
-scripts/shadow-pr \
+npx tsx scripts/run.ts .agents/skills/shadow-fork/scripts/shadow-pr \
   --provider generic \
   --upstream-repo upstream/project \
   --fork-repo user/project \

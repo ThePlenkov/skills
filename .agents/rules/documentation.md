@@ -76,7 +76,7 @@ Before committing, review changes and check:
 **Change**: Rename `git-commit` skill to `conventional-commit`
 
 **Documentation Impact**:
-- Run `scripts/install.sh` to update `.agents/skills/` symlinks
+- Run `npm run install:skills` to update `.agents/skills/` symlinks
 - Update any skills that reference it
 - Update any agent prompts that mention it
 - Update installation examples in README
@@ -186,7 +186,7 @@ Files updated:
 ## Project-Specific Patterns
 
 ### Skills Repository
-- Always run `scripts/install.sh` to update `.agents/skills/` symlinks when adding/removing skills
+- Always run `npm run install:skills` to update `.agents/skills/` symlinks when adding/removing skills
 - Update `AGENTS.md` when changing repository structure
 - Update skill references when renaming or moving skills
 - Keep layout sections synchronized across AGENTS.md, CLAUDE.md, README.md

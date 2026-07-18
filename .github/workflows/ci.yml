@@ -90,7 +90,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Check .agents/skills is in sync
-        run: ./scripts/install.sh --check
+        run: npx --yes tsx scripts/run.ts scripts/install.sh --check
 
   reserved-names:
     name: Check reserved skill names
@@ -105,5 +105,5 @@ jobs:
 
       - name: Generate and validate reserved names
         run: |
-          ./skills/tools/skillmaker/scripts/collect-reserved.sh
-          ./scripts/validate-reserved-names.sh
+          npx --yes tsx scripts/run.ts skills/tools/skillmaker/scripts/collect-reserved.sh
+          npx --yes tsx scripts/run.ts scripts/validate-reserved-names.sh

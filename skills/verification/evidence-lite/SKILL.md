@@ -57,7 +57,7 @@ That's it. No `claim.json`. No `.evidence/` directory. No `validate.py`. No four
 
 ```bash
 # Before: "Recieve"  After: "Receive"
-grep -n "Receive" README.md   # shows the corrected line
+git grep -n "Receive" README.md   # shows the corrected line (works on Windows with Git)
 ```
 
 Quote: `README.md:42: To receive...`
@@ -81,7 +81,7 @@ Quote one changed comment line.
 ### Doc build sanity
 
 ```bash
-pnpm docs:build 2>&1 | tail -5   # quotes the "successfully built" line
+pnpm docs:build   # inspect the last few lines for the "successfully built" message
 ```
 
 ## What lite is NOT for

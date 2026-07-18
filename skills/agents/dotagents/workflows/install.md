@@ -14,10 +14,10 @@ For `.agents` agents (Codex, Cursor), install or refresh skills as flat symlinks
 
 ```bash
 # Create .agents/skills/<skill-name> symlinks in the repo
-bash scripts/install.sh
+npm run install:skills
 
 # Preview changes
-bash scripts/install.sh --dry-run
+npm run install:skills -- --dry-run
 ```
 
 This avoids the `npx skills` CLI, which copies files instead of symlinking.
@@ -51,7 +51,7 @@ The CLI auto-detects which coding agents are installed. Skills are placed in the
 
 ## Principles
 
-- Use `scripts/install.sh` for `.agents` agents (symlinks) and `npx skills` for other agents.
+- Use `npm run install:skills` for `.agents` agents (links) and `npx skills` for other agents.
 - Never replace an existing manifest without explicit user confirmation.
 - Stay within the current project's repository boundary.
 - Confirm with the user before any file change; this workflow never runs unattended.

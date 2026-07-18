@@ -1,10 +1,10 @@
 # Agent Command Registry
 
 Built-in commands reserved by major AI coding agents. Skill names MUST NOT
-conflict with these — use `scripts/validate-reserved-names.sh` to check.
+conflict with these — use `npx tsx scripts/run.ts scripts/validate-reserved-names.sh` to check.
 
 Source of truth for reserved names: `skills/tools/skillmaker/assets/agents/*.yaml`.
-Regenerate: `./skills/tools/skillmaker/scripts/collect-reserved.sh`
+Regenerate: `npx tsx scripts/run.ts .agents/skills/skillmaker/scripts/collect-reserved.sh`
 
 Per-agent details are in [`references/agents/`](agents/).
 

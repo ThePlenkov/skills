@@ -68,5 +68,5 @@ TEMPLATE
 printf 'Created %s\n' "${SKILL_DIR}/SKILL.md"
 printf '\nNext steps:\n'
 printf '  1. Edit the description and workflow\n'
-printf '  2. Run: ./scripts/install.sh\n'
-printf '  3. Run: ./scripts/validate-reserved-names.sh\n'
+printf '  2. Run: npm run install:skills\n'
+printf '  3. Run: npx tsx scripts/run.ts scripts/validate-reserved-names.sh\n'

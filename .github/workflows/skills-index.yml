@@ -56,7 +56,7 @@ jobs:
         run: pip install jsonschema
 
       - name: Validate and generate index
-        run: scripts/validate-skills-index.sh --update
+        run: npm run validate:update
 
       - name: Prepare public folder
         run: |

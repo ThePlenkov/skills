@@ -25,7 +25,7 @@ The current agent bootstraps itself into the `.agents/` framework.
 
 ### 3. Install Skills
 
-Run `scripts/install.sh` to set up `.agents/skills/` symlinks, or use `/dotagents install` for other agents.
+Run `npm run install:skills` to set up `.agents/skills/` links, or use `/dotagents install` for other agents.
 
 ### 4. Configure Subagents
 
@@ -60,7 +60,7 @@ Use web search to find:
 For `.agents` agents (Codex, Cursor), use the install script to set up symlinks:
 
 ```bash
-bash scripts/install.sh
+npm run install:skills
 ```
 
 For other agents, use the [`npx skills` CLI](https://github.com/vercel-labs/skills):
@@ -77,7 +77,7 @@ The key rule: **only install skills that belong to or are configured for this pr
 
 ### 3. Install Skills for the Target Agent
 
-For `.agents` agents, `scripts/install.sh` already creates the correct flat symlink structure.
+For `.agents` agents, `npm run install:skills` already creates the correct flat link structure.
 
 For other agents, use the [`npx skills` CLI](https://github.com/vercel-labs/skills) to install skills in the target agent's native format:
 

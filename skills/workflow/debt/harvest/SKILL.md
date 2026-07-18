@@ -152,7 +152,7 @@ The harvest file is the only one `/harvest` writes; the others belong to
 - `bun .agents/skills/harvest/scripts/resolve-harvest-target.ts` — event parser.
 - `bun .agents/skills/harvest/scripts/harvest-threads.ts` — single PR.
 - `bun .agents/skills/harvest/scripts/harvest-debt-batch.ts` — batch.
-- `bash .agents/skills/harvest/scripts/land-harvest-files.sh` — push to main.
+- `npx tsx scripts/run.ts .agents/skills/harvest/scripts/land-harvest-files.sh` — push to main.
 
 All paths in the workflow were updated as part of this split. Workflow name
 stays `Review debt harvest` to keep `gh run list` filters stable.

@@ -27,16 +27,16 @@ Toolkit for creating and validating agent skills.
 ## Create a new skill
 
 ```bash
-./skills/tools/skillmaker/scripts/skill-scaffold.sh <category> <name>
+npx tsx scripts/run.ts .agents/skills/skillmaker/scripts/skill-scaffold.sh <category> <name>
 ```
 
 Creates `skills/<category>/<name>/SKILL.md` with valid frontmatter template.
-After creation, run `./scripts/install.sh` to generate the symlink.
+After creation, run `npm run install:skills` to update the links.
 
 ## Validate reserved names
 
 ```bash
-./scripts/validate-reserved-names.sh
+npx tsx scripts/run.ts scripts/validate-reserved-names.sh
 ```
 
 Checks all skills against the reserved names list. Run after creating or renaming any skill.
@@ -45,7 +45,7 @@ Checks all skills against the reserved names list. Run after creating or renamin
 
 1. Create `skills/tools/skillmaker/assets/agents/<agent-name>.yaml`
 2. List reserved commands under `commands:` (one per line, `- /command-name`)
-3. Run `./skills/tools/skillmaker/scripts/collect-reserved.sh` to regenerate `scripts/reserved-names.sh`
+3. Run `npx tsx scripts/run.ts .agents/skills/skillmaker/scripts/collect-reserved.sh` to regenerate `scripts/reserved-names.sh`
 4. Add a per-agent reference file to `references/agents/<agent-name>.md`
 5. Update `references/agent-command-registry.md` to link to it
 
@@ -64,7 +64,7 @@ commands:
 After editing any `assets/agents/*.yaml`:
 
 ```bash
-./skills/tools/skillmaker/scripts/collect-reserved.sh
+npx tsx scripts/run.ts .agents/skills/skillmaker/scripts/collect-reserved.sh
 ```
 
 This regenerates `scripts/reserved-names.sh` (single source of truth for all scripts).

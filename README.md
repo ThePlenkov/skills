@@ -116,16 +116,16 @@ Then restart the ChatGPT desktop app and install from the Plugins Directory.
 After cloning this repo, run once per machine:
 
 ```bash
-bash scripts/install.sh
+npm run install:skills
 ```
 
 This creates `.agents/skills/<skill-name>` symlinks pointing to `skills/<category>/<skill-name>/` (categories may be nested).
-Re-run `scripts/install.sh` after adding or removing skills to update the symlinks.
+Re-run `npm run install:skills` after adding or removing skills to update the links.
 
 To verify:
 
 ```bash
-bash scripts/install.sh --dry-run
+npm run install:skills -- --dry-run
 ```
 
 ## Creating a skill
@@ -156,17 +156,12 @@ repository.
 
 When a new codespace starts, `install.sh` runs automatically and creates flat
 `~/.agents/skills/<skill-name>` symlinks pointing to the `skills/` directory in this repo.
-Re-run `install.sh` after pulling new skills to create their symlinks.
-
-To re-run manually:
-
-```bash
-bash ~/dotfiles/install.sh
-```
+Re-run `npx tsx scripts/run.ts scripts/install.sh --home` after pulling new skills to update the links.
 
 ## Notes
 
 - Keep skills agent-agnostic and avoid hardcoded absolute paths.
+- Keep skills OS-independent: commands and scripts must work on Linux, macOS, and Windows. See `.agents/rules/os-independent.md`.
 - Use project-relative paths when a default is needed (for example `./docs/planning`).
-- Use `scripts/install.sh` for local installs — the remote CLI form is for consuming skills
+- Use `npm run install:skills` for local installs — the remote CLI form is for consuming skills
   from other machines or agents.
