@@ -6,14 +6,22 @@ on:
     paths:
       - 'skills/**/SKILL.md'
       - '.github/skill-schema.json'
+      - '.github/agent-manifest-schema.json'
       - '.github/workflows/validate-skills.yml'
       - '.github/scripts/**'
+      - '.agents/agents/**/manifest.yaml'
+      - '.agents/skills/**'
+      - 'scripts/validate-agent-manifests.sh'
   pull_request:
     paths:
       - 'skills/**/SKILL.md'
       - '.github/skill-schema.json'
+      - '.github/agent-manifest-schema.json'
       - '.github/workflows/validate-skills.yml'
       - '.github/scripts/**'
+      - '.agents/agents/**/manifest.yaml'
+      - '.agents/skills/**'
+      - 'scripts/validate-agent-manifests.sh'
 
 # Cancel duplicate runs on the same ref. Without this, a single push
 # to a PR branch can fire the workflow twice (once for the push event
@@ -88,3 +96,7 @@ jobs:
 
       - name: Check reserved skill names
         run: ./scripts/validate-reserved-names.sh
+
+      - name: Validate agent manifests
+        if: success() || failure()
+        run: ./scripts/validate-agent-manifests.sh

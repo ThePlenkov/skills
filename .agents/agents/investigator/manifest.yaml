@@ -1,0 +1,31 @@
+agent: investigator
+notes: |
+  Read-only investigator. Loaded by parent to answer a focused
+  investigation question with evidence. No git/commit/ci skill needed;
+  no edit/fix tooling. Heavy on investigation/rigor/placement skills.
+required:
+  - token-rationalism
+  - evidence
+  - investigate-first
+  - minimal-root-cause
+  - codehome
+  - critical-thinking
+  - safeguard
+optional:
+  - subagent-capsule
+  - persistent-memory
+  - shared-plan
+  - deepwiki
+forbidden:
+  - git-commit
+  - git-push
+  - git-reset
+  - ci-local
+  - e2e
+  - one-shot-patch
+  - act
+  - harvest
+  - github-pr-review
+  - mr-address-review
+  - triage-issue
+  - npm-publish

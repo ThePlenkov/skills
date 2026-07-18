@@ -1,0 +1,26 @@
+agent: verifier
+notes: |
+  Runtime and final proof verifier. Proves target behavior in real
+  runtime (backend, frontend browser, API, integration). No patching,
+  no commit, no fixing — only proving.
+required:
+  - evidence
+  - investigate-first
+  - minimal-root-cause
+  - codehome
+  - e2e
+optional:
+  - ci-local
+  - critical-thinking
+  - token-rationalism
+  - persistent-memory
+forbidden:
+  - one-shot-patch
+  - git-commit
+  - git-push
+  - git-reset
+  - act
+  - harvest
+  - github-pr-review
+  - mr-address-review
+  - triage-issue

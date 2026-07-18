@@ -1,0 +1,32 @@
+agent: coder
+notes: |
+  Autonomous producer. Default-stack for code work that may end in a
+  "done" claim. Heavy on evidence/investigation/rigor; explicit on
+  git/version-control tools and safety/patching primitives.
+required:
+  - token-rationalism
+  - persistent-memory
+  - evidence
+  - investigate-first
+  - minimal-root-cause
+  - codehome
+  - one-shot-patch
+  - safeguard
+  - git-commit
+  - git-push
+  - git-reset
+  - ci-local
+optional:
+  - sandboxed
+  - subagent-capsule
+  - retrospect
+  - npm-publish
+  - docker-agent
+  - e2e
+  - shared-plan
+forbidden:
+  - act
+  - harvest
+  - github-pr-review
+  - mr-address-review
+  - triage-issue

@@ -1,0 +1,28 @@
+agent: patcher
+notes: |
+  Narrow patch worker. Parent provides exact files and one fix
+  hypothesis; patcher applies exactly one logical change and verifies
+  it. Skips investigation/brainstorming skills; loads patch + verify
+  primitives only.
+required:
+  - minimal-root-cause
+  - codehome
+  - one-shot-patch
+  - safeguard
+  - evidence
+  - investigate-first
+optional:
+  - sandboxed
+  - git-commit
+  - ci-local
+  - persistent-memory
+forbidden:
+  - act
+  - harvest
+  - github-pr-review
+  - mr-address-review
+  - triage-issue
+  - git-push
+  - git-reset
+  - e2e
+  - npm-publish

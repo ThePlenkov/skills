@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Agent manifest",
+  "description": "JSON Schema for .agents/agents/<name>/manifest.yaml — declares required, optional, and forbidden skills for an agent.",
+  "type": "object",
+  "required": ["agent"],
+  "additionalProperties": false,
+  "properties": {
+    "agent": {
+      "type": "string",
+      "description": "Agent identifier (kebab-case, must match the directory name under .agents/agents/)",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "required": {
+      "type": "array",
+      "description": "Skills loaded automatically for this agent.",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+      },
+      "uniqueItems": true
+    },
+    "optional": {
+      "type": "array",
+      "description": "Skills available to the agent but not auto-loaded.",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+      },
+      "uniqueItems": true
+    },
+    "forbidden": {
+      "type": "array",
+      "description": "Skills this agent must never use (role isolation).",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+      },
+      "uniqueItems": true
+    },
+    "notes": {
+      "type": "string",
+      "description": "Free-form rationale or notes for maintainers."
+    }
+  }
+}
