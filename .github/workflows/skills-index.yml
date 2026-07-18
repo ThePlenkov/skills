@@ -64,38 +64,10 @@ jobs:
           cp .claude-plugin/skills-index.json public/skills-index.json
           cp .claude-plugin/skills-index.schema.json public/skills-index.schema.json
 
-      - name: Upload CI artifact
+      - name: Upload skills-index artifact
         uses: actions/upload-artifact@v7
         with:
           name: skills-index
           path: public/
           retention-days: 30
           if-no-files-found: error
-
-  deploy:
-    name: Deploy index and schema to GitHub Pages
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Download index artifact
-        uses: actions/download-artifact@v7
-        with:
-          name: skills-index
-          path: public
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: public
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4

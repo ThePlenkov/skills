@@ -67,11 +67,11 @@ skills/
    types. The validator checks the generated index against the generated schema
    (using jsonschema when available) and ignores the volatile `generated_at`
    field. The index and schema are built as CI artifacts by the `Skills Index`
-   workflow and are not committed. On every push to `main`, the workflow also
-   deploys the latest index and schema to GitHub Pages, so they can be consumed
-   at stable URLs:
-   `https://theplenkov.github.io/skills/skills-index.json` and
-   `https://theplenkov.github.io/skills/skills-index.schema.json`.
+   workflow and are not committed. Because this repository is private, the
+   artifacts are not deployed to GitHub Pages; they are published as a workflow
+   artifact named `skills-index`. Consumers with repository access can download
+   the latest files with:
+   `gh run download -R ThePlenkov/skills -n skills-index`
    Run `scripts/validate-skills-index.sh --update` locally to produce them for
    testing; `npm install` is required first.
 
