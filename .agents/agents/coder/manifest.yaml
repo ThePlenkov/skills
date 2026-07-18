@@ -5,7 +5,6 @@ notes: |
   git/version-control tools and safety/patching primitives.
 required:
   - token-rationalism
-  - persistent-memory
   - evidence
   - investigate-first
   - minimal-root-cause
@@ -17,11 +16,12 @@ required:
   - git-reset
   - ci-local
 optional:
+  - persistent-memory
   - sandboxed
   - subagent-capsule
   - retrospect
   - npm-publish
-  - docker-agent
+  - docker-agent-config
   - e2e
   - shared-plan
 forbidden:

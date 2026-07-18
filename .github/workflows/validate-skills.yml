@@ -12,6 +12,7 @@ on:
       - '.agents/agents/**/manifest.yaml'
       - '.agents/skills/**'
       - 'scripts/validate-agent-manifests.sh'
+      - 'scripts/check-tier-0-budget.sh'
   pull_request:
     paths:
       - 'skills/**/SKILL.md'
@@ -22,6 +23,7 @@ on:
       - '.agents/agents/**/manifest.yaml'
       - '.agents/skills/**'
       - 'scripts/validate-agent-manifests.sh'
+      - 'scripts/check-tier-0-budget.sh'
 
 # Cancel duplicate runs on the same ref. Without this, a single push
 # to a PR branch can fire the workflow twice (once for the push event
@@ -100,3 +102,7 @@ jobs:
       - name: Validate agent manifests
         if: success() || failure()
         run: ./scripts/validate-agent-manifests.sh
+
+      - name: Check Tier 0 always-on budget
+        if: success() || failure()
+        run: ./scripts/check-tier-0-budget.sh

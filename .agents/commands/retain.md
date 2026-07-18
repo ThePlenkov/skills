@@ -1,6 +1,7 @@
 ﻿---
 description: Persist significant learnings and findings immediately
 argument-hint: <what-to-remember>
+skill: persistent-memory
 ---
 
 Persist significant findings to memory immediately - don't batch to end of session.
@@ -32,4 +33,4 @@ Bad: "The build system is complex..."
 - Never store secrets or credentials
 - Persist immediately when learning occurs
 
-Apply the persist protocol from `.agents/skills/persistent-memory/SKILL.md`.
+Apply the persist protocol from `$skill{persistent-memory}` (Tier 1 — opt-in, not always-on).

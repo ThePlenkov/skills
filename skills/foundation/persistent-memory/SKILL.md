@@ -1,6 +1,8 @@
 ---
 name: persistent-memory
-description: "Persistent memory enforcement for AI agents. Before starting any task, recall prior work and findings. After completing work, persist learnings. Use always — this governs how the agent accumulates and retrieves knowledge across sessions."
+description: "Persistent memory enforcement for AI agents. Recall prior work and findings before starting a task; persist learnings after completing work. Tier 1 — opt-in via `/recall <terms>` at task start and `/retain <learning>` or `/reflect` when work concludes. NOT always-on; do not auto-load for every interaction."
+tier: 1
+triggers: [user]
 ---
 
 # Memory Skill
@@ -72,14 +74,14 @@ Then fall back to session-scoped notes (plan files, todo lists) as best-effort m
 
 ### 1. Recall Before Acting
 
-**Before starting any task**, search memory for prior context:
+**Once `/recall` has loaded this skill for the current task**, search memory for prior context before acting:
 
 1. **Extract key terms** from the task — project name, file paths, feature names, error messages, tool names
 2. **Search memory** using those terms
 3. **If results found**: read them, apply prior learnings, skip already-completed exploration
 4. **If no results**: proceed normally, but flag this as a fresh area to persist later
 
-This is non-negotiable. Skipping recall means potentially repeating work that was already done.
+While this skill is loaded, recall is non-negotiable for the current task. Skipping recall means potentially repeating work that was already done.
 
 #### What to search for
 

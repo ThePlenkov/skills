@@ -1,6 +1,7 @@
 ﻿---
 description: Search memory for prior context before starting work
 argument-hint: <search-terms>
+skill: persistent-memory
 ---
 
 Search memory for prior context, decisions, and learnings before starting any task.
@@ -24,6 +25,6 @@ Search memory for prior context, decisions, and learnings before starting any ta
 2. Memory MCP server (search_nodes, open_nodes)
 3. Session notes (fallback)
 
-**Always recall before acting** - this prevents repeating work and mistakes.
+**Opt-in by design (Tier 1)** — recall is NOT always-on. Invoke explicitly at task start when cross-session context may matter. For trivial tasks (typo fix, single-line change, quick question), skip this command.
 
-Apply the recall protocol from `.agents/skills/persistent-memory/SKILL.md`.
+Apply the recall protocol from `$skill{persistent-memory}`.

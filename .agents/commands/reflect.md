@@ -1,5 +1,6 @@
 ﻿---
 description: Review and consolidate memory - update entities, detect patterns, clean up
+skill: persistent-memory
 ---
 
 Periodically review and consolidate memories to maintain quality.
@@ -30,4 +31,4 @@ If pattern emerges (same mistake recurring):
 - Delete obsolete before adding new
 - Link related entities
 
-Apply the reflection protocol from `.agents/skills/persistent-memory/SKILL.md`.
+Apply the reflection protocol from `$skill{persistent-memory}` (Tier 1 — opt-in, not always-on).

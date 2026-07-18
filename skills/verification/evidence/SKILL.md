@@ -14,6 +14,8 @@ permissions:
   write: ask
 argument-hint: "<task or claim to evidence>"
 triggers: ["user", "model"]
+tier: 2
+# Tier 2 — on-demand. Load only when a task may produce a completion claim.
 ---
 
 # /evidence — file-first, run-first producer discipline

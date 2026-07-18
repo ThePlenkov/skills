@@ -53,15 +53,19 @@ descriptions to the task using plain keyword matching + intent. **Do not ask the
 skill to use.** If unsure, load 2-3 candidate skills — over-loading is cheap, under-loading is
 expensive.
 
-Always load `@skills:evidence` on any task that might end in a "done" claim (i.e., almost all
-of them). Always load `@skills:runtime-proof` for any task touching a runnable surface (UI,
-API, CLI, library). Load `@skills:investigate-first` before any edit. Load
-`@skills:codehome` and `@skills:minimal-root-cause` before any edit. These five are
-**default-stack** unless the task is purely conversational.
+**Tier 0 (always-on, budget ≤ 300 lines total):** only `$skill{token-rationalism}` loads
+for every interaction. Everything else is opt-in.
 
-State the load decision in one line at the top of your work:
+**Tier 1 (on-task-start):** invoke `/recall <terms>` to load `$skill{persistent-memory}`
+context when cross-session knowledge may matter. Skip for trivial tasks.
+
+**Tier 2 (on-demand):** `$skill{adhd}`, `$skill{evidence}` (already triggers on user/model),
+`$skill{investigate-first}`, `$skill{minimal-root-cause}`, `$skill{codehome}` — load only
+when the task matches their description.
+
+State the load decision in one line at the top of your work. For example, when a task calls for investigation, code placement, minimal fixes, and runtime proof, you might load:
 ```
-loaded skills: investigate-first, minimal-root-cause, codehome, runtime-proof, evidence
+loaded skills: investigate-first, codehome, minimal-root-cause, evidence
 ```
 
 ### Step 2 — Read each loaded skill fully
