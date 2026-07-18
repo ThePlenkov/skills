@@ -1,24 +1,34 @@
 ---
 name: evidence
 description: >-
-  Producer-side "say-nothing-without-a-run" discipline combined with runtime proof enforcement.
-  ANY claim of done/fixed/passing/verified/green by a coder agent MUST be backed by a real
-  executed command + `.evidence/.../claim.json` on disk. Also enforces proving actual behavior
-  in the target runtime (backend/API tests, CLI checks, frontend browser automation).
-  Required for HTML, UI, browser JavaScript, hydration, routing, and client-side behavior
-  where curl is not enough.
+  Full proof discipline for non-trivial changes. Every claim of done/fixed/passing/verified/green
+  MUST be backed by a real executed command and `.evidence/.../claim.json` validated by
+  `scripts/validate.py`. Required for HTML, UI, browser JavaScript, hydration, routing, and
+  client-side behavior. Use $skill{evidence-lite} for trivial changes.
 allowed-tools: read, grep, glob, write, exec
 permissions:
   bash: ask
   edit: ask
   write: ask
-argument-hint: "<task or claim to evidence>"
+argument-hint: "<task or claim to evidence> [lite|full]"
 triggers: ["user", "model"]
 tier: 2
 # Tier 2 — on-demand. Load only when a task may produce a completion claim.
 ---
 
 # /evidence — file-first, run-first producer discipline
+
+## Tier selection
+
+Before producing evidence, decide which tier applies:
+
+| Tier | Trigger | Skill |
+| --- | --- | --- |
+| `lite` | files_changed ≤ 2 AND lines_changed ≤ 20 AND no test/config/build files AND change is doc/comment/typo/rename/trivial refactor | $skill{evidence-lite} |
+| `full` | everything else (production code, features, fixes, browser/API claims) | this skill |
+
+Default for non-trivial code changes: `full`. Explicit `/evidence lite` or `/evidence full`
+overrides auto-detection.
 
 ## The only rule (restated, sharper)
 
