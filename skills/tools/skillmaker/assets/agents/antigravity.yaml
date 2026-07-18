@@ -1,0 +1,6 @@
+agent: antigravity
+source: https://antigravity.google/docs/cli-overview
+commands:
+  []
+note: >
+  Antigravity CLI (`agy`) is a TUI surface. Skills and plugins are loaded from configured directories. No documented built-in slash command namespace.

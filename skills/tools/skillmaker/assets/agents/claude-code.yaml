@@ -9,6 +9,7 @@ commands:
   - /batch
   - /branch
   - /btw
+  - /bug
   - /cd
   - /chrome
   - /claude-api
@@ -86,6 +87,7 @@ commands:
   - /statusline
   - /stickers
   - /stop
+  - /subtask
   - /tasks
   - /team-onboarding
   - /teleport
@@ -102,3 +104,5 @@ commands:
   - /voice
   - /web-setup
   - /workflows
+note: >
+  Skills are loaded from `.claude/skills/` and `.agents/skills/`. Use `/skills` to manage them. Built-in commands are reserved.

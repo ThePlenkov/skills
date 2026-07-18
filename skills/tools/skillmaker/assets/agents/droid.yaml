@@ -1,0 +1,6 @@
+agent: droid
+source: https://docs.factory.ai/reference/cli-reference
+commands:
+  []
+note: >
+  Droid has top-level CLI commands (`droid`, `droid exec`, `droid plugin`, etc.) and a REPL with slash commands defined by skills. No documented fixed built-in slash namespace.

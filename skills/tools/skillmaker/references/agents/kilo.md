@@ -1,0 +1,53 @@
+# Kilo Code (Kilo)
+
+Source: <https://kilo.ai/docs/cli>
+
+## Reserved slash commands
+
+- `/agents`
+- `/clear`
+- `/compact`
+- `/connect`
+- `/continue`
+- `/copy`
+- `/copy-session`
+- `/editor`
+- `/exit`
+- `/export`
+- `/fork`
+- `/help`
+- `/init`
+- `/mcps`
+- `/me`
+- `/models`
+- `/new`
+- `/org`
+- `/orgs`
+- `/profile`
+- `/q`
+- `/quit`
+- `/redo`
+- `/reload`
+- `/remote`
+- `/rename`
+- `/resume`
+- `/review`
+- `/sessions`
+- `/share`
+- `/status`
+- `/summarize`
+- `/team`
+- `/teams`
+- `/themes`
+- `/thinking`
+- `/timeline`
+- `/timestamps`
+- `/toggle-thinking`
+- `/toggle-timestamps`
+- `/undo`
+- `/unshare`
+- `/whoami`
+
+## Notes
+
+Skills are loaded from `.kilo/skills/` and `.agents/skills/`. Interactive slash commands and top-level `kilo` CLI commands are reserved.

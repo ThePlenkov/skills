@@ -1,0 +1,6 @@
+agent: docker-agent
+source: https://docs.docker.com/ai/docker-agent/features/skills/
+commands:
+  []
+note: >
+  Skills are configured in the agent YAML (`skills: true` or a list of names/URLs). No built-in slash command namespace.

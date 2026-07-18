@@ -1,0 +1,6 @@
+agent: codex
+source: https://developers.openai.com/codex/cli/slash-commands
+commands:
+  - /skills
+note: >
+  Skills are loaded from `~/.codex/skills/` and project `.codex/skills/`. In the TUI, use `/skills` to browse skills or `$skill-name` to mention a skill directly.

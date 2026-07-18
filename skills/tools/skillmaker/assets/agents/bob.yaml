@@ -1,0 +1,10 @@
+agent: bob
+source: https://bob.ibm.com/docs/ide/features/slash-commands
+commands:
+  - /ask
+  - /code
+  - /create-pr
+  - /init
+  - /review
+note: >
+  Built-in slash commands and custom commands loaded from `.bob/commands/` are reserved.

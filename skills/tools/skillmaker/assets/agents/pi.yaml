@@ -1,0 +1,6 @@
+agent: pi
+source: https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/skills.md
+commands:
+  - /settings
+note: >
+  Skills are loaded from `~/.pi/agent/skills/`, `.pi/skills/`, `.agents/skills/`, and via `--skill`. Skills are invoked with `/skill:name`; `/settings` toggles skill commands.

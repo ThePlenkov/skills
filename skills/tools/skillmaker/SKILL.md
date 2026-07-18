@@ -46,7 +46,8 @@ Checks all skills against the reserved names list. Run after creating or renamin
 1. Create `skills/tools/skillmaker/assets/agents/<agent-name>.yaml`
 2. List reserved commands under `commands:` (one per line, `- /command-name`)
 3. Run `./skills/tools/skillmaker/scripts/collect-reserved.sh` to regenerate `scripts/reserved-names.sh`
-4. Update `references/agent-command-registry.md`
+4. Add a per-agent reference file to `references/agents/<agent-name>.md`
+5. Update `references/agent-command-registry.md` to link to it
 
 ### Agent YAML format
 
@@ -99,16 +100,14 @@ argument-hint: --fix       # optional, shown in /help
 skills/tools/skillmaker/
   SKILL.md
   assets/
-    agents/                  # per-agent reserved command lists
+    agents/                  # per-agent reserved command lists (one YAML per agent)
       claude-code.yaml
       aider.yaml
-      copilot.yaml
-      kilo.yaml
-      cursor.yaml
-      windsurf.yaml
+      ...                    # additional agent YAMLs
   scripts/
     collect-reserved.sh      # aggregate YAMLs → reserved-names.sh
     skill-scaffold.sh        # create new skill from template
   references/
-    agent-command-registry.md  # human-readable command registry
+    agent-command-registry.md  # index linking to per-agent reference files
+    agents/                    # per-agent command reference files
 ```

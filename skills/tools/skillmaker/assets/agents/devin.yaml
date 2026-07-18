@@ -1,0 +1,6 @@
+agent: devin
+source: https://docs.devin.ai/cli/extensibility/skills/overview
+commands:
+  []
+note: >
+  Skills are loaded from `.devin/skills/`, `.agents/skills/`, and `.windsurf/skills/`. Skills are invoked with `/skill-name`; there is no fixed built-in slash command namespace beyond skill names.

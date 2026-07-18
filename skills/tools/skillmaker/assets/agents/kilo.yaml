@@ -1,6 +1,48 @@
 agent: kilo
-source: https://kilo.ai/docs
-commands: []
+source: https://kilo.ai/docs/cli
+commands:
+  - /agents
+  - /clear
+  - /compact
+  - /connect
+  - /continue
+  - /copy
+  - /copy-session
+  - /editor
+  - /exit
+  - /export
+  - /fork
+  - /help
+  - /init
+  - /mcps
+  - /me
+  - /models
+  - /new
+  - /org
+  - /orgs
+  - /profile
+  - /q
+  - /quit
+  - /redo
+  - /reload
+  - /remote
+  - /rename
+  - /resume
+  - /review
+  - /sessions
+  - /share
+  - /status
+  - /summarize
+  - /team
+  - /teams
+  - /themes
+  - /thinking
+  - /timeline
+  - /timestamps
+  - /toggle-thinking
+  - /toggle-timestamps
+  - /undo
+  - /unshare
+  - /whoami
 note: >
-  Kilo uses skills loaded from .kilo/skills/ and .agents/skills/.
-  No built-in slash commands beyond standard agent tool invocation.
+  Skills are loaded from `.kilo/skills/` and `.agents/skills/`. Interactive slash commands and top-level `kilo` CLI commands are reserved.

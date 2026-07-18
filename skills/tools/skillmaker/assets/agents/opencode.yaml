@@ -1,0 +1,28 @@
+agent: opencode
+source: https://opencode.ai/docs/tui/
+commands:
+  - /clear
+  - /compact
+  - /connect
+  - /continue
+  - /details
+  - /editor
+  - /exit
+  - /export
+  - /help
+  - /init
+  - /models
+  - /new
+  - /q
+  - /quit
+  - /redo
+  - /resume
+  - /sessions
+  - /share
+  - /summarize
+  - /themes
+  - /thinking
+  - /undo
+  - /unshare
+note: >
+  Skills are loaded from `.opencode/skills/` and `.agents/skills/`. TUI slash commands are reserved.
