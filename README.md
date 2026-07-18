@@ -84,6 +84,33 @@ This repo is also a [Claude Code plugin marketplace](https://code.claude.com/doc
 }
 ```
 
+### ChatGPT / Codex plugin marketplace
+
+This repo also supports [ChatGPT/Codex plugins](https://learn.chatgpt.com/docs/build-plugins).
+
+**Add the marketplace from the CLI:**
+```
+codex plugin marketplace add ThePlenkov/skills
+```
+
+**Or add manually** — add to your repo's `.agents/plugins/marketplace.json`:
+```json
+{
+  "name": "theplenkov-skills",
+  "interface": { "displayName": "Plenkov Skills" },
+  "plugins": [
+    {
+      "name": "skills",
+      "source": { "source": "git-subdir", "url": "https://github.com/ThePlenkov/skills.git", "path": "./", "ref": "main" },
+      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "category": "Productivity"
+    }
+  ]
+}
+```
+
+Then restart the ChatGPT desktop app and install from the Plugins Directory.
+
 ### Symlink install (local clone — recommended for contributors)
 
 After cloning this repo, run once per machine:
@@ -107,7 +134,7 @@ bash scripts/install.sh --dry-run
 2. Create a new folder: `skills/<category>/<skill-name>/`.
 3. Add `SKILL.md` with YAML frontmatter (`name`, `description`).
 4. Add `assets/`, `references/`, or `scripts/` only if needed.
-5. Update the category description in `.claude-plugin/marketplace.json`.
+5. Update the category description in `.claude-plugin/marketplace.json` (Claude Code) and add a plugin entry in `.agents/plugins/marketplace.json` (ChatGPT/Codex).
 
 ## Skill references
 

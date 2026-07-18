@@ -1,0 +1,17 @@
+{
+  "name": "skills",
+  "version": "1.0.0",
+  "description": "Personal, agent-agnostic skills for AI coding agents. Install via the ChatGPT Plugins Directory or .agents/skills/ symlinks.",
+  "author": {
+    "name": "Petr Plenkov"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Skills",
+    "shortDescription": "Personal, agent-agnostic skills for AI coding agents",
+    "longDescription": "Reusable agent skills organized by category. Install via the ChatGPT Plugins Directory or .agents/skills/ symlinks.",
+    "developerName": "Petr Plenkov",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"]
+  }
+}
