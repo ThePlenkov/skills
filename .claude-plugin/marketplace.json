@@ -9,7 +9,7 @@
       "name": "coaching",
       "source": "./",
       "skills": ["./skills/coaching"],
-      "description": "Agent coaching and user guidance"
+      "description": "Agent coaching and user guidance (requirement interviews, idea refinement, meta skill orchestration)"
     },
     {
       "name": "foundation",
@@ -21,7 +21,7 @@
       "name": "methodology",
       "source": "./",
       "skills": ["./skills/methodology"],
-      "description": "Development methodology (patching discipline, critical thinking, code home, spec-driven dev)"
+      "description": "Development methodology (SDD, TDD, incremental implementation, context/source/doubt-driven dev, UI/API design, security, performance, observability, code simplification)"
     },
     {
       "name": "verification",
@@ -39,7 +39,7 @@
       "name": "workflow",
       "source": "./",
       "skills": ["./skills/workflow"],
-      "description": "Development workflow (git, testing, planning, review debt)"
+      "description": "Development workflow (git, CI/CD, planning, testing, documentation, deprecation, shipping, and launch)"
     },
     {
       "name": "integrations",
