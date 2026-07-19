@@ -50,6 +50,55 @@ npx skills add ThePlenkov/skills --skill behavior
 npx skills add ThePlenkov/skills --skill methodology --skill orchestration
 ```
 
+### Direct install via npx/bunx/pnpm
+
+Install skills directly from GitHub without the `skills` CLI.
+
+> Requires Node.js ≥22.6 on the caller's machine (the wrapper is a TypeScript
+> file run via Node's `--experimental-strip-types`).
+
+```bash
+# Install to ~/.agents/skills/ (default, copy mode)
+npx github:theplenkov/skills
+
+# Install to current project's ./.agents/skills/
+npx github:theplenkov/skills --project
+
+# Preview what would be installed
+npx github:theplenkov/skills --dry-run
+
+# Verify an existing copy-mode install is in sync (non-zero exit if not)
+npx github:theplenkov/skills --check
+
+# Permit install.sh to clobber foreign entries in the target that don't
+# already match a current skill (e.g. files the user dropped into
+# ~/.agents/skills). Without --force, install.sh refuses to delete them.
+npx github:theplenkov/skills --force
+
+# Stable local checkout: symlink mode into an explicit target (recommended
+# over --copy because the source tree is persistent).
+npx github:theplenkov/skills --no-copy --target=$PWD/.agents/skills
+```
+
+Two install flows live side-by-side in this repo:
+
+| Flow | Source | Target layout | Default runner |
+| --- | --- | --- | --- |
+| Symlink-based | `./scripts/install.sh` (and `npx skills add`) | `~/.agents/skills/<skill>` symlinks into the repo checkout | Local clone, source tree is persistent |
+| Copy-based | `bin/skills.ts` via `npx github:theplenkov/skills` | `~/.agents/skills/<skill>` directories vendored into place | `npx`/`bunx`/`pnpm dlx` (transient cache) |
+
+Copy mode is the wrapper default because `npx github:theplenkov/skills`
+extracts the repo into a runner cache that may be pruned; symlinks would
+dangle once the cache is gone. For anything else, use the symlink flow
+directly via the `./scripts/install.sh --home` path or by passing
+`--no-copy` to the wrapper.
+
+```bash
+# Both runners end up at ~/.agents/skills/<skill-name>
+npx github:theplenkov/skills     # copies
+npx github:theplenkov/skills --no-copy --target=$HOME/.agents/skills  # symlinks
+```
+
 ### Claude Code plugin marketplace
 
 This repo is also a [Claude Code plugin marketplace](https://code.claude.com/docs/en/plugin-marketplaces).

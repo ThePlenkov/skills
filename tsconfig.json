@@ -9,8 +9,10 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
     "outDir": "./tmp/dist"
   },
-  "include": ["scripts/**/*.ts"],
-  "exclude": ["node_modules", "tmp"]
+  "include": ["scripts/**/*.ts", "bin/**/*.ts"],
+  "exclude": ["node_modules", "tmp", "**/*.test.ts"]
 }

@@ -1,15 +1,19 @@
 {
-  "name": "skills",
+  "name": "@theplenkov/skills",
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "bin": {
+    "skills": "./bin/skills.js"
+  },
   "scripts": {
     "generate": "tsx scripts/generate-skills-index.ts",
     "validate": "tsx scripts/run.ts scripts/validate-skills-index.sh",
     "validate:update": "tsx scripts/run.ts scripts/validate-skills-index.sh --update",
     "install:skills": "tsx scripts/run.ts scripts/install.sh",
     "typecheck": "tsc --noEmit",
-    "check:os": "tsx scripts/check-os-independence.ts"
+    "check:os": "tsx scripts/check-os-independence.ts",
+    "test": "bun test scripts/"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

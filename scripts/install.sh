@@ -3,6 +3,12 @@
 #
 # Default (project install): creates .agents/skills/<skill-name> symlinks in the repo.
 # --home: creates ~/.agents/skills/<skill-name> symlinks (dotfiles / global install).
+# --target=DIR: install into the given directory (used by the bin/skills.js wrapper
+#               to honour a caller's --project working directory).
+# --copy: copy skill files into the target instead of creating symlinks.
+#         Use this when running from a transient package-runner cache (npx, bunx,
+#         pnpm dlx) where the original location may be garbage-collected and the
+#         symlinks would otherwise dangle.
 # --check: verify the target directory is in sync and exit 1 if not.
 # --dry-run: print what would be done without changing anything.
 
@@ -75,6 +81,8 @@ HOME_INSTALL=0
 DRY_RUN=0
 CHECK=0
 FORCE=0
+COPY=0
+TARGET_DIR_OVERRIDE=
 
 for arg in "$@"; do
   case "$arg" in
@@ -90,8 +98,18 @@ for arg in "$@"; do
     --force)
       FORCE=1
       ;;
+    --copy)
+      COPY=1
+      ;;
+    --target=*)
+      TARGET_DIR_OVERRIDE=${arg#--target=}
+      if [[ -z "$TARGET_DIR_OVERRIDE" ]]; then
+        printf '--target requires a directory path\n' >&2
+        exit 1
+      fi
+      ;;
     --help)
-      printf 'Usage: %s [--home] [--dry-run|--check] [--force]\n' "$(basename "$0")"
+      printf 'Usage: %s [--home|--target=DIR] [--copy] [--dry-run|--check] [--force]\n' "$(basename "$0")"
       exit 0
       ;;
     *)
@@ -101,10 +119,49 @@ for arg in "$@"; do
   esac
 done
 
+if [[ -n "$TARGET_DIR_OVERRIDE" ]] && [[ "$HOME_INSTALL" = 1 ]]; then
+  printf '--target cannot be combined with --home\n' >&2
+  exit 1
+fi
+
+# Copy mode: the target entries are installer-managed copies, so the
+# install must be idempotent (a second run replaces prior copies in-place)
+# and --check must compare contents rather than blindly marking them out
+# of sync. We achieve both via a per-entry marker file (see MANAGED_MARKER
+# below): the marker is the proof that an entry is ours, so a re-run can
+# safely refresh it (the upgrade path); foreign content that happens to
+# share a name with a skill is left alone. Stale entries not in WANT_DIRS
+# remain gated by FORCE as before.
+MANAGED_MARKER=".skills-managed-by-install-sh"
+write_managed_marker() {
+  local dir="$1"
+  printf 'skills-managed-by-install-sh\n' > "$dir/$MANAGED_MARKER"
+}
+# Compare two trees, treating the managed marker as invisible. diff -r
+# doesn't have a portable --exclude (GNU-only), so temporarily move the
+# marker aside for the comparison and put it back regardless of result.
+content_matches() {
+  local src="$1" dst="$2" marker_tmp=""
+  if [[ -f "$dst/$MANAGED_MARKER" ]]; then
+    marker_tmp=$(mktemp)
+    mv "$dst/$MANAGED_MARKER" "$marker_tmp"
+  fi
+  if diff -r "$src" "$dst" >/dev/null 2>&1; then
+    [[ -n "$marker_tmp" ]] && mv "$marker_tmp" "$dst/$MANAGED_MARKER"
+    return 0
+  else
+    [[ -n "$marker_tmp" ]] && mv "$marker_tmp" "$dst/$MANAGED_MARKER"
+    return 1
+  fi
+}
+
 # shellcheck source=ensure-reserved.sh
 source "$(dirname "$0")/ensure-reserved.sh"
 
-if [[ "$HOME_INSTALL" = 1 ]]; then
+if [[ -n "$TARGET_DIR_OVERRIDE" ]]; then
+  TARGET_DIR="$TARGET_DIR_OVERRIDE"
+  BASE_ABS="$TARGET_DIR_OVERRIDE"
+elif [[ "$HOME_INSTALL" = 1 ]]; then
   TARGET_DIR="${HOME}/.agents/skills"
   BASE_ABS="$(cd "$HOME" && pwd -P)/.agents/skills"
 else
@@ -115,6 +172,13 @@ else
     FORCE=1
   fi
 fi
+
+# Copy mode: the target entries are installer-managed copies, so the
+# per-skill install loop must be idempotent — a second run replaces prior
+# copies in-place. The actual recognition is done via the per-entry
+# MANAGED_MARKER file (declared below); FORCE continues to gate the
+# stale-entry removal loop so `--copy` does not silently delete foreign
+# content in the target directory when the user did not opt in.
 
 if [[ "$DRY_RUN" = 1 ]] && [[ "$CHECK" = 1 ]]; then
   printf '%s\n' '--dry-run and --check are mutually exclusive' >&2
@@ -190,6 +254,93 @@ for name in $(printf '%s\n' "${!WANT_DIRS[@]}" | sort); do
   category="${WANT_DIRS[$name]}"
   skill_dir="${SOURCE_DIR}/${category}/${name}"
   link="${TARGET_DIR}/${name}"
+  if [[ "$COPY" = 1 ]]; then
+    # Copy mode: the target directory holds a fresh copy of every source
+    # skill. The install is idempotent — a second run replaces prior
+    # copies — and --check compares file contents rather than relying on a
+    # symlink target. Recognised managed entries (those carrying the
+    # $MANAGED_MARKER sentinel) refresh in place even when source content
+    # has changed; the stale-entry removal loop stays gated by FORCE.
+    #
+    # On a managed copy-mode install we drop $MANAGED_MARKER into the entry
+    # so future re-runs can recognise "this is ours" and refresh in place
+    # even when the source content has changed (a normal upgrade). The
+    # marker also keeps the safety guard from clobbering same-named
+    # hand-placed content under --target / --home / repo-local.
+    #
+    # Note: `[[ ! -e $link && ! -L $link ]]` is true only when nothing
+    # occupies the slot — including dangling symlinks, which we treat as
+    # user-placed content and refuse unless --force or a managed marker
+    # is present. This avoids silently clobbering a hand-placed dangling
+    # link with a fresh directory.
+    if [[ ! -e "$link" && ! -L "$link" ]]; then
+      if [[ "$CHECK" = 1 ]] || [[ "$DRY_RUN" = 1 ]]; then
+        printf 'Would create: %s (copy from %s)\n' "$link" "$skill_dir"
+        DIFF=1
+      else
+        printf 'Creating: %s (copy from %s)\n' "$link" "$skill_dir"
+        cp -R "$skill_dir" "$link"
+        write_managed_marker "$link"
+      fi
+      continue
+    fi
+
+    # Entry already exists. In CHECK mode, compare its content against the
+    # source: a matching tree is "in sync", otherwise report the would-be
+    # replacement so DIFF=1.
+    if [[ "$CHECK" = 1 ]]; then
+      if content_matches "$skill_dir" "$link"; then
+        continue
+      fi
+      printf 'Would replace: %s (content differs from %s)\n' "$link" "$skill_dir"
+      DIFF=1
+      continue
+    fi
+    if [[ "$DRY_RUN" = 1 ]]; then
+      printf 'Would replace: %s (copy from %s)\n' "$link" "$skill_dir"
+      DIFF=1
+      continue
+    fi
+
+    # Real install. Three replaceable cases:
+    #   1. --force is explicit.
+    #   2. The entry is a symlink whose target already matches the expected
+    #      source path — we created it (mode switch) and may switch back.
+    #   3. The entry is a directory carrying our managed marker from a prior
+    #      copy-mode install; refresh in place even when the source content
+    #      has changed (upgrade).
+    # Foreign hand-placed symlinks, directories, and files are refused so
+    # user content is not silently clobbered.
+    expected_target=$(relpath "$skill_dir" "$BASE_ABS" 2>/dev/null || printf '')
+    if [[ "$FORCE" = 1 ]]; then
+      : # explicit override
+    elif [[ -L "$link" ]]; then
+      current=$(readlink "$link" 2>/dev/null || true)
+      if [[ -z "$current" ]]; then
+        printf 'Refusing to overwrite dangling symlink %s (use --force to override).\n' "$link" >&2
+        exit 1
+      fi
+      if [[ "$current" != "$expected_target" ]]; then
+        printf 'Refusing to overwrite foreign symlink %s -> %s (use --force to override).\n' "$link" "$current" >&2
+        exit 1
+      fi
+    elif [[ ! -e "$link" ]]; then
+      # Survived `[[ ! -e $link && ! -L $link ]]` because the target is a
+      # symlink (caught above) — but if -L is also false we're seeing
+      # something exotic. Be safe and refuse.
+      printf 'Refusing to overwrite %s (unrecognised state; use --force to override).\n' "$link" >&2
+      exit 1
+    elif [[ ! -f "$link/$MANAGED_MARKER" ]]; then
+      printf 'Refusing to overwrite unmanaged %s (use --force to override).\n' "$link" >&2
+      exit 1
+    fi
+    printf 'Replacing: %s (copy from %s)\n' "$link" "$skill_dir"
+    rm -rf "$link"
+    cp -R "$skill_dir" "$link"
+    write_managed_marker "$link"
+    continue
+  fi
+
   if ! target=$(relpath "$skill_dir" "$BASE_ABS"); then
     printf 'Unable to compute relative path for %s\n' "$skill_dir" >&2
     exit 1
@@ -263,7 +414,11 @@ if [[ "$CHECK" = 1 ]]; then
 fi
 
 if [[ "$CHECK" = 0 ]] && [[ "$DRY_RUN" = 0 ]]; then
-  printf '%d skills linked in %s\n' ${#WANT_DIRS[@]} "$TARGET_DIR"
+  if [[ "$COPY" = 1 ]]; then
+    printf '%d skills installed in %s\n' ${#WANT_DIRS[@]} "$TARGET_DIR"
+  else
+    printf '%d skills linked in %s\n' ${#WANT_DIRS[@]} "$TARGET_DIR"
+  fi
 fi
 
 exit 0
