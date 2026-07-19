@@ -3,6 +3,7 @@ name: backlog
 description: >-
   Actionable improvement items derived from experience and retrospectives.
   Items live in .agents/backlog/.
+source: ThePlenkov/skills
 ---
 
 # Backlog

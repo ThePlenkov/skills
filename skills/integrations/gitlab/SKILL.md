@@ -1,6 +1,7 @@
 ---
 name: gitlab
 description: Work with GitLab projects, issues, merge requests, pipelines, and releases. Use when using `glab` CLI, GitLab API endpoints (`gitlab.com`/self-hosted REST/GraphQL), or GitLab MCP tools. NOT for general git operations or non-GitLab hosts.
+source: ThePlenkov/skills
 ---
 
 # GitLab

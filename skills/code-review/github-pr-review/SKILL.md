@@ -1,6 +1,7 @@
 ---
 name: github-pr-review
 description: Use when the user asks for a GitHub pull request review or wants review comments prepared for a PR on github.com.
+source: ThePlenkov/skills
 ---
 
 # GitHub Pull Request Review

@@ -6,6 +6,7 @@ argument-hint: <symptom, error message, failing command, or reproduction steps>
 triggers:
   - user
   - model
+source: ThePlenkov/skills
 ---
 
 # Debugging

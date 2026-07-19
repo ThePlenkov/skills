@@ -10,6 +10,7 @@ allowed-tools:
   - write
   - edit
   - grep
+source: ThePlenkov/skills
 ---
 
 # gh-stack

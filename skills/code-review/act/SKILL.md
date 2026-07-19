@@ -10,6 +10,7 @@ description: >-
   fix loop, not the collect or triage.
 disable-model-invocation: true
 compatibility: Requires gh, jq, git, bun.
+source: ThePlenkov/skills
 ---
 
 # /act
@@ -394,13 +395,14 @@ Follow [EVALUATE.md](references/EVALUATE.md). Durable sinks: REVIEW.md.
    - Mistake or debugging session → `.memory/experience/`
    - Observable project fact → `.memory/facts/`
 2. **Retrospect** — run `/retrospect --plan` ($retrospect) to record experience and create actionable $backlog items.
-3. **Cycle guard** — if any signal fires, **do not merge**; escalate to the user with evidence:
+3. **Feedback upstream** — if `/retrospect` classified a finding as universal AND tied to a specific skill's instructions (not this repo's `AGENTS.md`), call `$skill{skill-feedback}` instead of editing the skill file locally. Use `source:` from the affected skill's frontmatter. This is the loop closing back to `ThePlenkov/skills` (or the relevant fork).
+4. **Cycle guard** — if any signal fires, **do not merge**; escalate to the user with evidence:
 
    - A review thread was **reopened** after an earlier resolve on this PR.
    - The **same rule/alert** (Codacy, Semgrep, Code Scanning) was flagged **2+ times** after a fix commit — verify fix on current HEAD before another merge attempt.
    - **2+ `/act` runs** on the same PR with **no new product commits** since the last run — report an `/act` cycle; do not resolve-only again.
 
-4. **Fix counts** — name source system and query on **current HEAD** (REVIEW.md).
+5. **Fix counts** — name source system and query on **current HEAD** (REVIEW.md).
 
 ## Merge-ready — the loop has converged
 

@@ -1,6 +1,7 @@
 ---
 name: gitlab-ci-local
 description: Test GitLab CI pipelines locally using gitlab-ci-local. Use when debugging CI jobs, validating pipeline changes, or running jobs without pushing to GitLab.
+source: ThePlenkov/skills
 ---
 
 # GitLab CI Local Testing

@@ -12,6 +12,7 @@ permissions:
   write: ask
 argument-hint: "<trivial change to verify>"
 triggers: ["user", "model"]
+source: ThePlenkov/skills
 ---
 
 # /evidence-lite — proof for trivial changes

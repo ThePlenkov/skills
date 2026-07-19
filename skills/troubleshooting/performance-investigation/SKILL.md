@@ -6,6 +6,7 @@ argument-hint: <symptom, target workload, expected vs actual numbers>
 triggers:
   - user
   - model
+source: ThePlenkov/skills
 ---
 
 # Performance Investigation

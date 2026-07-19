@@ -6,6 +6,7 @@ argument-hint: <repository path or URL, optional focus area>
 triggers:
   - user
   - model
+source: ThePlenkov/skills
 ---
 
 # Repository Onboarding

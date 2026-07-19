@@ -5,6 +5,7 @@ description: >-
   evidence is written by the CLI. Use when the user invokes /e2e or asks to run a live scenario
   test and collect evidence under .e2e/results/. Agents use only e2e-agent commands — never
   import internal framework modules.
+source: ThePlenkov/skills
 ---
 
 # /e2e — e2e-agent (domain-agnostic)

@@ -1,6 +1,7 @@
 ---
 name: glab
 description: GitLab CLI automation with non-interactive mode. Automatically sets GLAB_NO_PROMPT=true to prevent hanging on interactive prompts.
+source: ThePlenkov/skills
 ---
 
 # GitLab CLI (glab) Automation

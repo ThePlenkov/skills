@@ -4,6 +4,7 @@ description: Use immediately before launching a subagent. Forces the parent to c
 allowed-tools: read, grep, glob
 argument-hint: <subagent profile and isolated subtask>
 triggers: ["user", "model"]
+source: ThePlenkov/skills
 ---
 
 # Subagent Capsule

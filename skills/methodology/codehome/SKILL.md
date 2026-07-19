@@ -23,6 +23,7 @@ permissions:
     - Exec(*lint*)
     - Exec(*typecheck*)
   deny: []
+source: ThePlenkov/skills
 ---
 
 # CODEHOME MODE

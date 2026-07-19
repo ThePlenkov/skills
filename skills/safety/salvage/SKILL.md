@@ -32,6 +32,7 @@ permissions:
     - Exec(*restore*working*)
     - Exec(*recursively*force*)
     - Exec(*find*and*delete*)
+source: ThePlenkov/skills
 ---
 
 # SALVAGE MODE

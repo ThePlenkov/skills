@@ -4,6 +4,7 @@ description: Use when the relevant file and fix hypothesis are known and the age
 allowed-tools: read, grep, glob, edit, write, exec
 argument-hint: <exact files plus one fix hypothesis>
 triggers: ["user", "model"]
+source: ThePlenkov/skills
 ---
 
 # One-Shot Patch

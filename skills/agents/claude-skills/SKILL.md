@@ -1,6 +1,7 @@
 ---
 name: claude-skills
 description: Install or refresh skills for Claude Code using `npx skills add`. Use when setting up Claude Code for the first time or after adding new skills to the repository.
+source: ThePlenkov/skills
 ---
 
 # Claude Skills Manager

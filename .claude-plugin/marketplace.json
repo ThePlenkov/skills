@@ -75,7 +75,7 @@
       "name": "self-learning",
       "source": "./",
       "skills": ["./skills/self-learning"],
-      "description": "Retrospective learning"
+      "description": "Retrospective learning and skill-improvement feedback routing (retrospect, skill-feedback)"
     },
     {
       "name": "research",

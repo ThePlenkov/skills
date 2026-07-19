@@ -1,6 +1,7 @@
 ---
 name: github-fix-main
 description: Use when the user asks to fix the current GitHub repository's default branch end-to-end, including latest failing CI on main, open code-scanning or quality findings, and follow-up PR iteration until the branch is green and review feedback is addressed.
+source: ThePlenkov/skills
 ---
 
 # github-fix-main

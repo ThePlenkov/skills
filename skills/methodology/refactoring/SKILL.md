@@ -6,6 +6,7 @@ argument-hint: <target area, refactor type, scope limits>
 triggers:
   - user
   - model
+source: ThePlenkov/skills
 ---
 
 # Refactoring

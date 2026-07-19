@@ -6,6 +6,7 @@ description: >-
   etc.) and you want inline PR annotations instead of (or in addition to)
   the Security tab. Exit code reflects the presence of error-severity
   findings so the same script can serve as both annotator and workflow gate.
+source: ThePlenkov/skills
 ---
 
 # SARIF → GitHub Actions Annotations

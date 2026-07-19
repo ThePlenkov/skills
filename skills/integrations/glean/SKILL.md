@@ -1,6 +1,7 @@
 ---
 name: glean
 description: "Use the glean-bk wrapper for Glean CLI with automatic OAuth token sync from bk CLI. Trigger when the user asks to search Glean, chat with Glean, or interact with the Glean API."
+source: ThePlenkov/skills
 ---
 
 # Glean CLI (via glean-bk)

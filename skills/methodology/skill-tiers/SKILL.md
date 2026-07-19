@@ -3,6 +3,7 @@ name: skill-tiers
 description: "Skill activation tiers and the 300-line always-on budget. Defines Tier 0 (always-on), Tier 1 (on-task-start via /recall), and Tier 2 (on-demand). Load when deciding which skills to activate or when designing a new skill."
 tier: 2
 triggers: ["user", "model"]
+source: ThePlenkov/skills
 ---
 
 # Skill Tiers

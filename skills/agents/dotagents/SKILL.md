@@ -5,6 +5,7 @@ permissions:
   modify-skill-files: true
   modify-agent-config: true
   scope: opt-in per user invocation; never runs automatically
+source: ThePlenkov/skills
 ---
 
 # dotagents

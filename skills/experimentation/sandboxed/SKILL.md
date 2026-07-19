@@ -41,6 +41,7 @@ permissions:
     - Exec(*clean*untracked*)
     - Exec(*restore*working*)
     - Exec(*recursively*force*)
+source: ThePlenkov/skills
 ---
 
 # SANDBOX MODE

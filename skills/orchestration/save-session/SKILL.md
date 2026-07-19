@@ -9,6 +9,7 @@ metadata:
     - handoff
   author: codex
   version: "1.0.0"
+source: ThePlenkov/skills
 ---
 
 # Save Session

@@ -3,6 +3,7 @@ name: minimal-root-cause
 description: Use before patching code when the task may cause overengineering, duplicate logic, unnecessary dependencies, or symptom-only bug fixes. Enforces laziness about solution, rigor about understanding and verification. Climb the laziness ladder before editing.
 allowed-tools: read, grep, glob, exec
 argument-hint: <planned change or bug fix>
+source: ThePlenkov/skills
 ---
 
 # Minimal Root Cause

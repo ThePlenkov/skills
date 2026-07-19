@@ -1,6 +1,7 @@
 ---
 name: mr-address-review
 description: End-to-end GitLab MR review-comment remediation. Use when the user asks to address, resolve, reply to, or work through MR review comments, especially commands like /mr address-review !3, /mr resolve-comments !3, or "fix all comments on this MR". Defaults to commit, push, reply, react, and resolve unless --dry-run is requested.
+source: ThePlenkov/skills
 ---
 
 # MR Address Review

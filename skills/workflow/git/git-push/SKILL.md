@@ -1,6 +1,7 @@
 ---
 name: git-push
 description: Push commits to remote with validation of target and scope. Analyzes target to determine if it's a branch, PR, external project, fork, or submodule. Enforces branch workflow rules and prevents accidental pushes to protected branches. Supports --check flag to run CI checks locally and --fix flag to auto-fix issues before pushing.
+source: ThePlenkov/skills
 ---
 
 # Git Push

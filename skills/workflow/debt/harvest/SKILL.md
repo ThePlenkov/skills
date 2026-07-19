@@ -9,6 +9,7 @@ description: >-
   collect, not a fix loop.
 disable-model-invocation: true
 compatibility: Requires gh, jq, bun; writes to .agents/review-debt/harvests/ and main.
+source: ThePlenkov/skills
 ---
 
 # /harvest

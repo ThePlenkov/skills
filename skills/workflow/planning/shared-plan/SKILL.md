@@ -1,6 +1,7 @@
 ---
 name: shared-plan
 description: Shared, persistent planning and retrospectives across agents and people. Use when planning work, coordinating parallel tasks, recording decisions, tracking ownership, or handing off work via git so another agent or person can pick up the plan later.
+source: ThePlenkov/skills
 ---
 
 # Shared Plan

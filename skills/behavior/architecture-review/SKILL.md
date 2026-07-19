@@ -6,6 +6,7 @@ argument-hint: <repository path or focus area, optional review scope>
 triggers:
   - user
   - model
+source: ThePlenkov/skills
 ---
 
 # Architecture Review

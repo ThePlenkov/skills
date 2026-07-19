@@ -11,6 +11,7 @@ allowed-tools:
   - bash
   - grep
   - glob
+source: ThePlenkov/skills
 ---
 
 # Skillmaker

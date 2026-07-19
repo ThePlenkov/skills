@@ -1,6 +1,7 @@
 ---
 name: retrospect
 description: Self-correction protocol for AI agents. Use when a mistake is made, a correction is received, or lessons need to be captured to prevent recurrence.
+source: ThePlenkov/skills
 ---
 
 # Retrospect
@@ -30,13 +31,32 @@ Stop the current approach immediately. Acknowledge the mistake. Don't continue h
 The fix must land at the right level:
 
 | Scope | When | Examples |
-|-------|------|---------|
+|-------|------|----------|
 | **Universal** | Applies to all agents, all projects | Update `AGENTS.md` or `.agents/skills/` |
 | **Project** | Specific to this codebase | Update project docs, README, config |
-| **Agent** | Specific to this agent's behavior | Agent memory, tool-specific rules |
+| **User** | Specific to the user's preferences, style, or workflow across all their projects | Global agent memory under the agent's user-config dir (e.g. `~/.config/<agent>/memory/`) |
+| **Agent** | Specific to this agent's behavior on this machine | Local agent rules, tool-specific config |
 | **Session** | One-off, won't recur | Mental note, no persistence needed |
 
 **Key rule**: extend existing rules rather than creating new ones. One source of truth per topic.
+
+### 3b. Classify Memory (when persisting to memory)
+
+When the chosen mechanism is **memory** (not file/rules), the agent MUST decide explicitly between **user memory** and **project memory**. Do not leave this to implicit routing.
+
+| Memory type | Lives in | Survives | Visible to |
+|-------------|----------|----------|------------|
+| **User memory** | Agent's user-config dir under `~/.config/<agent>/memory/` (global) | Across projects, across clones | All of the user's agents on this machine |
+| **Project memory** | `.memory/` inside the current repo | As long as the clone exists | Only agents working in this repo |
+
+Decision rules:
+
+- **User memory** — the finding is about the *user*: communication style, approval preferences, frequently used toolchains, things that should follow the user everywhere (e.g. "user prefers concise summaries, no preamble").
+- **Project memory** — the finding is about *this project*: conventions, current state, ownership, past decisions, runbooks specific to this repo (e.g. "Codacy token is configured under env `CODACY_API_TOKEN` in this repo").
+- **Both** — write the user-scoped half to user memory and the project-scoped half to project memory. Do not duplicate.
+- **Neither** — if it is genuinely universal, it goes to `AGENTS.md` or a skill update, not memory.
+
+Default to the narrower scope. Project memory that should be user memory leaks into every new repo; user memory that should be project memory breaks other repos that don't share the convention.
 
 ### 4. Persist the Fix
 
@@ -44,7 +64,9 @@ The agent chooses the persistence mechanism based on scope and its own capabilit
 
 - **Skill update** — if the finding improves a skill's instructions
 - **AGENTS.md** — if it's a universal project rule
-- **Agent memory** — if it's agent-specific context
+- **User memory** — if the finding is about the user's preferences and should follow them across projects (see `### 3b`)
+- **Agent memory** — if it's agent-specific context (one machine, one agent)
+- **Project memory** (`.memory/`) — if it's project-specific and the user-vs-project triage in `### 3b` classified it as project-scoped
 - **Code comments** — if it's implementation-level
 - **Project docs** — if it's project-specific knowledge
 
@@ -61,9 +83,14 @@ When rules conflict:
 1. `AGENTS.md` — highest authority
 2. `.agents/skills/` — domain rules
 3. Project documentation — project-specific
-4. Agent memory — lowest priority
+4. User memory (`~/.config/<agent>/memory/`) — user preferences across projects
+5. Agent memory — lowest priority
 
 When conflicts are detected: **stop, present to user, wait for resolution**.
+
+## Sending universal findings upstream
+
+When step 3 classifies a finding as **universal** AND the finding points at a specific skill's instructions (rather than `AGENTS.md` itself), do not edit the skill file in the consuming repo — hand off to `$skill{skill-feedback}`. It will file the finding at the skill's declared source repository using the `source:` field in its frontmatter. This keeps skill improvements flowing back to the canonical source instead of forking across clones.
 
 ## Anti-Patterns
 

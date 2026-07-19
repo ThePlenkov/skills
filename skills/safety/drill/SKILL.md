@@ -10,6 +10,7 @@ metadata:
     - delegation
   author: petr-plenkov
   version: "1.0.0"
+source: ThePlenkov/skills
 ---
 
 # Drill
