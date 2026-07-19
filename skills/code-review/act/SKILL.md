@@ -140,6 +140,10 @@ listing source PRs + thread ids).
 | "Codacy is not my responsibility — it's a third-party tool" | Codacy findings on this PR are your problem. Read annotations, install linter, reproduce, fix. |
 | One pass through threads, then resolve | Loop: fetch → analyse → fix → verify → push → re-fetch. CI may surface new findings after each push. |
 | Stop when context gets large | Plan a handoff: summarize state, write remaining items to backlog/harvest, report to user. |
+| `git stash push && git checkout other && git stash pop` to relocate WIP | `git add -A && git commit -am WIP` (or explicitly stage new untracked files first) on the current branch, then `git checkout -b new` / `git cherry-pick` / `git reset` cleanly. `git commit -am` skips untracked files, so inspect with `git status --short` before committing WIP. Stash silently drops content if the index is dirty in the wrong way. |
+| `git add -A` in an unfamiliar repo, then `git commit` | `git status --short` first; add explicit paths. The repo's `.gitignore` may not cover nested scratch dirs (`tmp/agent/`, `tmp/<run>/`) even when `/agent/` is ignored. |
+| Bypass `scripts/run.ts` and run `npx tsx <script.sh>` (or any non-TS) directly | Always go through `npx tsx scripts/run.ts <script>`. The runner inspects the extension and dispatches `.ts/.js/.mjs/.cjs` to `tsx`, `.py` to `python` on Windows / `python3` elsewhere, and anything else (including `.sh`) to a POSIX shell via `resolveTrustedBash()` (with Windows fallbacks). Direct `npx tsx <path>` throws `ERR_UNKNOWN_FILE_EXTENSION` on non-TS scripts. The runner also enforces realpath-based path containment plus an `isFile()` guard, and documents the symlink trust boundary in the source. |
+| Pause to describe an action when the user's phrasing could be read as an imperative | Prefer the imperative reading when context is forward motion. "какой PR?" / "what's the PR?" mid-flow usually means "open it", not "explain it". |
 
 ## PR metadata
 
