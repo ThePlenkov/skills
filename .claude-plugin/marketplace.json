@@ -21,7 +21,7 @@
       "name": "methodology",
       "source": "./",
       "skills": ["./skills/methodology"],
-      "description": "Development methodology (SDD, TDD, incremental implementation, context/source/doubt-driven dev, UI/API design, security, performance, observability, code simplification)"
+      "description": "Development methodology (SDD, TDD, incremental implementation, context/source/doubt-driven dev, UI/API design, security, performance, observability, code simplification, loop programming)"
     },
     {
       "name": "verification",

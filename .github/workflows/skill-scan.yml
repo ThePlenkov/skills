@@ -76,6 +76,12 @@ jobs:
         uses: ./actions/skillspector
         with:
           path: ./.agents/skills/
+          # Repo-level triage baseline: suppresses findings already
+          # reviewed and accepted as intentional (see the YAML header
+          # for the review contract of each rule). Passed as an
+          # absolute path so the per-skill executor resolves it
+          # regardless of the working directory it runs in.
+          baseline: ${{ github.workspace }}/.skillspector-baseline.yaml
           # sarif: "" disables SARIF output from the action. The
           # upload-sarif step below would otherwise fail with
           # "Code scanning is not enabled for this repository"
