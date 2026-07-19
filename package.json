@@ -13,6 +13,7 @@
     "install:skills": "tsx scripts/run.ts scripts/install.sh",
     "typecheck": "tsc --noEmit",
     "check:os": "tsx scripts/check-os-independence.ts",
+    "check:readme-categories": "tsx scripts/run.ts scripts/check-readme-categories.ts",
     "test": "bun test scripts/"
   },
   "devDependencies": {

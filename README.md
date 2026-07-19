@@ -6,22 +6,22 @@ Personal, agent-agnostic skills repository.
 
 ```
 skills/
-├── coaching/           # Agent coaching and user guidance
+├── agents/             # Framework management (dotagents, claude-skills)
 ├── behavior/           # Evidence, code quality, critical thinking
-├── methodology/        # Development methodologies (SDD, TDD, Agile)
-├── orchestration/      # Subagent coordination and context management
-├── planning/           # Planning, triage, session persistence
-├── integrations/       # External tool integrations
-├── testing/            # CI/CD testing and E2E scenarios
-├── tools/              # Development tools and utilities
+├── coaching/           # User guidance (adhd)
+├── code-review/        # PR/MR review and remediation (act, triage-issue, etc.)
+├── experimentation/    # Sandboxed experimentation (sandboxed)
+├── foundation/         # Always-on behavioral primitives (token economy, memory)
+├── integrations/       # Platform connectors (GitHub, GitLab, Atlassian, Codacy, ...)
+├── methodology/        # Development methodology (patching, critical thinking, code home, SDD)
+├── orchestration/      # Agent coordination, isolation, and session state
+├── research/           # Codebase analysis (deepwiki)
+├── safety/             # Destructive operation protection (safeguard, salvage)
+├── self-learning/      # Retrospective learning (retrospect, skill-feedback)
+├── tools/              # Dev tools (skillmaker, skills-cli, docker-agent-config, ...)
 ├── troubleshooting/    # Scoped descent, safety, recovery
-├── experimentation/    # Sandboxed experimentation
-├── git/                # Git workflow operations
-├── code-review/        # PR/MR review and remediation
-├── self-learning/      # Memory and retrospective learning
-├── debt-management/    # Review debt collection
-├── research/           # Research and documentation tools
-└── agents/             # Agent configuration and management
+├── verification/       # Runtime proof (evidence)
+└── workflow/           # Development workflow (git, testing, planning, debt)
 ```
 
 Each category contains skill directories with `SKILL.md` files.
@@ -116,7 +116,7 @@ This repo is also a [Claude Code plugin marketplace](https://code.claude.com/doc
 /plugin install methodology@theplenkov-claude
 ```
 
-**Available plugins:** `skills` (all), `coaching`, `behavior`, `methodology`, `orchestration`, `planning`, `integrations`, `testing`, `tools`, `troubleshooting`, `experimentation`, `git`, `code-review`, `self-learning`, `debt-management`, `research`, `agents`
+**Available plugins:** `skills` (all), `coaching`, `behavior`, `foundation`, `methodology`, `verification`, `orchestration`, `workflow`, `integrations`, `tools`, `safety`, `experimentation`, `troubleshooting`, `code-review`, `self-learning`, `research`, `agents`
 
 **Auto-populate for your team** — add to `.claude/settings.json`:
 

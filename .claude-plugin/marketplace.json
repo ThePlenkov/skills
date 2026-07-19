@@ -12,6 +12,12 @@
       "description": "Agent coaching and user guidance (requirement interviews, idea refinement, meta skill orchestration)"
     },
     {
+      "name": "behavior",
+      "source": "./",
+      "skills": ["./skills/behavior"],
+      "description": "Architecture review and design critique"
+    },
+    {
       "name": "foundation",
       "source": "./",
       "skills": ["./skills/foundation"],
@@ -64,6 +70,12 @@
       "source": "./",
       "skills": ["./skills/experimentation"],
       "description": "Sandboxed experimentation"
+    },
+    {
+      "name": "troubleshooting",
+      "source": "./",
+      "skills": ["./skills/troubleshooting"],
+      "description": "Debugging and performance investigation"
     },
     {
       "name": "code-review",

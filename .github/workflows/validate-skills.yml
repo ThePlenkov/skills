@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - 'skills/**/SKILL.md'
+      - 'README.md'
+      - '.claude-plugin/marketplace.json'
+      - 'package.json'
       - '.github/skill-schema.json'
       - '.github/agent-manifest-schema.json'
       - '.github/workflows/validate-skills.yml'
@@ -13,9 +16,13 @@ on:
       - '.agents/skills/**'
       - 'scripts/validate-agent-manifests.sh'
       - 'scripts/check-tier-0-budget.sh'
+      - 'scripts/check-readme-categories.ts'
   pull_request:
     paths:
       - 'skills/**/SKILL.md'
+      - 'README.md'
+      - '.claude-plugin/marketplace.json'
+      - 'package.json'
       - '.github/skill-schema.json'
       - '.github/agent-manifest-schema.json'
       - '.github/workflows/validate-skills.yml'
@@ -24,6 +31,7 @@ on:
       - '.agents/skills/**'
       - 'scripts/validate-agent-manifests.sh'
       - 'scripts/check-tier-0-budget.sh'
+      - 'scripts/check-readme-categories.ts'
 
 # Cancel duplicate runs on the same ref. Without this, a single push
 # to a PR branch can fire the workflow twice (once for the push event
@@ -106,3 +114,19 @@ jobs:
       - name: Check Tier 0 always-on budget
         if: success() || failure()
         run: npx --yes tsx scripts/run.ts scripts/check-tier-0-budget.sh
+  readme-categories:
+    name: Check README skill categories
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund --prefer-offline
+
+      - name: Check README categories
+        run: npx --yes tsx scripts/run.ts scripts/check-readme-categories.ts
