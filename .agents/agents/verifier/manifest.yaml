@@ -7,6 +7,7 @@ required:
   - evidence
   - investigate-first
   - minimal-root-cause
+  - minimalist
   - codehome
   - e2e
 optional:

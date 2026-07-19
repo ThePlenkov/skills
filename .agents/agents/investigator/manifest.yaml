@@ -8,6 +8,7 @@ required:
   - evidence
   - investigate-first
   - minimal-root-cause
+  - minimalist
   - codehome
   - critical-thinking
   - safeguard

@@ -6,6 +6,7 @@ notes: |
   primitives only.
 required:
   - minimal-root-cause
+  - minimalist
   - codehome
   - one-shot-patch
   - safeguard

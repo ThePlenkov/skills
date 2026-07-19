@@ -15,7 +15,7 @@
       "name": "foundation",
       "source": "./",
       "skills": ["./skills/foundation"],
-      "description": "Always-on behavioral primitives (token economy, memory)"
+      "description": "Always-on behavioral primitives (token economy, memory, minimalist senior-dev persona with the seven rungs)"
     },
     {
       "name": "methodology",

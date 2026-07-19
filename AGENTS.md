@@ -6,7 +6,7 @@ This repository is maintained by an agent that creates and updates skills and ro
 
 ```
 skills/
-├── foundation/         # Always-on behavioral primitives (token economy, memory)
+├── foundation/         # Behavioral primitives (token economy, memory, minimalist senior-dev persona) — tier 0 always-on + tier 1/2 opt-in primitives
 ├── methodology/        # Development methodology (patching, critical thinking, code home, SDD)
 ├── verification/       # Runtime proof (evidence)
 ├── safety/             # Destructive operation protection (safeguard, salvage)
