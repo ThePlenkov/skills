@@ -249,6 +249,57 @@ for skill_dir in "${SKILL_DIRS[@]}"; do
   WANT_DIRS[$name]=$category
 done
 
+# Load externally-installed skills from skills-lock.json so install.sh
+# preserves them (they are owned by `npx skills add`, not this repo's
+# skills/ tree). Only entries with a non-local sourceType are external;
+# `npx skills add .` records `sourceType: "local"` and those are still
+# validated against skills/.
+#
+# Allowed sourceType values match the vercel-labs/skills schema
+# (https://github.com/vercel-labs/skills): local, github, node_modules.
+# Entries with missing or unknown values are rejected (fail closed) so a
+# malformed lockfile entry cannot accidentally mark an entry as external
+# and shield it from stale-entry cleanup.
+declare -A EXTERNAL_DIRS
+LOCKFILE="${REPO_ROOT}/skills-lock.json"
+if [[ -f "$LOCKFILE" ]]; then
+  if ! command -v jq >/dev/null 2>&1; then
+    # jq is strongly recommended but not strictly required: we degrade to
+    # "no external preservation" instead of hard-failing. A running install
+    # without jq may still delete external skills on `--force` runs, but
+    # the default install already never deletes anything in the absence of
+    # stale cleanup mismatches.
+    printf 'Warning: jq is not installed. External skills listed in %s will not be preserved; install jq (e.g. `apt-get install jq` / `brew install jq`) for full support.\n' "$LOCKFILE" >&2
+  elif ! jq_output=$(jq -r --argjson known '["local","github","node_modules"]' '
+      .skills // {} | to_entries[]
+      | select((.value.sourceType // "") as $t | ($known | index($t)))
+      | "\(.key)\t\(.value.sourceType)"
+    ' "$LOCKFILE" 2>/dev/null); then
+    printf 'Error: failed to parse %s as JSON.\n' "$LOCKFILE" >&2
+    printf 'Run `npx skills update` to regenerate, or remove the lockfile.\n' >&2
+    exit 1
+  else
+    # Verify no declared entries were silently dropped (fail-closed on
+    # entries with missing or unknown sourceType).
+    declared=$(jq -r '.skills // {} | keys[]' "$LOCKFILE" 2>/dev/null | sort)
+    processed=$(printf '%s\n' "$jq_output" | awk -F'\t' 'NF>=1 && $1 != "" {print $1}' | sort)
+    if [[ "$declared" != "$processed" ]]; then
+      bad=$(comm -23 <(printf '%s\n' "$declared") <(printf '%s\n' "$processed") | tr '\n' ' ')
+      printf 'Error: %s has entries with missing or unknown sourceType (fail-closed).\n' "$LOCKFILE" >&2
+      printf '  Affected names: %s\n' "$bad" >&2
+      printf '  Allowed sourceType values: local, github, node_modules.\n' >&2
+      printf '  Run `npx skills update` to regenerate.\n' >&2
+      exit 1
+    fi
+    while IFS=$'\t' read -r lock_name lock_source_type; do
+      [[ -n "$lock_name" ]] || continue
+      if [[ "$lock_source_type" != "local" ]]; then
+        EXTERNAL_DIRS[$lock_name]=1
+      fi
+    done <<< "$jq_output"
+  fi
+fi
+
 # Compute symlink targets (relative for portability) and ensure/verify links.
 for name in $(printf '%s\n' "${!WANT_DIRS[@]}" | sort); do
   category="${WANT_DIRS[$name]}"
@@ -386,11 +437,46 @@ for name in $(printf '%s\n' "${!WANT_DIRS[@]}" | sort); do
   fi
 done
 
+# Positive presence check: every external entry declared in skills-lock.json
+# should have a corresponding .agents/skills/<name> directory (created by
+# `npx skills add`). On --check we report mismatches but never auto-create,
+# because install.sh does not know the external source path; the wrapper
+# (`bin/skills.ts`) is responsible for materialising externals before
+# delegating here. On a non-check install we warn but continue, since
+# re-running `npx skills add <source>` is the correct remediation.
+for name in $(printf '%s\n' "${!EXTERNAL_DIRS[@]}" | sort); do
+  ext_path="${TARGET_DIR}/${name}"
+  if [[ ! -e "$ext_path" ]]; then
+    if [[ "$CHECK" = 1 ]] || [[ "$DRY_RUN" = 1 ]]; then
+      printf 'External skill missing: %s (run `npx skills add` to install).\n' "$name" >&2
+      DIFF=1
+    else
+      printf 'External skill missing: %s (run `npx skills add` to install; skip by editing skills-lock.json).\n' "$name" >&2
+    fi
+  fi
+done
+
 # Remove stale entries in the target directory.
-if [[ -d "$TARGET_DIR" ]]; then
+# When `skills-lock.json` is absent, install.sh has no source of truth for
+# which `.agents/skills/<name>` entries are external (owned by `npx skills`)
+# vs stale. In that mode we skip the leftover-removal pass entirely to
+# avoid silently deleting externally-installed skills; users can still
+# remove manually with `--check` + targeted `rm`, or commit the lockfile
+# to restore the proper contract.
+if [[ ! -f "$LOCKFILE" ]]; then
+  if [[ "$CHECK" = 1 ]] || [[ "$DRY_RUN" = 1 ]]; then
+    printf 'Note: %s not found; skipping stale-entry cleanup. Run `npx skills` to add the lockfile.\n' "$LOCKFILE" >&2
+    DIFF=1
+  fi
+elif [[ -d "$TARGET_DIR" ]]; then
   while IFS= read -r -d '' entry; do
     name=$(basename "$entry")
     if [[ -z "${WANT_DIRS[$name]:-}" ]]; then
+      if [[ "${EXTERNAL_DIRS[$name]:-}" = "1" ]]; then
+        # External skill installed via `npx skills add`. Owned by the
+        # lockfile, not by this repo's skills/ tree. Preserve it.
+        continue
+      fi
       if [[ "$CHECK" = 1 ]] || [[ "$DRY_RUN" = 1 ]]; then
         printf 'Would remove stale entry: %s\n' "$entry"
         DIFF=1

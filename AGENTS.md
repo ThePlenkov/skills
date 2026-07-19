@@ -47,6 +47,17 @@ skills/
 - Avoid hardcoded absolute paths in skills or prompts.
 - Use project-relative defaults when needed (for example `./docs/planning`).
 - Keep prompts concise and focused on the role.
+- A skill that documents a specific external tool (one CLI / one service with its own upstream repo) lives **in that tool's repo**, not here. This repo only carries generic methodology, foundation, safety, verification, and agent-agnostic tooling. Examples: `gh-stackx` lives in `ThePlenkov/gh-stackx`, not here.
+
+## External skills (installed via `npx skills`)
+
+Some skills are owned by other repos and pulled into `.agents/skills/` at install time via `npx skills add <owner>/<repo> --skill <name>`. They are tracked by `skills-lock.json` at the repo root and **must be committed** so every contributor and CI gets the same set.
+
+- Install: `npx skills add <owner>/<repo> --skill <name> -y`
+- Update: `npx skills update`
+- Remove: `npx skills remove <name>`
+
+`scripts/install.sh` reads `skills-lock.json` (via `jq`) and preserves any entry whose `sourceType` is not `"local"` when regenerating `.agents/skills/`. Local-repo entries (e.g. from `npx skills add .`) are still validated against `skills/`. Do not manually edit `skills-lock.json` — it is machine-managed.
 
 ## Skill creation workflow
 

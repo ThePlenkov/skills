@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "gh-stackx": {
+      "source": "ThePlenkov/gh-stackx",
+      "sourceType": "github",
+      "skillPath": "skills/gh-stackx/SKILL.md",
+      "computedHash": "4b9331e4fa27c2e94d413476a75fbaeb0292f1e40b0aff4f2f74bf2d091aef13"
+    }
+  }
+}
