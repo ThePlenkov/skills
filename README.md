@@ -2,6 +2,47 @@
 
 Personal, agent-agnostic skills repository.
 
+## Dependency graph
+
+Skills reference each other via `$skill{name}` (or bare `$name`) inside their
+`SKILL.md` body. A global graph is unreadable at this scale (80 skills, ~140
+edges), so the generator produces one focused subgraph per skill: the skill
+itself plus its direct dependencies and direct dependents, grouped by
+relationship. Hub skills with many neighbors are truncated (capped at 15 per side)
+and clearly labelled.
+
+**Browse:** [`docs/graphs/generated/index.md`](docs/graphs/generated/index.md) — gallery grouped by
+category. Each row links to a `<skill>.md` with an embedded Mermaid block; on
+github.com the diagram is interactive (click any node to zoom, drag to pan).
+
+The path `docs/graphs/generated/` and the banner in every file mark these
+documents as auto-generated. Do not edit them by hand — run `npm run graph`
+(or `npm run graph:update`) after changing any `SKILL.md`.
+
+**Regenerate locally:**
+
+```bash
+npm run graph          # writes docs/graphs/generated/<skill>.md + index.md + .build/skills-graph.json
+npm run graph:update   # same defaults, explicit name
+
+# Or invoke the generator directly for custom output paths:
+npx tsx scripts/generate-skills-graph.ts --graph-dir docs/graphs/generated \
+                                          --json .build/skills-graph.json \
+                                          --neighbors 15
+
+# If a typo or migration leaves unknown `$skill{...}` references, the
+# generator exits 2 and prints the offenders. To regenerate anyway (e.g. in
+# CI before the missing skill lands) pass --allow-unknown-refs.
+```
+
+Outputs land in `docs/graphs/generated/` (committed; github.com renders Mermaid
+interactively) and `.build/skills-graph.json` (gitignored; CI artifact).
+
+**Drift check:** the [Skills Graph workflow](.github/workflows/skills-graph.yml)
+runs on every push and PR touching skills or the generator. If the regenerated
+graphs differ from the committed copy, the workflow warns so a maintainer can
+regenerate and commit the updated `docs/graphs/generated/*.md`.
+
 ## Layout
 
 ```

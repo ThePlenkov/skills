@@ -1,0 +1,68 @@
+name: Skills Graph
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'skills/**/SKILL.md'
+      - 'scripts/generate-skills-graph.ts'
+      - 'scripts/generate-skills-graph.test.ts'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/skills-graph.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'skills/**/SKILL.md'
+      - 'scripts/generate-skills-graph.ts'
+      - 'scripts/generate-skills-graph.test.ts'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/skills-graph.yml'
+  workflow_dispatch:
+
+# Cancel duplicate runs on the same ref.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  regenerate:
+    name: Regenerate and check skill graphs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Regenerate graphs
+        run: npm run graph
+
+      - name: Check for graph drift
+        run: |
+          set -euo pipefail
+          if ! git diff --quiet -- docs/graphs/generated/ .build/skills-graph.json; then
+            echo "::warning file=docs/graphs/generated/index.md::Generated graphs are out of date. Run 'npm run graph:update' locally and commit the changes."
+            git diff --stat -- docs/graphs/generated/ .build/skills-graph.json
+          fi
+
+      - name: Upload generated graphs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: skills-graph
+          path: |
+            docs/graphs/generated/
+            .build/skills-graph.json
+          retention-days: 7
+          if-no-files-found: warn
