@@ -112,7 +112,6 @@ async function main(): Promise<void> {
     exitCode = await runCommand(command!, rest)
   } catch (err) {
     console.error(err instanceof Error ? err.message : String(err))
-    exitCode = 1
   }
   process.exit(exitCode)
 }

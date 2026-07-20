@@ -93,7 +93,6 @@ The plugin auto-detects single-skill vs parent-of-many:
 | `annotations`          | no       | `"true"`                      | Emit `::error`/`::warning`/`::notice` lines for inline PR annotations.                                         |
 | `sarif`                | no       | `""`                          | Path to write a SARIF 2.1.0 report.                                                                            |
 | `fail-on-error`        | no       | `"true"`                      | Exit 1 on error-severity findings.                                                                             |
-| `job-summary`          | no       | `"true"`                      | Append a markdown per-skill summary table to `$GITHUB_STEP_SUMMARY`.                                          |
 | `skillspector-version` | no       | commit SHA pinned in action   | Pinned for reproducibility. Bump on purpose.                                                                   |
 | `parallelism`          | no       | `""` (uses `nproc`)          | Max concurrent skill scans. Set to `"1"` for sequential.                                                       |
 | `affected`            | no       | `"true"`                     | When `"true"`, use `nx affected` to scan only skills whose files changed since the base SHA. Requires `nx-set-shas` upstream. When `"false"`, always scan every skill. |

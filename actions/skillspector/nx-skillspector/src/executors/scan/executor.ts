@@ -250,7 +250,6 @@ export type ScanExecutorOptions = {
   sarif?: string;
   annotations?: boolean;
   failOnError?: boolean;
-  jobSummary?: boolean;
   noLlM?: boolean;
   baseline?: string;
 };

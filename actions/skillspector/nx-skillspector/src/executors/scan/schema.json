@@ -25,11 +25,6 @@
       "description": "Exit 1 on HIGH/CRITICAL findings. Set false to surface findings without failing.",
       "default": true
     },
-    "jobSummary": {
-      "type": "boolean",
-      "description": "Append a markdown summary to $GITHUB_STEP_SUMMARY.",
-      "default": true
-    },
     "noLlM": {
       "type": "boolean",
       "description": "Pass --no-llm to skillspector (recommended for CI).",

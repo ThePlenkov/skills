@@ -82,7 +82,6 @@ jobs:
           # ${{ github.workspace }}/skillspector.sarif) AND enable
           # code-scanning in the repo settings.
           sarif: ""
-          job-summary: 'true'
           # For cascade-of-PRs setups where each PR targets the
           # previous PR's branch (not main), pass the actual base.
           # nx-set-shas uses this to compute NX_BASE for `nx affected`.
