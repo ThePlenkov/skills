@@ -153,6 +153,7 @@ def build_message(explanation, properties):
             # percent keeps the output honest.
             out.append("confidence=" + str(pct))
         except (TypeError, ValueError):
+            # Confidence is optional; non-numeric values are ignored.
             pass
 
     return " — ".join(out)

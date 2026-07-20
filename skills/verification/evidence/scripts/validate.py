@@ -35,7 +35,6 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import Iterable
 
 
 SCHEMA_PATH = Path(__file__).resolve().parent.parent / "templates" / "claim.json"

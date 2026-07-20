@@ -51,17 +51,11 @@ export default async function scanExecutor(
     sarif = process.env.SARIF_OUT || '',
     annotations = process.env.ANNOTATIONS_ENABLED !== 'false',
     failOnError = process.env.FAIL_ON_ERROR !== 'false',
-    jobSummary = process.env.JOB_SUMMARY_ENABLED !== 'false',
     noLlM = process.env.SKILLSPECTOR_NO_LLM !== 'false',
     baseline = process.env.SKILLSPECTOR_BASELINE || '',
     skillspectorBin = process.env.SKILLSPECTOR_BIN || 'skillspector',
   } = options;
 
-  // Nx's ExecutorContext.root is the workspace root. The project root
-  // is the inferred project (skill dir). Resolve the path relative to
-  // the project root when it's relative.
-  const projectRoot = context.projectGraph?.nodes[context.projectName ?? '']?.data?.root
-    ?? context.cwd;
   // Resolve `skillPath` against the workspace root, not the project
   // root. The project root is already a sub-path of the workspace;
   // resolving against it would double up the prefix.

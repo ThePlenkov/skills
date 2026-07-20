@@ -53,7 +53,7 @@ function step(msg) { console.log(`\n▶ ${msg}`); }
 step("Detecting CI/CD provider from git remote...");
 const remoteUrl = tryRun("git remote get-url origin").stdout;
 
-let provider, workflowTemplate, defaultWorkflowFile;
+let provider, defaultWorkflowFile;
 
 if (remoteUrl.includes("github.com")) {
   provider = "github";
@@ -187,7 +187,7 @@ for (let i = 0; i < allPackages.length; i++) {
     log(`  ✓ Trust configured for ${pkg.name}`);
   } catch (err) {
     warn(`Failed to configure trust for ${pkg.name}: ${err.message}`);
-    warn("  If trust already exists, run: npm trust list ${pkg.name}");
+    warn(`  If trust already exists, run: npm trust list ${pkg.name}`);
   }
 }
 

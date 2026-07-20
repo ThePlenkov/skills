@@ -2,7 +2,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 const ERR = parseInt(process.env.ERROR_COUNT || '0', 10);
-const WARN = parseInt(process.env.WARNING_COUNT || '0', 10);
 const RUN_URL = process.env.RUN_URL;
 const ARTIFACT_URL = process.env.ARTIFACT_URL;
 const dir = process.env.FINDINGS_DIR;

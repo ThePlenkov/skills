@@ -107,7 +107,7 @@ async function main(): Promise<void> {
     process.exit(0)
   }
 
-  let exitCode = 1
+  let exitCode: number
   try {
     exitCode = await runCommand(command!, rest)
   } catch (err) {
