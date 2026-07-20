@@ -45,18 +45,24 @@ permissions:
   contents: read
 
 jobs:
-  validate-frontmatter:
-    name: Validate SKILL.md frontmatter
+  validate:
+    name: Validate skills structure
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '20'
+          cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install Node dependencies
+        run: npm ci --no-audit --no-fund --prefer-offline
+
+      - name: Install frontmatter validators
         run: npm install -g ajv-cli js-yaml
 
       - name: Validate all SKILL.md frontmatter
@@ -114,19 +120,7 @@ jobs:
       - name: Check Tier 0 always-on budget
         if: success() || failure()
         run: npx --yes tsx scripts/run.ts scripts/check-tier-0-budget.sh
-  readme-categories:
-    name: Check README skill categories
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: npm install --no-audit --no-fund --prefer-offline
 
       - name: Check README categories
+        if: success() || failure()
         run: npx --yes tsx scripts/run.ts scripts/check-readme-categories.ts

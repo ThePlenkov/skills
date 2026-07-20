@@ -20,6 +20,15 @@ on:
       - '.github/workflows/skill-scan.yml'
       - 'actions/skillspector/**'
   workflow_dispatch:
+    inputs:
+      affected:
+        description: 'Scan only affected skills (true) or perform a full scan (false)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
 
 # Cancel in-progress runs for the same workflow on the same ref. This
 # prevents duplicate runs when a single commit triggers both a push
@@ -50,6 +59,37 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # PRs scan changed skills by default, but a PR that touches the
+      # scanner itself or this workflow should run a full scan so the
+      # tooling changes are validated against every skill.
+      - uses: dorny/paths-filter@d1c1ffe0248fe513906c8e24db8ea791d46f8590
+        id: changes
+        with:
+          filters: |
+            skillspector-core:
+              - 'actions/skillspector/**'
+              - '.github/workflows/skill-scan.yml'
+
+      - name: Determine scan mode
+        id: mode
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUTS_AFFECTED: ${{ inputs.affected }}
+          SKILLSPECTOR_CORE_CHANGED: ${{ steps.changes.outputs.skillspector-core }}
+        run: |
+          if [[ "$EVENT_NAME" == "push" ]]; then
+            echo "affected=false"
+          elif [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            echo "affected=$INPUTS_AFFECTED"
+          elif [[ "$SKILLSPECTOR_CORE_CHANGED" == "true" ]]; then
+            echo "affected=false"
+          else
+            echo "affected=true"
+          fi >> "$GITHUB_OUTPUT"
 
       # The action handles installation of skillspector and per-skill
       # iteration internally. The path is auto-detected: a single
@@ -86,11 +126,12 @@ jobs:
           # previous PR's branch (not main), pass the actual base.
           # nx-set-shas uses this to compute NX_BASE for `nx affected`.
           base-branch: ${{ github.event.pull_request.base.ref || 'main' }}
-          # `nx affected` only scans skills whose files diff between
-          # NX_BASE and NX_HEAD. When only CI files change (no SKILL.md
-          # diffs), nx affected reports zero projects and the scan silently
-          # passes. Always run a full scan so every skill is checked.
-          affected: 'false'
+          # PRs scan only changed skills to save CI minutes, unless the PR
+          # touches the scanner or this workflow (then a full scan validates
+          # the tooling change). `push main` always does a full scan.
+          # Manual workflow_dispatch runs default to full but can opt into
+          # affected-only scanning via `affected: 'true'`.
+          affected: ${{ steps.mode.outputs.affected }}
 
       # Upload the merged SARIF to the code-scanning API. This is
       # what makes findings appear inline in the PR Files Changed
