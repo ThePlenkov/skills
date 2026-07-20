@@ -1,0 +1,14 @@
+schema_version = "1.3"
+
+[dataset]
+name = "devin/skills-bench-local"
+description = "Local A/B benchmark for skills in this repository."
+authors = [{ name = "devin-skills-bench" }]
+
+[[tasks]]
+name = "devin/skillmaker-create-skill"
+path = "tasks/skillmaker-create-skill"
+
+[[tasks]]
+name = "devin/investigate-before-edit"
+path = "tasks/investigate-before-edit"

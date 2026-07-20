@@ -1,0 +1,41 @@
+# Base image for Harbor tasks that run Devin CLI as an ACP agent.
+# Build once and tag as skills-harbor-devin-base:latest:
+#   docker build -t skills-harbor-devin-base:latest -f Dockerfile.devin-base .
+FROM python:3.12-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PATH="/usr/local/bin:${PATH}"
+
+# Devin CLI install requires curl, tar, sha256sum.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash \
+    git \
+    curl \
+    ca-certificates \
+    tar \
+    coreutils \
+    && rm -rf /var/lib/apt/lists/*
+
+# Benchmark tooling.
+RUN pip install --no-cache-dir pytest pyyaml
+
+# Install Devin CLI manually (the official installer prompts for login,
+# which fails in a non-interactive Docker build).
+COPY install-devin.sh /tmp/install-devin.sh
+RUN chmod +x /tmp/install-devin.sh && /tmp/install-devin.sh && rm /tmp/install-devin.sh
+
+# Verify binary is on PATH.
+RUN command -v devin && devin --version
+
+# Build a self-contained ACP archive for Harbor's ACP runner.
+# Harbor extracts the archive to /opt/harbor-acp-agent/dist/ and expects the
+# command executable at the archive root.
+RUN tar czf /opt/devin-acp-archive.tar.gz -C /usr/local/bin devin && \
+    sha256sum /opt/devin-acp-archive.tar.gz | awk '{print $1}' > /opt/devin-acp-archive.tar.gz.sha256
+
+# Run as a non-root user in the sandbox.
+RUN useradd -m -s /bin/bash devin && \
+    mkdir -p /workspace && \
+    chown -R devin:devin /workspace
+USER devin
+WORKDIR /workspace

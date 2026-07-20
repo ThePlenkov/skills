@@ -1,0 +1,55 @@
+{
+  "id": "devin",
+  "name": "Devin CLI",
+  "version": "3000.1.27",
+  "description": "Cognition Devin CLI running as an ACP server inside Harbor",
+  "repository": "https://github.com/Cognition-Devin/devin-cli",
+  "authors": ["Cognition AI"],
+  "license": "proprietary",
+  "distribution": {
+    "binary": {
+      "linux-aarch64": {
+        "archive": "https://static.devin.ai/cli/3000.1.27/devin-3000.1.27-aarch64-unknown-linux.tar.gz",
+        "cmd": "devin",
+        "args": ["acp"],
+        "env": {},
+        "checksum": "sha256:83259b0a97cb3698418e8486548862ee18064e804a71e6af10a9ffff20c0d6ec"
+      },
+      "linux-x86_64": {
+        "archive": "https://static.devin.ai/cli/3000.1.27/devin-3000.1.27-x86_64-unknown-linux.tar.gz",
+        "cmd": "devin",
+        "args": ["acp"],
+        "env": {},
+        "checksum": "sha256:cb4907a4a4f6c19beab91d04388a4537610c0bce01a4e38e28b5d6c04d27ca0a"
+      },
+      "darwin-aarch64": {
+        "archive": "https://static.devin.ai/cli/3000.1.27/devin-3000.1.27-aarch64-apple-darwin.tar.gz",
+        "cmd": "devin",
+        "args": ["acp"],
+        "env": {},
+        "checksum": "sha256:3a7a4035d321f70b3d147c1fc1647adce49a0bf3f7301f9e015df727140d51a4"
+      },
+      "darwin-x86_64": {
+        "archive": "https://static.devin.ai/cli/3000.1.27/devin-3000.1.27-x86_64-apple-darwin.tar.gz",
+        "cmd": "devin",
+        "args": ["acp"],
+        "env": {},
+        "checksum": "sha256:2cfe74dbf13bb64a90b28c15a93bc141fef5d3fd58437384175563926f2ec5c7"
+      },
+      "windows-aarch64": {
+        "archive": "https://static.devin.ai/cli/3000.1.27/devin-3000.1.27-aarch64-pc-windows.zip",
+        "cmd": "devin.exe",
+        "args": ["acp"],
+        "env": {},
+        "checksum": "sha256:b87820938041cc72e499892928cf0a7e9a40c2b5bc083cf5be7acc918c4c5f5e"
+      },
+      "windows-x86_64": {
+        "archive": "https://static.devin.ai/cli/3000.1.27/devin-3000.1.27-x86_64-pc-windows.zip",
+        "cmd": "devin.exe",
+        "args": ["acp"],
+        "env": {},
+        "checksum": "sha256:a7945cda36743cc87897ce8d385b5e420da213799f1d9b283c135a53b114f0a9"
+      }
+    }
+  }
+}

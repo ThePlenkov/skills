@@ -1,0 +1,20 @@
+# Harbor outputs
+jobs/
+dist.tar.gz
+results/*
+!results/oracle-smoke.md
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+
+# Secrets
+.env
+
+# OS
+.DS_Store

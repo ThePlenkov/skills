@@ -1,0 +1,10 @@
+# Custom Devin ACP agent for Harbor.
+# The ACP registry entry is in agent.json.
+# Run with:
+#   harbor run -p tasks -a acp \
+#     --agent-kwarg registry_entry_path=./agents/devin/agent.json \
+#     -m <model>
+
+name = "devin"
+description = "Devin CLI ACP agent for Harbor"
+protocol = "acp"

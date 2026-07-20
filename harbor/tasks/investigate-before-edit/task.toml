@@ -1,0 +1,27 @@
+schema_version = "1.3"
+
+[task]
+name = "devin/investigate-before-edit"
+description = "Investigate a failing test without editing source files."
+authors = [{ name = "devin-skills-bench" }]
+keywords = ["skills", "investigate-first", "behavior"]
+
+[metadata]
+difficulty = "easy"
+category = "agent-skills"
+
+[verifier]
+timeout_sec = 300.0
+
+[agent]
+timeout_sec = 600.0
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 600.0
+os = "linux"
+cpus = 1
+memory_mb = 2048
+storage_mb = 5120
+gpus = 0
+mcp_servers = []
