@@ -5,6 +5,8 @@ allowed-tools: read, grep, glob, exec
 argument-hint: <bug, file, feature, failing command, or investigation target>
 tier: 2
 triggers: [user, model]
+conflicts_with: [debugging, one-shot-patch]
+depends_on: [minimal-root-cause]
 source: ThePlenkov/skills
 ---
 

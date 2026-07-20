@@ -12,6 +12,7 @@ disable-model-invocation: true
 compatibility: Requires gh, jq, git, bun.
 tier: 2
 triggers: [user]
+conflicts_with: [github-pr-review, code-review-and-quality]
 source: ThePlenkov/skills
 ---
 
@@ -376,15 +377,16 @@ script prints `RECORDING=on\|off (source)` on every run so the choice is
 auditable.
 
 ```bash
-# prepare scratch dir once (repo ./tmp/ — never system /tmp)
-mkdir -p tmp/agent_$$
+# prepare a unique repo-local scratch directory for this run
+scratch_dir="$(bun -e "const { mkdtempSync }=require('node:fs'); process.stdout.write(mkdtempSync('tmp/act-'))")"
 
 # 1. one call — dump every finding with full metadata
-bun scripts/extract-findings.ts OWNER REPO PR > tmp/agent_$$/findings.jsonl
-# 2. read findings, write tmp/agent_$$/scores.tsv  (finding_id<TAB>0-5<TAB>why)
+bun scripts/extract-findings.ts OWNER REPO PR > "$scratch_dir/findings.jsonl"
+# 2. read findings, write scores.tsv (finding_id<TAB>0-5<TAB>why) into the same directory
 # 3. one call — join + upsert (writes scratch JSONL by default; CSV only if --record)
 bun scripts/submit-scores.ts OWNER REPO PR --evaluator <model-id> \
-  --findings tmp/agent_$$/findings.jsonl --scores tmp/agent_$$/scores.tsv \
+  --findings "$scratch_dir/findings.jsonl" \
+  --scores "$scratch_dir/scores.tsv" \
   [--record]                # remove this flag once the research dataset
                             # is intentionally collected again
 ```

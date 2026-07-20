@@ -19,6 +19,7 @@ import { parseArgs } from "node:util";
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
+import { isNestedSkill } from "./lib/nested-skill.js";
 
 const ALLOWED_TRIGGERS = new Set(["user", "model", "always"] as const);
 type Trigger = "user" | "model" | "always";
@@ -267,8 +268,8 @@ function buildEntry(
     lines: lineCount(text),
     always_on: triggers.includes("always"),
     allowed_tools: allowedTools,
-    conflicts_with: [],
-    depends_on: [],
+    conflicts_with: asList(frontmatter["conflicts_with"]),
+    depends_on: asList(frontmatter["depends_on"]),
   };
 
   return skillSchema.parse(raw);
@@ -291,16 +292,7 @@ function buildIndex(
     const rel = path.relative(skillsRoot, skillMd);
     const parts = rel.split(path.sep);
     if (parts.length < 3) continue;
-
-    let nested = false;
-    for (let depth = 1; depth < parts.length - 1; depth+=1) {
-      const ancestor = path.join(skillsRoot, ...parts.slice(0, depth), "SKILL.md");
-      if (fs.existsSync(ancestor)) {
-        nested = true;
-        break;
-      }
-    }
-    if (nested) continue;
+    if (isNestedSkill(skillMd, skillsRoot)) continue;
 
     const entry = buildEntry(skillMd, repoRoot, commandMap);
     if (seenNames.has(entry.name)) {
@@ -310,6 +302,25 @@ function buildIndex(
     }
     seenNames.set(entry.name, entry.path);
     entries.push(entry);
+  }
+
+  for (const entry of entries) {
+    for (const target of entry.conflicts_with) {
+      if (target === entry.name) {
+        throw new Error(`${entry.path}: skill cannot conflict with itself`);
+      }
+      if (!seenNames.has(target)) {
+        throw new Error(`${entry.path}: conflicts_with references unknown skill '${target}'`);
+      }
+    }
+    for (const target of entry.depends_on) {
+      if (target === entry.name) {
+        throw new Error(`${entry.path}: skill cannot depend on itself`);
+      }
+      if (!seenNames.has(target)) {
+        throw new Error(`${entry.path}: depends_on references unknown skill '${target}'`);
+      }
+    }
   }
 
   entries.sort((a, b) =>

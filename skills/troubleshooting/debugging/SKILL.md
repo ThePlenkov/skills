@@ -7,6 +7,7 @@ tier: 2
 triggers:
   - user
   - model
+conflicts_with: [investigate-first, one-shot-patch]
 source: ThePlenkov/skills
 ---
 

@@ -23,6 +23,7 @@ skills/
 ├── coaching/           # User guidance (adhd)
 ├── self-learning/      # Retrospective learning (retrospect, skill-feedback)
 ├── experimentation/    # Sandboxed experimentation (sandboxed)
+├── engineering/        # Cross-cutting engineering practices (API/UI design, performance, security)
 └── agents/             # Framework management (dotagents, claude-skills)
 ```
 

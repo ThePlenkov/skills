@@ -3,6 +3,7 @@ name: github-pr-review
 description: Use when the user asks for a GitHub pull request review or wants review comments prepared for a PR on github.com.
 tier: 2
 triggers: [user, model]
+conflicts_with: [code-review-and-quality]
 source: ThePlenkov/skills
 ---
 
@@ -34,11 +35,12 @@ If the options are missing and there is exactly one open PR referenced in the co
 All four commands are read-only and safe to batch:
 
 ```bash
+node -e "require('fs').mkdirSync('tmp', { recursive: true })"
 gh pr view     <N> --repo <OWNER/REPO> --json \
   title,body,state,mergeable,baseRefName,headRefName,\
 isDraft,author,labels,additions,deletions,changedFiles,\
 files,reviews,reviewDecision                                # PR metadata
-gh pr diff     <N> --repo <OWNER/REPO> > /tmp/pr.diff       # the diff
+gh pr diff     <N> --repo <OWNER/REPO> > tmp/pr.diff       # the diff
 gh pr checks   <N> --repo <OWNER/REPO>                      # CI status
 gh pr view     <N> --repo <OWNER/REPO> --comments           # existing threads
 ```
@@ -141,7 +143,7 @@ Only after you've shown the review in chat and the user has confirmed they want 
 
 ```bash
 gh pr review <N> --repo <OWNER/REPO> \
-  --comment --body "$(cat /tmp/review.md)"
+  --comment --body "$(cat tmp/review.md)"
 # or:
 gh pr review <N> --repo <OWNER/REPO> --approve --body ...
 gh pr review <N> --repo <OWNER/REPO> --request-changes --body ...

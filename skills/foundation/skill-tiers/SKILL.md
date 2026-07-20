@@ -100,14 +100,8 @@ Loaded only when the task description matches the skill's `description` frontmat
 ## Verification
 
 ```bash
-# Total Tier 0 line count must be ≤ 300
-total=0
-for f in $(grep -rl --include=SKILL.md '^tier:\s*0' skills/); do
-  lines=$(wc -l < "$f")
-  echo "$lines  $f"
-  total=$((total + lines))
-done
-echo "Total Tier 0: $total lines (must be ≤ 300)"
+# Run the Tier 0 budget check used in CI
+npx --yes tsx scripts/run.ts scripts/check-tier-0-budget.sh
 ```
 
 ---

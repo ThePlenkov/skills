@@ -21,13 +21,19 @@
       "name": "foundation",
       "source": "./",
       "skills": ["./skills/foundation"],
-      "description": "Always-on behavioral primitives (token economy, memory, minimalist senior-dev persona with the seven rungs)"
+      "description": "Always-on behavioral primitives and activation tiers (token economy, memory, minimalist senior-dev persona, skill tiers)"
     },
     {
       "name": "methodology",
       "source": "./",
       "skills": ["./skills/methodology"],
-      "description": "Development methodology (SDD, TDD, incremental implementation, context/source/doubt-driven dev, UI/API design, security, performance, observability, code simplification, loop programming)"
+      "description": "Development methodology (SDD, TDD, incremental implementation, context/source/doubt-driven dev, code simplification, loop programming, observability)"
+    },
+    {
+      "name": "engineering",
+      "source": "./",
+      "skills": ["./skills/engineering"],
+      "description": "Cross-cutting engineering practices (API and interface design, frontend UI engineering, performance optimization, security and hardening)"
     },
     {
       "name": "verification",
@@ -39,7 +45,7 @@
       "name": "orchestration",
       "source": "./",
       "skills": ["./skills/orchestration"],
-      "description": "Subagent coordination, isolation, and context management"
+      "description": "Agent coordination, isolation, context management, and skill discovery/invocation"
     },
     {
       "name": "workflow",

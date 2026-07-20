@@ -5,6 +5,7 @@ allowed-tools: read, grep, glob, edit, write, exec
 argument-hint: <exact files plus one fix hypothesis>
 tier: 2
 triggers: ["user", "model"]
+conflicts_with: [investigate-first, debugging]
 source: ThePlenkov/skills
 ---
 

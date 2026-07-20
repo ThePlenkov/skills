@@ -51,6 +51,7 @@ skills/
 ├── behavior/           # Evidence, code quality, critical thinking
 ├── coaching/           # User guidance (adhd)
 ├── code-review/        # PR/MR review and remediation (act, triage-issue, etc.)
+├── engineering/        # Cross-cutting engineering practices (API/UI design, performance, security)
 ├── experimentation/    # Sandboxed experimentation (sandboxed)
 ├── foundation/         # Always-on behavioral primitives (token economy, memory)
 ├── integrations/       # Platform connectors (GitHub, GitLab, Atlassian, Codacy, ...)
@@ -157,7 +158,7 @@ This repo is also a [Claude Code plugin marketplace](https://code.claude.com/doc
 /plugin install methodology@theplenkov-claude
 ```
 
-**Available plugins:** `skills` (all), `coaching`, `behavior`, `foundation`, `methodology`, `verification`, `orchestration`, `workflow`, `integrations`, `tools`, `safety`, `experimentation`, `troubleshooting`, `code-review`, `self-learning`, `research`, `agents`
+**Available plugins:** `skills` (all), `coaching`, `behavior`, `foundation`, `methodology`, `verification`, `orchestration`, `workflow`, `integrations`, `tools`, `safety`, `experimentation`, `engineering`, `troubleshooting`, `code-review`, `self-learning`, `research`, `agents`
 
 **Auto-populate for your team** — add to `.claude/settings.json`:
 

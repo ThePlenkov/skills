@@ -119,7 +119,7 @@ runtime + dev deps in `.agents/skills/e2e/package.json`:
 
 | Dep | Role | Pin policy |
 | --- | ---- | ---------- |
-| `js-yaml` | YAML parser for project config + scenario frontmatter | Exact-pinned (CVE-2025-64718, CVE-2026-53550 advisory — bumping is a spec change) |
+| `js-yaml` | YAML parser for project config + scenario frontmatter | Exact-pinned to patched 4.3.0 |
 | `@types/js-yaml` | TypeScript types | Exact-pinned |
 | `@types/node` | Node API types | Exact-pinned (avoid floating into a major that breaks `import.meta.dir`) |
 | `typescript` | TypeScript compiler | Exact-pinned (the published `dist/` is built with the pinned version) |

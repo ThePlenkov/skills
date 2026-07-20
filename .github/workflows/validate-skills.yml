@@ -4,7 +4,6 @@ on:
   push:
     branches: [main]
     paths:
-      - 'skills/**/SKILL.md'
       - 'README.md'
       - '.claude-plugin/marketplace.json'
       - 'package.json'
@@ -17,9 +16,13 @@ on:
       - 'scripts/validate-agent-manifests.sh'
       - 'scripts/check-tier-0-budget.sh'
       - 'scripts/check-readme-categories.ts'
+      - 'scripts/generate-coverage-matrix.ts'
+      - 'scripts/check-os-independence.ts'
+      - 'scripts/check-skill-size.ts'
+      - 'skills/**'
+      - 'docs/skill-coverage-matrix.md'
   pull_request:
     paths:
-      - 'skills/**/SKILL.md'
       - 'README.md'
       - '.claude-plugin/marketplace.json'
       - 'package.json'
@@ -32,6 +35,11 @@ on:
       - 'scripts/validate-agent-manifests.sh'
       - 'scripts/check-tier-0-budget.sh'
       - 'scripts/check-readme-categories.ts'
+      - 'scripts/generate-coverage-matrix.ts'
+      - 'scripts/check-os-independence.ts'
+      - 'scripts/check-skill-size.ts'
+      - 'skills/**'
+      - 'docs/skill-coverage-matrix.md'
 
 # Cancel duplicate runs on the same ref. Without this, a single push
 # to a PR branch can fire the workflow twice (once for the push event
@@ -120,6 +128,91 @@ jobs:
       - name: Check Tier 0 always-on budget
         if: success() || failure()
         run: npx --yes tsx scripts/run.ts scripts/check-tier-0-budget.sh
+  check-os-independence:
+    name: Check OS independence
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund --prefer-offline
+
+      - name: Determine OS-independence baseline
+        id: os-baseline
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            BEFORE="${{ github.event.before }}"
+            if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+              echo "ref=" >> "$GITHUB_OUTPUT"
+            else
+              echo "ref=$BEFORE" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "ref=origin/$BASE_REF" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          BASE_REF: ${{ github.base_ref }}
+
+      - name: Run OS-independence check
+        run: |
+          if [ -z "${{ steps.os-baseline.outputs.ref }}" ]; then
+            npm run check:os
+          else
+            npm run check:os -- --since-ref "${{ steps.os-baseline.outputs.ref }}"
+          fi
+
+  check-skill-size:
+    name: Warn on oversized skill files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Check SKILL.md size
+        run: npx --yes tsx scripts/check-skill-size.ts
+
+  coverage-matrix:
+    name: Check skill coverage matrix
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund --prefer-offline
+
+      - name: Check coverage matrix is up to date
+        run: npx --yes tsx scripts/generate-coverage-matrix.ts --check
+
+  readme-categories:
+    name: Check README skill categories
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund --prefer-offline
 
       - name: Check README categories
         if: success() || failure()

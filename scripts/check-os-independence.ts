@@ -1,8 +1,17 @@
-import { readFile, readdir } from 'node:fs/promises';
+import { readFile, readdir, stat } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
 import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseArgs } from 'node:util';
 
 const ROOT = resolve(fileURLToPath(import.meta.url), '..', '..');
+
+const { values } = parseArgs({
+  options: {
+    'since-ref': { type: 'string' },
+  },
+  allowPositionals: false,
+});
 
 // Patterns that are not portable to Windows without Git Bash / WSL / translation.
 const POSIX_PATTERNS = [
@@ -52,7 +61,29 @@ interface Issue {
 
 const issues: Issue[] = [];
 
-for await (const path of walk(ROOT)) {
+async function* getFilesToCheck(): AsyncGenerator<string> {
+  if (values['since-ref']) {
+    const output = execFileSync('git', ['diff', '--name-only', '--diff-filter=ACMRT', values['since-ref'], '--'], {
+      cwd: ROOT,
+      encoding: 'utf-8',
+    }).trim();
+    for (const file of output.split('\n')) {
+      if (file && file.startsWith('skills/')) {
+        const full = join(ROOT, file);
+        try {
+          const stats = await stat(full);
+          if (stats.isFile()) yield full;
+        } catch {
+          // ignore missing files
+        }
+      }
+    }
+    return;
+  }
+  yield* walk(ROOT);
+}
+
+for await (const path of getFilesToCheck()) {
   const rel = relative(ROOT, path);
   const text = await readFile(path, 'utf8');
   const lines = text.split('\n');
@@ -144,4 +175,4 @@ for (const [file, fileIssues] of byFile) {
 }
 
 console.log(`\nTotal POSIX-only patterns found: ${deduped.length}`);
-process.exit(0);
+process.exit(deduped.length > 0 ? 1 : 0);

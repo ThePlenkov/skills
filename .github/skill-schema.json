@@ -2,7 +2,7 @@
   "title": "Skill frontmatter",
   "description": "JSON Schema for SKILL.md YAML frontmatter validation",
   "type": "object",
-  "required": ["name", "description", "tier", "triggers"],
+  "required": ["name", "description", "tier", "triggers", "source"],
   "additionalProperties": true,
   "properties": {
     "name": {
@@ -42,6 +42,25 @@
     "argument-hint": {
       "type": "string",
       "description": "Hint for argument passing to the skill"
+    },
+    "source": {
+      "type": "string",
+      "description": "Canonical source repository for upstream feedback (owner/repo)",
+      "pattern": "^[^/\\s]+/[^/\\s]+$"
+    },
+    "conflicts_with": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ],
+      "description": "Skill names that overlap with this skill for disambiguation"
+    },
+    "depends_on": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ],
+      "description": "Skill names this skill builds upon"
     }
   }
 }
