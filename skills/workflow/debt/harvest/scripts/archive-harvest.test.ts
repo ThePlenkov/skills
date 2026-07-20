@@ -88,14 +88,14 @@ function invoke(args: string[]): { stderr: string } {
 function writeHarvest(debtDir: string, rows: DebtRecord[]): string {
   const harvests = join(debtDir, 'harvests')
   const file = join(harvests, '2026-01-01T000000Z-pr-1-run-test.jsonl')
-  writeFileSync(file, rows.map((r) => JSON.stringify(r)).join('\n') + '\n', 'utf8')
+  writeFileSync(file, `${rows.map((r) => JSON.stringify(r)).join('\n')}\n`, 'utf8')
   return file
 }
 
 function writeLedger(debtDir: string, overlays: object[]): void {
   writeFileSync(
     join(debtDir, 'ledger.jsonl'),
-    overlays.map((o) => JSON.stringify(o)).join('\n') + '\n',
+    `${overlays.map((o) => JSON.stringify(o)).join('\n')}\n`,
     'utf8'
   )
 }

@@ -418,8 +418,6 @@ def _strip_git_global_options(rest: list[str]) -> list[str] | None:
 
             return rest[index:]
 
-        continue
-
     # The loop exited normally (no break). `index` is guaranteed
     # set here because every `continue` branch advances it; an empty
     # `rest` short-circuits to `[]` before the loop body runs.
@@ -456,7 +454,7 @@ def _is_git_wrapper(arguments: Sequence[str]) -> Sequence[str] | None:
             arg = rest[index]
             if "=" in arg and not arg.startswith("-"):
                 name = arg.split("=", 1)[0]
-                if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
+                if re.fullmatch(r"[A-Za-z_]\w*", name):
                     index += 1
                     continue
             break

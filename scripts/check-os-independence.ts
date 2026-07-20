@@ -58,7 +58,7 @@ for await (const path of walk(ROOT)) {
   const lines = text.split('\n');
 
   let inShell = false;
-  for (let i = 0; i < lines.length; i++) {
+  for (let i = 0; i < lines.length; i+=1) {
     const line = lines[i];
     if (/^```(bash|sh|shell)\b/.test(line)) {
       inShell = true;

@@ -179,30 +179,28 @@ function printBatchUsage(): void {
 }
 
 async function harvestPrList(args: BatchArgs, prs: { number: number }[]): Promise<number> {
-  let totalRows = 0
-
-  for (const pr of prs) {
-    const result = await tryHarvestPr(args, pr.number)
-    if (!result) {
-      continue
-    }
-    if (args.dryRun) {
-      for (const row of result.incoming) {
-        console.log(JSON.stringify(row))
+  const totalRows = await prs.reduce<Promise<number>>(
+    async (accPromise, pr): Promise<number> => {
+      const total = await accPromise
+      const result = await tryHarvestPr(args, pr.number)
+      if (!result) return total
+      if (args.dryRun) {
+        for (const row of result.incoming) {
+          console.log(JSON.stringify(row))
+        }
+        return total
       }
-      continue
-    }
-    if (result.incoming.length === 0) {
-      continue
-    }
-    writeHarvestFile({
-      pr: result.pr,
-      runId: args.runId,
-      harvestedAt: result.incoming[0]!.harvested_at,
-      records: result.incoming,
-    })
-    totalRows += result.incoming.length
-  }
+      if (result.incoming.length === 0) return total
+      writeHarvestFile({
+        pr: result.pr,
+        runId: args.runId,
+        harvestedAt: result.incoming[0]!.harvested_at,
+        records: result.incoming,
+      })
+      return total + result.incoming.length
+    },
+    Promise.resolve(0)
+  )
 
   if (!args.dryRun && totalRows > 0) {
     writeSummary(buildSummary(readDebtRecords()))

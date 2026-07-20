@@ -22,7 +22,7 @@ function substituteString(raw: string, ctx: RunContext): string {
   // Support dynamic parameter substitution via {{paramName}}
   const matches = raw.matchAll(/\{\{(\w+)\}\}/g)
   for (const match of matches) {
-    const key = match[1]
+    const [, key] = match
     const value = ctx[key]
     if (value !== undefined) {
       out = out.replaceAll(`{{${key}}}`, String(value))

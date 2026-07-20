@@ -48,7 +48,7 @@ function makeFindings(dir: string): string {
 			detection_latency_ms: 0,
 		},
 	];
-	writeFileSync(path, findings.map((f) => JSON.stringify(f)).join("\n") + "\n");
+	writeFileSync(path, `${findings.map((f) => JSON.stringify(f)).join("\n")}\n`);
 	return path;
 }
 
@@ -56,8 +56,7 @@ function makeScores(dir: string): string {
 	const path = join(dir, "scores.tsv");
 	writeFileSync(
 		path,
-		["scan:101:0\t4\tReal bug", "review:202\t2\tLow-impact style"].join("\n") +
-			"\n",
+		`${["scan:101:0\t4\tReal bug", "review:202\t2\tLow-impact style"].join("\n")}\n`,
 		"utf8",
 	);
 	return path;

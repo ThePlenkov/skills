@@ -28,7 +28,7 @@ export type CliOptions = {
 }
 
 export function getCliFlag(argv: string[], flag: string): string | undefined {
-  for (let i = 0; i < argv.length; i++) {
+  for (let i = 0; i < argv.length; i+=1) {
     const arg = argv[i]!
     if (arg === flag) {
       const next = argv[i + 1]
@@ -76,7 +76,7 @@ export function resolveAcpAgent(opts: CliOptions): string {
   const id = opts.agent?.trim() ?? process.env.ACP_AGENT?.trim()
   if (!id) {
     throw new Error(
-      `ACP dispatch requires --agent <acp-agent-id> or env ACP_AGENT. ` + `See ${ACP_AGENTS_URL}`
+      `ACP dispatch requires --agent <acp-agent-id> or env ACP_AGENT. See ${ACP_AGENTS_URL}`
     )
   }
   return id
@@ -134,7 +134,7 @@ const FRAMEWORK_FLAGS = new Set([
 
 function collectDynamicArgs(argv: string[]): Record<string, string | boolean | number> {
   const args: Record<string, string | boolean | number> = {}
-  for (let i = 0; i < argv.length; i++) {
+  for (let i = 0; i < argv.length; i+=1) {
     const arg = argv[i]
     if (!arg?.startsWith('--')) continue
     if (FRAMEWORK_FLAGS.has(arg)) continue

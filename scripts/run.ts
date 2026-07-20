@@ -21,7 +21,7 @@ function main() {
   // the OS uses to look up script paths — otherwise a symlinked repo root could
   // produce a false `..`-prefixed relative path and reject every legitimate script.
   const repoRoot = realpathSync(resolve(fileURLToPath(import.meta.url), "..", ".."));
-  const scriptArg = args[0];
+  const [scriptArg] = args;
   const scriptPath = isAbsolute(scriptArg) ? resolve(scriptArg) : resolve(repoRoot, scriptArg);
 
   // Path containment + type guard: the script must resolve to a regular file
@@ -44,7 +44,7 @@ function main() {
     }
     realScriptPath = realpathSync(scriptPath);
   } catch (err) {
-    const code = (err as NodeJS.ErrnoException).code;
+    const {code} = (err as NodeJS.ErrnoException);
     if (code === "ENOENT") {
       console.error(`Script not found: ${scriptPath}`);
     } else if (code === "EACCES" || code === "EPERM") {

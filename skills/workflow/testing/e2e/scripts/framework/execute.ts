@@ -1,4 +1,4 @@
-import type { E2eProjectAdapter } from './adapter-types'
+import type { E2eProjectAdapter, ToolExecutor } from './adapter-types'
 import { evaluateAssert, extractToolPayload } from './assertions'
 import type { CliOptions } from './context'
 import { buildRunContext } from './context'
@@ -35,6 +35,65 @@ function mergeContext(
   }))
 }
 
+async function runSteps(
+  executor: ToolExecutor,
+  scenario: Scenario,
+  ctx: RunContext,
+  index: number,
+  acc: StepResult[]
+): Promise<StepResult[]> {
+  if (index >= scenario.steps.length) {
+    return acc
+  }
+
+  const step = scenario.steps[index]
+  const args = substituteArgs(step.args, ctx)
+  const t0 = Date.now()
+  let result: unknown
+
+  try {
+    result = await executor.callTool(step.tool, args)
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    const detail = redact(msg, ctx)
+    console.log(`✗ ${step.tool}: ${detail}`)
+    const failure: StepResult = {
+      tool: step.tool,
+      ok: false,
+      detail,
+      durationMs: Date.now() - t0,
+      args,
+      isError: true,
+      checks: [
+        {
+          name: 'service_replied',
+          expected: 'Tool returned a response',
+          actual: `transport error: ${detail}`,
+          passed: false,
+        },
+      ],
+    }
+    return runSteps(executor, scenario, ctx, index + 1, [...acc, failure])
+  }
+
+  const payload = extractToolPayload(result)
+  const verdict = evaluateAssert(substituteAssert(step.assert, ctx), payload)
+  const icon = verdict.ok ? '✓' : '✗'
+  const detail = redact(verdict.detail, ctx)
+  console.log(`${icon} ${step.tool}: ${detail}`)
+  const stepResult: StepResult = {
+    tool: step.tool,
+    ok: verdict.ok,
+    detail,
+    durationMs: Date.now() - t0,
+    args,
+    isError: payload.isError,
+    checks: verdict.checks,
+    responseBody: redact(payload.contentText.slice(0, 4000), ctx),
+  }
+  return runSteps(executor, scenario, ctx, index + 1, [...acc, stepResult])
+}
+
 async function runScenarioSteps(
   adapter: E2eProjectAdapter,
   scenario: Scenario,
@@ -43,61 +102,35 @@ async function runScenarioSteps(
 ): Promise<ScenarioResult> {
   console.log(`--- ${scenario.code} ${scenario.id}: ${scenario.title} ---`)
   const executor = adapter.createExecutor(scenario, ctx, suiteId)
-  const steps: StepResult[] = []
   try {
     await executor.start()
-    for (const step of scenario.steps) {
-      const args = substituteArgs(step.args, ctx)
-      const t0 = Date.now()
-      let result: unknown
-      try {
-        result = await executor.callTool(step.tool, args)
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err)
-        console.log(`✗ ${step.tool}: ${redact(msg, ctx)}`)
-        steps.push({
-          tool: step.tool,
-          ok: false,
-          detail: msg,
-          durationMs: Date.now() - t0,
-          args,
-          isError: true,
-          checks: [
-            {
-              name: 'service_replied',
-              expected: 'Tool returned a response',
-              actual: `transport error: ${msg}`,
-              passed: false,
-            },
-          ],
-        })
-        continue
-      }
-      const payload = extractToolPayload(result)
-      const verdict = evaluateAssert(substituteAssert(step.assert, ctx), payload)
-      const icon = verdict.ok ? '✓' : '✗'
-      console.log(`${icon} ${step.tool}: ${redact(verdict.detail, ctx)}`)
-      steps.push({
-        tool: step.tool,
-        ok: verdict.ok,
-        detail: verdict.detail,
-        durationMs: Date.now() - t0,
-        args,
-        isError: payload.isError,
-        checks: verdict.checks,
-        responseBody: redact(payload.contentText.slice(0, 4000), ctx),
-      })
+    const steps = await runSteps(executor, scenario, ctx, 0, [])
+    return {
+      code: scenario.code,
+      id: scenario.id,
+      title: scenario.title,
+      passed: steps.every((s) => s.ok),
+      steps,
     }
   } finally {
     executor.close()
   }
-  return {
-    code: scenario.code,
-    id: scenario.id,
-    title: scenario.title,
-    passed: steps.every((s) => s.ok),
-    steps,
+}
+
+async function runScenariosSequential(
+  adapter: E2eProjectAdapter,
+  selected: Scenario[],
+  ctx: RunContext,
+  suiteId: string,
+  index: number,
+  acc: ScenarioResult[]
+): Promise<ScenarioResult[]> {
+  if (index >= selected.length) {
+    return acc
   }
+
+  const result = await runScenarioSteps(adapter, selected[index], ctx, suiteId)
+  return runScenariosSequential(adapter, selected, ctx, suiteId, index + 1, [...acc, result])
 }
 
 function printSummary(results: ScenarioResult[]): void {
@@ -145,16 +178,13 @@ async function runSelectedScenarios(input: RunSelectionInput): Promise<ScenarioR
   const timeout = setTimeout(() => {
     console.error('Run timeout — remote logon or handshake may be stuck')
   }, timeoutMs).unref()
-  const results: ScenarioResult[] = []
   try {
-    for (const scenario of selected) {
-      results.push(await runScenarioSteps(adapter, scenario, ctx, suiteId))
-    }
+    const results = await runScenariosSequential(adapter, selected, ctx, suiteId, 0, [])
     printSummary(results)
+    return results
   } finally {
     clearTimeout(timeout)
   }
-  return results
 }
 
 type EvidenceWriteInput = {
@@ -307,7 +337,7 @@ export async function showScenarioByCode(argv: string[], code: string): Promise<
   const suiteId = resolveSuiteId(projectConfig, code)
   const suite = projectConfig.suites[suiteId]!
   const scenarios = loadScenariosFromDir(suiteDir(repoRoot, suite))
-  const scenario = filterScenarios(scenarios, code)[0]
+  const [scenario] = filterScenarios(scenarios, code)
   if (!scenario) throw new Error(`Scenario not found: ${code}`)
   showScenario(scenario)
 }

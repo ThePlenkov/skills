@@ -86,7 +86,7 @@ function issuesToRules(issues: SkillspectorIssue[]): { rules: SarifRule[]; index
   const rules: SarifRule[] = [];
   const index = new Map<string, number>();
   for (const issue of issues) {
-    const id = issue.id;
+    const {id} = issue;
     if (!id || seen.has(id)) continue;
     seen.add(id);
     const idx = rules.length;
@@ -121,9 +121,6 @@ export function buildSarif(doc: SkillspectorDoc, toolName = 'skillspector'): Sar
     },
     results,
   };
-  if (doc.skill?.source) {
-    run.originalUriBaseIds = { PROJECTROOT: { uri: 'file://' + doc.skill.source } };
-  }
   return { $schema: SARIF_SCHEMA_URL, version: '2.1.0', runs: [run] };
 }
 

@@ -345,7 +345,7 @@ function writeScratchReport(opts: {
 	rows: Record<string, string>[];
 	rootDir: string;
 }): string {
-	const pid = process.pid;
+	const {pid} = process;
 	const scratchDir = `${SCRATCH_DIR_PREFIX}${pid}`;
 	mkdirSync(scratchDir, { recursive: true });
 	const reportPath = `${scratchDir}/scores-report.jsonl`;

@@ -115,7 +115,7 @@ export function isWorkingShell(cmd: string): boolean {
 export function isWslBash(cmd: string): boolean {
   if (process.platform !== "win32") return false;
   try {
-    const r = spawnSync(cmd, ["-c", 'echo "${WSL_DISTRO_NAME:-}"'], {
+    const r = spawnSync(cmd, ["-c", `echo "\${WSL_DISTRO_NAME:-}"`], {
       shell: false,
     });
     if (!r.error && r.status === 0) {
@@ -135,7 +135,7 @@ export function isWslBash(cmd: string): boolean {
  */
 function isBashVersionGte4(candidate: string): boolean {
   try {
-    const r = spawnSync(candidate, ["-c", 'echo "${BASH_VERSINFO[0]:-0}"'], {
+    const r = spawnSync(candidate, ["-c", `echo "\${BASH_VERSINFO[0]:-0}"`], {
       shell: false,
     });
     if (r.error || r.status !== 0) return false;

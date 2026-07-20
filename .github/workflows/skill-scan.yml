@@ -20,18 +20,6 @@ on:
       - '.github/workflows/skill-scan.yml'
       - 'actions/skillspector/**'
   workflow_dispatch:
-    inputs:
-      full-scan:
-        description: >-
-          Scan every skill in `.agents/skills/` instead of only the
-          `nx affected` ones. Defaults to `true` (full scan) to
-          preserve the pre-existing dispatch behaviour. Set to `false`
-          to restrict the scan to skills whose files changed since
-          `base-branch` (saves time on large skill repos; uses
-          `nx affected` under the hood).
-        type: boolean
-        required: false
-        default: true
 
 # Cancel in-progress runs for the same workflow on the same ref. This
 # prevents duplicate runs when a single commit triggers both a push
@@ -99,21 +87,11 @@ jobs:
           # previous PR's branch (not main), pass the actual base.
           # nx-set-shas uses this to compute NX_BASE for `nx affected`.
           base-branch: ${{ github.event.pull_request.base.ref || 'main' }}
-          # Translate the `full-scan` workflow_dispatch input into the
-          # action's `affected` input. The mapping is inverted because
-          # the two inputs use opposite polarities:
-          #   workflow_dispatch.inputs.full-scan = true  →  affected = false  →  `nx run-many`  (full scan)
-          #   workflow_dispatch.inputs.full-scan = false →  affected = true   →  `nx affected`  (changed skills only)
-          #
-          # On push / pull_request events the workflow_dispatch input is
-          # empty (falsy in GHA). The old logic fell through to
-          # `affected = true` (affected-only), but `nx affected` only
-          # scans skills whose files diff between NX_BASE and NX_HEAD.
-          # When only CI files change (no SKILL.md diffs), nx affected
-          # reports zero projects and the scan silently passes.
-          # Default to full scan on non-dispatch events so every skill
-          # is always checked.
-          affected: ${{ github.event_name == 'workflow_dispatch' && (inputs.full-scan == false && 'true' || 'false') || 'false' }}
+          # `nx affected` only scans skills whose files diff between
+          # NX_BASE and NX_HEAD. When only CI files change (no SKILL.md
+          # diffs), nx affected reports zero projects and the scan silently
+          # passes. Always run a full scan so every skill is checked.
+          affected: 'false'
 
       # Upload the merged SARIF to the code-scanning API. This is
       # what makes findings appear inline in the PR Files Changed

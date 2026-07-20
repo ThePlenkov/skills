@@ -36,7 +36,7 @@ async function cmdList(argv: string[]): Promise<number> {
 }
 
 async function cmdShow(argv: string[]): Promise<number> {
-  const code = argv[0]
+  const [code] = argv
   if (!code || code.startsWith('-')) {
     console.error('show requires a scenario code')
     return 1

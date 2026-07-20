@@ -112,14 +112,14 @@ function parseFrontmatter(text: string): {
 }
 
 function toStringScalar(value: unknown, context: string): string {
-  if (value == null || typeof value === "object" || Array.isArray(value)) {
+  if (value === null || value === undefined || typeof value === "object") {
     throw new Error(`${context} must be a scalar value`);
   }
   return String(value);
 }
 
 function asList(value: unknown): string[] {
-  if (value == null) return [];
+  if (value === null || value === undefined) return [];
   if (Array.isArray(value)) {
     return value
       .map((v, i) => toStringScalar(v, `list item ${i}`).trim())
@@ -293,7 +293,7 @@ function buildIndex(
     if (parts.length < 3) continue;
 
     let nested = false;
-    for (let depth = 1; depth < parts.length - 1; depth++) {
+    for (let depth = 1; depth < parts.length - 1; depth+=1) {
       const ancestor = path.join(skillsRoot, ...parts.slice(0, depth), "SKILL.md");
       if (fs.existsSync(ancestor)) {
         nested = true;
@@ -313,9 +313,9 @@ function buildIndex(
   }
 
   entries.sort((a, b) =>
-    a.category === b.category
+    (a.category === b.category
       ? a.name.localeCompare(b.name)
-      : a.category.localeCompare(b.category)
+      : a.category.localeCompare(b.category))
   );
 
   const index: z.infer<typeof indexSchema> = {
@@ -375,7 +375,7 @@ async function main(): Promise<number> {
       fs.mkdirSync(path.dirname(outputPath), { recursive: true });
       fs.writeFileSync(
         outputPath,
-        JSON.stringify(index, null, 2) + "\n",
+        `${JSON.stringify(index, null, 2)}\n`,
         "utf-8"
       );
       console.log(`wrote ${index.count} skills to ${outputPath}`);
@@ -386,7 +386,7 @@ async function main(): Promise<number> {
       fs.mkdirSync(path.dirname(schemaPath), { recursive: true });
       fs.writeFileSync(
         schemaPath,
-        JSON.stringify(generateSchema(), null, 2) + "\n",
+        `${JSON.stringify(generateSchema(), null, 2)}\n`,
         "utf-8"
       );
       console.log(`wrote schema to ${schemaPath}`);

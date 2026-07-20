@@ -77,7 +77,6 @@ def create_symlinks(skills: list[tuple[str, Path]], target_dir: Path, dry_run: b
         if link_path.exists():
             if link_path.is_symlink() and link_path.resolve() == skill_path.resolve():
                 print(f"Already exists: {skill_name} -> {skill_path}")
-                continue
             else:
                 if dry_run:
                     print(f"Would replace: {skill_name} -> {skill_path}")

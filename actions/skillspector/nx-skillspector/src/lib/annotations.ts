@@ -27,14 +27,14 @@ export function buildTitle(
   // around the rule ID are kept so the title is visually scannable
   // when many findings are open at once.
   const category = properties.category as string | undefined;
-  return '[' + ruleId + ']: ' + (category ?? ruleId);
+  return `[${ruleId}]: ${category ?? ruleId}`;
 }
 
 export function buildMessage(explanation: string, properties: Record<string, unknown>): string {
   const out: string[] = [];
-  if (properties.intent) out.push('Intent: ' + String(properties.intent));
+  if (properties.intent) out.push(`Intent: ${String(properties.intent)}`);
   if (explanation) out.push(explanation);
-  if (properties.remediation) out.push('Fix: ' + String(properties.remediation));
+  if (properties.remediation) out.push(`Fix: ${String(properties.remediation)}`);
   const snippet = properties.code_snippet as string | undefined;
   if (snippet) {
     // GitHub's `::error ...::message` workflow command is single-line
@@ -47,9 +47,9 @@ export function buildMessage(explanation: string, properties: Record<string, unk
     // full snippet via the SARIF code-scanning tab if they need it.
     const flat = snippet.replace(/\s+/g, ' ').trim();
     const truncated = flat.length > MAX_SNIPPET_LENGTH
-      ? flat.slice(0, MAX_SNIPPET_LENGTH - 1) + '…'
+      ? `${flat.slice(0, MAX_SNIPPET_LENGTH - 1)}…`
       : flat;
-    out.push('Code: ' + truncated);
+    out.push(`Code: ${truncated}`);
   }
   const confidence = properties.confidence as number | undefined;
   if (confidence !== undefined && confidence !== null) {
@@ -59,7 +59,7 @@ export function buildMessage(explanation: string, properties: Record<string, unk
     // about. Check explicitly before rounding.
     if (!isNaN(parsed)) {
       const pct = Math.round(parsed * 100);
-      out.push('confidence=' + pct);
+      out.push(`confidence=${pct}`);
     }
   }
   return out.join(' — ');
@@ -88,14 +88,14 @@ export function issueToAnnotation(issue: SkillspectorIssue, toolName = 'skillspe
 
   const loc = issue.location ?? {};
   const parts: string[] = [];
-  if (loc.file) parts.push('file=' + escapeParam(loc.file));
-  if (loc.start_line !== undefined && loc.start_line !== null) parts.push('line=' + loc.start_line);
-  if (loc.end_line !== undefined && loc.end_line !== null) parts.push('endLine=' + loc.end_line);
-  parts.push('title=' + escapeParam(title));
+  if (loc.file) parts.push(`file=${escapeParam(loc.file)}`);
+  if (loc.start_line !== undefined && loc.start_line !== null) parts.push(`line=${loc.start_line}`);
+  if (loc.end_line !== undefined && loc.end_line !== null) parts.push(`endLine=${loc.end_line}`);
+  parts.push(`title=${escapeParam(title)}`);
   const props = parts.join(',');
 
   const safe = message.replace(/%/g, '%25').replace(/\r/g, ' ').replace(/\n/g, ' ');
-  return '::' + ghCmd + ' ' + props + '::' + safe;
+  return `::${ghCmd} ${props}::${safe}`;
 }
 
 // Escape a GitHub Actions workflow-command parameter value.

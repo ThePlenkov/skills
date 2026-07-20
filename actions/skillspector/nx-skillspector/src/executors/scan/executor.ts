@@ -145,7 +145,7 @@ export default async function scanExecutor(
     fs.mkdirSync(path.dirname(annotationsPath), { recursive: true });
     fs.appendFileSync(
       annotationsPath,
-      issuesToAnnotations(codeFindings).join('\n') + '\n',
+      `${issuesToAnnotations(codeFindings).join('\n')}\n`,
       'utf8',
     );
   }
@@ -154,8 +154,8 @@ export default async function scanExecutor(
   let warningCount = 0;
   for (const issue of codeFindings) {
     const sev = (issue.severity ?? '').toUpperCase();
-    if (sev === 'HIGH' || sev === 'CRITICAL') errorCount++;
-    else if (sev === 'MEDIUM' || sev === 'WARNING') warningCount++;
+    if (sev === 'HIGH' || sev === 'CRITICAL') errorCount+=1;
+    else if (sev === 'MEDIUM' || sev === 'WARNING') warningCount+=1;
   }
   // docFindings are informational; count them separately so the
   // summary can show "N doc-policy findings" alongside the actionable
@@ -164,8 +164,8 @@ export default async function scanExecutor(
   let docWarningCount = 0;
   for (const issue of docFindings) {
     const sev = (issue.severity ?? '').toUpperCase();
-    if (sev === 'HIGH' || sev === 'CRITICAL') docErrorCount++;
-    else if (sev === 'MEDIUM' || sev === 'WARNING') docWarningCount++;
+    if (sev === 'HIGH' || sev === 'CRITICAL') docErrorCount+=1;
+    else if (sev === 'MEDIUM' || sev === 'WARNING') docWarningCount+=1;
   }
 
   if (sarif) {
@@ -186,7 +186,7 @@ export default async function scanExecutor(
       version: '2.1.0' as const,
       runs: [...(existing.runs ?? []), ...fresh.runs],
     };
-    fs.writeFileSync(resolvedSarif, JSON.stringify(merged, null, 2) + '\n');
+    fs.writeFileSync(resolvedSarif, `${JSON.stringify(merged, null, 2)}\n`);
   }
 
   console.log(`  findings=${issues.length} errors=${errorCount} warnings=${warningCount} ss_exit=${result.exitCode}`);
@@ -235,7 +235,7 @@ export default async function scanExecutor(
       } catch (err: unknown) {
         const code = (err as NodeJS.ErrnoException)?.code;
         if (code === 'EEXIST') {
-          idx++;
+          idx+=1;
           continue;
         }
         throw err;

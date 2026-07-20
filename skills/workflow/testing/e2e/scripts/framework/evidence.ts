@@ -21,7 +21,7 @@ function isConsumingRepoRoot(dir: string): boolean {
   const pkgPath = join(dir, 'package.json')
   if (!existsSync(pkgPath)) return false
   try {
-    const name = (JSON.parse(readFileSync(pkgPath, 'utf8')) as { name?: string }).name
+    const {name} = (JSON.parse(readFileSync(pkgPath, 'utf8')) as { name?: string })
     return name !== NESTED_SKILL_PACKAGE
   } catch {
     return true
@@ -33,7 +33,7 @@ export function resolveRepoRoot(start: string): string {
     return process.env.E2E_REPO.trim()
   }
   let dir = start
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 12; i+=1) {
     if (isConsumingRepoRoot(dir)) return dir
     const parent = join(dir, '..')
     if (parent === dir) break
@@ -178,8 +178,9 @@ function buildEvidenceMarkdown(input: EvidenceReportInput): string {
   const allPassed = exitCode === 0
   const agent = resolveE2eAgent(input.opts)
   const model = resolveE2eModel(input.opts)
+  const scenarioLabels = scenarios.map((s) => `${s.code}: ${s.title}`).join(', ')
   const lines = [
-    `# 📋 E2E evidence — ${scenarios.map((s) => `${s.code}: ${s.title}`).join(', ')}`,
+    `# 📋 E2E evidence — ${scenarioLabels}`,
     '',
     `**Verdict:** ${verdictLabel(allPassed)}`,
     `**Run id:** 🆔 ${runId}`,

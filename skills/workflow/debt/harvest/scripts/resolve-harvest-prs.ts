@@ -72,16 +72,16 @@ export function filterByMergedDate(
 ): MergedPrCandidate[] {
   const sinceMs = since ? dayStart(since) : null
   const untilMs = until ? dayEnd(until) : null
+  if (sinceMs !== null && Number.isNaN(sinceMs)) {
+    throw new Error(`Invalid --merged-since date: ${since}`)
+  }
+  if (untilMs !== null && Number.isNaN(untilMs)) {
+    throw new Error(`Invalid --merged-until date: ${until}`)
+  }
 
   return prs.filter((pr) => {
     const mergedMs = new Date(pr.mergedAt).getTime()
-    if (sinceMs !== null && mergedMs < sinceMs) {
-      return false
-    }
-    if (untilMs !== null && mergedMs > untilMs) {
-      return false
-    }
-    return true
+    return (sinceMs === null || mergedMs >= sinceMs) && (untilMs === null || mergedMs <= untilMs)
   })
 }
 

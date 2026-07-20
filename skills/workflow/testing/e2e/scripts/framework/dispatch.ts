@@ -134,8 +134,9 @@ function buildAcpPrompt(input: {
     .filter(([k]) => k !== 'prompt')
     .map(([k, v]) => `${k}=${v}`)
     .join(', ')
+  const contextSuffix = ctxSummary ? ` with context: ${ctxSummary}` : ''
   const lines = [
-    `Run E2E scenario ${input.scenario}${ctxSummary ? ` with context: ${ctxSummary}` : ''}.`,
+    `Run E2E scenario ${input.scenario}${contextSuffix}.`,
     '',
     'Use the e2e-agent CLI only (do not import framework modules):',
     `1. Read scenario: ${input.scenarioFilePath}`,
