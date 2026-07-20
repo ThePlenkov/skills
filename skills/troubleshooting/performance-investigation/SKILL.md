@@ -3,6 +3,7 @@ name: performance-investigation
 description: 'Use when an agent must analyze a reported or suspected performance problem — slow requests, memory growth, high CPU, long build/test/runtime, query latency, contention, or regressions. Pairs with $skill{debugging} (correctness-first): this skill is for "too slow / too big / too many" symptoms, not "wrong output." Pairs with $skill{architecture-review} (structural reasons) by isolating one symptom down to a measurable fix.'
 allowed-tools: read, grep, glob, exec
 argument-hint: <symptom, target workload, expected vs actual numbers>
+tier: 2
 triggers:
   - user
   - model

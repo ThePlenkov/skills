@@ -1,6 +1,8 @@
 ---
 name: github-pr-review
 description: Use when the user asks for a GitHub pull request review or wants review comments prepared for a PR on github.com.
+tier: 2
+triggers: [user, model]
 source: ThePlenkov/skills
 ---
 

@@ -8,6 +8,8 @@ description: >-
   declares (fail-closed if `source:` is missing; `--repo` overrides).
   Idempotent (checks for open skill-feedback issues first), severity-labelled,
   pairs with /retrospect and /act.
+tier: 2
+triggers: [user]
 source: ThePlenkov/skills
 compatibility: Requires gh (authenticated), jq. Network access to api.github.com.
 disable-model-invocation: true

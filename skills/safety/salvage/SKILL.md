@@ -2,6 +2,7 @@
 name: salvage
 description: Emergency recovery mode after accidental deletion, git clean, git restore, reset, overwrite, or destructive agent action. Use when user work may have been lost. The goal is to stop further damage, preserve current disk state, inspect recovery sources, and report what can and cannot be recovered.
 argument-hint: "[optional lost file or directory]"
+tier: 2
 triggers:
   - user
 allowed-tools:

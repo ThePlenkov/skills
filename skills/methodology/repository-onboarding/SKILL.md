@@ -3,6 +3,7 @@ name: repository-onboarding
 description: Use when an agent or developer must quickly understand a previously unknown repository — its purpose, layout, build/test/lint conventions, dependency graph, and where to make changes. Applies on first contact with a codebase, after a long hiatus, or when handed a new project. Pairs with $skill{investigate-first} (narrow code area) and $skill{architecture-review} (deep structural critique).
 allowed-tools: read, grep, glob, exec
 argument-hint: <repository path or URL, optional focus area>
+tier: 2
 triggers:
   - user
   - model

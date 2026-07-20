@@ -3,6 +3,7 @@ name: subagent-capsule
 description: Use immediately before launching a subagent. Forces the parent to construct a complete context capsule with root objective, current stack, known evidence, scope, permissions, and output contract, because subagents do not reliably inherit parent context. Useful for investigator, patcher, and verifier subagent calls.
 allowed-tools: read, grep, glob
 argument-hint: <subagent profile and isolated subtask>
+tier: 2
 triggers: ["user", "model"]
 source: ThePlenkov/skills
 ---

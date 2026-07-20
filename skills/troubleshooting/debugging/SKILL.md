@@ -3,6 +3,7 @@ name: debugging
 description: Use when an agent is confronted with a runtime failure, wrong output, flaky behavior, regression, performance regression, or crash and needs a disciplined debugging loop. Covers the 4-phase Reproduce → Hypothesize → Test → Fix methodology, stack-trace and log analysis, binary-search regression isolation, and strategic print/debug instrumentation. Built on top of $skill{investigate-first} and feeds into $skill{one-shot-patch}.
 allowed-tools: read, grep, glob, exec
 argument-hint: <symptom, error message, failing command, or reproduction steps>
+tier: 2
 triggers:
   - user
   - model

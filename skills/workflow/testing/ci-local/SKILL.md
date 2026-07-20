@@ -1,6 +1,8 @@
 ---
 name: ci-local
 description: Analyze CI/CD pipeline configuration and run checks locally before commit or push. Detects workflow files, extracts validation steps, executes them locally, and attempts to auto-fix ANY failing check that can be fixed programmatically.
+tier: 2
+triggers: [user, model]
 source: ThePlenkov/skills
 ---
 

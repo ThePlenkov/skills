@@ -3,6 +3,7 @@ name: architecture-review
 description: Use when an agent or developer needs a holistic evaluation of a codebase's architecture — module boundaries, layer violations, coupling/cohesion, SOLID adherence, and technology-stack fitness — typically before a large refactor, design decision, or major PR merge. Goes deeper than $skill{codehome} (wrong placement of one piece) and broader than $skill{investigate-first} (one area). Outputs a review report, not a fix.
 allowed-tools: read, grep, glob, exec
 argument-hint: <repository path or focus area, optional review scope>
+tier: 2
 triggers:
   - user
   - model

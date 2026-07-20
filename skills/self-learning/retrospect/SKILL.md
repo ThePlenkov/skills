@@ -1,6 +1,8 @@
 ---
 name: retrospect
 description: Self-correction protocol for AI agents. Use when a mistake is made, a correction is received, or lessons need to be captured to prevent recurrence.
+tier: 2
+triggers: [user, model]
 source: ThePlenkov/skills
 ---
 

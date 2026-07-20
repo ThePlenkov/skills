@@ -1,6 +1,8 @@
 ---
 name: shadow-fork
 description: "enforce a provider-neutral shadow fork workflow: develop upstream repos through a personal fork, keep fork main synced as a mirror, and create paired shadow/upstream review requests from one feature branch. supports github, gitlab, and generic git hosts."
+tier: 2
+triggers: [user, model]
 source: ThePlenkov/skills
 ---
 

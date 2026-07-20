@@ -10,6 +10,7 @@ description: >-
 allowed-tools: read, grep, glob, edit, write, exec
 argument-hint: <goal plus validators, e.g. "fix auth tests; npm test -- auth">
 source: ThePlenkov/skills
+tier: 2
 triggers: ["user", "model"]
 ---
 

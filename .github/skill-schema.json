@@ -2,7 +2,7 @@
   "title": "Skill frontmatter",
   "description": "JSON Schema for SKILL.md YAML frontmatter validation",
   "type": "object",
-  "required": ["name", "description"],
+  "required": ["name", "description", "tier", "triggers"],
   "additionalProperties": true,
   "properties": {
     "name": {
@@ -15,6 +15,11 @@
       "description": "One-sentence description shown in skill listings",
       "minLength": 10,
       "maxLength": 500
+    },
+    "tier": {
+      "type": "integer",
+      "enum": [0, 1, 2],
+      "description": "Skill activation tier"
     },
     "version": {
       "type": "string",
@@ -30,6 +35,7 @@
     },
     "triggers": {
       "type": "array",
+      "minItems": 1,
       "items": { "type": "string", "enum": ["user", "model", "always"] },
       "description": "When the skill should be activated"
     },

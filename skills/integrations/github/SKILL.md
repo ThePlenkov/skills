@@ -1,6 +1,8 @@
 ---
 name: github
 description: Work with GitHub repositories, issues, pull requests, releases, and Actions. Use when using `gh` CLI, GitHub API endpoints (`api.github.com`), or GitHub MCP tools. NOT for general git operations or non-GitHub hosts.
+tier: 2
+triggers: [user, model]
 source: ThePlenkov/skills
 ---
 

@@ -2,6 +2,7 @@
 name: codehome
 description: "Detect and fix code placed in the wrong architectural layer, config file, or oversized file. Use when runtime logic appears in config, server code leaks into UI components, or a file grows because everything was solved in-place. NOT for style refactoring or aesthetic moves."
 argument-hint: "[optional file, feature, or concern]"
+tier: 2
 triggers:
   - user
 allowed-tools:

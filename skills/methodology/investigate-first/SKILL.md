@@ -3,6 +3,8 @@ name: investigate-first
 description: Use before editing when a bug, task, failing test, or code area is not yet understood. Guides agents to inspect files, search symbols and errors, reproduce a failure when practical, and produce evidence before any patching. Useful for weak-model stability, unknown codebases, root-cause analysis, and preventing chaotic edits.
 allowed-tools: read, grep, glob, exec
 argument-hint: <bug, file, feature, failing command, or investigation target>
+tier: 2
+triggers: [user, model]
 source: ThePlenkov/skills
 ---
 

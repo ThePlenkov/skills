@@ -48,10 +48,11 @@ cat > "${SKILL_DIR}/SKILL.md" << TEMPLATE
 ---
 name: ${NAME}
 description: "TODO: One-sentence description (10-500 chars)"
-triggers:
-  - user
+tier: 2
+triggers: [user, model]
 allowed-tools:
   - read
+source: ThePlenkov/skills
 ---
 
 # ${NAME}

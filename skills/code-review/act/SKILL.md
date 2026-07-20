@@ -10,6 +10,8 @@ description: >-
   fix loop, not the collect or triage.
 disable-model-invocation: true
 compatibility: Requires gh, jq, git, bun.
+tier: 2
+triggers: [user]
 source: ThePlenkov/skills
 ---
 

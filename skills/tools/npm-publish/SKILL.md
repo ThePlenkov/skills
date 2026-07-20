@@ -4,6 +4,8 @@ description: Publish npm packages using OIDC-based trusted publishing, or short-
 permissions:
   network: registry.npmjs.org
   scope: packages explicitly opted in via `npm publish` from a clean checkout
+tier: 2
+triggers: [user, model]
 source: ThePlenkov/skills
 ---
 

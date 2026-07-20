@@ -3,6 +3,8 @@ name: codescene
 description: >-
   CodeScene setup and usage — CI delta analysis, local CLI, CS_ACCESS_TOKEN,
   Docker image, troubleshooting 403s and secret visibility.
+tier: 2
+triggers: [user, model]
 source: ThePlenkov/skills
 ---
 

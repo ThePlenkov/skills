@@ -3,6 +3,7 @@ name: refactoring
 description: Use when an agent needs to safely restructure existing code without changing observable behavior — extract method/class/module, move method/file, rename with impact analysis, inline dead code, or large code reorganization. Guarantees test-first refactoring discipline and explicit behavior preservation. Differs from $skill{one-shot-patch} (small fix) and $skill{architecture-review} (critical read-only diagnosis).
 allowed-tools: read, grep, glob, exec, edit, write
 argument-hint: <target area, refactor type, scope limits>
+tier: 2
 triggers:
   - user
   - model

@@ -11,6 +11,7 @@ permissions:
   edit: ask
   write: ask
 argument-hint: "<trivial change to verify>"
+tier: 2
 triggers: ["user", "model"]
 source: ThePlenkov/skills
 ---

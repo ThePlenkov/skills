@@ -5,6 +5,8 @@ permissions:
   modify-skill-files: true
   modify-agent-config: true
   scope: opt-in per user invocation; never runs automatically
+tier: 2
+triggers: [user, model]
 source: ThePlenkov/skills
 ---
 

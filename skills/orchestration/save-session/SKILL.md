@@ -9,6 +9,8 @@ metadata:
     - handoff
   author: codex
   version: "1.0.0"
+tier: 2
+triggers: [user, model]
 source: ThePlenkov/skills
 ---
 

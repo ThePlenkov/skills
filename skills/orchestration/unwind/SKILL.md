@@ -2,6 +2,7 @@
 name: unwind
 description: Collapse a solved narrow branch into the parent/root task, rebuild the execution plan from the new proven state, and continue automatically. Use when a subtask, architecture spike, blocker, or investigation is resolved and the agent must stop asking what to do next, integrate the result into the main plan, and proceed with the next best parent-level action.
 argument-hint: "[optional root objective or direction]"
+tier: 2
 triggers:
   - user
 allowed-tools:
