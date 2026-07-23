@@ -7,7 +7,7 @@
 
 # frontend-ui-engineering
 
-> **Category:** `methodology` · **Path:** `skills/methodology/frontend-ui-engineering/SKILL.md`
+> **Category:** `engineering` · **Path:** `skills/engineering/frontend-ui-engineering/SKILL.md`
 
 Builds production-quality, accessible, responsive user-facing UIs. Use when building or modifying interfaces and pages, creating components, implementing layouts, meeting WCAG accessibility requiremen
 
@@ -21,13 +21,13 @@ Rendered with [Mermaid](https://mermaid.js.org/). On github.com click any node t
 
 ```mermaid
 graph LR
-  frontend_ui_engineering["frontend-ui-engineering<br/><i>methodology</i>"]
+  frontend_ui_engineering["frontend-ui-engineering<br/><i>engineering</i>"]
   classDef center fill:#1d4ed8,stroke:#fbbf24,stroke-width:3px,color:#fff
   class frontend_ui_engineering center
 
   subgraph sg_used_by["used by"]
     direction TB
-    using_agent_skills["using-agent-skills<br/><i>methodology</i>"]
+    using_agent_skills["using-agent-skills<br/><i>orchestration</i>"]
   end
   using_agent_skills --> frontend_ui_engineering
 

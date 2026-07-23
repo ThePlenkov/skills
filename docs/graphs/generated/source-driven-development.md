@@ -29,7 +29,7 @@ graph LR
     direction TB
     doubt_driven_development["doubt-driven-development<br/><i>methodology</i>"]
     interview_me["interview-me<br/><i>coaching</i>"]
-    using_agent_skills["using-agent-skills<br/><i>methodology</i>"]
+    using_agent_skills["using-agent-skills<br/><i>orchestration</i>"]
   end
   doubt_driven_development --> source_driven_development
   interview_me --> source_driven_development

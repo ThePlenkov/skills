@@ -114,3 +114,24 @@ skills/tools/skillmaker/
     agent-command-registry.md  # index linking to per-agent reference files
     agents/                    # per-agent command reference files
 ```
+
+## Craft layer
+
+After scaffolding a new skill (or revising an existing one), the **human**
+should invoke `$skill{writing-great-skills}` to review the result against
+the craft rules that make a skill predictable: invocation mode (model- vs.
+user-invoked), the description (front-loaded leading word, one trigger
+per branch, no duplication), the information hierarchy (steps vs.
+reference, progressive disclosure to a linked file), the leading-word
+technique, and the failure modes that the skill's body should defend
+against. `skillmaker` is the **procedure** (how to scaffold);
+`writing-great-skills` is the **craft** (how to make the result fire
+reliably). Both are required for a skill that ages well.
+
+**Why a human trigger, not an agent handoff**: `writing-great-skills` is
+user-invoked (`disable-model-invocation: true`) precisely so it doesn't
+sit in every agent's context window as another always-loaded description.
+The trade is that no agent — including `skillmaker` — can reach it
+automatically; the human must invoke it. If your agent is running
+`skillmaker` autonomously, schedule a human review pass before the
+scaffolded skill is merged.

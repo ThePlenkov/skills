@@ -27,7 +27,7 @@ graph LR
 
   subgraph sg_used_by["used by"]
     direction TB
-    using_agent_skills["using-agent-skills<br/><i>methodology</i>"]
+    using_agent_skills["using-agent-skills<br/><i>orchestration</i>"]
   end
   using_agent_skills --> documentation_and_adrs
 

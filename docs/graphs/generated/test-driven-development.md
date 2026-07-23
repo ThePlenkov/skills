@@ -29,7 +29,7 @@ graph LR
     direction TB
     doubt_driven_development["doubt-driven-development<br/><i>methodology</i>"]
     spec_driven_development["spec-driven-development<br/><i>methodology/sdd</i>"]
-    using_agent_skills["using-agent-skills<br/><i>methodology</i>"]
+    using_agent_skills["using-agent-skills<br/><i>orchestration</i>"]
   end
   doubt_driven_development --> test_driven_development
   spec_driven_development --> test_driven_development

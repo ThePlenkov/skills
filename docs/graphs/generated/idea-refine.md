@@ -28,7 +28,7 @@ graph LR
   subgraph sg_used_by["used by"]
     direction TB
     interview_me["interview-me<br/><i>coaching</i>"]
-    using_agent_skills["using-agent-skills<br/><i>methodology</i>"]
+    using_agent_skills["using-agent-skills<br/><i>orchestration</i>"]
   end
   interview_me --> idea_refine
   using_agent_skills --> idea_refine

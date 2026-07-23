@@ -13,7 +13,7 @@ Create, validate, and manage agent skills. Generates SKILL.md scaffolds, checks 
 
 ## Stats
 
-0 dependencies · 0 dependents
+1 dependencies · 1 dependents
 
 ## Graph
 
@@ -25,4 +25,10 @@ graph LR
   classDef center fill:#1d4ed8,stroke:#fbbf24,stroke-width:3px,color:#fff
   class skillmaker center
 
+  subgraph sg_depends_on["depends on"]
+    direction TB
+    writing_great_skills["writing-great-skills<br/><i>tools</i>"]
+  end
+  skillmaker --> writing_great_skills
+  writing_great_skills -. "↕ mutual with writing-great-skills" .-> skillmaker
 ```

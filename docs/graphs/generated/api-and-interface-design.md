@@ -7,13 +7,13 @@
 
 # api-and-interface-design
 
-> **Category:** `methodology` · **Path:** `skills/methodology/api-and-interface-design/SKILL.md`
+> **Category:** `engineering` · **Path:** `skills/engineering/api-and-interface-design/SKILL.md`
 
 Guides stable API and interface design. Use when designing APIs, module boundaries, or any public interface. Use when creating REST or GraphQL endpoints, defining type contracts between modules, or es
 
 ## Stats
 
-1 dependencies · 2 dependents
+1 dependencies · 3 dependents
 
 ## Graph
 
@@ -21,16 +21,18 @@ Rendered with [Mermaid](https://mermaid.js.org/). On github.com click any node t
 
 ```mermaid
 graph LR
-  api_and_interface_design["api-and-interface-design<br/><i>methodology</i>"]
+  api_and_interface_design["api-and-interface-design<br/><i>engineering</i>"]
   classDef center fill:#1d4ed8,stroke:#fbbf24,stroke-width:3px,color:#fff
   class api_and_interface_design center
 
   subgraph sg_used_by["used by"]
     direction TB
     git_workflow_and_versioning["git-workflow-and-versioning<br/><i>workflow/git</i>"]
-    using_agent_skills["using-agent-skills<br/><i>methodology</i>"]
+    two_axis_review["two-axis-review<br/><i>code-review</i>"]
+    using_agent_skills["using-agent-skills<br/><i>orchestration</i>"]
   end
   git_workflow_and_versioning --> api_and_interface_design
+  two_axis_review --> api_and_interface_design
   using_agent_skills --> api_and_interface_design
 
   subgraph sg_depends_on["depends on"]

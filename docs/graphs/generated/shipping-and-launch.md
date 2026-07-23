@@ -29,7 +29,7 @@ graph LR
     direction TB
     git_workflow_and_versioning["git-workflow-and-versioning<br/><i>workflow/git</i>"]
     observability_and_instrumentation["observability-and-instrumentation<br/><i>methodology</i>"]
-    using_agent_skills["using-agent-skills<br/><i>methodology</i>"]
+    using_agent_skills["using-agent-skills<br/><i>orchestration</i>"]
   end
   git_workflow_and_versioning --> shipping_and_launch
   observability_and_instrumentation --> shipping_and_launch

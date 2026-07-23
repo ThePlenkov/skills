@@ -1,0 +1,11 @@
+interface:
+  display_name: "Prototype"
+  short_description: "Prototype to answer a design question"
+  default_prompt: >-
+    Build a throwaway prototype to answer a design question. Identify whether
+    the question is about logic / state model or about UI look-and-feel, then
+    follow the matching branch (`references/LOGIC.md` for state-machine
+    questions, `references/UI.md` for visual variations). Keep the prototype
+    runnable, clearly marked as throwaway, and free of polish. Surface state
+    after every action. When the question is answered, capture the validated
+    decision into the real code and leave a pointer to the throwaway branch.

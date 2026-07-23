@@ -34,7 +34,7 @@ graph LR
     performance_investigation["performance-investigation<br/><i>troubleshooting</i>"]
     refactoring["refactoring<br/><i>methodology</i>"]
     repository_onboarding["repository-onboarding<br/><i>methodology</i>"]
-    skill_tiers["skill-tiers<br/><i>methodology</i>"]
+    skill_tiers["skill-tiers<br/><i>foundation</i>"]
   end
   architecture_review --> investigate_first
   debugging --> investigate_first

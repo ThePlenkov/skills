@@ -29,7 +29,7 @@ graph LR
     direction TB
     evidence["evidence<br/><i>verification</i>"]
     github_fix_main["github-fix-main<br/><i>code-review</i>"]
-    skill_tiers["skill-tiers<br/><i>methodology</i>"]
+    skill_tiers["skill-tiers<br/><i>foundation</i>"]
   end
   evidence --> triage_issue
   github_fix_main --> triage_issue

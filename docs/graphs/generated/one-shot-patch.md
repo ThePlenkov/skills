@@ -30,7 +30,7 @@ graph LR
     debugging["debugging<br/><i>troubleshooting</i>"]
     performance_investigation["performance-investigation<br/><i>troubleshooting</i>"]
     refactoring["refactoring<br/><i>methodology</i>"]
-    skill_tiers["skill-tiers<br/><i>methodology</i>"]
+    skill_tiers["skill-tiers<br/><i>foundation</i>"]
   end
   debugging --> one_shot_patch
   performance_investigation --> one_shot_patch

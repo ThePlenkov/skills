@@ -7,7 +7,7 @@
 
 # skill-tiers
 
-> **Category:** `methodology` · **Path:** `skills/methodology/skill-tiers/SKILL.md`
+> **Category:** `foundation` · **Path:** `skills/foundation/skill-tiers/SKILL.md`
 
 Skill activation tiers and the 300-line always-on budget. Defines Tier 0 (always-on), Tier 1 (on-task-start via /recall), and Tier 2 (on-demand). Load when deciding which skills to activate or when de
 
@@ -21,7 +21,7 @@ Rendered with [Mermaid](https://mermaid.js.org/). On github.com click any node t
 
 ```mermaid
 graph LR
-  skill_tiers["skill-tiers<br/><i>methodology</i>"]
+  skill_tiers["skill-tiers<br/><i>foundation</i>"]
   classDef center fill:#1d4ed8,stroke:#fbbf24,stroke-width:3px,color:#fff
   class skill_tiers center
 

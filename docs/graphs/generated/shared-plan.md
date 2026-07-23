@@ -13,7 +13,7 @@ Shared, persistent planning and retrospectives across agents and people. Use whe
 
 ## Stats
 
-1 dependencies · 2 dependents
+1 dependencies · 5 dependents
 
 ## Graph
 
@@ -28,10 +28,16 @@ graph LR
   subgraph sg_used_by["used by"]
     direction TB
     architecture_review["architecture-review<br/><i>behavior</i>"]
+    handoff["handoff<br/><i>orchestration</i>"]
+    prototype["prototype<br/><i>engineering</i>"]
     save_session["save-session<br/><i>orchestration</i>"]
+    two_axis_review["two-axis-review<br/><i>code-review</i>"]
   end
   architecture_review --> shared_plan
+  handoff --> shared_plan
+  prototype --> shared_plan
   save_session --> shared_plan
+  two_axis_review --> shared_plan
 
   subgraph sg_depends_on["depends on"]
     direction TB

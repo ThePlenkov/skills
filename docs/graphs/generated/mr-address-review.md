@@ -13,7 +13,7 @@ End-to-end GitLab MR review-comment remediation. Use when the user asks to addre
 
 ## Stats
 
-2 dependencies · 2 dependents
+2 dependencies · 4 dependents
 
 ## Graph
 
@@ -28,10 +28,14 @@ graph LR
   subgraph sg_used_by["used by"]
     direction TB
     evidence["evidence<br/><i>verification</i>"]
+    resolving_merge_conflicts["resolving-merge-conflicts<br/><i>workflow/git</i>"]
     triage_issue["triage-issue<br/><i>code-review</i>"]
+    two_axis_review["two-axis-review<br/><i>code-review</i>"]
   end
   evidence --> mr_address_review
+  resolving_merge_conflicts --> mr_address_review
   triage_issue --> mr_address_review
+  two_axis_review --> mr_address_review
 
   subgraph sg_depends_on["depends on"]
     direction TB

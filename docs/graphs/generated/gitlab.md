@@ -13,7 +13,7 @@ Work with GitLab projects, issues, merge requests, pipelines, and releases. Use 
 
 ## Stats
 
-0 dependencies · 2 dependents
+0 dependencies · 3 dependents
 
 ## Graph
 
@@ -29,8 +29,10 @@ graph LR
     direction TB
     mr_address_review["mr-address-review<br/><i>code-review</i>"]
     triage_issue["triage-issue<br/><i>code-review</i>"]
+    two_axis_review["two-axis-review<br/><i>code-review</i>"]
   end
   mr_address_review --> gitlab
   triage_issue --> gitlab
+  two_axis_review --> gitlab
 
 ```

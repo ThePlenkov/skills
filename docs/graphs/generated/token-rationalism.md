@@ -13,7 +13,7 @@ Token-rational agent behavior. Maximize value delivered per request, minimize wa
 
 ## Stats
 
-0 dependencies · 1 dependents
+0 dependencies · 2 dependents
 
 ## Graph
 
@@ -27,8 +27,10 @@ graph LR
 
   subgraph sg_used_by["used by"]
     direction TB
-    skill_tiers["skill-tiers<br/><i>methodology</i>"]
+    skill_tiers["skill-tiers<br/><i>foundation</i>"]
+    two_axis_review["two-axis-review<br/><i>code-review</i>"]
   end
   skill_tiers --> token_rationalism
+  two_axis_review --> token_rationalism
 
 ```

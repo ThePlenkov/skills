@@ -33,7 +33,7 @@
       "name": "engineering",
       "source": "./",
       "skills": ["./skills/engineering"],
-      "description": "Cross-cutting engineering practices (API and interface design, frontend UI engineering, performance optimization, security and hardening)"
+      "description": "Cross-cutting engineering practices (API and interface design, frontend UI engineering, performance optimization, prototype-driven design, security and hardening)"
     },
     {
       "name": "verification",
@@ -45,13 +45,13 @@
       "name": "orchestration",
       "source": "./",
       "skills": ["./skills/orchestration"],
-      "description": "Agent coordination, isolation, context management, and skill discovery/invocation"
+      "description": "Agent coordination, isolation, context management, session hand-off, and skill discovery/invocation"
     },
     {
       "name": "workflow",
       "source": "./",
       "skills": ["./skills/workflow"],
-      "description": "Development workflow (git, CI/CD, planning, testing, documentation, deprecation, shipping, and launch)"
+      "description": "Development workflow (git, CI/CD, planning, testing, merge conflict resolution, documentation, deprecation, shipping, and launch)"
     },
     {
       "name": "integrations",
@@ -63,7 +63,7 @@
       "name": "tools",
       "source": "./",
       "skills": ["./skills/tools"],
-      "description": "Agent development utilities (skills, publishing, SARIF, docker-agent config)"
+      "description": "Agent development utilities (skills authoring and craft, publishing, SARIF, docker-agent config)"
     },
     {
       "name": "safety",
@@ -87,7 +87,7 @@
       "name": "code-review",
       "source": "./",
       "skills": ["./skills/code-review"],
-      "description": "PR/MR review and remediation"
+      "description": "PR/MR review, remediation, and two-axis (Standards + Spec) review discipline"
     },
     {
       "name": "self-learning",

@@ -13,7 +13,7 @@ Use when an agent is confronted with a runtime failure, wrong output, flaky beha
 
 ## Stats
 
-7 dependencies · 5 dependents
+7 dependencies · 6 dependents
 
 ## Graph
 
@@ -30,11 +30,13 @@ graph LR
     doubt_driven_development["doubt-driven-development<br/><i>methodology</i>"]
     observability_and_instrumentation["observability-and-instrumentation<br/><i>methodology</i>"]
     repository_onboarding["repository-onboarding<br/><i>methodology</i>"]
-    using_agent_skills["using-agent-skills<br/><i>methodology</i>"]
+    resolving_merge_conflicts["resolving-merge-conflicts<br/><i>workflow/git</i>"]
+    using_agent_skills["using-agent-skills<br/><i>orchestration</i>"]
   end
   doubt_driven_development --> debugging
   observability_and_instrumentation --> debugging
   repository_onboarding --> debugging
+  resolving_merge_conflicts --> debugging
   using_agent_skills --> debugging
 
   subgraph sg_depends_on["depends on"]

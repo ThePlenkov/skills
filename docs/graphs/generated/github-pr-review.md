@@ -13,7 +13,7 @@ Use when the user asks for a GitHub pull request review or wants review comments
 
 ## Stats
 
-0 dependencies · 4 dependents
+0 dependencies · 5 dependents
 
 ## Graph
 
@@ -29,12 +29,14 @@ graph LR
     direction TB
     evidence["evidence<br/><i>verification</i>"]
     github_fix_main["github-fix-main<br/><i>code-review</i>"]
-    skill_tiers["skill-tiers<br/><i>methodology</i>"]
+    skill_tiers["skill-tiers<br/><i>foundation</i>"]
     triage_issue["triage-issue<br/><i>code-review</i>"]
+    two_axis_review["two-axis-review<br/><i>code-review</i>"]
   end
   evidence --> github_pr_review
   github_fix_main --> github_pr_review
   skill_tiers --> github_pr_review
   triage_issue --> github_pr_review
+  two_axis_review --> github_pr_review
 
 ```

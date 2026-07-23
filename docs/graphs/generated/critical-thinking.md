@@ -28,7 +28,7 @@ graph LR
   subgraph sg_used_by["used by"]
     direction TB
     architecture_review["architecture-review<br/><i>behavior</i>"]
-    skill_tiers["skill-tiers<br/><i>methodology</i>"]
+    skill_tiers["skill-tiers<br/><i>foundation</i>"]
   end
   architecture_review --> critical_thinking
   skill_tiers --> critical_thinking

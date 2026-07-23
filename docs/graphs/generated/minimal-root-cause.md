@@ -29,7 +29,7 @@ graph LR
     direction TB
     debugging["debugging<br/><i>troubleshooting</i>"]
     refactoring["refactoring<br/><i>methodology</i>"]
-    skill_tiers["skill-tiers<br/><i>methodology</i>"]
+    skill_tiers["skill-tiers<br/><i>foundation</i>"]
   end
   debugging --> minimal_root_cause
   refactoring --> minimal_root_cause

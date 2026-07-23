@@ -1,0 +1,13 @@
+interface:
+  display_name: "Handoff"
+  short_description: "Compact a conversation into a handoff"
+  default_prompt: >-
+    Compact the current conversation into a handoff document for another agent
+    to pick up. Save it to the OS temp directory (not the current workspace).
+    Include a one-paragraph summary, the state of the world, decisions made
+    with rationales, open questions, and a short list of suggested skills.
+    Reference artifacts by path or URL rather than restating their contents.
+    Redact secrets and PII. Honour any user argument as a description of the
+    next session's focus.
+policy:
+  allow_implicit_invocation: false

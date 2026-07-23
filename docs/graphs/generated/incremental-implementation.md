@@ -29,7 +29,7 @@ graph LR
     direction TB
     deprecation_and_migration["deprecation-and-migration<br/><i>workflow</i>"]
     spec_driven_development["spec-driven-development<br/><i>methodology/sdd</i>"]
-    using_agent_skills["using-agent-skills<br/><i>methodology</i>"]
+    using_agent_skills["using-agent-skills<br/><i>orchestration</i>"]
   end
   deprecation_and_migration --> incremental_implementation
   spec_driven_development --> incremental_implementation

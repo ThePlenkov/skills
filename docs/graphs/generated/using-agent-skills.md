@@ -7,7 +7,7 @@
 
 # using-agent-skills
 
-> **Category:** `methodology` · **Path:** `skills/methodology/using-agent-skills/SKILL.md`
+> **Category:** `orchestration` · **Path:** `skills/orchestration/using-agent-skills/SKILL.md`
 
 Discovers and invokes agent skills. Use when starting a session or when you need to discover which skill applies to the current task. This is the meta-skill that governs how all other skills are disco
 
@@ -22,13 +22,13 @@ Rendered with [Mermaid](https://mermaid.js.org/). On github.com click any node t
 
 ```mermaid
 graph LR
-  using_agent_skills["using-agent-skills<br/><i>methodology</i>"]
+  using_agent_skills["using-agent-skills<br/><i>orchestration</i>"]
   classDef center fill:#1d4ed8,stroke:#fbbf24,stroke-width:3px,color:#fff
   class using_agent_skills center
 
   subgraph sg_depends_on["depends on"]
     direction TB
-    api_and_interface_design["api-and-interface-design<br/><i>methodology</i>"]
+    api_and_interface_design["api-and-interface-design<br/><i>engineering</i>"]
     ci_cd_and_automation["ci-cd-and-automation<br/><i>workflow</i>"]
     code_review_and_quality["code-review-and-quality<br/><i>methodology</i>"]
     code_simplification["code-simplification<br/><i>methodology</i>"]
@@ -37,7 +37,7 @@ graph LR
     deprecation_and_migration["deprecation-and-migration<br/><i>workflow</i>"]
     documentation_and_adrs["documentation-and-adrs<br/><i>workflow</i>"]
     doubt_driven_development["doubt-driven-development<br/><i>methodology</i>"]
-    frontend_ui_engineering["frontend-ui-engineering<br/><i>methodology</i>"]
+    frontend_ui_engineering["frontend-ui-engineering<br/><i>engineering</i>"]
     git_workflow_and_versioning["git-workflow-and-versioning<br/><i>workflow/git</i>"]
     idea_refine["idea-refine<br/><i>methodology</i>"]
     incremental_implementation["incremental-implementation<br/><i>methodology</i>"]

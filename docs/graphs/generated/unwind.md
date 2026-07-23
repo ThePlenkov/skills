@@ -13,7 +13,7 @@ Collapse a solved narrow branch into the parent/root task, rebuild the execution
 
 ## Stats
 
-0 dependencies · 1 dependents
+0 dependencies · 2 dependents
 
 ## Graph
 
@@ -28,7 +28,9 @@ graph LR
   subgraph sg_used_by["used by"]
     direction TB
     drill["drill<br/><i>safety</i>"]
+    handoff["handoff<br/><i>orchestration</i>"]
   end
   drill --> unwind
+  handoff --> unwind
 
 ```

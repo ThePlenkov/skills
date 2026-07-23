@@ -8,7 +8,7 @@
 # Skills dependency graphs
 
 Per-skill focus graphs showing direct dependencies and dependents.
-Contains 80 skills and 139 edges.
+Contains 85 skills and 168 edges.
 
 Each row links to a focused graph for that skill, rendered with Mermaid. On github.com the linked `.md` files render with native pan/zoom (click any node).
 
@@ -31,24 +31,35 @@ Regenerate locally with `npm run graph:update`.
 
 | Skill | Dependencies | Dependents | Graph |
 | --- | ---: | ---: | --- |
-| `adhd` — Goal anchoring for ADHD-impacted users. Detect false goals, prevent rabbit holes | 0 | 1 | [graph](adhd.md) |
+| `adhd` — Goal anchoring for ADHD-impacted users. Detect false goals, prevent rabbit holes | 0 | 2 | [graph](adhd.md) |
 | `interview-me` — Extracts what the user actually wants instead of what they think they should wan | 5 | 1 | [graph](interview-me.md) |
 
 ## code-review
 
 | Skill | Dependencies | Dependents | Graph |
 | --- | ---: | ---: | --- |
-| `act` — Use when the user invokes /act on a PR/MR, /act with no arguments (uses the PR i | 6 | 3 | [graph](act.md) |
+| `act` — Use when the user invokes /act on a PR/MR, /act with no arguments (uses the PR i | 6 | 5 | [graph](act.md) |
 | `github-fix-main` — Use when the user asks to fix the current GitHub repository's default branch end | 4 | 0 | [graph](github-fix-main.md) |
-| `github-pr-review` — Use when the user asks for a GitHub pull request review or wants review comments | 0 | 4 | [graph](github-pr-review.md) |
-| `mr-address-review` — End-to-end GitLab MR review-comment remediation. Use when the user asks to addre | 2 | 2 | [graph](mr-address-review.md) |
+| `github-pr-review` — Use when the user asks for a GitHub pull request review or wants review comments | 0 | 5 | [graph](github-pr-review.md) |
+| `mr-address-review` — End-to-end GitLab MR review-comment remediation. Use when the user asks to addre | 2 | 4 | [graph](mr-address-review.md) |
 | `triage-issue` — Triage a GitLab or GitHub issue end-to-end — acknowledge, investigate, fix or re | 5 | 3 | [graph](triage-issue.md) |
+| `two-axis-review` — Review the changes since a fixed point (commit, branch, tag, or merge-base) alon | 12 | 0 | [graph](two-axis-review.md) |
+
+## engineering
+
+| Skill | Dependencies | Dependents | Graph |
+| --- | ---: | ---: | --- |
+| `api-and-interface-design` — Guides stable API and interface design. Use when designing APIs, module boundari | 1 | 3 | [graph](api-and-interface-design.md) |
+| `frontend-ui-engineering` — Builds production-quality, accessible, responsive user-facing UIs. Use when buil | 0 | 1 | [graph](frontend-ui-engineering.md) |
+| `performance-optimization` — Optimizes application performance across frontend, backend, queries, and databas | 0 | 3 | [graph](performance-optimization.md) |
+| `prototype` — Build a throwaway prototype to answer a design question. Use when the user wants | 5 | 0 | [graph](prototype.md) |
+| `security-and-hardening` — Hardens code against vulnerabilities. Use when handling user input, authenticati | 0 | 3 | [graph](security-and-hardening.md) |
 
 ## experimentation
 
 | Skill | Dependencies | Dependents | Graph |
 | --- | ---: | ---: | --- |
-| `sandboxed` — Isolate risky agent experiments in a dedicated git branch or git worktree, creat | 0 | 0 | [graph](sandboxed.md) |
+| `sandboxed` — Isolate risky agent experiments in a dedicated git branch or git worktree, creat | 0 | 1 | [graph](sandboxed.md) |
 
 ## foundation
 
@@ -56,7 +67,8 @@ Regenerate locally with `npm run graph:update`.
 | --- | ---: | ---: | --- |
 | `minimalist` — Activates the minimalist senior-dev persona: every line costs, the best code is | 0 | 0 | [graph](minimalist.md) |
 | `persistent-memory` — Persistent memory enforcement for AI agents. Recall prior work and findings befo | 1 | 3 | [graph](persistent-memory.md) |
-| `token-rationalism` — Token-rational agent behavior. Maximize value delivered per request, minimize wa | 0 | 1 | [graph](token-rationalism.md) |
+| `skill-tiers` — Skill activation tiers and the 300-line always-on budget. Defines Tier 0 (always | 11 | 0 | [graph](skill-tiers.md) |
+| `token-rationalism` — Token-rational agent behavior. Maximize value delivered per request, minimize wa | 0 | 2 | [graph](token-rationalism.md) |
 
 ## integrations
 
@@ -65,8 +77,8 @@ Regenerate locally with `npm run graph:update`.
 | `atlassian` — Work with Atlassian Jira and Confluence. Use when using the `acli` CLI, Jira/Con | 0 | 0 | [graph](atlassian.md) |
 | `codacy` — Codacy static analysis — reproduce findings locally, debug "N issues (0 max.)" f | 1 | 1 | [graph](codacy.md) |
 | `codescene` — CodeScene setup and usage — CI delta analysis, local CLI, CS_ACCESS_TOKEN, Docke | 0 | 1 | [graph](codescene.md) |
-| `github` — Work with GitHub repositories, issues, pull requests, releases, and Actions. Use | 0 | 2 | [graph](github.md) |
-| `gitlab` — Work with GitLab projects, issues, merge requests, pipelines, and releases. Use | 0 | 2 | [graph](gitlab.md) |
+| `github` — Work with GitHub repositories, issues, pull requests, releases, and Actions. Use | 0 | 3 | [graph](github.md) |
+| `gitlab` — Work with GitLab projects, issues, merge requests, pipelines, and releases. Use | 0 | 3 | [graph](gitlab.md) |
 | `gitlab-ci-local` — Test GitLab CI pipelines locally using gitlab-ci-local. Use when debugging CI jo | 0 | 0 | [graph](gitlab-ci-local.md) |
 | `glab` — GitLab CLI automation with non-interactive mode. Automatically sets GLAB_NO_PROM | 0 | 2 | [graph](glab.md) |
 | `glean` — Use the glean-bk wrapper for Glean CLI with automatic OAuth token sync from bk C | 0 | 0 | [graph](glean.md) |
@@ -75,14 +87,12 @@ Regenerate locally with `npm run graph:update`.
 
 | Skill | Dependencies | Dependents | Graph |
 | --- | ---: | ---: | --- |
-| `api-and-interface-design` — Guides stable API and interface design. Use when designing APIs, module boundari | 1 | 2 | [graph](api-and-interface-design.md) |
-| `code-review-and-quality` — Conducts multi-axis code review. Use before merging any change. Use when reviewi | 2 | 3 | [graph](code-review-and-quality.md) |
-| `code-simplification` — Simplifies code for clarity. Use when refactoring code for clarity without chang | 0 | 1 | [graph](code-simplification.md) |
-| `codehome` — Detect and fix code placed in the wrong architectural layer, config file, or ove | 0 | 4 | [graph](codehome.md) |
+| `code-review-and-quality` — Conducts multi-axis code review. Use before merging any change. Use when reviewi | 2 | 4 | [graph](code-review-and-quality.md) |
+| `code-simplification` — Simplifies code for clarity. Use when refactoring code for clarity without chang | 0 | 2 | [graph](code-simplification.md) |
+| `codehome` — Detect and fix code placed in the wrong architectural layer, config file, or ove | 0 | 5 | [graph](codehome.md) |
 | `context-engineering` — Optimizes agent context setup. Use when starting a new session, when agent outpu | 0 | 2 | [graph](context-engineering.md) |
 | `critical-thinking` — Make the agent a rational, evidence-driven critic. Use when evaluating a user's | 0 | 2 | [graph](critical-thinking.md) |
 | `doubt-driven-development` — Subjects every non-trivial decision to a fresh-context adversarial review before | 4 | 2 | [graph](doubt-driven-development.md) |
-| `frontend-ui-engineering` — Builds production-quality, accessible, responsive user-facing UIs. Use when buil | 0 | 1 | [graph](frontend-ui-engineering.md) |
 | `idea-refine` — Refines raw ideas into sharp, actionable concepts through structured divergent a | 0 | 2 | [graph](idea-refine.md) |
 | `incremental-implementation` — Delivers changes incrementally. Use when implementing any feature or change that | 1 | 3 | [graph](incremental-implementation.md) |
 | `investigate-first` — Use before editing when a bug, task, failing test, or code area is not yet under | 0 | 8 | [graph](investigate-first.md) |
@@ -90,14 +100,10 @@ Regenerate locally with `npm run graph:update`.
 | `minimal-root-cause` — Use before patching code when the task may cause overengineering, duplicate logi | 0 | 3 | [graph](minimal-root-cause.md) |
 | `observability-and-instrumentation` — Instruments code so production behavior is visible and diagnosable. Use when add | 4 | 1 | [graph](observability-and-instrumentation.md) |
 | `one-shot-patch` — Use when the relevant file and fix hypothesis are known and the agent needs to m | 1 | 4 | [graph](one-shot-patch.md) |
-| `performance-optimization` — Optimizes application performance across frontend, backend, queries, and databas | 0 | 3 | [graph](performance-optimization.md) |
 | `refactoring` — Use when an agent needs to safely restructure existing code without changing obs | 8 | 3 | [graph](refactoring.md) |
 | `repository-onboarding` — Use when an agent or developer must quickly understand a previously unknown repo | 5 | 1 | [graph](repository-onboarding.md) |
-| `security-and-hardening` — Hardens code against vulnerabilities. Use when handling user input, authenticati | 0 | 3 | [graph](security-and-hardening.md) |
-| `skill-tiers` — Skill activation tiers and the 300-line always-on budget. Defines Tier 0 (always | 11 | 0 | [graph](skill-tiers.md) |
 | `source-driven-development` — Grounds every implementation decision in official documentation. Use when you wa | 0 | 3 | [graph](source-driven-development.md) |
 | `test-driven-development` — Drives development with tests. Use when implementing any logic, fixing any bug, | 0 | 3 | [graph](test-driven-development.md) |
-| `using-agent-skills` — Discovers and invokes agent skills. Use when starting a session or when you need | 22 | 0 | [graph](using-agent-skills.md) |
 
 ## methodology/sdd
 
@@ -110,9 +116,11 @@ Regenerate locally with `npm run graph:update`.
 
 | Skill | Dependencies | Dependents | Graph |
 | --- | ---: | ---: | --- |
-| `save-session` — Save work durably when the user says a save-session trigger phrase, or generate | 4 | 1 | [graph](save-session.md) |
-| `subagent-capsule` — Use immediately before launching a subagent. Forces the parent to construct a co | 0 | 1 | [graph](subagent-capsule.md) |
-| `unwind` — Collapse a solved narrow branch into the parent/root task, rebuild the execution | 0 | 1 | [graph](unwind.md) |
+| `handoff` — Compact the current conversation into a handoff document so a fresh agent sessio | 5 | 0 | [graph](handoff.md) |
+| `save-session` — Save work durably when the user says a save-session trigger phrase, or generate | 4 | 3 | [graph](save-session.md) |
+| `subagent-capsule` — Use immediately before launching a subagent. Forces the parent to construct a co | 0 | 3 | [graph](subagent-capsule.md) |
+| `unwind` — Collapse a solved narrow branch into the parent/root task, rebuild the execution | 0 | 2 | [graph](unwind.md) |
+| `using-agent-skills` — Discovers and invokes agent skills. Use when starting a session or when you need | 22 | 0 | [graph](using-agent-skills.md) |
 
 ## research
 
@@ -132,8 +140,8 @@ Regenerate locally with `npm run graph:update`.
 
 | Skill | Dependencies | Dependents | Graph |
 | --- | ---: | ---: | --- |
-| `retrospect` — Self-correction protocol for AI agents. Use when a mistake is made, a correction | 1 | 5 | [graph](retrospect.md) |
-| `skill-feedback` — Use when the user invokes /skill-feedback on a skill, or after /retrospect ident | 1 | 2 | [graph](skill-feedback.md) |
+| `retrospect` — Self-correction protocol for AI agents. Use when a mistake is made, a correction | 1 | 6 | [graph](retrospect.md) |
+| `skill-feedback` — Use when the user invokes /skill-feedback on a skill, or after /retrospect ident | 1 | 3 | [graph](skill-feedback.md) |
 
 ## tools
 
@@ -142,21 +150,22 @@ Regenerate locally with `npm run graph:update`.
 | `docker-agent-config` — Design, configure, and run multi-agent AI teams using the Docker Agent CLI plugi | 0 | 0 | [graph](docker-agent-config.md) |
 | `npm-publish` — Publish npm packages using OIDC-based trusted publishing, or short-lived scoped | 0 | 0 | [graph](npm-publish.md) |
 | `sarif-to-annotations` — Convert SARIF 2.1.0 reports to GitHub Actions workflow-command annotations. Use | 0 | 0 | [graph](sarif-to-annotations.md) |
-| `skillmaker` — Create, validate, and manage agent skills. Generates SKILL.md scaffolds, checks | 0 | 0 | [graph](skillmaker.md) |
+| `skillmaker` — Create, validate, and manage agent skills. Generates SKILL.md scaffolds, checks | 1 | 1 | [graph](skillmaker.md) |
 | `skills-cli` — Install and manage agent skills using the `npx skills` CLI (vercel-labs/skills). | 0 | 1 | [graph](skills-cli.md) |
+| `writing-great-skills` — Reference for writing and editing skills well — the vocabulary and principles th | 3 | 1 | [graph](writing-great-skills.md) |
 
 ## troubleshooting
 
 | Skill | Dependencies | Dependents | Graph |
 | --- | ---: | ---: | --- |
-| `debugging` — Use when an agent is confronted with a runtime failure, wrong output, flaky beha | 7 | 5 | [graph](debugging.md) |
+| `debugging` — Use when an agent is confronted with a runtime failure, wrong output, flaky beha | 7 | 6 | [graph](debugging.md) |
 | `performance-investigation` — Use when an agent must analyze a reported or suspected performance problem — slo | 5 | 3 | [graph](performance-investigation.md) |
 
 ## verification
 
 | Skill | Dependencies | Dependents | Graph |
 | --- | ---: | ---: | --- |
-| `evidence` — Full proof discipline for non-trivial changes. Every claim of done/fixed/passing | 5 | 5 | [graph](evidence.md) |
+| `evidence` — Full proof discipline for non-trivial changes. Every claim of done/fixed/passing | 5 | 7 | [graph](evidence.md) |
 | `evidence-lite` — Lightweight proof discipline for trivial changes. Single command + quoted output | 1 | 1 | [graph](evidence-lite.md) |
 
 ## workflow
@@ -182,6 +191,7 @@ Regenerate locally with `npm run graph:update`.
 | `git-push` — Push commits to remote with validation of target and scope. Analyzes target to d | 2 | 2 | [graph](git-push.md) |
 | `git-reset` — Reset git state with mandatory $skill{safeguard} preservation and approval. Anal | 2 | 0 | [graph](git-reset.md) |
 | `git-workflow-and-versioning` — Structures git workflow practices. Use when making any code change. Use when com | 4 | 2 | [graph](git-workflow-and-versioning.md) |
+| `resolving-merge-conflicts` — Use when an in-progress `git merge` or `git rebase` has produced conflict marker | 3 | 0 | [graph](resolving-merge-conflicts.md) |
 | `shadow-fork` — enforce a provider-neutral shadow fork workflow: develop upstream repos through | 0 | 1 | [graph](shadow-fork.md) |
 
 ## workflow/planning
@@ -190,7 +200,7 @@ Regenerate locally with `npm run graph:update`.
 | --- | ---: | ---: | --- |
 | `backlog` — Actionable improvement items derived from experience and retrospectives. Items l | 1 | 2 | [graph](backlog.md) |
 | `planning-and-task-breakdown` — Breaks work into ordered tasks. Use when you have a spec or clear requirements a | 0 | 3 | [graph](planning-and-task-breakdown.md) |
-| `shared-plan` — Shared, persistent planning and retrospectives across agents and people. Use whe | 1 | 2 | [graph](shared-plan.md) |
+| `shared-plan` — Shared, persistent planning and retrospectives across agents and people. Use whe | 1 | 5 | [graph](shared-plan.md) |
 
 ## workflow/testing
 

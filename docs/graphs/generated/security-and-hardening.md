@@ -7,7 +7,7 @@
 
 # security-and-hardening
 
-> **Category:** `methodology` · **Path:** `skills/methodology/security-and-hardening/SKILL.md`
+> **Category:** `engineering` · **Path:** `skills/engineering/security-and-hardening/SKILL.md`
 
 Hardens code against vulnerabilities. Use when handling user input, authentication, data storage, or external integrations. Use when building any feature that accepts untrusted data, manages user sess
 
@@ -21,7 +21,7 @@ Rendered with [Mermaid](https://mermaid.js.org/). On github.com click any node t
 
 ```mermaid
 graph LR
-  security_and_hardening["security-and-hardening<br/><i>methodology</i>"]
+  security_and_hardening["security-and-hardening<br/><i>engineering</i>"]
   classDef center fill:#1d4ed8,stroke:#fbbf24,stroke-width:3px,color:#fff
   class security_and_hardening center
 
@@ -29,7 +29,7 @@ graph LR
     direction TB
     code_review_and_quality["code-review-and-quality<br/><i>methodology</i>"]
     observability_and_instrumentation["observability-and-instrumentation<br/><i>methodology</i>"]
-    using_agent_skills["using-agent-skills<br/><i>methodology</i>"]
+    using_agent_skills["using-agent-skills<br/><i>orchestration</i>"]
   end
   code_review_and_quality --> security_and_hardening
   observability_and_instrumentation --> security_and_hardening

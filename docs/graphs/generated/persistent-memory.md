@@ -29,7 +29,7 @@ graph LR
     direction TB
     act["act<br/><i>code-review</i>"]
     drill["drill<br/><i>safety</i>"]
-    skill_tiers["skill-tiers<br/><i>methodology</i>"]
+    skill_tiers["skill-tiers<br/><i>foundation</i>"]
   end
   act --> persistent_memory
   drill --> persistent_memory

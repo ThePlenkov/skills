@@ -1,0 +1,13 @@
+interface:
+  display_name: "Two-Axis Review"
+  short_description: "Review a diff on standards and spec"
+  default_prompt: >-
+    Review the diff between HEAD and a user-supplied fixed point along two
+    independent axes: Standards (does the code follow the repo's documented
+    standards plus a Fowler smell baseline?) and Spec (does the code match the
+    originating issue / PRD / spec?). Pin the fixed point first, identify the
+    spec source, identify the standards sources, then — if a spec was found —
+    spawn the Standards and Spec sub-agents in parallel and aggregate their
+    findings under separate headings. If no spec was found, run the Standards
+    sub-agent only and report "no spec available" in the final summary. Do
+    not merge or rerank the two axes.

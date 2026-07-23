@@ -13,7 +13,7 @@ Use when the user invokes /act on a PR/MR, /act with no arguments (uses the PR i
 
 ## Stats
 
-6 dependencies · 3 dependents
+6 dependencies · 5 dependents
 
 ## Graph
 
@@ -28,10 +28,14 @@ graph LR
   subgraph sg_used_by["used by"]
     direction TB
     harvest["harvest<br/><i>workflow/debt</i>"]
+    resolving_merge_conflicts["resolving-merge-conflicts<br/><i>workflow/git</i>"]
     save_session["save-session<br/><i>orchestration</i>"]
+    two_axis_review["two-axis-review<br/><i>code-review</i>"]
   end
   harvest --> act
+  resolving_merge_conflicts --> act
   save_session --> act
+  two_axis_review --> act
 
   subgraph sg_depends_on["depends on"]
     direction TB

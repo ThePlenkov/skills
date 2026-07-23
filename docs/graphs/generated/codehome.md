@@ -13,7 +13,7 @@ Detect and fix code placed in the wrong architectural layer, config file, or ove
 
 ## Stats
 
-0 dependencies · 4 dependents
+0 dependencies · 5 dependents
 
 ## Graph
 
@@ -30,11 +30,13 @@ graph LR
     architecture_review["architecture-review<br/><i>behavior</i>"]
     refactoring["refactoring<br/><i>methodology</i>"]
     repository_onboarding["repository-onboarding<br/><i>methodology</i>"]
-    skill_tiers["skill-tiers<br/><i>methodology</i>"]
+    skill_tiers["skill-tiers<br/><i>foundation</i>"]
+    two_axis_review["two-axis-review<br/><i>code-review</i>"]
   end
   architecture_review --> codehome
   refactoring --> codehome
   repository_onboarding --> codehome
   skill_tiers --> codehome
+  two_axis_review --> codehome
 
 ```

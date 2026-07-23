@@ -28,7 +28,7 @@ graph LR
   subgraph sg_used_by["used by"]
     direction TB
     spec_driven_development["spec-driven-development<br/><i>methodology/sdd</i>"]
-    using_agent_skills["using-agent-skills<br/><i>methodology</i>"]
+    using_agent_skills["using-agent-skills<br/><i>orchestration</i>"]
   end
   spec_driven_development --> context_engineering
   using_agent_skills --> context_engineering

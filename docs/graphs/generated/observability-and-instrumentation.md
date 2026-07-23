@@ -27,15 +27,15 @@ graph LR
 
   subgraph sg_used_by["used by"]
     direction TB
-    using_agent_skills["using-agent-skills<br/><i>methodology</i>"]
+    using_agent_skills["using-agent-skills<br/><i>orchestration</i>"]
   end
   using_agent_skills --> observability_and_instrumentation
 
   subgraph sg_depends_on["depends on"]
     direction TB
     debugging["debugging<br/><i>troubleshooting</i>"]
-    performance_optimization["performance-optimization<br/><i>methodology</i>"]
-    security_and_hardening["security-and-hardening<br/><i>methodology</i>"]
+    performance_optimization["performance-optimization<br/><i>engineering</i>"]
+    security_and_hardening["security-and-hardening<br/><i>engineering</i>"]
     shipping_and_launch["shipping-and-launch<br/><i>workflow</i>"]
   end
   observability_and_instrumentation --> debugging

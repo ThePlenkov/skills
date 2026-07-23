@@ -27,9 +27,9 @@ graph LR
 
   subgraph sg_used_by["used by"]
     direction TB
-    api_and_interface_design["api-and-interface-design<br/><i>methodology</i>"]
+    api_and_interface_design["api-and-interface-design<br/><i>engineering</i>"]
     git_workflow_and_versioning["git-workflow-and-versioning<br/><i>workflow/git</i>"]
-    using_agent_skills["using-agent-skills<br/><i>methodology</i>"]
+    using_agent_skills["using-agent-skills<br/><i>orchestration</i>"]
   end
   api_and_interface_design --> deprecation_and_migration
   git_workflow_and_versioning --> deprecation_and_migration

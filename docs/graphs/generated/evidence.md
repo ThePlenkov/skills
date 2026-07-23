@@ -13,7 +13,7 @@ Full proof discipline for non-trivial changes. Every claim of done/fixed/passing
 
 ## Stats
 
-5 dependencies · 5 dependents
+5 dependencies · 7 dependents
 
 ## Graph
 
@@ -28,12 +28,16 @@ graph LR
   subgraph sg_used_by["used by"]
     direction TB
     debugging["debugging<br/><i>troubleshooting</i>"]
+    handoff["handoff<br/><i>orchestration</i>"]
     performance_investigation["performance-investigation<br/><i>troubleshooting</i>"]
+    prototype["prototype<br/><i>engineering</i>"]
     refactoring["refactoring<br/><i>methodology</i>"]
-    skill_tiers["skill-tiers<br/><i>methodology</i>"]
+    skill_tiers["skill-tiers<br/><i>foundation</i>"]
   end
   debugging --> evidence
+  handoff --> evidence
   performance_investigation --> evidence
+  prototype --> evidence
   refactoring --> evidence
   skill_tiers --> evidence
 

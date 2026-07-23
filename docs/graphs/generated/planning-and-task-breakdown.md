@@ -29,7 +29,7 @@ graph LR
     direction TB
     interview_me["interview-me<br/><i>coaching</i>"]
     spec_driven_development["spec-driven-development<br/><i>methodology/sdd</i>"]
-    using_agent_skills["using-agent-skills<br/><i>methodology</i>"]
+    using_agent_skills["using-agent-skills<br/><i>orchestration</i>"]
   end
   interview_me --> planning_and_task_breakdown
   spec_driven_development --> planning_and_task_breakdown

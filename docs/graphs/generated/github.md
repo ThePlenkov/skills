@@ -13,7 +13,7 @@ Work with GitHub repositories, issues, pull requests, releases, and Actions. Use
 
 ## Stats
 
-0 dependencies · 2 dependents
+0 dependencies · 3 dependents
 
 ## Graph
 
@@ -29,8 +29,10 @@ graph LR
     direction TB
     github_fix_main["github-fix-main<br/><i>code-review</i>"]
     triage_issue["triage-issue<br/><i>code-review</i>"]
+    two_axis_review["two-axis-review<br/><i>code-review</i>"]
   end
   github_fix_main --> github
   triage_issue --> github
+  two_axis_review --> github
 
 ```

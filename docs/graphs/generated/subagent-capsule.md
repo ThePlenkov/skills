@@ -13,7 +13,7 @@ Use immediately before launching a subagent. Forces the parent to construct a co
 
 ## Stats
 
-0 dependencies · 1 dependents
+0 dependencies · 3 dependents
 
 ## Graph
 
@@ -27,8 +27,12 @@ graph LR
 
   subgraph sg_used_by["used by"]
     direction TB
+    prototype["prototype<br/><i>engineering</i>"]
     save_session["save-session<br/><i>orchestration</i>"]
+    two_axis_review["two-axis-review<br/><i>code-review</i>"]
   end
+  prototype --> subagent_capsule
   save_session --> subagent_capsule
+  two_axis_review --> subagent_capsule
 
 ```

@@ -13,7 +13,7 @@ Save work durably when the user says a save-session trigger phrase, or generate 
 
 ## Stats
 
-4 dependencies · 1 dependents
+4 dependencies · 3 dependents
 
 ## Graph
 
@@ -28,8 +28,12 @@ graph LR
   subgraph sg_used_by["used by"]
     direction TB
     evidence["evidence<br/><i>verification</i>"]
+    handoff["handoff<br/><i>orchestration</i>"]
+    prototype["prototype<br/><i>engineering</i>"]
   end
   evidence --> save_session
+  handoff --> save_session
+  prototype --> save_session
 
   subgraph sg_depends_on["depends on"]
     direction TB

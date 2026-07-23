@@ -7,7 +7,7 @@
 
 # performance-optimization
 
-> **Category:** `methodology` · **Path:** `skills/methodology/performance-optimization/SKILL.md`
+> **Category:** `engineering` · **Path:** `skills/engineering/performance-optimization/SKILL.md`
 
 Optimizes application performance across frontend, backend, queries, and databases. Use when performance requirements exist, when you suspect performance regressions, when Core Web Vitals or load time
 
@@ -21,7 +21,7 @@ Rendered with [Mermaid](https://mermaid.js.org/). On github.com click any node t
 
 ```mermaid
 graph LR
-  performance_optimization["performance-optimization<br/><i>methodology</i>"]
+  performance_optimization["performance-optimization<br/><i>engineering</i>"]
   classDef center fill:#1d4ed8,stroke:#fbbf24,stroke-width:3px,color:#fff
   class performance_optimization center
 
@@ -29,7 +29,7 @@ graph LR
     direction TB
     code_review_and_quality["code-review-and-quality<br/><i>methodology</i>"]
     observability_and_instrumentation["observability-and-instrumentation<br/><i>methodology</i>"]
-    using_agent_skills["using-agent-skills<br/><i>methodology</i>"]
+    using_agent_skills["using-agent-skills<br/><i>orchestration</i>"]
   end
   code_review_and_quality --> performance_optimization
   observability_and_instrumentation --> performance_optimization

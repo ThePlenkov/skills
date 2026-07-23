@@ -13,7 +13,7 @@ Isolate risky agent experiments in a dedicated git branch or git worktree, creat
 
 ## Stats
 
-0 dependencies · 0 dependents
+0 dependencies · 1 dependents
 
 ## Graph
 
@@ -24,5 +24,11 @@ graph LR
   sandboxed["sandboxed<br/><i>experimentation</i>"]
   classDef center fill:#1d4ed8,stroke:#fbbf24,stroke-width:3px,color:#fff
   class sandboxed center
+
+  subgraph sg_used_by["used by"]
+    direction TB
+    prototype["prototype<br/><i>engineering</i>"]
+  end
+  prototype --> sandboxed
 
 ```

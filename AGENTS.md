@@ -10,20 +10,20 @@ skills/
 ├── methodology/        # Development methodology (patching, critical thinking, code home, SDD)
 ├── verification/       # Runtime proof (evidence)
 ├── safety/             # Destructive operation protection (safeguard, salvage)
-├── orchestration/      # Agent coordination, isolation, and session state
+├── orchestration/      # Agent coordination, isolation, session state, and context-window hand-off
 ├── workflow/           # Development workflow (git, testing, planning, debt)
-│   ├── git/                # commit, push, reset
+│   ├── git/                # commit, push, reset, merge conflict resolution
 │   ├── testing/            # ci-local, e2e
 │   ├── planning/           # shared-plan, backlog
 │   └── debt/               # harvest
-├── code-review/        # PR/MR review and remediation (act, triage-issue, etc.)
+├── code-review/        # PR/MR review, remediation, and the two-axis (Standards + Spec) review discipline
 ├── integrations/       # Platform connectors (GitHub, GitLab, Atlassian, Codacy, ...)
-├── tools/              # Dev tools (skillmaker, skills-cli, docker-agent-config, ...)
+├── tools/              # Dev tools (skillmaker, skills-cli, docker-agent-config, writing-great-skills, ...)
 ├── research/           # Codebase analysis (deepwiki)
 ├── coaching/           # User guidance (adhd)
 ├── self-learning/      # Retrospective learning (retrospect, skill-feedback)
 ├── experimentation/    # Sandboxed experimentation (sandboxed)
-├── engineering/        # Cross-cutting engineering practices (API/UI design, performance, security)
+├── engineering/        # Cross-cutting engineering practices (API/UI design, prototype-driven design, performance, security)
 └── agents/             # Framework management (dotagents, claude-skills)
 ```
 

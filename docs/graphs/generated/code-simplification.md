@@ -13,7 +13,7 @@ Simplifies code for clarity. Use when refactoring code for clarity without chang
 
 ## Stats
 
-0 dependencies · 1 dependents
+0 dependencies · 2 dependents
 
 ## Graph
 
@@ -27,8 +27,10 @@ graph LR
 
   subgraph sg_used_by["used by"]
     direction TB
-    using_agent_skills["using-agent-skills<br/><i>methodology</i>"]
+    two_axis_review["two-axis-review<br/><i>code-review</i>"]
+    using_agent_skills["using-agent-skills<br/><i>orchestration</i>"]
   end
+  two_axis_review --> code_simplification
   using_agent_skills --> code_simplification
 
 ```

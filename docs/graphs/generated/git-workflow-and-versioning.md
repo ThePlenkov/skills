@@ -28,14 +28,14 @@ graph LR
   subgraph sg_used_by["used by"]
     direction TB
     incremental_implementation["incremental-implementation<br/><i>methodology</i>"]
-    using_agent_skills["using-agent-skills<br/><i>methodology</i>"]
+    using_agent_skills["using-agent-skills<br/><i>orchestration</i>"]
   end
   incremental_implementation --> git_workflow_and_versioning
   using_agent_skills --> git_workflow_and_versioning
 
   subgraph sg_depends_on["depends on"]
     direction TB
-    api_and_interface_design["api-and-interface-design<br/><i>methodology</i>"]
+    api_and_interface_design["api-and-interface-design<br/><i>engineering</i>"]
     code_review_and_quality["code-review-and-quality<br/><i>methodology</i>"]
     deprecation_and_migration["deprecation-and-migration<br/><i>workflow</i>"]
     shipping_and_launch["shipping-and-launch<br/><i>workflow</i>"]
