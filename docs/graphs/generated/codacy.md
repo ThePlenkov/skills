@@ -13,7 +13,7 @@ Codacy static analysis — reproduce findings locally, debug "N issues (0 max.)"
 
 ## Stats
 
-1 dependencies · 1 dependents
+1 dependencies · 0 dependents
 
 ## Graph
 
@@ -30,5 +30,4 @@ graph LR
     act["act<br/><i>code-review</i>"]
   end
   codacy --> act
-  act -. "↕ mutual with act" .-> codacy
 ```

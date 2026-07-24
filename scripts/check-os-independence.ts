@@ -129,8 +129,31 @@ async function* getFilesToCheck(): AsyncGenerator<string> {
   yield* walk(ROOT);
 }
 
+// Per-file exemption list. The check is meant for SKILL.md bodies
+// (loaded as agent context, where cross-platform portability matters
+// for the agent's runtime). References/ files that are explicitly
+// "copy these bash commands" recipes (e.g. per-environment runs for
+// /evidence) are exempt — their purpose is to show what to type in
+// the user's terminal, which is bash-by-design.
+//
+// Add a path + one-line reason. Keep this list short; every entry
+// should be a deliberate call, not a default.
+const EXEMPT_FILES = new Set<string>([
+  // /evidence per-environment runs: intentional POSIX bash recipes
+  // that the agent types into a shell to produce evidence. The file's
+  // whole purpose is to be a copy-paste-ready command list.
+  'skills/verification/evidence/references/per-environment-runs.md',
+]);
+
 for await (const path of getFilesToCheck()) {
-  const rel = relative(ROOT, path);
+  // Normalize to POSIX-style separators so the EXEMPT_FILES lookup
+  // works on every platform. `relative()` on Windows uses
+  // backslashes, but the exempt paths above are written with
+  // forward slashes — a raw compare would never match there.
+  const rel = relative(ROOT, path).replace(/\\/g, '/');
+  if (EXEMPT_FILES.has(rel)) {
+    continue; // see EXEMPT_FILES comment above
+  }
   const text = await readFile(path, 'utf8');
   const lines = text.split('\n');
 

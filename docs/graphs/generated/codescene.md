@@ -13,7 +13,7 @@ CodeScene setup and usage — CI delta analysis, local CLI, CS_ACCESS_TOKEN, Doc
 
 ## Stats
 
-0 dependencies · 1 dependents
+0 dependencies · 0 dependents
 
 ## Graph
 
@@ -24,11 +24,5 @@ graph LR
   codescene["codescene<br/><i>integrations</i>"]
   classDef center fill:#1d4ed8,stroke:#fbbf24,stroke-width:3px,color:#fff
   class codescene center
-
-  subgraph sg_used_by["used by"]
-    direction TB
-    act["act<br/><i>code-review</i>"]
-  end
-  act --> codescene
 
 ```

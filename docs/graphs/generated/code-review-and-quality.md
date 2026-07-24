@@ -13,7 +13,7 @@ Conducts multi-axis code review. Use before merging any change. Use when reviewi
 
 ## Stats
 
-2 dependencies · 4 dependents
+2 dependencies · 5 dependents
 
 ## Graph
 
@@ -27,11 +27,13 @@ graph LR
 
   subgraph sg_used_by["used by"]
     direction TB
+    ci_cd_and_automation["ci-cd-and-automation<br/><i>workflow</i>"]
     doubt_driven_development["doubt-driven-development<br/><i>methodology</i>"]
     git_workflow_and_versioning["git-workflow-and-versioning<br/><i>workflow/git</i>"]
     handoff["handoff<br/><i>orchestration</i>"]
     using_agent_skills["using-agent-skills<br/><i>orchestration</i>"]
   end
+  ci_cd_and_automation --> code_review_and_quality
   doubt_driven_development --> code_review_and_quality
   git_workflow_and_versioning --> code_review_and_quality
   handoff --> code_review_and_quality

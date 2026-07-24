@@ -13,7 +13,7 @@ Self-correction protocol for AI agents. Use when a mistake is made, a correction
 
 ## Stats
 
-1 dependencies · 6 dependents
+1 dependencies · 5 dependents
 
 ## Graph
 
@@ -27,14 +27,12 @@ graph LR
 
   subgraph sg_used_by["used by"]
     direction TB
-    act["act<br/><i>code-review</i>"]
     drill["drill<br/><i>safety</i>"]
     persistent_memory["persistent-memory<br/><i>foundation</i>"]
     save_session["save-session<br/><i>orchestration</i>"]
     shared_plan["shared-plan<br/><i>workflow/planning</i>"]
     writing_great_skills["writing-great-skills<br/><i>tools</i>"]
   end
-  act --> retrospect
   drill --> retrospect
   persistent_memory --> retrospect
   save_session --> retrospect

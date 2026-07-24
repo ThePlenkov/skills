@@ -13,7 +13,7 @@ Persistent memory enforcement for AI agents. Recall prior work and findings befo
 
 ## Stats
 
-1 dependencies · 3 dependents
+1 dependencies · 2 dependents
 
 ## Graph
 
@@ -27,11 +27,9 @@ graph LR
 
   subgraph sg_used_by["used by"]
     direction TB
-    act["act<br/><i>code-review</i>"]
     drill["drill<br/><i>safety</i>"]
     skill_tiers["skill-tiers<br/><i>foundation</i>"]
   end
-  act --> persistent_memory
   drill --> persistent_memory
   skill_tiers --> persistent_memory
 

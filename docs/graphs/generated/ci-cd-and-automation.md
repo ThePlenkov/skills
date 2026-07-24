@@ -13,7 +13,7 @@ Automates CI/CD pipeline setup. Use when setting up or modifying build and deplo
 
 ## Stats
 
-0 dependencies · 1 dependents
+1 dependencies · 1 dependents
 
 ## Graph
 
@@ -31,4 +31,9 @@ graph LR
   end
   using_agent_skills --> ci_cd_and_automation
 
+  subgraph sg_depends_on["depends on"]
+    direction TB
+    code_review_and_quality["code-review-and-quality<br/><i>methodology</i>"]
+  end
+  ci_cd_and_automation --> code_review_and_quality
 ```

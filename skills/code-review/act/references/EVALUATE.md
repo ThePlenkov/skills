@@ -50,4 +50,74 @@ If **any** box is “yes”: write **what / root cause / prevention** and update
 
 ## 4. Agent memory reminder (optional)
 
-If the lesson is user-specific (e.g. “always use Codacy MCP on this org”), suggest the user paste the snippet from [SKILL.md § Memory reminder template](../SKILL.md#memory-reminder-template) into their Cursor user rules — do not commit private landscape data.
+If the lesson is user-specific (e.g. “always use Codacy MCP on this org”), suggest the user paste the snippet from [codacy § Memory reminder template](../../../integrations/codacy/SKILL.md#memory-reminder-template) into their Cursor user rules — do not commit private landscape data.
+
+## 5. P6 has two surfaces — keep them separate
+
+P6 produces two artifacts, and they go to two different places:
+
+- **External-facing status** (PR comment on the PR): a short
+  summary that the maintainer / external reviewer needs to see —
+  HEAD SHA, CI status, `open_threads`, what's NOT in scope, and a
+  note that the full detail is internal (the agent's memory), not
+  a link to the local worktree, which reviewers cannot access.
+  This is what a human reviewer reads in their inbox. Keep it
+  under 15 lines; do not include iteration-by-iteration change
+  logs, the retrospective reasoning, or P5 scores. Example shape:
+
+  > PR #N is merge-ready. All CI green on `<sha>`. N/N review
+  > threads resolved. No outstanding cycle-guard signals.
+  > Iteration log, P5 ratings, and the P6 retrospective are kept
+  > internally in the agent's memory (not reviewer-accessible).
+
+- **Internal retrospective** (memory + REVIEW.md): the full
+  iteration log, what went wrong, root causes, prevention, and
+  process lessons. This is for the agent's own learning loop
+  and for future `/act` runs on other PRs. Write to
+  `.memory/experience/<date>-<topic>.md` via the
+  [persistent-memory](../../../foundation/persistent-memory/SKILL.md)
+  skill; durable API/tool/domain lessons go to `REVIEW.md`. Do
+  NOT post this as a PR comment — external reviewers don't need
+  the agent's self-critique, and the retrospective's job is to
+  improve future runs, which means living where the agent reads
+  memory, not where reviewers scroll GitHub.
+
+If a retrospective is required (something went wrong this
+session), the closing PR comment should mention that the
+retrospective is in memory, not inline it. If nothing went
+wrong, the PR comment can be concise — but it must still carry
+all the required merge-decision inputs (HEAD SHA, CI status,
+thread count, what's NOT in scope, and the internal-detail
+pointer); "one-liner" means no retrospective prose, not dropping
+those fields.
+
+### Concrete split: what goes on the PR comment, what goes to memory
+
+The two-surface rule is meaningless without a concrete list. The
+default assignment is:
+
+| Item | Surface |
+|------|---------|
+| HEAD SHA | PR comment (one line) |
+| CI status (green / failing / N/A) | PR comment (one line) |
+| `open_threads` count + total | PR comment (one line) |
+| "What's NOT in scope" (deferred items, blocking reasons) | PR comment (one line) |
+| Internal-detail pointer (memory entry; not the worktree) | PR comment (one line) |
+| Per-file change list | PR comment (3-5 lines max — file:theme, not a full diff) |
+| Iteration-by-iteration change log | Memory (not the PR) |
+| P5 ratings (per-tool scores, dataset rows) | Memory + `review_scores.csv` (if recorded) |
+| Retrospective reasoning (what went wrong, why, prevention) | Memory + REVIEW.md |
+| Cycle-guard diagnostic (re-opens, false negatives, etc.) | Memory |
+| Process lessons for future `/act` runs | Memory (`.memory/experience/<date>-<topic>.md`) |
+| API/tool gotchas (e.g. GraphQL "comment: null" false negative) | Memory + REVIEW.md |
+| Code-review findings (per-thread fix) | **In the THREAD** (per-thread reply + resolve), NOT a top-level comment |
+
+The last row is the most-violated rule. A code-review finding's
+natural home is the thread that contains it, not a top-level PR
+comment that summarizes the whole iteration. Even when the bot
+auto-resolves, post the per-thread reply anyway — it's the audit
+trail, and external reviewers will click into the thread, not
+scroll the top-level summary.
+
+The PR comment is for the merge-decision inputs (HEAD, CI,
+threads, in-scope, pointer). Everything else lives in memory.

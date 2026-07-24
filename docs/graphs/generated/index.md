@@ -8,7 +8,7 @@
 # Skills dependency graphs
 
 Per-skill focus graphs showing direct dependencies and dependents.
-Contains 85 skills and 168 edges.
+Contains 85 skills and 163 edges.
 
 Each row links to a focused graph for that skill, rendered with Mermaid. On github.com the linked `.md` files render with native pan/zoom (click any node).
 
@@ -38,7 +38,7 @@ Regenerate locally with `npm run graph:update`.
 
 | Skill | Dependencies | Dependents | Graph |
 | --- | ---: | ---: | --- |
-| `act` — Use when the user invokes /act on a PR/MR, /act with no arguments (uses the PR i | 6 | 5 | [graph](act.md) |
+| `act` — Use when the user invokes /act on a PR/MR, /act with no arguments (uses the PR i | 0 | 5 | [graph](act.md) |
 | `github-fix-main` — Use when the user asks to fix the current GitHub repository's default branch end | 4 | 0 | [graph](github-fix-main.md) |
 | `github-pr-review` — Use when the user asks for a GitHub pull request review or wants review comments | 0 | 5 | [graph](github-pr-review.md) |
 | `mr-address-review` — End-to-end GitLab MR review-comment remediation. Use when the user asks to addre | 2 | 4 | [graph](mr-address-review.md) |
@@ -66,7 +66,7 @@ Regenerate locally with `npm run graph:update`.
 | Skill | Dependencies | Dependents | Graph |
 | --- | ---: | ---: | --- |
 | `minimalist` — Activates the minimalist senior-dev persona: every line costs, the best code is | 0 | 0 | [graph](minimalist.md) |
-| `persistent-memory` — Persistent memory enforcement for AI agents. Recall prior work and findings befo | 1 | 3 | [graph](persistent-memory.md) |
+| `persistent-memory` — Persistent memory enforcement for AI agents. Recall prior work and findings befo | 1 | 2 | [graph](persistent-memory.md) |
 | `skill-tiers` — Skill activation tiers and the 300-line always-on budget. Defines Tier 0 (always | 11 | 0 | [graph](skill-tiers.md) |
 | `token-rationalism` — Token-rational agent behavior. Maximize value delivered per request, minimize wa | 0 | 2 | [graph](token-rationalism.md) |
 
@@ -75,8 +75,8 @@ Regenerate locally with `npm run graph:update`.
 | Skill | Dependencies | Dependents | Graph |
 | --- | ---: | ---: | --- |
 | `atlassian` — Work with Atlassian Jira and Confluence. Use when using the `acli` CLI, Jira/Con | 0 | 0 | [graph](atlassian.md) |
-| `codacy` — Codacy static analysis — reproduce findings locally, debug "N issues (0 max.)" f | 1 | 1 | [graph](codacy.md) |
-| `codescene` — CodeScene setup and usage — CI delta analysis, local CLI, CS_ACCESS_TOKEN, Docke | 0 | 1 | [graph](codescene.md) |
+| `codacy` — Codacy static analysis — reproduce findings locally, debug "N issues (0 max.)" f | 1 | 0 | [graph](codacy.md) |
+| `codescene` — CodeScene setup and usage — CI delta analysis, local CLI, CS_ACCESS_TOKEN, Docke | 0 | 0 | [graph](codescene.md) |
 | `github` — Work with GitHub repositories, issues, pull requests, releases, and Actions. Use | 0 | 3 | [graph](github.md) |
 | `gitlab` — Work with GitLab projects, issues, merge requests, pipelines, and releases. Use | 0 | 3 | [graph](gitlab.md) |
 | `gitlab-ci-local` — Test GitLab CI pipelines locally using gitlab-ci-local. Use when debugging CI jo | 0 | 0 | [graph](gitlab-ci-local.md) |
@@ -87,7 +87,7 @@ Regenerate locally with `npm run graph:update`.
 
 | Skill | Dependencies | Dependents | Graph |
 | --- | ---: | ---: | --- |
-| `code-review-and-quality` — Conducts multi-axis code review. Use before merging any change. Use when reviewi | 2 | 4 | [graph](code-review-and-quality.md) |
+| `code-review-and-quality` — Conducts multi-axis code review. Use before merging any change. Use when reviewi | 2 | 5 | [graph](code-review-and-quality.md) |
 | `code-simplification` — Simplifies code for clarity. Use when refactoring code for clarity without chang | 0 | 2 | [graph](code-simplification.md) |
 | `codehome` — Detect and fix code placed in the wrong architectural layer, config file, or ove | 0 | 5 | [graph](codehome.md) |
 | `context-engineering` — Optimizes agent context setup. Use when starting a new session, when agent outpu | 0 | 2 | [graph](context-engineering.md) |
@@ -140,8 +140,8 @@ Regenerate locally with `npm run graph:update`.
 
 | Skill | Dependencies | Dependents | Graph |
 | --- | ---: | ---: | --- |
-| `retrospect` — Self-correction protocol for AI agents. Use when a mistake is made, a correction | 1 | 6 | [graph](retrospect.md) |
-| `skill-feedback` — Use when the user invokes /skill-feedback on a skill, or after /retrospect ident | 1 | 3 | [graph](skill-feedback.md) |
+| `retrospect` — Self-correction protocol for AI agents. Use when a mistake is made, a correction | 1 | 5 | [graph](retrospect.md) |
+| `skill-feedback` — Use when the user invokes /skill-feedback on a skill, or after /retrospect ident | 1 | 2 | [graph](skill-feedback.md) |
 
 ## tools
 
@@ -172,7 +172,7 @@ Regenerate locally with `npm run graph:update`.
 
 | Skill | Dependencies | Dependents | Graph |
 | --- | ---: | ---: | --- |
-| `ci-cd-and-automation` — Automates CI/CD pipeline setup. Use when setting up or modifying build and deplo | 0 | 1 | [graph](ci-cd-and-automation.md) |
+| `ci-cd-and-automation` — Automates CI/CD pipeline setup. Use when setting up or modifying build and deplo | 1 | 1 | [graph](ci-cd-and-automation.md) |
 | `deprecation-and-migration` — Manages deprecation and migration. Use when removing old systems, APIs, or featu | 1 | 3 | [graph](deprecation-and-migration.md) |
 | `documentation-and-adrs` — Records decisions and documentation. Use when making architectural decisions, ch | 0 | 1 | [graph](documentation-and-adrs.md) |
 | `shipping-and-launch` — Prepares production launches. Use when preparing to deploy to production. Use wh | 0 | 3 | [graph](shipping-and-launch.md) |
@@ -198,7 +198,7 @@ Regenerate locally with `npm run graph:update`.
 
 | Skill | Dependencies | Dependents | Graph |
 | --- | ---: | ---: | --- |
-| `backlog` — Actionable improvement items derived from experience and retrospectives. Items l | 1 | 2 | [graph](backlog.md) |
+| `backlog` — Actionable improvement items derived from experience and retrospectives. Items l | 1 | 1 | [graph](backlog.md) |
 | `planning-and-task-breakdown` — Breaks work into ordered tasks. Use when you have a spec or clear requirements a | 0 | 3 | [graph](planning-and-task-breakdown.md) |
 | `shared-plan` — Shared, persistent planning and retrospectives across agents and people. Use whe | 1 | 5 | [graph](shared-plan.md) |
 

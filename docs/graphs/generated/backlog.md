@@ -13,7 +13,7 @@ Actionable improvement items derived from experience and retrospectives. Items l
 
 ## Stats
 
-1 dependencies · 2 dependents
+1 dependencies · 1 dependents
 
 ## Graph
 
@@ -24,12 +24,6 @@ graph LR
   backlog["backlog<br/><i>workflow/planning</i>"]
   classDef center fill:#1d4ed8,stroke:#fbbf24,stroke-width:3px,color:#fff
   class backlog center
-
-  subgraph sg_used_by["used by"]
-    direction TB
-    act["act<br/><i>code-review</i>"]
-  end
-  act --> backlog
 
   subgraph sg_depends_on["depends on"]
     direction TB

@@ -13,7 +13,7 @@ Use when the user invokes /act on a PR/MR, /act with no arguments (uses the PR i
 
 ## Stats
 
-6 dependencies · 5 dependents
+0 dependencies · 5 dependents
 
 ## Graph
 
@@ -27,30 +27,16 @@ graph LR
 
   subgraph sg_used_by["used by"]
     direction TB
+    codacy["codacy<br/><i>integrations</i>"]
     harvest["harvest<br/><i>workflow/debt</i>"]
     resolving_merge_conflicts["resolving-merge-conflicts<br/><i>workflow/git</i>"]
     save_session["save-session<br/><i>orchestration</i>"]
     two_axis_review["two-axis-review<br/><i>code-review</i>"]
   end
+  codacy --> act
   harvest --> act
   resolving_merge_conflicts --> act
   save_session --> act
   two_axis_review --> act
 
-  subgraph sg_depends_on["depends on"]
-    direction TB
-    backlog["backlog<br/><i>workflow/planning</i>"]
-    codacy["codacy<br/><i>integrations</i>"]
-    codescene["codescene<br/><i>integrations</i>"]
-    persistent_memory["persistent-memory<br/><i>foundation</i>"]
-    retrospect["retrospect<br/><i>self-learning</i>"]
-    skill_feedback["skill-feedback<br/><i>self-learning</i>"]
-  end
-  act --> backlog
-  act --> codacy
-  act --> codescene
-  act --> persistent_memory
-  act --> retrospect
-  act --> skill_feedback
-  codacy -. "↕ mutual with codacy" .-> act
 ```

@@ -13,7 +13,7 @@ Use when the user invokes /skill-feedback on a skill, or after /retrospect ident
 
 ## Stats
 
-1 dependencies · 3 dependents
+1 dependencies · 2 dependents
 
 ## Graph
 
@@ -27,11 +27,9 @@ graph LR
 
   subgraph sg_used_by["used by"]
     direction TB
-    act["act<br/><i>code-review</i>"]
     retrospect["retrospect<br/><i>self-learning</i>"]
     writing_great_skills["writing-great-skills<br/><i>tools</i>"]
   end
-  act --> skill_feedback
   retrospect --> skill_feedback
   writing_great_skills --> skill_feedback
 
