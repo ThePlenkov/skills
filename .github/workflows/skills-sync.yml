@@ -1,0 +1,147 @@
+name: Sync skills to skills-sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'skills/**'
+      - 'skills-lock.json'
+      - 'bin/**'
+      - 'scripts/**'
+      - '.github/workflows/skills-sync.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: skills-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    if: "github.ref == 'refs/heads/main'"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source skills
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Checkout skills-sync
+        uses: actions/checkout@v7
+        with:
+          repository: theplenkov-ai/skills-sync
+          ref: main
+          token: ${{ secrets.SKILLS_SYNC_TOKEN }}
+          path: skills-sync
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Remove external skill directories for refresh
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const lockFile = 'skills-lock.json';
+          if (!fs.existsSync(lockFile)) {
+            console.log('No skills-lock.json found; nothing to refresh.');
+            process.exit(0);
+          }
+          const lock = JSON.parse(fs.readFileSync(lockFile, 'utf8'));
+          const skills = lock.skills || {};
+          const root = path.resolve('skills-sync', '.agents', 'skills');
+          for (const [name, entry] of Object.entries(skills)) {
+            if (entry && (entry.sourceType === 'github' || entry.sourceType === 'node_modules')) {
+              if (!name || name === '.' || name === '..' || name !== path.basename(name) || name.includes('/') || name.includes('\\')) {
+                throw new Error(`Invalid external skill name: ${name}`);
+              }
+              const expectedDir = path.join(root, name);
+              const resolvedDir = path.resolve(expectedDir);
+              if (!resolvedDir.startsWith(root + path.sep)) {
+                throw new Error(`Resolved path escapes target root: ${resolvedDir}`);
+              }
+              if (fs.existsSync(expectedDir)) {
+                console.log(`Removing external skill for refresh: ${name}`);
+                fs.rmSync(expectedDir, { recursive: true, force: true });
+              }
+            }
+          }
+          NODE
+
+      - name: Install jq
+        run: |
+          set -euo pipefail
+          which jq || (sudo apt-get update -qq && sudo apt-get install -y -qq jq)
+
+      - name: Install skills into skills-sync
+        run: |
+          set -euo pipefail
+          ./bin/skills.js --target=skills-sync/.agents/skills --force
+
+      - name: Verify external skills re-materialised
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const lockFile = 'skills-lock.json';
+          if (!fs.existsSync(lockFile)) {
+            console.log('No skills-lock.json found; no external skills to verify.');
+            process.exit(0);
+          }
+          const lock = JSON.parse(fs.readFileSync(lockFile, 'utf8'));
+          const skills = lock.skills || {};
+          const root = path.resolve('skills-sync', '.agents', 'skills');
+          let missing = false;
+          for (const [name, entry] of Object.entries(skills)) {
+            if (entry && (entry.sourceType === 'github' || entry.sourceType === 'node_modules')) {
+              if (!name || name === '.' || name === '..' || name !== path.basename(name) || name.includes('/') || name.includes('\\')) {
+                throw new Error(`Invalid external skill name: ${name}`);
+              }
+              const expectedDir = path.join(root, name);
+              const skillMd = path.join(expectedDir, 'SKILL.md');
+              const resolvedSkillMd = path.resolve(skillMd);
+              if (!resolvedSkillMd.startsWith(expectedDir + path.sep)) {
+                throw new Error(`Resolved path escapes target root: ${resolvedSkillMd}`);
+              }
+              if (!fs.existsSync(skillMd)) {
+                console.error(`Missing expected external skill after sync: ${name}`);
+                missing = true;
+              }
+            }
+          }
+          if (missing) {
+            console.error('External skill reinstall failed; aborting so the mirror is not updated.');
+            process.exit(1);
+          }
+          console.log('All external skills present.');
+          NODE
+
+      - name: Remove installer managed markers from mirror
+        run: |
+          set -euo pipefail
+          find skills-sync/.agents/skills -type f -name '.skills-managed-by-install-sh' -delete
+
+      - name: Commit and push updates
+        env:
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+        run: |
+          set -euo pipefail
+          cd skills-sync
+          git add .agents/skills
+          if git diff --cached --quiet; then
+            echo 'No changes to commit.'
+            exit 0
+          fi
+          git commit -m "chore: sync skills from ${{ github.repository }}@${{ github.sha }}"
+          git push https://x-access-token:${{ secrets.SKILLS_SYNC_TOKEN }}@github.com/theplenkov-ai/skills-sync.git HEAD:main
