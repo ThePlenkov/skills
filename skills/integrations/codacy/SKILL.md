@@ -5,7 +5,7 @@ description: >-
   failures, work with Codacy CLI, GitHub annotations API, and org-level secrets.
 tier: 2
 triggers: [user, model]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # Codacy

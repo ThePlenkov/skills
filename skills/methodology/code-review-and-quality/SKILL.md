@@ -4,7 +4,7 @@ description: Conducts multi-axis code review. Use before merging any change. Use
 tier: 2
 triggers: [user, model]
 conflicts_with: [github-pr-review]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # Code Review and Quality

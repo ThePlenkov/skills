@@ -3,7 +3,7 @@ name: spec-kit
 description: Use Spec-Driven Development with GitHub Spec Kit. Create specifications, generate implementations, and build high-quality software faster using the `specify` CLI.
 tier: 2
 triggers: [user, model]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # Spec Kit (Spec-Driven Development)

@@ -4,7 +4,7 @@ description: Delivers changes incrementally. Use when implementing any feature o
 tier: 2
 triggers: [user, model]
 conflicts_with: [loop-programming]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # Incremental Implementation

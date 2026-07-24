@@ -3,7 +3,7 @@ name: docker-agent-config
 description: "Design, configure, and run multi-agent AI teams using the Docker Agent CLI plugin. Use when creating docker agent YAML/HCL configs, building sub-agent teams, or needing the schema for agents, models, toolsets, distribution, and CLI. NOT for general Docker, docker-compose, or non-Docker frameworks."
 tier: 2
 triggers: [user, model]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # Docker Agent — Configuration & Runtime

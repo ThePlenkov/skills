@@ -5,7 +5,7 @@ allowed-tools: read, grep, glob
 argument-hint: <subagent profile and isolated subtask>
 tier: 2
 triggers: ["user", "model"]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # Subagent Capsule

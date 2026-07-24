@@ -14,7 +14,7 @@ argument-hint: "<task or claim to evidence> [lite|full]"
 triggers: ["user", "model"]
 tier: 2
 # Tier 2 — on-demand. Load only when a task may produce a completion claim.
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # /evidence — file-first, run-first producer discipline

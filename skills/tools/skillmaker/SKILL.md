@@ -12,7 +12,7 @@ allowed-tools:
   - bash
   - grep
   - glob
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # Skillmaker
@@ -92,7 +92,7 @@ triggers:                  # required
 allowed-tools:             # optional
   - read
   - bash
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 argument-hint: --fix       # optional, shown in /help
 ---
 ```

@@ -42,7 +42,7 @@ permissions:
     - Exec(*clean*untracked*)
     - Exec(*restore*working*)
     - Exec(*recursively*force*)
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # SANDBOX MODE

@@ -5,7 +5,7 @@ description: >-
   Items live in .agents/backlog/.
 tier: 2
 triggers: [user, model]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # Backlog

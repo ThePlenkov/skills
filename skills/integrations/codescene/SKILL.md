@@ -5,7 +5,7 @@ description: >-
   Docker image, troubleshooting 403s and secret visibility.
 tier: 2
 triggers: [user, model]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # CodeScene

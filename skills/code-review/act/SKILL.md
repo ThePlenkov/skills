@@ -13,7 +13,7 @@ compatibility: Requires gh, jq, git, bun.
 tier: 2
 triggers: [user]
 conflicts_with: [github-pr-review, code-review-and-quality]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # /act
@@ -403,7 +403,7 @@ Follow [EVALUATE.md](references/EVALUATE.md). Durable sinks: REVIEW.md.
    - Mistake or debugging session → `.memory/experience/`
    - Observable project fact → `.memory/facts/`
 2. **Retrospect** — run `/retrospect --plan` ($retrospect) to record experience and create actionable $backlog items.
-3. **Feedback upstream** — if `/retrospect` classified a finding as universal AND tied to a specific skill's instructions (not this repo's `AGENTS.md`), call `$skill{skill-feedback}` instead of editing the skill file locally. Use `source:` from the affected skill's frontmatter. This is the loop closing back to `ThePlenkov/skills` (or the relevant fork).
+3. **Feedback upstream** — if `/retrospect` classified a finding as universal AND tied to a specific skill's instructions (not this repo's `AGENTS.md`), call `$skill{skill-feedback}` instead of editing the skill file locally. Use `source:` from the affected skill's frontmatter. This is the loop closing back to `theplenkov-ai/skills` (or the relevant fork).
 4. **Cycle guard** — if any signal fires, **do not merge**; escalate to the user with evidence:
 
    - A review thread was **reopened** after an earlier resolve on this PR.

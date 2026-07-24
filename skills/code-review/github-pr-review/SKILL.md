@@ -4,7 +4,7 @@ description: Use when the user asks for a GitHub pull request review or wants re
 tier: 2
 triggers: [user, model]
 conflicts_with: [code-review-and-quality]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # GitHub Pull Request Review

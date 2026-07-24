@@ -3,7 +3,7 @@ name: critical-thinking
 description: "Make the agent a rational, evidence-driven critic. Use when evaluating a user's architectural claim, idea, or pushback, or when a premise may be false. Covers sycophancy resistance, knowledge cutoffs, research-before-answer, structured disagreement, and code uncertainty. NOT for routine implementation or simple lookups."
 tier: 2
 triggers: [user, model]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # Critical Thinking Skill

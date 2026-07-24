@@ -6,7 +6,7 @@ description: >-
   Spawns a background subagent so analysis never blocks the current thread.
 tier: 2
 triggers: [user, model]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # DeepWiki — GitHub Repository Analysis

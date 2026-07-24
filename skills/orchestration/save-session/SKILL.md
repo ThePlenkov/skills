@@ -11,7 +11,7 @@ metadata:
   version: "1.0.0"
 tier: 2
 triggers: [user, model]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # Save Session

@@ -52,7 +52,7 @@ tier: 2
 triggers: [user, model]
 allowed-tools:
   - read
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # ${NAME}

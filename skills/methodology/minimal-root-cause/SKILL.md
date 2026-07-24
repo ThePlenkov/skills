@@ -6,7 +6,7 @@ argument-hint: <planned change or bug fix>
 tier: 2
 triggers: [user, model]
 conflicts_with: [investigate-first, debugging, one-shot-patch]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # Minimal Root Cause

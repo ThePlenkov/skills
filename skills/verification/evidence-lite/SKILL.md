@@ -13,7 +13,7 @@ permissions:
 argument-hint: "<trivial change to verify>"
 tier: 2
 triggers: ["user", "model"]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # /evidence-lite — proof for trivial changes

@@ -1,10 +1,14 @@
-import { readFile, readdir, stat } from 'node:fs/promises';
+import { readFile, readdir, realpath, stat } from 'node:fs/promises';
+import { realpathSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { join, relative, resolve } from 'node:path';
+import { join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
+import { baselinePathForStatus, isFrontmatterOnlyChange } from './lib/frontmatter-diff.ts';
 
-const ROOT = resolve(fileURLToPath(import.meta.url), '..', '..');
+// Canonicalize ROOT so the symlink-containment check compares realpath against
+// realpath (a symlinked checkout would otherwise make every file look external).
+const ROOT = realpathSync(resolve(fileURLToPath(import.meta.url), '..', '..'));
 
 const { values } = parseArgs({
   options: {
@@ -62,21 +66,63 @@ interface Issue {
 const issues: Issue[] = [];
 
 async function* getFilesToCheck(): AsyncGenerator<string> {
-  if (values['since-ref']) {
-    const output = execFileSync('git', ['diff', '--name-only', '--diff-filter=ACMRT', values['since-ref'], '--'], {
+  const sinceRef = values['since-ref'];
+  if (sinceRef) {
+    // Reject refs that git would parse as an option (e.g. `--upload-pack=...`),
+    // since the ref is passed positionally before `--` at both diff call sites.
+    if (sinceRef.startsWith('-')) {
+      throw new Error(`invalid --since-ref '${sinceRef}': must not start with '-'`);
+    }
+    // `-z` yields NUL-terminated fields with literal (unquoted) pathnames.
+    // Each record is `status NUL path NUL`; renames/copies add a second path:
+    // `status NUL oldPath NUL newPath NUL`.
+    const output = execFileSync('git', ['diff', '--name-status', '-z', '--diff-filter=ACMRT', sinceRef, '--'], {
       cwd: ROOT,
       encoding: 'utf-8',
-    }).trim();
-    for (const file of output.split('\n')) {
-      if (file && file.startsWith('skills/')) {
-        const full = join(ROOT, file);
-        try {
-          const stats = await stat(full);
-          if (stats.isFile()) yield full;
-        } catch {
-          // ignore missing files
-        }
+    });
+    const fields = output.split('\0');
+    let i = 0;
+    while (i < fields.length) {
+      const status = fields[i];
+      i += 1;
+      if (!status) continue;
+      const isRenameOrCopy = status[0] === 'R' || status[0] === 'C';
+      const oldPath = isRenameOrCopy ? fields[i++] : undefined;
+      const file = fields[i++];
+      if (!file || !file.startsWith('skills/')) continue;
+      const full = join(ROOT, file);
+      try {
+        const stats = await stat(full);
+        if (!stats.isFile()) continue;
+        // Reject files that resolve (through symlinks) outside the repo so the
+        // scanner never reads content beyond ROOT.
+        const real = await realpath(full);
+        if (real !== ROOT && !real.startsWith(ROOT + sep)) continue;
+      } catch (err) {
+        // Only skip genuinely missing files; let other errors surface so a
+        // skipped scan is never silent.
+        if ((err as NodeJS.ErrnoException).code === 'ENOENT') continue;
+        throw err;
       }
+      // A metadata-only change (e.g. bumping the `source:` frontmatter field)
+      // must not force cleaning unrelated pre-existing POSIX patterns in the
+      // body. Skip only when the body (everything after the frontmatter) is
+      // unchanged from the baseline. A baseline exists only for true
+      // modifications (`M`/`T`, baseline is the file itself at `sinceRef`) and
+      // for renames within `skills/` (`R`, baseline is the pre-rename path).
+      // Additions (`A`), copies (`C`), and moves from outside `skills/` have
+      // no in-tree baseline, so their bodies are scanned fully. `git show`
+      // errors on a file that must exist at the baseline are real and propagate.
+      const baselinePath = baselinePathForStatus(status, file, oldPath);
+      if (baselinePath) {
+        const baselineText = execFileSync('git', ['show', `${sinceRef}:${baselinePath}`], {
+          cwd: ROOT,
+          encoding: 'utf-8',
+        });
+        const newText = await readFile(full, 'utf8');
+        if (isFrontmatterOnlyChange(baselineText, newText)) continue;
+      }
+      yield full;
     }
     return;
   }

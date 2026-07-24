@@ -39,7 +39,7 @@ permissions:
     - Exec(*find*and*delete*)
     - Exec(*xargs*remove*)
     - Exec(*truncate*file*)
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # SAFEGUARD MODE

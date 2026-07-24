@@ -3,7 +3,7 @@ name: triage-issue
 description: Triage a GitLab or GitHub issue end-to-end — acknowledge, investigate, fix or retest, verify, and report back on the issue. Use when the user asks to triage an issue/work item, says "/triage-issue", or pastes an issue URL with an implicit ask to handle it.
 tier: 2
 triggers: [user, model]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # Triage Issue

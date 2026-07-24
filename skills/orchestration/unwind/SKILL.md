@@ -26,7 +26,7 @@ permissions:
     - Exec(*typecheck*)
     - run_subagent
   deny: []
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # UNWIND MODE

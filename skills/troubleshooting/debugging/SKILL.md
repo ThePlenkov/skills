@@ -8,7 +8,7 @@ triggers:
   - user
   - model
 conflicts_with: [investigate-first, one-shot-patch]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # Debugging

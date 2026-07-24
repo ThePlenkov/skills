@@ -4,7 +4,7 @@ description: Subjects every non-trivial decision to a fresh-context adversarial 
 tier: 2
 triggers: [user, model]
 conflicts_with: [investigate-first, critical-thinking]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # Doubt-Driven Development

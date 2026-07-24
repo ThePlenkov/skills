@@ -7,7 +7,7 @@ description: >-
   import internal framework modules.
 tier: 2
 triggers: [user, model]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # /e2e — e2e-agent (domain-agnostic)

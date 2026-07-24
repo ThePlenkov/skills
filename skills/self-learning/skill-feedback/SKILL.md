@@ -10,7 +10,7 @@ description: >-
   pairs with /retrospect and /act.
 tier: 2
 triggers: [user]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 compatibility: Requires gh (authenticated), jq. Network access to api.github.com.
 disable-model-invocation: true
 argument-hint: "<skill-name>"
@@ -41,7 +41,7 @@ Do **not** use for:
 Each skill declares its source in its SKILL.md frontmatter:
 
 ```yaml
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ```
 
 Resolution order:
@@ -60,7 +60,7 @@ Either:
   - re-run with `--repo <owner>/<repo>` to file against a specific repo.
 ```
 
-Defaulting to `ThePlenkov/skills` on missing `source:` is **not** acceptable — feedback for a misconfigured fork would silently land on the canonical repo and miss its maintainer. The default only applies when `source:` is explicitly set to `ThePlenkov/skills` (or when the affected skill lives in the canonical repo).
+Defaulting to a hard-coded repo on missing `source:` is **not** acceptable — feedback for a misconfigured skill would silently land on the wrong repo and miss its maintainer. `theplenkov-ai/skills` (the canonical host for skills that live in this repo) is targeted only when a skill explicitly declares `source: theplenkov-ai/skills`.
 
 Path inside the source repo is derived from the on-disk location (`skills/<category>/<skill-name>/`) — do not encode it in `source:`.
 
@@ -96,10 +96,9 @@ Filed by `/skill-feedback` from <agent-id> on <iso-date>.
 ## Commands
 
 ```bash
-# Resolve the target repo for a skill
-gh repo view "$(awk '/^source:/{print $2; exit}' \
-  skills/<category>/<skill-name>/SKILL.md)" \
-  --json nameWithOwner --jq .nameWithOwner
+# Resolve the target repo for a skill: read the `source:` field from the
+# skill's SKILL.md frontmatter (use your file/read tools), then verify it:
+gh repo view "<source-from-frontmatter>" --json nameWithOwner --jq .nameWithOwner
 
 # Post the issue
 gh issue create \
@@ -109,7 +108,8 @@ gh issue create \
   --title "<short title>" \
   --body-file tmp/agent_<pid>/feedback-body.md
 
-# Or, when --pr is passed, open a draft PR against ThePlenkov/skills instead.
+# Or, when --pr is passed, open a draft PR against the skill's own `source:`
+# repo (`$REPO`, resolved above) instead.
 # Requires the agent to be on a branch with the fix already applied locally
 # and the remote to allow pushes (fork-first — see $skill{shadow-fork}).
 ```

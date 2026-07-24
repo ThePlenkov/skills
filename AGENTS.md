@@ -102,13 +102,28 @@ without hard-coding the repo per skill.
 ---
 name: my-skill
 description: ...
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 ```
 
 - **Format**: `<owner>/<repo>` (GitHub shorthand). Accepted directly by `gh`.
-- **Default**: `ThePlenkov/skills`. Set explicitly on every skill — do not rely
-  on a fallback in tools, so the source is greppable.
+- **Default**: `theplenkov-ai/skills` (this repo's host). Set explicitly on
+  every skill — do not rely on a fallback in tools, so the source is greppable.
+- **The canonical source is the repo where the skill actually lives.** This
+  repo is `theplenkov-ai/skills`. `ThePlenkov/skills` is a leftover
+  fork from when this repo was transferred from the old owner
+  account to the new one (per the user, 2026-07-24: it was the
+  initial repo, then transferred, and the old URL stayed around as
+  a fork for compatibility). It is NOT the canonical source for
+  skills in this repo, and the GitHub API confirms it
+  (`fork: true`, `parent: theplenkov-ai/skills`,
+  `source: theplenkov-ai/skills`). Do not frame this as
+  "older / newer" — the API's `created_at` on the fork is the
+  post-transfer date, which makes the timestamps look inverted;
+  the right framing is "transfer → fork kept for compatibility".
+  If you find a skill with `source: ThePlenkov/skills`, it is a
+  pre-existing routing bug — update it to `theplenkov-ai/skills`
+  in the same commit.
 - **Path inside the repo is derived** from the on-disk location
   (`skills/<category>/<skill-name>/`). Do not encode the path in `source:`.
 - **Forks**: set `source:` to the fork's `<owner>/<repo>`. The feedback skill

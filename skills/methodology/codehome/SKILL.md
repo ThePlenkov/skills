@@ -24,7 +24,7 @@ permissions:
     - Exec(*lint*)
     - Exec(*typecheck*)
   deny: []
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # CODEHOME MODE

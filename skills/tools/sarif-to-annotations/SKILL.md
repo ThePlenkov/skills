@@ -8,7 +8,7 @@ description: >-
   findings so the same script can serve as both annotator and workflow gate.
 tier: 2
 triggers: [user, model]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # SARIF → GitHub Actions Annotations

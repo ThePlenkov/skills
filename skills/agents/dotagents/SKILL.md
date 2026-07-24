@@ -7,7 +7,7 @@ permissions:
   scope: opt-in per user invocation; never runs automatically
 tier: 2
 triggers: [user, model]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # dotagents

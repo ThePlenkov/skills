@@ -6,7 +6,7 @@ permissions:
   scope: packages explicitly opted in via `npm publish` from a clean checkout
 tier: 2
 triggers: [user, model]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # npm-publish

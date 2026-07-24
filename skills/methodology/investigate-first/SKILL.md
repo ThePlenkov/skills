@@ -7,7 +7,7 @@ tier: 2
 triggers: [user, model]
 conflicts_with: [debugging, one-shot-patch]
 depends_on: [minimal-root-cause]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # Investigate First

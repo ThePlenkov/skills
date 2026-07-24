@@ -3,7 +3,7 @@ name: skills-cli
 description: Install and manage agent skills using the `npx skills` CLI (vercel-labs/skills).
 tier: 2
 triggers: [user, model]
-source: ThePlenkov/skills
+source: theplenkov-ai/skills
 ---
 
 # skills CLI
