@@ -35,15 +35,16 @@ permissions:
 jobs:
   build:
     name: Generate skills-index.json
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       - uses: actions/checkout@v7
 
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: lts/*
+                    check-latest: true
+cache: 'npm'
 
       - name: Set up Python
         uses: actions/setup-python@v5

@@ -46,7 +46,7 @@ permissions:
 jobs:
   shellcheck:
     name: ShellCheck
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -84,16 +84,17 @@ jobs:
 
   markdownlint:
     name: Markdown Lint
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: lts/*
+          check-latest: true
 
       # Pin the version so CI is reproducible. markdownlint-cli2 v0.22
       # (markdownlint v0.40) is what we developed against; later versions
@@ -115,22 +116,34 @@ jobs:
 
   dotagents-skills:
     name: Verify .agents/skills symlinks
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+          check-latest: true
 
       - name: Check .agents/skills is in sync
         run: npx --yes tsx scripts/run.ts scripts/install.sh --check
 
   reserved-names:
     name: Check reserved skill names
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+          check-latest: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -149,16 +162,17 @@ jobs:
     # `npx github:theplenkov/skills`) is exercised here so the idempotent
     # re-install path can't regress unnoticed.
     name: Wrapper smoke test
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: '22'
+          node-version: lts/*
+          check-latest: true
 
       - name: Install npm dependencies
         # Pure devDeps; production npm install is unnecessary because the
@@ -192,8 +206,8 @@ jobs:
   unit-tests:
     # PRs only need fast Linux feedback; the full matrix runs on main.
     if: github.event_name == 'pull_request'
-    name: Unit tests (ubuntu-latest)
-    runs-on: ubuntu-latest
+    name: Unit tests (self-hosted)
+    runs-on: [self-hosted, linux, x64]
     steps:
       - uses: actions/checkout@v7
         with:

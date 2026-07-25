@@ -10,16 +10,16 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `behavior` | Evidence, code quality, and critical thinking | `architecture-review` |
 | `coaching` | User guidance and focus support | `adhd`, `interview-me` |
 | `code-review` | PR/MR review and remediation | `act`, `github-fix-main`, `github-pr-review`, `mr-address-review`, `triage-issue`, `two-axis-review` |
-| `engineering` | Cross-cutting engineering practices (API/UI design, performance, security) | `api-and-interface-design`, `frontend-ui-engineering`, `performance-optimization`, `prototype`, `security-and-hardening` |
+| `engineering` | Cross-cutting engineering practices (API/UI design, performance, security) | `api-and-interface-design`, `bootstrap-ts-repo`, `frontend-ui-engineering`, `nodejs`, `performance-optimization`, `prototype`, `security-and-hardening`, `typescript` |
 | `experimentation` | Sandboxed experimentation | `sandboxed` |
 | `foundation` | Always-on behavioral primitives and activation tiers | `minimalist`, `persistent-memory`, `skill-tiers`, `token-rationalism` |
 | `integrations` | External platform connectors | `atlassian`, `codacy`, `codescene`, `github`, `gitlab`, `gitlab-ci-local`, `glab`, `glean` |
-| `methodology` | Development methodology | `code-review-and-quality`, `code-simplification`, `codehome`, `context-engineering`, `critical-thinking`, `doubt-driven-development`, `idea-refine`, `incremental-implementation`, `investigate-first`, `loop-programming`, `minimal-root-cause`, `observability-and-instrumentation`, `one-shot-patch`, `refactoring`, `repository-onboarding`, `source-driven-development`, `spec-driven-development`, `spec-kit`, `test-driven-development` |
+| `methodology` | Development methodology | `code-review-and-quality`, `code-simplification`, `codehome`, `context-engineering`, `critical-thinking`, `doubt-driven-development`, `idea-refine`, `incremental-implementation`, `investigate-first`, `loop-programming`, `minimal-root-cause`, `modern-stack`, `observability-and-instrumentation`, `one-shot-patch`, `refactoring`, `repository-onboarding`, `source-driven-development`, `spec-driven-development`, `spec-kit`, `test-driven-development` |
 | `orchestration` | Agent coordination, isolation, context management, and skill discovery | `handoff`, `save-session`, `subagent-capsule`, `unwind`, `using-agent-skills` |
 | `research` | Codebase analysis and documentation tools | `deepwiki` |
 | `safety` | Destructive operation protection and recovery | `drill`, `safeguard`, `salvage` |
 | `self-learning` | Retrospective learning and skill-improvement feedback | `retrospect`, `skill-feedback` |
-| `tools` | Agent development utilities | `docker-agent-config`, `npm-publish`, `sarif-to-annotations`, `skillmaker`, `skills-cli`, `writing-great-skills` |
+| `tools` | Agent development utilities | `docker-agent-config`, `npm-publish`, `sarif-to-annotations`, `skillmaker`, `skills-cli`, `tsdown`, `writing-great-skills` |
 | `troubleshooting` | Scoped descent, debugging, and performance investigation | `debugging`, `performance-investigation` |
 | `verification` | Runtime proof and evidence-backed claims | `evidence`, `evidence-lite` |
 | `workflow` | Development workflow | `backlog`, `ci-cd-and-automation`, `ci-local`, `deprecation-and-migration`, `documentation-and-adrs`, `e2e`, `git-commit`, `git-push`, `git-reset`, `git-workflow-and-versioning`, `harvest`, `planning-and-task-breakdown`, `resolving-merge-conflicts`, `shadow-fork`, `shared-plan`, `shipping-and-launch` |
@@ -40,10 +40,13 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `triage-issue` | `code-review` | 2 | user, model | — | — |
 | `two-axis-review` | `code-review` | 2 | user, model | `$skill{github-pr-review}`, `$skill{mr-address-review}`, `$skill{code-review-and-quality}` | — |
 | `api-and-interface-design` | `engineering` | 2 | user, model | — | — |
+| `bootstrap-ts-repo` | `engineering` | 2 | user, model | — | — |
 | `frontend-ui-engineering` | `engineering` | 2 | user, model | — | — |
+| `nodejs` | `engineering` | 2 | user, model | — | — |
 | `performance-optimization` | `engineering` | 2 | user, model | — | — |
 | `prototype` | `engineering` | 2 | user, model | — | — |
 | `security-and-hardening` | `engineering` | 2 | user, model | — | — |
+| `typescript` | `engineering` | 2 | user, model | — | — |
 | `sandboxed` | `experimentation` | 2 | user | — | — |
 | `minimalist` | `foundation` | 2 | user, model | — | — |
 | `persistent-memory` | `foundation` | 1 | user | — | — |
@@ -68,6 +71,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `investigate-first` | `methodology` | 2 | user, model | `$skill{debugging}`, `$skill{one-shot-patch}` | `$skill{minimal-root-cause}` |
 | `loop-programming` | `methodology` | 2 | user, model | `$skill{incremental-implementation}` | — |
 | `minimal-root-cause` | `methodology` | 2 | user, model | `$skill{investigate-first}`, `$skill{debugging}`, `$skill{one-shot-patch}` | — |
+| `modern-stack` | `methodology` | 2 | user, model | — | — |
 | `observability-and-instrumentation` | `methodology` | 2 | user, model | — | — |
 | `one-shot-patch` | `methodology` | 2 | user, model | `$skill{investigate-first}`, `$skill{debugging}` | — |
 | `refactoring` | `methodology` | 2 | user, model | — | — |
@@ -92,6 +96,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `sarif-to-annotations` | `tools` | 2 | user, model | — | — |
 | `skillmaker` | `tools` | 2 | user, model | — | — |
 | `skills-cli` | `tools` | 2 | user, model | — | — |
+| `tsdown` | `tools` | 2 | user, model | — | — |
 | `writing-great-skills` | `tools` | 2 | user | — | — |
 | `debugging` | `troubleshooting` | 2 | user, model | `$skill{investigate-first}`, `$skill{one-shot-patch}` | — |
 | `performance-investigation` | `troubleshooting` | 2 | user, model | — | — |

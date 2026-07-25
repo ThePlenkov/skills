@@ -55,17 +55,18 @@ permissions:
 jobs:
   validate:
     name: Validate skills structure
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: lts/*
+                    check-latest: true
+cache: 'npm'
 
       - name: Install Node dependencies
         run: npm ci --no-audit --no-fund --prefer-offline
@@ -130,7 +131,7 @@ jobs:
         run: npx --yes tsx scripts/run.ts scripts/check-tier-0-budget.sh
   check-os-independence:
     name: Check OS independence
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -138,9 +139,10 @@ jobs:
           persist-credentials: false
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: lts/*
+          check-latest: true
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund --prefer-offline
@@ -171,28 +173,30 @@ jobs:
 
   check-skill-size:
     name: Warn on oversized skill files
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       - uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: lts/*
+          check-latest: true
 
       - name: Check SKILL.md size
         run: npx --yes tsx scripts/check-skill-size.ts
 
   coverage-matrix:
     name: Check skill coverage matrix
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       - uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: lts/*
+          check-latest: true
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund --prefer-offline
@@ -202,14 +206,15 @@ jobs:
 
   readme-categories:
     name: Check README skill categories
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       - uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: lts/*
+          check-latest: true
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund --prefer-offline
