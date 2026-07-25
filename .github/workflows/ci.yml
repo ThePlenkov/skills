@@ -47,33 +47,46 @@ jobs:
   shellcheck:
     name: ShellCheck
     runs-on: [self-hosted, linux, x64]
+    env:
+      SC_VERSION: v0.10.0
     steps:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
+      - name: Cache ShellCheck binary
+        id: shellcheck-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/bin/shellcheck
+          key: shellcheck-${{ env.SC_VERSION }}
+
       - name: Install ShellCheck
+        if: steps.shellcheck-cache.outputs.cache-hit != 'true'
         # Install a recent shellcheck from GitHub releases (apt on Ubuntu 22.04
         # runners ships shellcheck 0.9.0 which doesn't accept directories as
-        # arguments; we need ≥0.10.0 for `shellcheck scripts/`).
+        # arguments; we need >=0.10.0 for `shellcheck scripts/`).
         run: |
           set -euo pipefail
-          SC_VERSION="v0.10.0"
           curl -sSL \
             "https://github.com/koalaman/shellcheck/releases/download/${SC_VERSION}/shellcheck-${SC_VERSION}.linux.x86_64.tar.xz" \
             | tar -xJ -C /tmp
-          sudo mv "/tmp/shellcheck-${SC_VERSION}/shellcheck" /usr/local/bin/
-          shellcheck --version
+          mkdir -p ~/.local/bin
+          mv "/tmp/shellcheck-${SC_VERSION}/shellcheck" ~/.local/bin/shellcheck
+          ~/.local/bin/shellcheck --version
+
+      - name: Add ~/.local/bin to PATH
+        run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run ShellCheck
         # shellcheck doesn't recurse on its own, so we use `find` to expand
         # the directory into explicit files. Pipe through the annotation
         # converter so each warning becomes a GitHub PR annotation.
         #
-        # Pipeline: find → xargs shellcheck → tee log → converter.
+        # Pipeline: find -> xargs shellcheck -> tee log -> converter.
         # We rely on `set -o pipefail` so the pipeline's exit code is
         # the rightmost non-zero status (i.e. shellcheck's, via xargs).
-        # We do NOT use ${PIPESTATUS[0]} — that captures `find`'s exit,
+        # We do NOT use ${PIPESTATUS[0]} -- that captures `find`'s exit,
         # which is almost always 0, masking shellcheck failures.
         run: |
           set -o pipefail
@@ -95,22 +108,20 @@ jobs:
         with:
           node-version: lts/*
           check-latest: true
+          cache: npm
 
-      # Pin the version so CI is reproducible. markdownlint-cli2 v0.22
-      # (markdownlint v0.40) is what we developed against; later versions
-      # may add rules that would cause new failures.
-      - name: Install markdownlint-cli2
-        run: npm install -g markdownlint-cli2@0.22.1
+      - name: Install Node dependencies
+        run: npm ci --no-audit --no-fund --prefer-offline
 
       - name: Run markdownlint
-        # Pipeline: markdownlint → tee log → converter.
+        # Pipeline: markdownlint -> tee log -> converter.
         # `set -o pipefail` makes the pipeline's exit code the rightmost
         # non-zero status (markdownlint's). The converter always succeeds
         # (it never errors on bad input), so the gate is purely on
         # markdownlint.
         run: |
           set -o pipefail
-          markdownlint-cli2 '**/*.md' '!.agents/skills/**' --config .markdownlint.json \
+          ./node_modules/.bin/markdownlint-cli2 '**/*.md' '!.agents/skills/**' '!node_modules/**' --config .markdownlint.json \
             | tee markdownlint.log \
             | .github/scripts/to-annotations.sh markdownlint
 
@@ -127,9 +138,13 @@ jobs:
         with:
           node-version: lts/*
           check-latest: true
+          cache: npm
+
+      - name: Install Node dependencies
+        run: npm ci --no-audit --no-fund --prefer-offline
 
       - name: Check .agents/skills is in sync
-        run: npx --yes tsx scripts/run.ts scripts/install.sh --check
+        run: ./node_modules/.bin/tsx scripts/run.ts scripts/install.sh --check
 
   reserved-names:
     name: Check reserved skill names
@@ -144,6 +159,10 @@ jobs:
         with:
           node-version: lts/*
           check-latest: true
+          cache: npm
+
+      - name: Install Node dependencies
+        run: npm ci --no-audit --no-fund --prefer-offline
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -152,13 +171,13 @@ jobs:
 
       - name: Generate and validate reserved names
         run: |
-          npx --yes tsx scripts/run.ts skills/tools/skillmaker/scripts/collect-reserved.sh
-          npx --yes tsx scripts/run.ts scripts/validate-reserved-names.sh
+          ./node_modules/.bin/tsx scripts/run.ts skills/tools/skillmaker/scripts/collect-reserved.sh
+          ./node_modules/.bin/tsx scripts/run.ts scripts/validate-reserved-names.sh
 
   wrapper-regression:
     # Smoke-tests the bin/skills.{js,ts} wrapper end-to-end. The wrapper is a
     # TypeScript file run through Node's --experimental-strip-types, so this
-    # job requires Node ≥22.6. The wrapper's default --copy flow (used by
+    # job requires Node >=22.6. The wrapper's default --copy flow (used by
     # `npx github:theplenkov/skills`) is exercised here so the idempotent
     # re-install path can't regress unnoticed.
     name: Wrapper smoke test
@@ -173,11 +192,12 @@ jobs:
         with:
           node-version: lts/*
           check-latest: true
+          cache: npm
 
       - name: Install npm dependencies
         # Pure devDeps; production npm install is unnecessary because the
         # wrapper is shipped as a source file and resolved at runtime.
-        run: npm install --no-audit --no-fund --prefer-offline
+        run: npm ci --no-audit --no-fund --prefer-offline
 
       - name: Typecheck
         run: npm run typecheck
@@ -193,7 +213,7 @@ jobs:
         # itself; the final --check assertion fails the step on drift.
         # Invocation goes through the shebang (`./bin/skills.js`) rather
         # than a bare `node` so the type-stripping flag from bin/skills.js
-        # applies uniformly across all wrapper steps (Node ≥22.18 strips
+        # applies uniformly across all wrapper steps (Node >=22.18 strips
         # types by default; older 22.x runners still need the flag).
         run: |
           set -euo pipefail

@@ -65,14 +65,11 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: lts/*
-                    check-latest: true
-cache: 'npm'
+          check-latest: true
+          cache: npm
 
       - name: Install Node dependencies
         run: npm ci --no-audit --no-fund --prefer-offline
-
-      - name: Install frontmatter validators
-        run: npm install -g ajv-cli js-yaml
 
       - name: Validate all SKILL.md frontmatter
         # For each SKILL.md: extract YAML frontmatter, convert to JSON,
@@ -93,12 +90,33 @@ cache: 'npm'
               continue
             fi
 
-            # Convert YAML → JSON for ajv validation
+            # Convert YAML -> JSON for ajv validation using the pinned yaml package.
+            # If parsing fails, annotate the file and continue with the rest.
             tmpjson=$(mktemp /tmp/skill-XXXXXX.json)
-            printf '%s\n' "$frontmatter" | npx --yes js-yaml > "$tmpjson"
+            yaml_err=$(mktemp /tmp/skill-XXXXXX.err)
+            if ! printf '%s\n' "$frontmatter" | node -e '
+              const YAML = require("yaml");
+              let d = "";
+              process.stdin.on("data", c => d += c);
+              process.stdin.on("end", () => {
+                try {
+                  process.stdout.write(JSON.stringify(YAML.parse(d)));
+                } catch (e) {
+                  console.error("YAML parse error:", e.message);
+                  process.exit(1);
+                }
+              });
+            ' > "$tmpjson" 2>"$yaml_err"; then
+              echo "::error file=${skill_file}::Failed to parse YAML frontmatter"
+              cat "$yaml_err" >&2
+              FAILED=1
+              rm -f "$tmpjson" "$yaml_err" /tmp/ajv.out
+              continue
+            fi
+            rm -f "$yaml_err"
 
             # Run ajv and capture combined output. On failure, emit annotations.
-            if ajv validate -s "$SCHEMA" -d "$tmpjson" --spec=draft7 \
+            if ./node_modules/.bin/ajv validate -s "$SCHEMA" -d "$tmpjson" --spec=draft7 \
                  > /tmp/ajv.out 2>&1; then
               echo "✅ ${skill_file}"
             else
@@ -120,15 +138,16 @@ cache: 'npm'
           python-version: '3.x'
 
       - name: Check reserved skill names
-        run: npx --yes tsx scripts/run.ts scripts/validate-reserved-names.sh
+        run: ./node_modules/.bin/tsx scripts/run.ts scripts/validate-reserved-names.sh
 
       - name: Validate agent manifests
         if: success() || failure()
-        run: npx --yes tsx scripts/run.ts scripts/validate-agent-manifests.sh
+        run: ./node_modules/.bin/tsx scripts/run.ts scripts/validate-agent-manifests.sh
 
       - name: Check Tier 0 always-on budget
         if: success() || failure()
-        run: npx --yes tsx scripts/run.ts scripts/check-tier-0-budget.sh
+        run: ./node_modules/.bin/tsx scripts/run.ts scripts/check-tier-0-budget.sh
+
   check-os-independence:
     name: Check OS independence
     runs-on: [self-hosted, linux, x64]
@@ -143,9 +162,10 @@ cache: 'npm'
         with:
           node-version: lts/*
           check-latest: true
+          cache: npm
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund --prefer-offline
+        run: npm ci --no-audit --no-fund --prefer-offline
 
       - name: Determine OS-independence baseline
         id: os-baseline
@@ -182,9 +202,13 @@ cache: 'npm'
         with:
           node-version: lts/*
           check-latest: true
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund --prefer-offline
 
       - name: Check SKILL.md size
-        run: npx --yes tsx scripts/check-skill-size.ts
+        run: ./node_modules/.bin/tsx scripts/check-skill-size.ts
 
   coverage-matrix:
     name: Check skill coverage matrix
@@ -197,12 +221,13 @@ cache: 'npm'
         with:
           node-version: lts/*
           check-latest: true
+          cache: npm
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund --prefer-offline
+        run: npm ci --no-audit --no-fund --prefer-offline
 
       - name: Check coverage matrix is up to date
-        run: npx --yes tsx scripts/generate-coverage-matrix.ts --check
+        run: ./node_modules/.bin/tsx scripts/generate-coverage-matrix.ts --check
 
   readme-categories:
     name: Check README skill categories
@@ -215,10 +240,11 @@ cache: 'npm'
         with:
           node-version: lts/*
           check-latest: true
+          cache: npm
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund --prefer-offline
+        run: npm ci --no-audit --no-fund --prefer-offline
 
       - name: Check README categories
         if: success() || failure()
-        run: npx --yes tsx scripts/run.ts scripts/check-readme-categories.ts
+        run: ./node_modules/.bin/tsx scripts/run.ts scripts/check-readme-categories.ts

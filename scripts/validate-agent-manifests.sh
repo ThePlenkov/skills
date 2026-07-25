@@ -59,20 +59,29 @@ for agent_dir in "$AGENTS_DIR"/*/; do
     FAILED=1; agent_failed=1
   fi
 
-  # Validate the manifest structure against the JSON schema when the tooling
-  # is present. The Validate Skills workflow installs ajv-cli and js-yaml.
+  # Validate the manifest structure against the JSON schema using the
+  # locally installed ajv-cli and yaml packages.
   SCHEMA="${REPO_ROOT}/.github/agent-manifest-schema.json"
-  if [[ -f "$SCHEMA" ]] && command -v js-yaml >/dev/null 2>&1 && command -v ajv >/dev/null 2>&1; then
+  if [[ -f "$SCHEMA" ]]; then
+    AJV="${REPO_ROOT}/node_modules/.bin/ajv"
     tmpjson=$(mktemp /tmp/agent-manifest-XXXXXX.json)
     ajv_out=$(mktemp /tmp/ajv-out-XXXXXX.txt)
-    if js-yaml "$manifest" > "$tmpjson" 2>"$ajv_out"; then
-      if ! ajv validate -s "$SCHEMA" -d "$tmpjson" --spec=draft7 >"$ajv_out" 2>&1; then
-        printf '❌ %s: manifest does not match %s\n' "$agent" ".github/agent-manifest-schema.json" >&2
-        sed 's/^/  /' "$ajv_out" >&2
-        FAILED=1; agent_failed=1
-      fi
-    else
+    if ! node -e '
+      const YAML = require("yaml");
+      const fs = require("fs");
+      const data = fs.readFileSync(process.argv[1], "utf8");
+      try {
+        process.stdout.write(JSON.stringify(YAML.parse(data)));
+      } catch (e) {
+        console.error("YAML parse error:", e.message);
+        process.exit(1);
+      }
+    ' "$manifest" > "$tmpjson" 2>"$ajv_out"; then
       printf '❌ %s: failed to parse manifest as YAML\n' "$agent" >&2
+      sed 's/^/  /' "$ajv_out" >&2
+      FAILED=1; agent_failed=1
+    elif ! "$AJV" validate -s "$SCHEMA" -d "$tmpjson" --spec=draft7 >"$ajv_out" 2>&1; then
+      printf '❌ %s: manifest does not match %s\n' "$agent" ".github/agent-manifest-schema.json" >&2
       sed 's/^/  /' "$ajv_out" >&2
       FAILED=1; agent_failed=1
     fi
