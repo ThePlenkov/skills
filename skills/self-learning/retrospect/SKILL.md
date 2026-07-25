@@ -80,7 +80,7 @@ Apply the learning to the current task immediately. Don't just document it for t
 
 ## Drill-driven retrospection
 
-Run this protocol once after the root `/drill` returns and the topmost parent has merged the `prevention_plan` from the whole drill tree.
+Run this protocol once after the root `/undrill` returns and the topmost parent has merged the `prevention_plan` from the whole drill tree.
 
 For every action in the merged plan, route it to the correct resource based on its `sink`:
 
