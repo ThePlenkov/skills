@@ -13,7 +13,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `engineering` | Cross-cutting engineering practices (API/UI design, performance, security) | `api-and-interface-design`, `bootstrap-ts-repo`, `frontend-ui-engineering`, `nodejs`, `performance-optimization`, `prototype`, `security-and-hardening`, `typescript` |
 | `experimentation` | Sandboxed experimentation | `sandboxed` |
 | `foundation` | Always-on behavioral primitives and activation tiers | `minimalist`, `persistent-memory`, `skill-tiers`, `token-rationalism` |
-| `integrations` | External platform connectors | `atlassian`, `codacy`, `codescene`, `github`, `gitlab`, `gitlab-ci-local`, `glab`, `glean` |
+| `integrations` | External platform connectors | `atlassian`, `bootstrap-gh-self-hosted-runner`, `codacy`, `codescene`, `github`, `gitlab`, `gitlab-ci-local`, `glab`, `glean` |
 | `methodology` | Development methodology | `code-review-and-quality`, `code-simplification`, `codehome`, `context-engineering`, `critical-thinking`, `doubt-driven-development`, `idea-refine`, `incremental-implementation`, `investigate-first`, `loop-programming`, `minimal-root-cause`, `modern-stack`, `observability-and-instrumentation`, `one-shot-patch`, `refactoring`, `repository-onboarding`, `source-driven-development`, `spec-driven-development`, `spec-kit`, `test-driven-development` |
 | `orchestration` | Agent coordination, isolation, context management, and skill discovery | `handoff`, `save-session`, `subagent-capsule`, `unwind`, `using-agent-skills` |
 | `research` | Codebase analysis and documentation tools | `deepwiki` |
@@ -53,6 +53,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `skill-tiers` | `foundation` | 2 | user, model | — | — |
 | `token-rationalism` | `foundation` | 0 | always | — | — |
 | `atlassian` | `integrations` | 2 | user, model | — | — |
+| `bootstrap-gh-self-hosted-runner` | `integrations` | 2 | user | — | — |
 | `codacy` | `integrations` | 2 | user, model | — | — |
 | `codescene` | `integrations` | 2 | user, model | — | — |
 | `github` | `integrations` | 2 | user, model | — | — |
