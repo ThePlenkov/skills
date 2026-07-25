@@ -9,11 +9,11 @@
 
 > **Category:** `self-learning` · **Path:** `skills/self-learning/retrospect/SKILL.md`
 
-Self-correction protocol for AI agents. Use when a mistake is made, a correction is received, or lessons need to be captured to prevent recurrence.
+Self-correction protocol for AI agents. Use after mistakes, corrections, or when a drill returns a non-trivial finding, then persist the fix and route parallel prevention actions to the right resource
 
 ## Stats
 
-1 dependencies · 5 dependents
+3 dependencies · 5 dependents
 
 ## Graph
 
@@ -28,20 +28,23 @@ graph LR
   subgraph sg_used_by["used by"]
     direction TB
     drill["drill<br/><i>safety</i>"]
-    persistent_memory["persistent-memory<br/><i>foundation</i>"]
     save_session["save-session<br/><i>orchestration</i>"]
     shared_plan["shared-plan<br/><i>workflow/planning</i>"]
     writing_great_skills["writing-great-skills<br/><i>tools</i>"]
   end
   drill --> retrospect
-  persistent_memory --> retrospect
   save_session --> retrospect
   shared_plan --> retrospect
   writing_great_skills --> retrospect
 
   subgraph sg_depends_on["depends on"]
     direction TB
+    backlog["backlog<br/><i>workflow/planning</i>"]
+    persistent_memory["persistent-memory<br/><i>foundation</i>"]
     skill_feedback["skill-feedback<br/><i>self-learning</i>"]
   end
+  retrospect --> backlog
+  retrospect --> persistent_memory
   retrospect --> skill_feedback
+  persistent_memory -. "↕ mutual with persistent-memory" .-> retrospect
 ```

@@ -9,11 +9,11 @@
 
 > **Category:** `safety` · **Path:** `skills/safety/drill/SKILL.md`
 
-Scoped descent primitive for agent systems. Creates isolated execution frames with filesystem materialization, session tracking, and controlled context flow. Each drill narrows scope, materializes as
+Scoped descent primitive for agent systems. Creates isolated execution frames, materializes them as directory trees, and returns a result plus a parallel prevention plan so the same problem does not r
 
 ## Stats
 
-4 dependencies · 0 dependents
+5 dependencies · 0 dependents
 
 ## Graph
 
@@ -27,11 +27,13 @@ graph LR
 
   subgraph sg_depends_on["depends on"]
     direction TB
+    backlog["backlog<br/><i>workflow/planning</i>"]
     investigate_first["investigate-first<br/><i>methodology</i>"]
     persistent_memory["persistent-memory<br/><i>foundation</i>"]
     retrospect["retrospect<br/><i>self-learning</i>"]
     unwind["unwind<br/><i>orchestration</i>"]
   end
+  drill --> backlog
   drill --> investigate_first
   drill --> persistent_memory
   drill --> retrospect

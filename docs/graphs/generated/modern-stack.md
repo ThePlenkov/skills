@@ -5,15 +5,15 @@
 > Edits will be overwritten. To change the graph, edit the source `SKILL.md` files and run `npm run graph:update`.
 > Source: `scripts/generate-skills-graph.ts` · Regenerate: `npm run graph:update`
 
-# backlog
+# modern-stack
 
-> **Category:** `workflow/planning` · **Path:** `skills/workflow/planning/backlog/SKILL.md`
+> **Category:** `methodology` · **Path:** `skills/methodology/modern-stack/SKILL.md`
 
-Actionable improvement items derived from experience and retrospectives. Items live in .agents/backlog/.
+Enforce the latest supported version for each dependency, CI action, and runtime, respecting the current major line. Ground decisions in live registry data, not training data.
 
 ## Stats
 
-1 dependencies · 3 dependents
+0 dependencies · 0 dependents
 
 ## Graph
 
@@ -21,22 +21,8 @@ Rendered with [Mermaid](https://mermaid.js.org/). On github.com click any node t
 
 ```mermaid
 graph LR
-  backlog["backlog<br/><i>workflow/planning</i>"]
+  modern_stack["modern-stack<br/><i>methodology</i>"]
   classDef center fill:#1d4ed8,stroke:#fbbf24,stroke-width:3px,color:#fff
-  class backlog center
+  class modern_stack center
 
-  subgraph sg_used_by["used by"]
-    direction TB
-    drill["drill<br/><i>safety</i>"]
-    retrospect["retrospect<br/><i>self-learning</i>"]
-  end
-  drill --> backlog
-  retrospect --> backlog
-
-  subgraph sg_depends_on["depends on"]
-    direction TB
-    harvest["harvest<br/><i>workflow/debt</i>"]
-  end
-  backlog --> harvest
-  harvest -. "↕ mutual with harvest" .-> backlog
 ```

@@ -17,6 +17,7 @@ Before moving **upward**:
 - The current drill exists and is active.
 - Findings or status are written.
 - The return payload is present unless the drill is abandoned.
+- A `prevention_plan` is present (may be empty).
 - Evidence links resolve or are explicitly marked missing.
 
 ## Scope rules
@@ -35,10 +36,11 @@ A child drill is invalid if it broadens, pivots sideways, or introduces a new to
 Recommended failures:
 
 - Reject nested drill creation if the requested work broadens the scope.
-- Reject `/undrill` at the root unless a root-close mode is explicitly allowed.
+- Root `/undrill` is valid and triggers the post-drill phase once; non-root `/undrill` restores the parent frame.
 - Warn when a child returns excessive raw context relative to its merge mode.
 - Warn when evidence exists but is unlinked.
 - Warn when a sibling drill should be created from a parent instead of from the current drill.
+- Warn when a `prevention_plan` is missing for a non-trivial drill result, or when actions are listed sequentially instead of in parallel.
 
 ## State machine
 
@@ -60,6 +62,9 @@ Each child drill must define an explicit return contract. Minimum:
 - Evidence links.
 - Open questions.
 - Recommended next action.
+- `prevention_plan` (may be empty).
+
+A prevention plan is a set of parallel actions. It is not a single follow-up task.
 
 Clear result contracts reduce the information loss that isolation can otherwise introduce.
 
@@ -68,7 +73,7 @@ Clear result contracts reduce the information loss that isolation can otherwise 
 | Mode | Use when |
 |------|----------|
 | `summary` | One concise finding set; default. |
-| `structured` | Machine-readable: `answer`, `confidence`, `evidence`, `next_step`. |
+| `structured` | Machine-readable: `answer`, `confidence`, `evidence`, `next_step`, `prevention_plan`. |
 | `full` | Extensive notes + trace references; deep debugging only. |
 
 Default to `summary` or `structured` — returning too much child material defeats the purpose of context isolation.
@@ -92,8 +97,17 @@ Default to `summary` or `structured` — returning too much child material defea
   delegate=auto|never|always,
   trace=none|light|full,
   merge=summary|structured|full,
+  prevention=auto|required|structured,
   evidence=link|copy|none,
   slug="..."
+}
+```
+
+```text
+/undrill {
+  merge=summary|structured|full,
+  trace=none|light|full,
+  conflicts=resolve|surface|ignore
 }
 ```
 

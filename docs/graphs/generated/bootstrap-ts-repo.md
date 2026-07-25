@@ -5,15 +5,15 @@
 > Edits will be overwritten. To change the graph, edit the source `SKILL.md` files and run `npm run graph:update`.
 > Source: `scripts/generate-skills-graph.ts` · Regenerate: `npm run graph:update`
 
-# backlog
+# bootstrap-ts-repo
 
-> **Category:** `workflow/planning` · **Path:** `skills/workflow/planning/backlog/SKILL.md`
+> **Category:** `engineering` · **Path:** `skills/engineering/bootstrap-ts-repo/SKILL.md`
 
-Actionable improvement items derived from experience and retrospectives. Items live in .agents/backlog/.
+Bootstrap a new TypeScript repository with native TS, tsdown, oxlint, biome, husky, and Nx. Use the current Node LTS as the minimum runtime, the latest supported versions for each major line, and avoi
 
 ## Stats
 
-1 dependencies · 3 dependents
+0 dependencies · 0 dependents
 
 ## Graph
 
@@ -21,22 +21,8 @@ Rendered with [Mermaid](https://mermaid.js.org/). On github.com click any node t
 
 ```mermaid
 graph LR
-  backlog["backlog<br/><i>workflow/planning</i>"]
+  bootstrap_ts_repo["bootstrap-ts-repo<br/><i>engineering</i>"]
   classDef center fill:#1d4ed8,stroke:#fbbf24,stroke-width:3px,color:#fff
-  class backlog center
+  class bootstrap_ts_repo center
 
-  subgraph sg_used_by["used by"]
-    direction TB
-    drill["drill<br/><i>safety</i>"]
-    retrospect["retrospect<br/><i>self-learning</i>"]
-  end
-  drill --> backlog
-  retrospect --> backlog
-
-  subgraph sg_depends_on["depends on"]
-    direction TB
-    harvest["harvest<br/><i>workflow/debt</i>"]
-  end
-  backlog --> harvest
-  harvest -. "↕ mutual with harvest" .-> backlog
 ```

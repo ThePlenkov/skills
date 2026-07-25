@@ -1,6 +1,6 @@
 ---
 name: retrospect
-description: Self-correction protocol for AI agents. Use when a mistake is made, a correction is received, or lessons need to be captured to prevent recurrence.
+description: Self-correction protocol for AI agents. Use after mistakes, corrections, or when a drill returns a non-trivial finding, then persist the fix and route parallel prevention actions to the right resource.
 tier: 2
 triggers: [user, model]
 source: theplenkov-ai/skills
@@ -78,6 +78,21 @@ The only requirement: **the fix must be where the agent (or another agent) will 
 
 Apply the learning to the current task immediately. Don't just document it for the future.
 
+## Drill-driven retrospection
+
+Run this protocol once after the root `/drill` returns and the topmost parent has merged the `prevention_plan` from the whole drill tree.
+
+For every action in the merged plan, route it to the correct resource based on its `sink`:
+
+- `backlog` → `$skill{backlog}` with the action, scope, and a link to the root drill as the source.
+- `memory` → classify as user or project memory per step 3b, then persist the learning through `$skill{persistent-memory}` with the selected scope.
+- `knowledgebase` → create or update a knowledge note when the finding is reusable across projects or agents.
+- `agentic-documents` → update `AGENTS.md`, `.agents/rules/`, `.agents/commands/`, or project docs based on the scope decision in step 3. If the target is a specific skill's `SKILL.md`, use `$skill{skill-feedback}` to route the change to its canonical `source:` repository instead of editing a generated copy.
+- `upstream-issue` → open an issue in the relevant OSS/external repo. Do **not** submit a PR unless the drill explicitly included it.
+- `workaround` / `code` → implement the workaround, link it to the root drill, and add a guardrail or test if possible.
+
+If an action is out of the agent's current scope or permissions, document it in the backlog and flag it to the user.
+
 ## Authority Hierarchy
 
 When rules conflict:
@@ -106,3 +121,6 @@ When step 3 classifies a finding as **universal** AND the finding points at a sp
 ## References
 
 - [ATTRIBUTION.md](references/ATTRIBUTION.md) — AI attribution headers for external posts
+- `drill` — scoped descent that returns a `prevention_plan`.
+- `$skill{backlog}` — track actionable follow-up work.
+- `$skill{persistent-memory}` — persistent knowledge across sessions.

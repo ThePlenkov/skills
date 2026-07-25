@@ -5,15 +5,15 @@
 > Edits will be overwritten. To change the graph, edit the source `SKILL.md` files and run `npm run graph:update`.
 > Source: `scripts/generate-skills-graph.ts` · Regenerate: `npm run graph:update`
 
-# backlog
+# bootstrap-gh-self-hosted-runner
 
-> **Category:** `workflow/planning` · **Path:** `skills/workflow/planning/backlog/SKILL.md`
+> **Category:** `integrations` · **Path:** `skills/integrations/bootstrap-gh-self-hosted-runner/SKILL.md`
 
-Actionable improvement items derived from experience and retrospectives. Items live in .agents/backlog/.
+Spin up an ephemeral or persistent self-hosted GitHub Actions runner to work around GitHub-hosted runner billing limits, re-run PR checks, and tear it down safely when done.
 
 ## Stats
 
-1 dependencies · 3 dependents
+1 dependencies · 0 dependents
 
 ## Graph
 
@@ -21,22 +21,13 @@ Rendered with [Mermaid](https://mermaid.js.org/). On github.com click any node t
 
 ```mermaid
 graph LR
-  backlog["backlog<br/><i>workflow/planning</i>"]
+  bootstrap_gh_self_hosted_runner["bootstrap-gh-self-hosted-runner<br/><i>integrations</i>"]
   classDef center fill:#1d4ed8,stroke:#fbbf24,stroke-width:3px,color:#fff
-  class backlog center
-
-  subgraph sg_used_by["used by"]
-    direction TB
-    drill["drill<br/><i>safety</i>"]
-    retrospect["retrospect<br/><i>self-learning</i>"]
-  end
-  drill --> backlog
-  retrospect --> backlog
+  class bootstrap_gh_self_hosted_runner center
 
   subgraph sg_depends_on["depends on"]
     direction TB
-    harvest["harvest<br/><i>workflow/debt</i>"]
+    github["github<br/><i>integrations</i>"]
   end
-  backlog --> harvest
-  harvest -. "↕ mutual with harvest" .-> backlog
+  bootstrap_gh_self_hosted_runner --> github
 ```

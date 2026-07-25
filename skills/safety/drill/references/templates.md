@@ -63,6 +63,14 @@ References to related drills, ancestor drills, or sibling investigations.
 
 The exact summary or structured object intended for the parent on undrill.
 
+# Prevention Plan
+
+Parallel actions that stop this problem from recurring. See `skills/safety/drill/SKILL.md` for the full contract.
+
+- Action, scope, sink, owner, and evidence for each item.
+- Supported sinks: `backlog`, `memory`, `knowledgebase`, `agentic-documents`, `upstream-issue`, `code`, `workaround`.
+- If the drill found a non-trivial issue and this section is empty, treat it as a retrospective gap.
+
 # Session Continuity
 
 - **Agent**: `{agent.session.agent_id}`
@@ -70,6 +78,27 @@ The exact summary or structured object intended for the parent on undrill.
 - **Parent session (if delegated)**: `{agent.session.parent_session_id}`
 - **Spawned by**: `{agent.session.spawned_by}`
 - **Resume**: `{agent.session.resume_uri || agent.session.resume_command || "continue in current orchestrator session"}`
+```
+
+## Return payload example
+
+```yaml
+answer: Short answer to the drill's goal
+confidence: 0.87
+evidence:
+  - ./evidence-log-snippet/evidence-log-snippet.md
+next_step: Recommended immediate action
+prevention_plan:
+  - action: Open upstream issue for the failing dependency
+    scope: project
+    sink: upstream-issue
+    owner: parent agent
+    evidence: ./findings.md
+  - action: Pin the dependency and add a retry in CI
+    scope: project
+    sink: code
+    owner: drill
+    evidence: ./ci-log.md
 ```
 
 ## Supporting document template
@@ -130,7 +159,8 @@ Root:
   problem="500s occur during concurrency spikes",
   delegate=auto,
   trace=light,
-  slug="api-debug"
+  slug="api-debug",
+  prevention=required
 }
 ```
 
@@ -174,7 +204,7 @@ session:
 Return:
 
 ```text
-/undrill
+/undrill --merge=structured
 ```
 
 Equivalent:

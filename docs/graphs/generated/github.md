@@ -13,7 +13,7 @@ Work with GitHub repositories, issues, pull requests, releases, and Actions. Use
 
 ## Stats
 
-0 dependencies · 3 dependents
+0 dependencies · 4 dependents
 
 ## Graph
 
@@ -27,10 +27,12 @@ graph LR
 
   subgraph sg_used_by["used by"]
     direction TB
+    bootstrap_gh_self_hosted_runner["bootstrap-gh-self-hosted-runner<br/><i>integrations</i>"]
     github_fix_main["github-fix-main<br/><i>code-review</i>"]
     triage_issue["triage-issue<br/><i>code-review</i>"]
     two_axis_review["two-axis-review<br/><i>code-review</i>"]
   end
+  bootstrap_gh_self_hosted_runner --> github
   github_fix_main --> github
   triage_issue --> github
   two_axis_review --> github

@@ -1,5 +1,5 @@
 ---
-description: Close drill frame and reintegrate results - upward traversal with session restoration
+description: Close drill frame, reintegrate results, and emit a parallel prevention plan
 argument-hint: --merge=summary|structured|full --trace=none|light|full --conflicts=resolve|surface|ignore
 ---
 
@@ -20,12 +20,18 @@ Close current drill frame and safely reintegrate results into parent context. Al
 
 **Upward Drill Operations:**
 1. Finalizes current drill file
-2. Compresses findings into parent-consumable result
-3. Links important evidence and artifacts
-4. Propagates only selected outputs (not full child history)
-5. Reads drill's `parent` from frontmatter
-6. Rewrites `.drills/cursor` with parent's SHA
-7. Returns control to parent frame/session
+2. Produces a `prevention_plan` (empty array if no actions; populated when the drill found an error, gap, or reusable lesson)
+3. Compresses findings and the prevention plan into a parent-consumable result
+4. Links important evidence and artifacts
+5. If this drill has a parent:
+   - Propagates `prevention_plan` and selected outputs upward (not full child history)
+   - Reads drill's `parent` from frontmatter
+   - Rewrites `.drills/cursor` with parent's SHA
+   - Returns control to parent frame/session
+6. If this drill is the root:
+   - Finalizes `.drills/cursor` in a terminal state (root SHA)
+   - Skips parent restoration
+   - Triggers the **post-drill phase** once
 
 **Merge Policies:**
 - `summary` (default) - Distilled insights only, one concise finding set
@@ -35,12 +41,21 @@ Close current drill frame and safely reintegrate results into parent context. Al
 **Structured Output Example:**
 ```json
 {
-  "result": "...",
+  "answer": "...",
   "insights": [...],
   "artifacts": [...],
   "confidence": 0.87,
   "evidence": [...],
-  "next_step": "..."
+  "next_step": "...",
+  "prevention_plan": [
+    {
+      "action": "Open upstream issue for the failing dependency",
+      "scope": "project",
+      "sink": "upstream-issue",
+      "owner": "parent agent",
+      "evidence": ["./findings.md"]
+    }
+  ]
 }
 ```
 
@@ -77,6 +92,7 @@ Each child drill must define:
 - Evidence links
 - Open questions
 - Recommended next action
+- `prevention_plan` with parallel actions when the drill found an error, gap, or reusable lesson
 
 **State Transitions:**
 - `open` → `done` (successful completion)
@@ -100,9 +116,10 @@ After:   .drills/cursor contains parent SHA (a1b2c3)
 Before moving upward, verify:
 - Current drill exists and is active
 - Findings or status are written
+- `prevention_plan` present (may be empty)
 - Return payload present (unless abandoned)
 - Evidence links resolve or marked missing
-- Not at root (unless root-close mode allowed)
+- Root `/undrill` is valid and triggers the post-drill phase once; non-root `/undrill` restores the parent frame
 
 **Example:**
 ```
@@ -120,4 +137,6 @@ Root (a1b2c3)
 **Mental Model:**
 `/undrill` = finalize + extract + compress + restore parent session
 
-Full specification: `.agents/skills/drill/SKILL.md`
+Non-root `/undrill` propagates `prevention_plan` upward for merging. Root `/undrill` triggers the **post-drill phase** once, where the topmost parent merges all plans and invokes `$skill{retrospect}` to route actions to the correct resources.
+
+Full specification: `skills/safety/drill/SKILL.md`

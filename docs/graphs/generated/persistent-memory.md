@@ -13,7 +13,7 @@ Persistent memory enforcement for AI agents. Recall prior work and findings befo
 
 ## Stats
 
-1 dependencies · 2 dependents
+1 dependencies · 3 dependents
 
 ## Graph
 
@@ -38,4 +38,5 @@ graph LR
     retrospect["retrospect<br/><i>self-learning</i>"]
   end
   persistent_memory --> retrospect
+  retrospect -. "↕ mutual with retrospect" .-> persistent_memory
 ```

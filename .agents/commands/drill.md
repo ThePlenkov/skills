@@ -1,6 +1,6 @@
 ﻿---
-description: Create isolated execution frame with filesystem materialization and session tracking
-argument-hint: <goal> [--direction=down|up] [--scope=...] [--delegate=auto|never|always] [--trace=none|light|full]
+description: Create isolated execution frame with filesystem materialization, session tracking, and a parallel prevention plan
+argument-hint: <goal> --direction=down|up --scope=<scope> --delegate=auto|never|always --trace=none|light|full --prevention=auto|required|structured
 ---
 
 Create a scoped, isolated execution frame that materializes as a directory tree with durable artifacts.
@@ -8,6 +8,7 @@ Create a scoped, isolated execution frame that materializes as a directory tree 
 **Core Concept:**
 - `/drill` creates isolated execution frames with narrowed scope
 - Each drill is a directory with markdown file + evidence + nested `.drills/`
+- Every drill must produce a `prevention_plan`; it is empty when there are no actions, and populated when the drill finds an error, gap, or reusable lesson
 - `.drills/cursor` tracks current position by SHA
 - Session pointers enable agent continuity and delegation
 
@@ -40,6 +41,7 @@ Create a scoped, isolated execution frame that materializes as a directory tree 
   delegate: auto|never|always, # can spawn subagents
   trace: none|light|full,      # how much trace to save
   merge: summary|structured|full, # how much returns upward
+  prevention: auto|required|structured, # whether to require a prevention plan
   evidence: link|copy|none,    # evidence handling
   slug: "..."                  # human-readable name part
 }
@@ -50,8 +52,9 @@ Create a scoped, isolated execution frame that materializes as a directory tree 
 2. Creates child directory under current `.drills/`
 3. Creates drill markdown file
 4. Copies only minimum necessary context
-5. Updates `.drills/cursor` with new SHA
-6. Starts new execution frame
+5. Sets `prevention` policy (`auto` adds a plan for errors/gaps, `required` always adds a plan, `structured` emits typed fields)
+6. Updates `.drills/cursor` with new SHA
+7. Starts new execution frame
 
 **Session Block (in drill frontmatter):**
 ```yaml
@@ -96,6 +99,7 @@ scope: Only /api/orders, production logs, DB latency
 delegate: auto
 trace: light
 merge: summary
+prevention: auto
 session:
   agent_id: orchestrator
   session_id: sess_01jz8n4x7e
@@ -109,6 +113,7 @@ session:
 # Evidence
 # Links
 # Return Payload
+# Prevention Plan
 # Session Continuity
 ```
 
@@ -117,4 +122,6 @@ session:
 
 Must be closed with `/undrill` to reintegrate results.
 
-Full specification: `.agents/skills/drill/SKILL.md`
+After the root `/undrill`, the calling agent enters the **post-drill phase** once: merge all `prevention_plan` entries from the drill tree, then invoke `$skill{retrospect}` to update `backlog`, `memory`, `knowledgebase`, or agentic documents as appropriate.
+
+Full specification: `skills/safety/drill/SKILL.md`

@@ -9,10 +9,9 @@ description: >-
   Idempotent (checks for open skill-feedback issues first), severity-labelled,
   pairs with /retrospect and /act.
 tier: 2
-triggers: [user]
+triggers: [user, model]
 source: theplenkov-ai/skills
 compatibility: Requires gh (authenticated), jq. Network access to api.github.com.
-disable-model-invocation: true
 argument-hint: "<skill-name>"
 ---
 

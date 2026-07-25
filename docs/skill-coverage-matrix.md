@@ -91,7 +91,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `safeguard` | `safety` | 2 | user, model | — | — |
 | `salvage` | `safety` | 2 | user | — | — |
 | `retrospect` | `self-learning` | 2 | user, model | — | — |
-| `skill-feedback` | `self-learning` | 2 | user | — | — |
+| `skill-feedback` | `self-learning` | 2 | user, model | — | — |
 | `docker-agent-config` | `tools` | 2 | user, model | — | — |
 | `npm-publish` | `tools` | 2 | user, model | — | — |
 | `sarif-to-annotations` | `tools` | 2 | user, model | — | — |
