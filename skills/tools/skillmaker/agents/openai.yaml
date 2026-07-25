@@ -1,0 +1,5 @@
+interface:
+  display_name: "Skillmaker"
+  short_description: "Create, validate, and manage agent skills"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $skillmaker to get started."

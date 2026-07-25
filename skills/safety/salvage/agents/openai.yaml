@@ -1,0 +1,5 @@
+interface:
+  display_name: "Salvage"
+  short_description: "Help with Salvage tasks and workflows"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $salvage to get started."

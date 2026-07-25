@@ -1,0 +1,5 @@
+interface:
+  display_name: "Token Rationalism"
+  short_description: "Token-rational agent behavior"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $token-rationalism to get started."

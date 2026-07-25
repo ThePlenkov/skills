@@ -1,0 +1,5 @@
+interface:
+  display_name: "Github Pr Review"
+  short_description: "Help with Github Pr Review"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $github-pr-review to get started."

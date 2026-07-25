@@ -1,0 +1,5 @@
+interface:
+  display_name: "Shared Plan"
+  short_description: "Help with Shared Plan tasks and workflows"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $shared-plan to get started."

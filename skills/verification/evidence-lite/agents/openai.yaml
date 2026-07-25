@@ -1,0 +1,5 @@
+interface:
+  display_name: "Evidence Lite"
+  short_description: "Lightweight proof discipline for trivial changes"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $evidence-lite to get started."

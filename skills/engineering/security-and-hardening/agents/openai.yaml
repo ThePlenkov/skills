@@ -1,0 +1,5 @@
+interface:
+  display_name: "Security And Hardening"
+  short_description: "Hardens code against vulnerabilities"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $security-and-hardening to get started."

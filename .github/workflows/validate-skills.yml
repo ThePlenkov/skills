@@ -9,11 +9,13 @@ on:
       - 'package.json'
       - '.github/skill-schema.json'
       - '.github/agent-manifest-schema.json'
+      - '.github/openai-metadata-schema.json'
       - '.github/workflows/validate-skills.yml'
       - '.github/scripts/**'
       - '.agents/agents/**/manifest.yaml'
       - '.agents/skills/**'
       - 'scripts/validate-agent-manifests.sh'
+      - 'scripts/validate-openai-metadata.sh'
       - 'scripts/check-tier-0-budget.sh'
       - 'scripts/check-readme-categories.ts'
       - 'scripts/generate-coverage-matrix.ts'
@@ -28,11 +30,13 @@ on:
       - 'package.json'
       - '.github/skill-schema.json'
       - '.github/agent-manifest-schema.json'
+      - '.github/openai-metadata-schema.json'
       - '.github/workflows/validate-skills.yml'
       - '.github/scripts/**'
       - '.agents/agents/**/manifest.yaml'
       - '.agents/skills/**'
       - 'scripts/validate-agent-manifests.sh'
+      - 'scripts/validate-openai-metadata.sh'
       - 'scripts/check-tier-0-budget.sh'
       - 'scripts/check-readme-categories.ts'
       - 'scripts/generate-coverage-matrix.ts'
@@ -131,6 +135,12 @@ jobs:
           done < <(find skills -name 'SKILL.md' -print0)
 
           exit $FAILED
+
+      - name: Validate OpenAI skill metadata
+        # Every skill must have an agents/openai.yaml file that conforms to
+        # .github/openai-metadata-schema.json. The script emits GitHub
+        # annotations for missing files or schema violations.
+        run: ./node_modules/.bin/tsx scripts/run.ts scripts/validate-openai-metadata.sh
 
       - name: Set up Python
         uses: actions/setup-python@v5

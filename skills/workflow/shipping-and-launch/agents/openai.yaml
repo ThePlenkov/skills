@@ -1,0 +1,5 @@
+interface:
+  display_name: "Shipping And Launch"
+  short_description: "Prepares production launches"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $shipping-and-launch to get started."

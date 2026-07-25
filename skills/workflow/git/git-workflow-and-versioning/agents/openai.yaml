@@ -1,0 +1,5 @@
+interface:
+  display_name: "Git Workflow And Versioning"
+  short_description: "Structures git workflow practices"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $git-workflow-and-versioning to get started."

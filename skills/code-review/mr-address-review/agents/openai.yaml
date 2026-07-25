@@ -1,0 +1,5 @@
+interface:
+  display_name: "Mr Address Review"
+  short_description: "End-to-end GitLab MR review-comment remediation"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $mr-address-review to get started."

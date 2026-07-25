@@ -1,0 +1,5 @@
+interface:
+  display_name: "Backlog"
+  short_description: "Help with Backlog tasks and workflows"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $backlog to get started."

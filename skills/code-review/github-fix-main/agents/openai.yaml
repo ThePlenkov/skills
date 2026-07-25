@@ -1,0 +1,5 @@
+interface:
+  display_name: "Github Fix Main"
+  short_description: "Help with Github Fix Main"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $github-fix-main to get started."

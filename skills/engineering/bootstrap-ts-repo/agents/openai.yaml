@@ -1,0 +1,5 @@
+interface:
+  display_name: "Bootstrap Ts Repo"
+  short_description: "Help with Bootstrap Ts Repo"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $bootstrap-ts-repo to get started."

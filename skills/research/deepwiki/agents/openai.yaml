@@ -1,0 +1,5 @@
+interface:
+  display_name: "Deepwiki"
+  short_description: "Help with Deepwiki tasks and workflows"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $deepwiki to get started."

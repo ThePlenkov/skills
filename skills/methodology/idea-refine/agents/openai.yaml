@@ -1,0 +1,5 @@
+interface:
+  display_name: "Idea Refine"
+  short_description: "Help with Idea Refine tasks and workflows"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $idea-refine to get started."

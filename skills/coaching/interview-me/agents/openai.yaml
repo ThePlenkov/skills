@@ -1,0 +1,5 @@
+interface:
+  display_name: "Interview Me"
+  short_description: "Help with Interview Me tasks and workflows"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $interview-me to get started."

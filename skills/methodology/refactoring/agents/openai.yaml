@@ -1,0 +1,5 @@
+interface:
+  display_name: "Refactoring"
+  short_description: "Help with Refactoring tasks and workflows"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $refactoring to get started."

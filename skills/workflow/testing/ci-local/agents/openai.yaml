@@ -1,0 +1,5 @@
+interface:
+  display_name: "Ci Local"
+  short_description: "Help with Ci Local tasks and workflows"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $ci-local to get started."

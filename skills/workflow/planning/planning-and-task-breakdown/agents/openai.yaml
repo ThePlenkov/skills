@@ -1,0 +1,5 @@
+interface:
+  display_name: "Planning And Task Breakdown"
+  short_description: "Breaks work into ordered tasks"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $planning-and-task-breakdown to get started."

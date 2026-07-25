@@ -1,0 +1,5 @@
+interface:
+  display_name: "Tsdown"
+  short_description: "Help with Tsdown tasks and workflows"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $tsdown to get started."

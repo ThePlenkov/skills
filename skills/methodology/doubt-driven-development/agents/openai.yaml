@@ -1,0 +1,5 @@
+interface:
+  display_name: "Doubt Driven Development"
+  short_description: "Help with Doubt Driven Development"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $doubt-driven-development to get started."

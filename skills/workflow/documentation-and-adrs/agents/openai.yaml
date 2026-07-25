@@ -1,0 +1,5 @@
+interface:
+  display_name: "Documentation And Adrs"
+  short_description: "Records decisions and documentation"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $documentation-and-adrs to get started."

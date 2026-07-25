@@ -1,0 +1,5 @@
+interface:
+  display_name: "E2e"
+  short_description: "Domain-agnostic AI-native scenario runner (e2e-agent CLI)"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $e2e to get started."

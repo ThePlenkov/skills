@@ -1,0 +1,5 @@
+interface:
+  display_name: "Sarif To Annotations"
+  short_description: "Help with Sarif To Annotations"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $sarif-to-annotations to get started."

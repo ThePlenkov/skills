@@ -142,10 +142,11 @@ Use $skill{safeguard} before destructive operations.
 See $github for authentication.
 ```
 
-## Optional UI metadata
+## Required UI metadata
 
-- Some skills may include `agents/openai.yaml` for UI metadata.
-- This is optional and does not affect skill behavior.
+- Every skill must include an `agents/openai.yaml` file with UI metadata.
+- The file is validated by the `Validate OpenAI skill metadata` step in CI against `.github/openai-metadata-schema.json`.
+- The scaffold script creates a valid template; edit `display_name`, `short_description`, and `default_prompt` to fit the skill.
 
 ## Role prompts
 

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Safeguard"
+  short_description: "Help with Safeguard tasks and workflows"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $safeguard to get started."

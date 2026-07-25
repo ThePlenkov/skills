@@ -1,0 +1,5 @@
+interface:
+  display_name: "Skill Feedback"
+  short_description: "Help with Skill Feedback tasks and workflows"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $skill-feedback to get started."

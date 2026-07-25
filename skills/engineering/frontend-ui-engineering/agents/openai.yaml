@@ -1,0 +1,5 @@
+interface:
+  display_name: "Frontend Ui Engineering"
+  short_description: "Help with Frontend Ui Engineering"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $frontend-ui-engineering to get started."

@@ -44,6 +44,31 @@ fi
 
 mkdir -p "$SKILL_DIR"
 
+capitalize_words() {
+  local input="$1"
+  local output=""
+  local word
+  IFS='-' read -ra words <<< "$input"
+  for word in "${words[@]}"; do
+    word="${word,,}"
+    word="${word^}"
+    output+="${word} "
+  done
+  printf '%s' "${output% }"
+}
+
+DISPLAY_NAME=$(capitalize_words "$NAME")
+SHORT_DESCRIPTION="Help with ${DISPLAY_NAME}"
+if [[ ${#SHORT_DESCRIPTION} -lt 25 ]]; then
+  SHORT_DESCRIPTION="${SHORT_DESCRIPTION} tasks and workflows"
+fi
+if [[ ${#SHORT_DESCRIPTION} -gt 64 ]]; then
+  SHORT_DESCRIPTION="${DISPLAY_NAME:0:61}..."
+fi
+if [[ ${#SHORT_DESCRIPTION} -lt 25 ]]; then
+  SHORT_DESCRIPTION="Help with ${SHORT_DESCRIPTION}"
+fi
+
 cat > "${SKILL_DIR}/SKILL.md" << TEMPLATE
 ---
 name: ${NAME}
@@ -66,8 +91,18 @@ TODO
 1. TODO
 TEMPLATE
 
-printf 'Created %s\n' "${SKILL_DIR}/SKILL.md"
+mkdir -p "${SKILL_DIR}/agents"
+
+cat > "${SKILL_DIR}/agents/openai.yaml" << TEMPLATE
+interface:
+  display_name: "${DISPLAY_NAME}"
+  short_description: "${SHORT_DESCRIPTION}"
+  brand_color: "#3B82F6"
+  default_prompt: "Use \$${NAME} to get started."
+TEMPLATE
+
+printf 'Created %s and %s\n' "${SKILL_DIR}/SKILL.md" "${SKILL_DIR}/agents/openai.yaml"
 printf '\nNext steps:\n'
-printf '  1. Edit the description and workflow\n'
+printf '  1. Edit the description, workflow, and agents/openai.yaml\n'
 printf '  2. Run: npm run install:skills\n'
 printf '  3. Run: npx tsx scripts/run.ts scripts/validate-reserved-names.sh\n'

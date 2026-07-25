@@ -1,0 +1,5 @@
+interface:
+  display_name: "Triage Issue"
+  short_description: "Help with Triage Issue tasks and workflows"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $triage-issue to get started."

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Skill Tiers"
+  short_description: "Skill activation tiers and the 300-line always-on budget"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $skill-tiers to get started."

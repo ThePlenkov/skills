@@ -1,0 +1,5 @@
+interface:
+  display_name: "Critical Thinking"
+  short_description: "Make the agent a rational, evidence-driven critic"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $critical-thinking to get started."

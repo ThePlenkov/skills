@@ -1,0 +1,5 @@
+interface:
+  display_name: "Docker Agent Config"
+  short_description: "Help with Docker Agent Config"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $docker-agent-config to get started."

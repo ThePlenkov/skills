@@ -1,0 +1,80 @@
+{
+  "title": "OpenAI skill metadata",
+  "description": "JSON Schema for agents/openai.yaml metadata per the OpenAI skill spec (https://github.com/openai/skills/blob/main/skills/.system/skill-creator/references/openai_yaml.md).",
+  "type": "object",
+  "required": ["interface"],
+  "additionalProperties": true,
+  "properties": {
+    "interface": {
+      "type": "object",
+      "required": ["display_name", "short_description"],
+      "additionalProperties": true,
+      "properties": {
+        "display_name": {
+          "type": "string",
+          "description": "Human-facing title shown in UI skill lists and chips."
+        },
+        "short_description": {
+          "type": "string",
+          "description": "Human-facing short UI blurb (25–64 chars) for quick scanning.",
+          "minLength": 25,
+          "maxLength": 64
+        },
+        "icon_small": {
+          "type": "string",
+          "description": "Path to a small icon asset (relative to skill dir). Defaults to ./assets/."
+        },
+        "icon_large": {
+          "type": "string",
+          "description": "Path to a larger logo asset (relative to skill dir). Defaults to ./assets/."
+        },
+        "brand_color": {
+          "type": "string",
+          "description": "Hex color used for UI accents (e.g., badges).",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "default_prompt": {
+          "type": "string",
+          "description": "Default prompt snippet inserted when invoking the skill. Should explicitly mention the skill as $skill-name."
+        }
+      }
+    },
+    "dependencies": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type", "value"],
+            "additionalProperties": true,
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Dependency category. Only 'mcp' is supported for now.",
+                "enum": ["mcp"]
+              },
+              "value": {
+                "type": "string",
+                "description": "Identifier of the tool or dependency."
+              },
+              "description": {
+                "type": "string",
+                "description": "Human-readable explanation of the dependency."
+              },
+              "transport": {
+                "type": "string",
+                "description": "Connection type when type is 'mcp'."
+              },
+              "url": {
+                "type": "string",
+                "description": "MCP server URL when type is 'mcp'."
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

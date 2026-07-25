@@ -1,0 +1,5 @@
+interface:
+  display_name: "Minimal Root Cause"
+  short_description: "Help with Minimal Root Cause"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $minimal-root-cause to get started."

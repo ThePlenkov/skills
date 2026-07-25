@@ -1,0 +1,5 @@
+interface:
+  display_name: "Act"
+  short_description: "Help with Act tasks and workflows"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $act to get started."

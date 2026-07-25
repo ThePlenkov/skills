@@ -1,0 +1,5 @@
+interface:
+  display_name: "Drill"
+  short_description: "Scoped descent primitive for agent systems"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $drill to get started."

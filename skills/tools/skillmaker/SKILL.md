@@ -32,7 +32,7 @@ Toolkit for creating and validating agent skills.
 npx tsx scripts/run.ts .agents/skills/skillmaker/scripts/skill-scaffold.sh <category> <name>
 ```
 
-Creates `skills/<category>/<name>/SKILL.md` with valid frontmatter template.
+Creates `skills/<category>/<name>/SKILL.md` and `skills/<category>/<name>/agents/openai.yaml` with valid templates.
 After creation, run `npm run install:skills` to update the links.
 
 ## Validate reserved names

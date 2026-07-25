@@ -1,0 +1,5 @@
+interface:
+  display_name: "Npm Publish"
+  short_description: "Help with Npm Publish tasks and workflows"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $npm-publish to get started."

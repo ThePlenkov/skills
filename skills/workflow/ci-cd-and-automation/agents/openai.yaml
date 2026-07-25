@@ -1,0 +1,5 @@
+interface:
+  display_name: "Ci Cd And Automation"
+  short_description: "Automates CI/CD pipeline setup"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $ci-cd-and-automation to get started."

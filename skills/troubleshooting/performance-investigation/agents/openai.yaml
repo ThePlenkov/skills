@@ -1,0 +1,5 @@
+interface:
+  display_name: "Performance Investigation"
+  short_description: "Help with Performance Investigation"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $performance-investigation to get started."

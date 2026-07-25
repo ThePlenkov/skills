@@ -1,0 +1,5 @@
+interface:
+  display_name: "Spec Kit"
+  short_description: "Use Spec-Driven Development with GitHub Spec Kit"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $spec-kit to get started."

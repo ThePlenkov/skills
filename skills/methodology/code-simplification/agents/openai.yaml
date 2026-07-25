@@ -1,0 +1,5 @@
+interface:
+  display_name: "Code Simplification"
+  short_description: "Simplifies code for clarity"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $code-simplification to get started."

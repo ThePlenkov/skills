@@ -1,0 +1,5 @@
+interface:
+  display_name: "Git Reset"
+  short_description: "Help with Git Reset tasks and workflows"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $git-reset to get started."

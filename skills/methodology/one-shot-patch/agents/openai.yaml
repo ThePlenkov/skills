@@ -1,0 +1,5 @@
+interface:
+  display_name: "One Shot Patch"
+  short_description: "Help with One Shot Patch tasks and workflows"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $one-shot-patch to get started."
