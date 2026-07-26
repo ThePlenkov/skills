@@ -7,7 +7,7 @@ import {
   unlinkSync,
   readFileSync,
 } from 'node:fs'
-import { join } from 'node:path'
+import { basename, join } from 'node:path'
 import { resolveE2eAgent, resolveE2eExecution, resolveE2eModel, type CliOptions } from './context'
 import { substituteValue } from './template'
 import type { AssertCheck, RunContext, Scenario, ScenarioResult } from './types'
@@ -40,6 +40,21 @@ export function resolveRepoRoot(start: string): string {
     dir = parent
   }
   return start
+}
+
+/**
+ * Test-only guard: consumer-repo integration tests should be skipped when
+ * the framework is executed from the skills repo itself, or when explicitly
+ * disabled via `E2E_SKIP_CONSUMER_TESTS=1`.
+ */
+export function shouldSkipConsumerTests(start: string): boolean {
+  if (process.env.E2E_SKIP_CONSUMER_TESTS === '1') return true
+  try {
+    const root = resolveRepoRoot(start)
+    return basename(root).toLowerCase() === 'skills'
+  } catch {
+    return false
+  }
 }
 
 export function defaultEvidenceRoot(repoRoot: string): string {

@@ -17,15 +17,23 @@ import {
   evidenceFileBase,
   formatDestination,
   resolveRepoRoot,
+  shouldSkipConsumerTests,
   writeEvidenceReport,
 } from './evidence'
 import type { ScenarioResult } from './types'
 
 const frameworkDir = dirname(fileURLToPath(import.meta.url))
+const skipConsumerTests = shouldSkipConsumerTests(frameworkDir)
+if (skipConsumerTests) {
+  // eslint-disable-next-line no-console
+  console.log(
+    'evidence.test: skipping consumer-repo integration tests (E2E_SKIP_CONSUMER_TESTS=1 or in-skills-repo heuristic).'
+  )
+}
 
 // eslint-disable-next-line max-lines-per-function -- describe block groups related evidence scenarios
 describe('evidence', () => {
-  test('resolveRepoRoot finds consuming repo root (skips nested skill package)', () => {
+  test.skipIf(skipConsumerTests)('resolveRepoRoot finds consuming repo root (skips nested skill package)', () => {
     const root = resolveRepoRoot(frameworkDir)
     expect(root).toMatch(/openadt$/i)
     expect(root).not.toMatch(/sap-adt-mcp-launcher$/)

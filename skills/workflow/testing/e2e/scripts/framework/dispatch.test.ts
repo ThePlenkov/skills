@@ -3,8 +3,16 @@ import { join } from 'node:path'
 import { buildE2eDispatch, dispatchRunId, formatDispatchInstructions } from './dispatch'
 import type { CliOptions } from './context'
 import type { ProjectE2eConfig } from './project-config'
+import { shouldSkipConsumerTests } from './evidence'
 
 const repoRoot = join(import.meta.dir, '..', '..', '..', '..', '..')
+const skipConsumerTests = shouldSkipConsumerTests(repoRoot)
+if (skipConsumerTests) {
+  // eslint-disable-next-line no-console
+  console.log(
+    'dispatch.test: skipping consumer-repo integration tests (E2E_SKIP_CONSUMER_TESTS=1 or in-skills-repo heuristic).'
+  )
+}
 
 const projectConfig: ProjectE2eConfig = {
   adapter: 'e2e/openadt-adapter.ts',
@@ -32,7 +40,7 @@ describe('dispatchRunId', () => {
 })
 
 describe('buildE2eDispatch', () => {
-  test('builds ACP handoff payload', () => {
+  test.skipIf(skipConsumerTests)('builds ACP handoff payload', () => {
     const payload = buildE2eDispatch(baseOpts(), repoRoot, {
       configPath: join(repoRoot, 'e2e.config.yaml'),
       projectConfig,
@@ -71,7 +79,7 @@ describe('buildE2eDispatch', () => {
 })
 
 describe('formatDispatchInstructions', () => {
-  test('is ACP-neutral', () => {
+  test.skipIf(skipConsumerTests)('is ACP-neutral', () => {
     const payload = buildE2eDispatch(baseOpts(), repoRoot, {
       configPath: join(repoRoot, 'e2e.config.yaml'),
       projectConfig,
