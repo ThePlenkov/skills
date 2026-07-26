@@ -140,18 +140,25 @@ write_managed_marker() {
 # Compare two trees, treating the managed marker as invisible. diff -r
 # doesn't have a portable --exclude (GNU-only), so temporarily move the
 # marker aside for the comparison and put it back regardless of result.
-# If diff is unavailable, fall back to a Python 3 directory comparison so
-# the wrapper smoke test (and other --copy --check runs) work on minimal
-# self-hosted runner images that omit diffutils.
+# If diff is unavailable, fall back to Git's built-in recursive diff and then
+# to a Python 3 directory comparison so the wrapper smoke test (and other
+# --copy --check runs) work on minimal self-hosted runner images that omit
+# diffutils or Python.
 content_matches() {
-  local src="$1" dst="$2" marker_tmp=""
+  local src="$1" dst="$2" marker_tmp="" status=0
   if [[ -f "$dst/$MANAGED_MARKER" ]]; then
     marker_tmp=$(mktemp)
     mv "$dst/$MANAGED_MARKER" "$marker_tmp"
   fi
-  local status=0
   if command -v diff >/dev/null 2>&1; then
     if ! diff -r "$src" "$dst" >/dev/null 2>&1; then
+      status=1
+    fi
+  elif command -v git >/dev/null 2>&1; then
+    # Self-hosted runners can be minimal and omit both diffutils and python3;
+    # Git is already required by `npx skills add` and provides a built-in
+    # recursive diff.
+    if ! git diff --no-index "$src" "$dst" >/dev/null 2>&1; then
       status=1
     fi
   elif command -v python3 >/dev/null 2>&1; then
@@ -204,7 +211,7 @@ PYEOF
       status=1
     fi
   else
-    printf 'Error: content_matches requires diff or python3, neither found on PATH.\n' >&2
+    printf 'Error: content_matches requires diff, git, or python3; none found on PATH.\n' >&2
     status=1
   fi
   [[ -n "$marker_tmp" ]] && mv "$marker_tmp" "$dst/$MANAGED_MARKER"

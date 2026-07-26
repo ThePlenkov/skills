@@ -26,10 +26,10 @@ else
 fi
 
 if [[ "$generate" = 1 ]]; then
-  if [[ -f "$COLLECT" ]] && command -v python3 >/dev/null 2>&1; then
+  if [[ -f "$COLLECT" ]] && command -v node >/dev/null 2>&1; then
     bash "$COLLECT" "$RESERVED_FILE"
   else
-    printf 'error: %s is missing or stale and cannot be regenerated (python3 required)\n' "$RESERVED_FILE" >&2
+    printf 'error: %s is missing or stale and cannot be regenerated (node required)\n' "$RESERVED_FILE" >&2
     exit 1
   fi
 fi

@@ -7,42 +7,50 @@
 # Reads: skills/tools/skillmaker/assets/agents/*.yaml
 # Writes: reserved-names.sh (bash sourceable, with RESERVED_NAMES array + RESERVED_SET)
 #
-# Requires: python3 (uses only stdlib, no PyYAML)
+# Requires: node (uses only stdlib, no external packages)
 set -euo pipefail
 
 REPO_ROOT=$(cd "$(dirname "$0")/../../../.." && pwd -P)
 AGENTS_DIR="${REPO_ROOT}/skills/tools/skillmaker/assets/agents"
 OUTPUT="${1:-${REPO_ROOT}/scripts/reserved-names.sh}"
 
-# Use Python to parse the simple YAML lists (no external deps needed).
-ALL_COMMANDS=$(python3 - "$AGENTS_DIR" << 'PYEOF'
-import sys, glob, re
-
-agents_dir = sys.argv[1]
-commands = set()
-
-for path in sorted(glob.glob(f"{agents_dir}/*.yaml")):
-    with open(path) as f:
-        in_commands = False
-        for line in f:
-            stripped = line.strip()
-            if stripped.startswith("commands:"):
-                in_commands = True
-                continue
-            if in_commands:
-                m = re.match(r"^\s*-\s*(.+)$", stripped)
-                if m:
-                    cmd = m.group(1).strip().strip('"').strip("'")
-                    if cmd:
-                        commands.add(cmd.lstrip("/"))
-                else:
-                    in_commands = False
-
-for cmd in sorted(commands):
-    # Only include kebab-case names (matching skill naming rules).
-    if re.match(r'^[a-z0-9]+(-[a-z0-9]+)*$', cmd):
-        print(cmd)
-PYEOF
+# Use Node to parse the simple YAML lists (no external deps needed).
+ALL_COMMANDS=$(node - "$AGENTS_DIR" <<'NODEEOF'
+const fs = require('fs');
+const path = require('path');
+const agentsDir = process.argv[2];
+const commands = new Set();
+const yamls = fs.readdirSync(agentsDir)
+  .filter((f) => f.endsWith('.yaml'))
+  .sort();
+for (const yaml of yamls) {
+  const content = fs.readFileSync(path.join(agentsDir, yaml), 'utf8');
+  const lines = content.split(/\r?\n/);
+  let inCommands = false;
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (line.startsWith('commands:')) {
+      inCommands = true;
+      continue;
+    }
+    if (inCommands) {
+      const m = line.match(/^-\s*(.+)$/);
+      if (m) {
+        const cmd = m[1].trim().replace(/^["']|["']$/g, '').replace(/^\//, '');
+        if (cmd) {
+          commands.add(cmd);
+        }
+      } else {
+        inCommands = false;
+      }
+    }
+  }
+}
+const sorted = [...commands]
+  .sort()
+  .filter((cmd) => /^[a-z0-9]+(-[a-z0-9]+)*$/.test(cmd));
+console.log(sorted.join('\n'));
+NODEEOF
 )
 
 # Read into array.

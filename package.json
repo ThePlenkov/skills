@@ -8,6 +8,8 @@
   },
   "scripts": {
     "generate": "tsx scripts/generate-skills-index.ts",
+    "generate:skills-index-md": "tsx scripts/generate-skills-index-md.ts",
+    "check:skills-index-md": "tsx scripts/generate-skills-index-md.ts --check",
     "graph": "tsx scripts/generate-skills-graph.ts --json .build/skills-graph.json --graph-dir docs/graphs/generated",
     "graph:update": "tsx scripts/generate-skills-graph.ts --json .build/skills-graph.json --graph-dir docs/graphs/generated",
     "validate": "tsx scripts/run.ts scripts/validate-skills-index.sh",
