@@ -9,7 +9,7 @@
 
 > **Category:** `orchestration` · **Path:** `skills/orchestration/handoff/SKILL.md`
 
-Compact the current conversation into a handoff document so a fresh agent session can continue the work. Use when a thread is full, when the work needs to span a context-window boundary, or when branc
+Write a handoff document so a fresh agent session can continue the work on the same machine and user account, or resume the most recent handoff across git worktrees on that machine. Use when a thread
 
 ## Stats
 

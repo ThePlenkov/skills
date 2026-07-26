@@ -121,7 +121,7 @@ Regenerate locally with `npm run graph:update`.
 
 | Skill | Dependencies | Dependents | Graph |
 | --- | ---: | ---: | --- |
-| `handoff` — Compact the current conversation into a handoff document so a fresh agent sessio | 5 | 0 | [graph](handoff.md) |
+| `handoff` — Write a handoff document so a fresh agent session can continue the work on the s | 5 | 0 | [graph](handoff.md) |
 | `save-session` — Save work durably when the user says a save-session trigger phrase, or generate | 4 | 3 | [graph](save-session.md) |
 | `subagent-capsule` — Use immediately before launching a subagent. Forces the parent to construct a co | 0 | 3 | [graph](subagent-capsule.md) |
 | `unwind` — Collapse a solved narrow branch into the parent/root task, rebuild the execution | 0 | 2 | [graph](unwind.md) |
