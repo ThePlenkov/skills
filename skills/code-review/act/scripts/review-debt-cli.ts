@@ -56,9 +56,9 @@ function joinScript(name: string): string {
 
 function runTests(): number {
   const tests = [
-    `${SCRIPT_DIR}/../../harvest/scripts/review-debt-lib.test.ts`,
-    `${SCRIPT_DIR}/../../harvest/scripts/resolve-harvest-prs.test.ts`,
-    `${SCRIPT_DIR}/../../harvest/scripts/resolve-harvest-target.test.ts`,
+    `${SCRIPT_DIR}/../../../workflow/debt/harvest/scripts/review-debt-lib.test.ts`,
+    `${SCRIPT_DIR}/../../../workflow/debt/harvest/scripts/resolve-harvest-prs.test.ts`,
+    `${SCRIPT_DIR}/../../../workflow/debt/harvest/scripts/resolve-harvest-target.test.ts`,
     `${SCRIPT_DIR}/update-debt-status.test.ts`,
   ]
   const result = spawnSync(BUN, ['test', ...tests], { stdio: 'inherit' })
