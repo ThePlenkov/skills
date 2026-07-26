@@ -12,13 +12,18 @@
     "prepublishOnly": "node ./scripts/build.mjs"
   },
   "devDependencies": {
-    "@nx/devkit": "23.0.1",
+    "@nx/devkit": "23.1.0",
     "@types/node": "24.0.0",
     "esbuild": "^0.25.0",
-    "nx": "23.0.1",
+    "nx": "23.1.0",
     "typescript": "6.0.3"
   },
   "dependencies": {
     "@theplenkov/nx-skillspector": "file:./nx-skillspector"
+  },
+  "overrides": {
+    "axios": "1.18.1",
+    "brace-expansion": "5.0.8",
+    "minimatch": "10.2.5"
   }
 }

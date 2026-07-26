@@ -116,6 +116,9 @@ runs:
         set -euo pipefail
         npm ci --prefix "$GITHUB_ACTION_PATH" --no-audit --no-fund
 
+    - name: Set up Python
+      uses: ./.github/actions/setup-python-with-fallback
+
     - name: Install SkillSpector
       shell: bash
       run: python3 -m pip install --quiet --user "git+https://github.com/NVIDIA/skillspector.git@${{ inputs.skillspector-version }}"
@@ -128,7 +131,10 @@ runs:
         workflow-id: skill-scan.yml
 
     # Cache Nx's default .nx/cache directory in the host repo.
-    # Key: package-lock.json hash + SKILL.md / scripts / references / assets hashes + runner.os.
+    # Key: nx-skillspector-<os>-<run_id>-<sha>. Unique per run/commit;
+    # falls back to the most recent OS-specific cache. Using run_id+sha avoids
+    # act's hashFiles bug while still rotating the primary key on every commit
+    # (so changes to skill scripts, references, or assets invalidate the cache).
     # Falling back via restore-keys keeps prior plugin versions
     # usable after a dep upgrade.
     - name: Restore Nx cache
@@ -136,7 +142,7 @@ runs:
       uses: actions/cache/restore@v6
       with:
         path: .nx/cache
-        key: nx-skillspector-${{ runner.os }}-${{ hashFiles('actions/skillspector/package-lock.json', 'skills/**/SKILL.md', 'skills/**/scripts/**', 'skills/**/references/**', 'skills/**/assets/**') }}
+        key: nx-skillspector-${{ runner.os }}-${{ github.run_id }}-${{ github.sha }}
         restore-keys: |
           nx-skillspector-${{ runner.os }}-
 
