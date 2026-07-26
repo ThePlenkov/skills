@@ -5,6 +5,7 @@ argument-hint: "[optional root objective or direction]"
 tier: 2
 triggers:
   - user
+disable-model-invocation: true
 allowed-tools:
   - read
   - grep

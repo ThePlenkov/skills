@@ -3,3 +3,5 @@ interface:
   short_description: "Help with Sandboxed tasks and workflows"
   brand_color: "#3B82F6"
   default_prompt: "Use $sandboxed to get started."
+policy:
+  allow_implicit_invocation: false

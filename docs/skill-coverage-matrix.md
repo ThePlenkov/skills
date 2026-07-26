@@ -82,7 +82,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `spec-kit` | `methodology` | 2 | user, model | — | — |
 | `test-driven-development` | `methodology` | 2 | user, model | — | — |
 | `handoff` | `orchestration` | 2 | user | — | — |
-| `save-session` | `orchestration` | 2 | user, model | — | — |
+| `save-session` | `orchestration` | 2 | user | — | — |
 | `subagent-capsule` | `orchestration` | 2 | user, model | — | — |
 | `unwind` | `orchestration` | 2 | user | — | — |
 | `using-agent-skills` | `orchestration` | 2 | user, model | — | — |
@@ -108,10 +108,10 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `ci-local` | `workflow` | 2 | user, model | — | — |
 | `deprecation-and-migration` | `workflow` | 2 | user, model | — | — |
 | `documentation-and-adrs` | `workflow` | 2 | user, model | — | — |
-| `e2e` | `workflow` | 2 | user, model | — | — |
+| `e2e` | `workflow` | 2 | user | — | — |
 | `git-commit` | `workflow` | 2 | user, model | — | — |
 | `git-push` | `workflow` | 2 | user, model | — | — |
-| `git-reset` | `workflow` | 2 | user, model | — | — |
+| `git-reset` | `workflow` | 2 | user | — | — |
 | `git-workflow-and-versioning` | `workflow` | 2 | user, model | — | — |
 | `harvest` | `workflow` | 2 | user | — | — |
 | `planning-and-task-breakdown` | `workflow` | 2 | user, model | — | — |

@@ -6,7 +6,8 @@ description: >-
   test and collect evidence under .e2e/results/. Agents use only e2e-agent commands — never
   import internal framework modules.
 tier: 2
-triggers: [user, model]
+triggers: [user]
+disable-model-invocation: true
 source: theplenkov-ai/skills
 ---
 

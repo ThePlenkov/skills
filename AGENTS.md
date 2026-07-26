@@ -32,7 +32,7 @@ skills/
 - `.claude-plugin/plugin.json` — Claude Code plugin manifest (identity metadata).
 - `.claude-plugin/marketplace.json` — Claude Code plugin marketplace catalog (category-to-skills mapping).
 - `.claude-plugin/skills-index.json` — generated machine-readable index for lazy loading at scale. It is built as a CI artifact by the `Skills Index` workflow and is not committed to the repository.
-- `.claude-plugin/skills-index.schema.json` — JSON Schema for the index (validated with jsonschema in `scripts/validate-skills-index.sh`).
+- `.claude-plugin/skills-index.schema.json` — JSON Schema for the index (validated with ajv-cli in `scripts/validate-skills-index.sh`).
 - `.codex-plugin/plugin.json` — ChatGPT/Codex plugin manifest. Same skills, different plugin format.
 - `.agents/plugins/marketplace.json` — ChatGPT/Codex plugin marketplace catalog (Codex-format entries for the Plugins Directory).
 - `.agents/agents/` — role prompts (tiered filenames only, role text without tiers).
@@ -82,7 +82,7 @@ Some skills are owned by other repos and pulled into `.agents/skills/` at instal
    `scripts/validate-skills-index.sh`. The generator also produces
    `.claude-plugin/skills-index.schema.json` from the same TypeScript/Zod
    types. The validator checks the generated index against the generated schema
-   (using jsonschema when available) and ignores the volatile `generated_at`
+   (using the locally installed ajv-cli) and ignores the volatile `generated_at`
    field. The index and schema are built as CI artifacts by the `Skills Index`
    workflow and are not committed. Because this repository is private, the
    artifacts are not deployed to GitHub Pages; they are published as a workflow

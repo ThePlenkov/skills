@@ -140,19 +140,75 @@ write_managed_marker() {
 # Compare two trees, treating the managed marker as invisible. diff -r
 # doesn't have a portable --exclude (GNU-only), so temporarily move the
 # marker aside for the comparison and put it back regardless of result.
+# If diff is unavailable, fall back to a Python 3 directory comparison so
+# the wrapper smoke test (and other --copy --check runs) work on minimal
+# self-hosted runner images that omit diffutils.
 content_matches() {
   local src="$1" dst="$2" marker_tmp=""
   if [[ -f "$dst/$MANAGED_MARKER" ]]; then
     marker_tmp=$(mktemp)
     mv "$dst/$MANAGED_MARKER" "$marker_tmp"
   fi
-  if diff -r "$src" "$dst" >/dev/null 2>&1; then
-    [[ -n "$marker_tmp" ]] && mv "$marker_tmp" "$dst/$MANAGED_MARKER"
-    return 0
+  local status=0
+  if command -v diff >/dev/null 2>&1; then
+    if ! diff -r "$src" "$dst" >/dev/null 2>&1; then
+      status=1
+    fi
+  elif command -v python3 >/dev/null 2>&1; then
+    if ! python3 - "$src" "$dst" <<'PYEOF'
+import os, sys
+def same(a, b):
+    if os.path.islink(a) and os.path.islink(b):
+        return os.readlink(a) == os.readlink(b)
+    if os.path.isdir(a) and os.path.isdir(b):
+        return True
+    if os.path.isfile(a) and os.path.isfile(b):
+        if os.path.getsize(a) != os.path.getsize(b):
+            return False
+        with open(a, 'rb') as fa, open(b, 'rb') as fb:
+            while True:
+                x = fa.read(65536)
+                y = fb.read(65536)
+                if x != y:
+                    return False
+                if not x:
+                    return True
+    return False
+def walk(src, dst):
+    for root, dirs, files in os.walk(src, followlinks=False):
+        rel = os.path.relpath(root, src)
+        dst_root = os.path.normpath(os.path.join(dst, rel))
+        if not os.path.isdir(dst_root):
+            return False
+        for d in dirs:
+            if not os.path.isdir(os.path.join(dst_root, d)):
+                return False
+        for f in files:
+            if not same(os.path.join(root, f), os.path.join(dst_root, f)):
+                return False
+    for root, dirs, files in os.walk(dst, followlinks=False):
+        rel = os.path.relpath(root, dst)
+        src_root = os.path.normpath(os.path.join(src, rel))
+        if not os.path.isdir(src_root):
+            return False
+        for d in dirs:
+            if not os.path.isdir(os.path.join(src_root, d)):
+                return False
+        for f in files:
+            if not same(os.path.join(src_root, f), os.path.join(root, f)):
+                return False
+    return True
+sys.exit(0 if walk(sys.argv[1], sys.argv[2]) else 1)
+PYEOF
+    then
+      status=1
+    fi
   else
-    [[ -n "$marker_tmp" ]] && mv "$marker_tmp" "$dst/$MANAGED_MARKER"
-    return 1
+    printf 'Error: content_matches requires diff or python3, neither found on PATH.\n' >&2
+    status=1
   fi
+  [[ -n "$marker_tmp" ]] && mv "$marker_tmp" "$dst/$MANAGED_MARKER"
+  return "$status"
 }
 
 # shellcheck source=ensure-reserved.sh

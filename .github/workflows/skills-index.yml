@@ -46,16 +46,8 @@ jobs:
           check-latest: true
           cache: 'npm'
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
       - name: Install Node dependencies
         run: npm ci
-
-      - name: Install jsonschema
-        run: pip install jsonschema
 
       - name: Validate and generate index
         run: npm run validate:update

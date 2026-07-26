@@ -72,11 +72,18 @@ jobs:
             ~/.local/bin/shellcheck --version
             exit 0
           fi
-          curl -sSL \
+          mkdir -p /tmp/shellcheck
+          curl -fsSL \
             "https://github.com/koalaman/shellcheck/releases/download/${SC_VERSION}/shellcheck-${SC_VERSION}.linux.x86_64.tar.xz" \
-            | tar -xJ -C /tmp
+            -o /tmp/shellcheck.tar.xz
+          if command -v xz >/dev/null 2>&1; then
+            tar -xJf /tmp/shellcheck.tar.xz -C /tmp
+          else
+            python3 -m tarfile -e /tmp/shellcheck.tar.xz /tmp
+          fi
           mkdir -p ~/.local/bin
           mv "/tmp/shellcheck-${SC_VERSION}/shellcheck" ~/.local/bin/shellcheck
+          chmod +x ~/.local/bin/shellcheck
           ~/.local/bin/shellcheck --version
 
       - name: Add ~/.local/bin to PATH
@@ -233,12 +240,29 @@ jobs:
           persist-credentials: false
 
       - name: Set up Bun
-        # Pinned to the v2.1.3 release commit SHA. SonarCloud S7637 requires
-        # a fully-pinned action reference for third-party Actions so a
-        # tag rewrite cannot silently run new code on every CI invocation.
-        uses: oven-sh/setup-bun@ecf28ddc73e819eb6fa29df6b34ef8921c743461
-        with:
-          bun-version: 1.3.12
+        # Self-hosted runner images may not provide unzip, so we extract the
+        # pinned Bun release with python3's zipfile module as a fallback.
+        env:
+          BUN_VERSION: "1.3.12"
+        run: |
+          set -euo pipefail
+          if [ -x ~/.local/bin/bun ] && ~/.local/bin/bun --version 2>/dev/null | grep -Fqx "$BUN_VERSION"; then
+            echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+            ~/.local/bin/bun --version
+            exit 0
+          fi
+          mkdir -p ~/.local/bin /tmp/bun
+          curl -fsSL "https://github.com/oven-sh/bun/releases/download/bun-v${BUN_VERSION}/bun-linux-x64.zip" -o /tmp/bun/bun.zip
+          if command -v unzip >/dev/null 2>&1; then
+            unzip -q /tmp/bun/bun.zip -d /tmp/bun
+          else
+            python3 -m zipfile -e /tmp/bun/bun.zip /tmp/bun
+          fi
+          mv "/tmp/bun/bun-linux-x64/bun" ~/.local/bin/bun
+          chmod +x ~/.local/bin/bun
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          export PATH="$HOME/.local/bin:$PATH"
+          bun --version
 
       - name: Run unit tests
         run: bun test scripts/lib/

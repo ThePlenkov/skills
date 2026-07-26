@@ -5,6 +5,7 @@ argument-hint: "[optional experiment name or root objective]"
 tier: 2
 triggers:
   - user
+disable-model-invocation: true
 allowed-tools:
   - read
   - grep

@@ -3,7 +3,7 @@
 #
 # By default this script:
 #   * regenerates the index and schema in a tmp dir using the TypeScript generator
-#   * validates the generated index against the generated schema (when jsonschema is available)
+#   * validates the generated index against the generated schema using the locally installed ajv-cli
 #   * if .claude-plugin/skills-index.json exists, compares the generated index against it
 #
 # Usage:
@@ -75,15 +75,16 @@ fi
 
 npx tsx "$SCRIPT_DIR/generate-skills-index.ts" --no-timestamp --root "$REPO_ROOT" --output "$TMP_INDEX" --schema "$TMP_SCHEMA" >/dev/null
 
-# Validate the generated index against the JSON Schema when jsonschema is available.
-if python3 -c "import jsonschema" >/dev/null 2>&1; then
-  if ! python3 -m jsonschema -i "$TMP_INDEX" "$TMP_SCHEMA" >/dev/null 2>&1; then
+# Validate the generated index against the JSON Schema using the locally installed ajv-cli.
+AJV="$REPO_ROOT/node_modules/.bin/ajv"
+if [[ -x "$AJV" ]]; then
+  if ! "$AJV" validate -s "$TMP_SCHEMA" -d "$TMP_INDEX" --spec=draft7 --strict=false >/dev/null 2>&1; then
     echo "error: generated index does not match the generated schema" >&2
-    python3 -m jsonschema -i "$TMP_INDEX" "$TMP_SCHEMA" >&2
+    "$AJV" validate -s "$TMP_SCHEMA" -d "$TMP_INDEX" --spec=draft7 --strict=false >&2 || true
     exit 1
   fi
 else
-  echo "warning: jsonschema not installed; skipping JSON schema validation" >&2
+  echo "warning: ajv-cli not installed; skipping JSON schema validation" >&2
 fi
 
 # Compare with an existing on-disk index *before* writing, so --update only

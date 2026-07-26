@@ -89,6 +89,11 @@ tier: 2                    # required; on-demand default
 triggers:                  # required
   - user                   # user invokes explicitly
   - model                  # agent loads automatically
+disable-model-invocation: false  # set to true for user-only skills
+# When true, set `triggers` to user-only by removing `- model`.
+# For Codex, also create agents/openai.yaml with:
+#   policy:
+#     allow_implicit_invocation: false
 allowed-tools:             # optional
   - read
   - bash

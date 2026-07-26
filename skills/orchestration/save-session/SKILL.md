@@ -10,7 +10,8 @@ metadata:
   author: codex
   version: "1.0.0"
 tier: 2
-triggers: [user, model]
+triggers: [user]
+disable-model-invocation: true
 source: theplenkov-ai/skills
 ---
 
