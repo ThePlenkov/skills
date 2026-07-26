@@ -116,14 +116,9 @@ runs:
         set -euo pipefail
         npm ci --prefix "$GITHUB_ACTION_PATH" --no-audit --no-fund
 
-    - name: Set up Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: "3.12"
-
     - name: Install SkillSpector
       shell: bash
-      run: pip install --quiet "git+https://github.com/NVIDIA/skillspector.git@${{ inputs.skillspector-version }}"
+      run: python3 -m pip install --quiet --user "git+https://github.com/NVIDIA/skillspector.git@${{ inputs.skillspector-version }}"
 
     - name: Set Nx SHAs
       if: inputs.affected == 'true'
