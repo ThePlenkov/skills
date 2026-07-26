@@ -7,9 +7,9 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-skills-inde
 - **Total skills:** 91
 - **Context window (default):** 128,000 tokens
 - **Skills metadata budget (2%):** 2,560 tokens
-- **Total description tokens:** 6,266 tokens
+- **Total description tokens:** 6,264 tokens
 - **Overflow vs. 2% budget:** 2.45x
-- **Total skill file tokens:** 168,135 tokens
+- **Total skill file tokens:** 170,339 tokens
 
 Token counts use the same approximation Codex uses for its skills context budget: `ceil(byte_length / 4)`.
 
@@ -20,20 +20,20 @@ Token counts use the same approximation Codex uses for its skills context budget
 | agents | 2 | 83 | 1,196 |
 | behavior | 1 | 106 | 1,923 |
 | coaching | 2 | 191 | 5,196 |
-| code-review | 6 | 472 | 17,337 |
+| code-review | 6 | 472 | 17,857 |
 | engineering | 8 | 513 | 15,917 |
-| experimentation | 1 | 101 | 1,762 |
+| experimentation | 1 | 101 | 1,770 |
 | foundation | 4 | 320 | 8,338 |
 | integrations | 9 | 406 | 9,101 |
 | methodology | 20 | 1,405 | 43,729 |
-| orchestration | 5 | 368 | 8,084 |
+| orchestration | 5 | 366 | 9,666 |
 | research | 1 | 57 | 1,368 |
 | safety | 3 | 224 | 4,584 |
 | self-learning | 2 | 169 | 3,552 |
-| tools | 7 | 425 | 12,138 |
+| tools | 7 | 425 | 12,220 |
 | troubleshooting | 2 | 216 | 3,699 |
 | verification | 2 | 161 | 3,489 |
-| workflow | 16 | 1,049 | 26,722 |
+| workflow | 16 | 1,049 | 26,734 |
 
 ## Skill catalog
 
@@ -44,7 +44,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`architecture-review`](skills/behavior/architecture-review/SKILL.md) | behavior | 2 | yes | 106 | 1,923 | user, model | yes | yes |
 | [`adhd`](skills/coaching/adhd/SKILL.md) | coaching | 2 | yes | 69 | 1,571 | user, model | yes | yes |
 | [`interview-me`](skills/coaching/interview-me/SKILL.md) | coaching | 2 | yes | 122 | 3,625 | user, model | yes | yes |
-| [`act`](skills/code-review/act/SKILL.md) | code-review | 2 | no | 116 | 6,811 | user | no | no |
+| [`act`](skills/code-review/act/SKILL.md) | code-review | 2 | no | 116 | 7,331 | user | no | no |
 | [`github-fix-main`](skills/code-review/github-fix-main/SKILL.md) | code-review | 2 | yes | 63 | 1,990 | user, model | yes | yes |
 | [`github-pr-review`](skills/code-review/github-pr-review/SKILL.md) | code-review | 2 | yes | 29 | 2,351 | user, model | yes | yes |
 | [`mr-address-review`](skills/code-review/mr-address-review/SKILL.md) | code-review | 2 | yes | 82 | 1,759 | user, model | yes | yes |
@@ -58,7 +58,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`prototype`](skills/engineering/prototype/SKILL.md) | engineering | 2 | yes | 82 | 1,098 | user, model | yes | yes |
 | [`security-and-hardening`](skills/engineering/security-and-hardening/SKILL.md) | engineering | 2 | yes | 62 | 2,006 | user, model | yes | yes |
 | [`typescript`](skills/engineering/typescript/SKILL.md) | engineering | 2 | yes | 58 | 1,107 | user, model | yes | yes |
-| [`sandboxed`](skills/experimentation/sandboxed/SKILL.md) | experimentation | 2 | no | 101 | 1,762 | user | no | no |
+| [`sandboxed`](skills/experimentation/sandboxed/SKILL.md) | experimentation | 2 | no | 101 | 1,770 | user | no | no |
 | [`minimalist`](skills/foundation/minimalist/SKILL.md) | foundation | 2 | yes | 124 | 3,538 | user, model | yes | yes |
 | [`persistent-memory`](skills/foundation/persistent-memory/SKILL.md) | foundation | 1 | no | 78 | 2,449 | user | no | no |
 | [`skill-tiers`](skills/foundation/skill-tiers/SKILL.md) | foundation | 2 | yes | 55 | 1,095 | user, model | yes | yes |
@@ -92,10 +92,10 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`spec-driven-development`](skills/methodology/sdd/spec-driven-development/SKILL.md) | methodology | 2 | yes | 51 | 2,166 | user, model | yes | yes |
 | [`spec-kit`](skills/methodology/sdd/spec-kit/SKILL.md) | methodology | 2 | yes | 41 | 2,214 | user, model | yes | yes |
 | [`test-driven-development`](skills/methodology/test-driven-development/SKILL.md) | methodology | 2 | yes | 58 | 3,757 | user, model | yes | yes |
-| [`handoff`](skills/orchestration/handoff/SKILL.md) | orchestration | 2 | no | 93 | 1,570 | user | no | no |
-| [`save-session`](skills/orchestration/save-session/SKILL.md) | orchestration | 2 | yes | 51 | 2,337 | user, model | yes | yes |
+| [`handoff`](skills/orchestration/handoff/SKILL.md) | orchestration | 2 | no | 91 | 3,138 | user | no | no |
+| [`save-session`](skills/orchestration/save-session/SKILL.md) | orchestration | 2 | no | 51 | 2,343 | user | no | no |
 | [`subagent-capsule`](skills/orchestration/subagent-capsule/SKILL.md) | orchestration | 2 | yes | 79 | 558 | user, model | yes | yes |
-| [`unwind`](skills/orchestration/unwind/SKILL.md) | orchestration | 2 | no | 90 | 1,019 | user | no | no |
+| [`unwind`](skills/orchestration/unwind/SKILL.md) | orchestration | 2 | no | 90 | 1,027 | user | no | no |
 | [`using-agent-skills`](skills/orchestration/using-agent-skills/SKILL.md) | orchestration | 2 | yes | 55 | 2,600 | user, model | yes | yes |
 | [`deepwiki`](skills/research/deepwiki/SKILL.md) | research | 2 | yes | 57 | 1,368 | user, model | yes | yes |
 | [`drill`](skills/safety/drill/SKILL.md) | safety | 2 | yes | 52 | 2,068 | user, model | yes | yes |
@@ -106,10 +106,10 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`docker-agent-config`](skills/tools/docker-agent-config/SKILL.md) | tools | 2 | yes | 75 | 3,509 | user, model | yes | yes |
 | [`npm-publish`](skills/tools/npm-publish/SKILL.md) | tools | 2 | yes | 76 | 2,111 | user, model | yes | yes |
 | [`sarif-to-annotations`](skills/tools/sarif-to-annotations/SKILL.md) | tools | 2 | yes | 92 | 1,484 | user, model | yes | yes |
-| [`skillmaker`](skills/tools/skillmaker/SKILL.md) | tools | 2 | yes | 43 | 1,098 | user, model | yes | yes |
+| [`skillmaker`](skills/tools/skillmaker/SKILL.md) | tools | 2 | yes | 43 | 1,156 | user, model | yes | yes |
 | [`skills-cli`](skills/tools/skills-cli/SKILL.md) | tools | 2 | yes | 20 | 502 | user, model | yes | yes |
 | [`tsdown`](skills/tools/tsdown/SKILL.md) | tools | 2 | yes | 52 | 802 | user, model | yes | yes |
-| [`writing-great-skills`](skills/tools/writing-great-skills/SKILL.md) | tools | 2 | no | 67 | 2,632 | user | no | no |
+| [`writing-great-skills`](skills/tools/writing-great-skills/SKILL.md) | tools | 2 | no | 67 | 2,656 | user | no | no |
 | [`debugging`](skills/troubleshooting/debugging/SKILL.md) | troubleshooting | 2 | yes | 109 | 1,830 | user, model | yes | yes |
 | [`performance-investigation`](skills/troubleshooting/performance-investigation/SKILL.md) | troubleshooting | 2 | yes | 107 | 1,869 | user, model | yes | yes |
 | [`evidence`](skills/verification/evidence/SKILL.md) | verification | 2 | yes | 85 | 2,798 | user, model | yes | yes |
@@ -119,10 +119,10 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`ci-local`](skills/workflow/testing/ci-local/SKILL.md) | workflow | 2 | yes | 59 | 1,056 | user, model | yes | yes |
 | [`deprecation-and-migration`](skills/workflow/deprecation-and-migration/SKILL.md) | workflow | 2 | yes | 52 | 3,146 | user, model | yes | yes |
 | [`documentation-and-adrs`](skills/workflow/documentation-and-adrs/SKILL.md) | workflow | 2 | yes | 56 | 2,458 | user, model | yes | yes |
-| [`e2e`](skills/workflow/testing/e2e/SKILL.md) | workflow | 2 | yes | 78 | 606 | user, model | yes | yes |
+| [`e2e`](skills/workflow/testing/e2e/SKILL.md) | workflow | 2 | no | 78 | 612 | user | no | no |
 | [`git-commit`](skills/workflow/git/git-commit/SKILL.md) | workflow | 2 | yes | 83 | 1,088 | user, model | yes | yes |
 | [`git-push`](skills/workflow/git/git-push/SKILL.md) | workflow | 2 | yes | 83 | 1,126 | user, model | yes | yes |
-| [`git-reset`](skills/workflow/git/git-reset/SKILL.md) | workflow | 2 | yes | 66 | 1,444 | user, model | yes | yes |
+| [`git-reset`](skills/workflow/git/git-reset/SKILL.md) | workflow | 2 | no | 66 | 1,450 | user | no | no |
 | [`git-workflow-and-versioning`](skills/workflow/git/git-workflow-and-versioning/SKILL.md) | workflow | 2 | yes | 71 | 3,518 | user, model | yes | yes |
 | [`harvest`](skills/workflow/debt/harvest/SKILL.md) | workflow | 2 | no | 107 | 2,066 | user | no | no |
 | [`planning-and-task-breakdown`](skills/workflow/planning/planning-and-task-breakdown/SKILL.md) | workflow | 2 | yes | 60 | 1,923 | user, model | yes | yes |
