@@ -133,7 +133,7 @@ runs:
         workflow-id: skill-scan.yml
 
     # Cache Nx's default .nx/cache directory in the host repo.
-    # Key: package-lock.json hash + SKILL.md hash + runner.os.
+    # Key: package-lock.json hash + SKILL.md / scripts / references / assets hashes + runner.os.
     # Falling back via restore-keys keeps prior plugin versions
     # usable after a dep upgrade.
     - name: Restore Nx cache
@@ -141,7 +141,7 @@ runs:
       uses: actions/cache/restore@v6
       with:
         path: .nx/cache
-        key: nx-skillspector-${{ runner.os }}-${{ hashFiles('actions/skillspector/package-lock.json', 'skills/**') }}
+        key: nx-skillspector-${{ runner.os }}-${{ hashFiles('actions/skillspector/package-lock.json', 'skills/**/SKILL.md', 'skills/**/scripts/**', 'skills/**/references/**', 'skills/**/assets/**') }}
         restore-keys: |
           nx-skillspector-${{ runner.os }}-
 

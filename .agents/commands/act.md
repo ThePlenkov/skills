@@ -1,6 +1,6 @@
 ---
 description: Fix PR review threads and CI issues - iterative loop until merge-ready
-argument-hint: pr|plan|backlog|harvest pr-number
+argument-hint: pr|plan|backlog|harvest pr-number [--runner]
 ---
 
 Use the `/act` skill to resolve review threads and CI issues on a pull request.
@@ -8,6 +8,7 @@ Use the `/act` skill to resolve review threads and CI issues on a pull request.
 **Context modes:**
 - `/act` or `/act pr` - Fix open threads on current PR
 - `/act <pr-number>` - Fix specific PR by number
+- `/act ... --runner` - Explicitly request a local self-hosted runner if CI is blocked by runner limits
 - `/act plan` - Process threads from `.agents/plans/*.md`
 - `/act backlog` - Process threads from `.agents/backlog/*.md`
 - `/act harvest` - Process threads from `.agents/review-debt/harvests/*.jsonl`

@@ -9,9 +9,18 @@ description: >-
   triage (priority / grouping / wontfix) lives in /backlog. /act is the
   fix loop, not the collect or triage.
 disable-model-invocation: true
-compatibility: Requires gh, jq, git, bun.
+compatibility: Requires gh, jq, git, bun, node.
 tier: 2
 triggers: [user]
+allowed-tools:
+  - read
+  - exec
+  - write
+  - edit
+  - web_search
+  - web_get_contents
+  - grep
+  - message_user
 conflicts_with: [github-pr-review, code-review-and-quality]
 source: theplenkov-ai/skills
 ---
@@ -25,14 +34,15 @@ SAST-source-priority). Copy `.agents/skills/act/` to relocate.
 **`/act` means fix the PR, not hide review comments.**
 
 Applies to `/act`, `/act pr`, `/act plan`, `/act backlog`, `/act harvest`,
-`@claude /act`, `@codex /act`, `@copilot /act`.
+`/act ... --runner`, `@claude /act`, `@codex /act`, `@copilot /act`.
 
 **No Playwright** for GitHub PR UI.
 
-**`bun` is required.** The helper scripts in `scripts/` use
-`Bun`-specific APIs (e.g. `Bun.spawnSync`, `bun:test`,
-`#!/usr/bin/env bun`). Do not attempt to run them with Node.js/npx.
-Install `bun` first if it is missing.
+**`bun` is required** for most helper scripts (e.g. `Bun.spawnSync`,
+`bun:test`, `#!/usr/bin/env bun`). The runner fallback scripts
+(`scripts/runner.cjs` and `scripts/cleanup-runner.cjs`) are plain Node.js
+so they work on hosts without `bun`. Install `bun` first if it is
+missing.
 
 ## Philosophy — "It's all yours"
 
@@ -287,7 +297,7 @@ After the batch PR merges, run `bun run harvest:archive` (or
 
 | Step | What | Done when |
 |------|------|-----------|
-| **P0a** | CI / merge blockers on **HEAD** | Required checks green on **current** HEAD (passing **and** failing-blockers resolved) |
+| **P0a** | CI / merge blockers on **HEAD** | Required checks green on **current** HEAD (passing **and** failing-blockers resolved). If checks are blocked by runner limits or the user requested `/act ... --runner`, start a local self-hosted runner, re-run checks, and watch them with `gh` (see [`references/runner-fallback.md`](references/runner-fallback.md)) |
 | **P0b** | SAST error annotations on failing checks | For each FAILING SAST check, the agent has read every annotation_level=`failure` entry via `gh api repos/<owner>/<repo>/check-runs/<id>/annotations`, fixed in code or triaged with a documented reason (NOSONAR / suppression / false-positive link) |
 | **P1** | Blocking review ("must fix", changes requested) | **Code fixed** on branch + **reply in that thread** |
 | **P2** | Nits, questions, style | **Fix or answer in thread** (not silent) |
@@ -302,6 +312,44 @@ After the batch PR merges, run `bun run harvest:archive` (or
 checks that are blocking. Treat every non-AI-reviewer failing check as
 P0: green it locally, push, or document why it cannot be fixed in
 this PR.
+
+#### CI blocked by runner limits or `/act ... --runner`
+
+If a failing/pending check annotation contains:
+
+```
+The job was not started because recent account payments have failed or your
+spending limit needs to be increased.
+```
+
+or the user explicitly requested `--runner`, `/act` must start a local
+self-hosted runner for the repo, re-run the blocked checks, and watch them to
+completion.
+
+1. Confirm `gh auth status` and the token can request a runner registration token.
+2. Ask the user for approval via `message_user` before running arbitrary workflow
+   code on the host.
+3. Temporarily route `.github/workflows` to self-hosted labels matching the host
+   (commit this change so it can be reverted).
+4. Start the runner in the background:
+   ```bash
+   RUNNER_TOKEN=$(gh api --method POST repos/<owner>/<repo>/actions/runners/registration-token --jq '.token')
+   node scripts/runner.cjs --owner <owner> --repo <repo> --token "$RUNNER_TOKEN" --work-dir tmp/act-runner --persistent --detach --pid-file tmp/act-runner.pid
+   ```
+5. Re-run the latest failed run or push an empty commit to trigger checks.
+6. Watch the queued runs:
+   ```bash
+   RUN_ID=$(gh run list --repo <owner>/<repo> --branch <branch> --json databaseId --jq '.[0].databaseId')
+   gh run watch "$RUN_ID" --repo <owner>/<repo>
+   ```
+7. After the checks finish, stop the runner and clean up:
+   ```bash
+   node scripts/cleanup-runner.cjs --owner <owner> --repo <repo> --work-dir tmp/act-runner --pid-file tmp/act-runner.pid
+   git revert <routing-commit-sha>
+   ```
+
+Full details and platform-specific notes are in
+[`references/runner-fallback.md`](references/runner-fallback.md).
 
 ### P0b — Critical SAST error annotations (obligatory for failing checks)
 

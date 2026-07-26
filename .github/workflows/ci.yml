@@ -62,12 +62,16 @@ jobs:
           key: shellcheck-${{ env.SC_VERSION }}
 
       - name: Install ShellCheck
-        if: steps.shellcheck-cache.outputs.cache-hit != 'true'
-        # Install a recent shellcheck from GitHub releases (apt on Ubuntu 22.04
-        # runners ships shellcheck 0.9.0 which doesn't accept directories as
-        # arguments; we need >=0.10.0 for `shellcheck scripts/`).
+        # Always verify the binary is present and matches the expected version;
+        # a cache hit can be stale or restored on a self-hosted runner whose
+        # ~/.local/bin does not yet contain a valid executable.
         run: |
           set -euo pipefail
+          if [ -x ~/.local/bin/shellcheck ] && \
+             ~/.local/bin/shellcheck --version 2>/dev/null | grep -Fqx "version: ${SC_VERSION#v}"; then
+            ~/.local/bin/shellcheck --version
+            exit 0
+          fi
           curl -sSL \
             "https://github.com/koalaman/shellcheck/releases/download/${SC_VERSION}/shellcheck-${SC_VERSION}.linux.x86_64.tar.xz" \
             | tar -xJ -C /tmp
