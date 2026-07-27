@@ -193,12 +193,19 @@ Use plain text for optional arguments, `|` for alternatives, `<name>` for placeh
 To publish a skill:
 
 1. Open `public-skills.config.ts` at the repo root.
-2. Add an entry to the default export array:
+2. If the target repo is not already in the `repositories` map, add it there:
    ```ts
-   { skill: '<name>', repo: 'ThePlenkov/skills', format: 'skills-sh' }
+   repositories: {
+     'public-skills': 'ThePlenkov/skills',
+     'another': 'AnotherOrg/another-skills-repo',
+   }
    ```
-3. Push the change to `main`.
-4. The `Public skills` GitHub Actions workflow (`.github/workflows/public-skills.yml`) runs on `main` and publishes each entry via a matrix.
+3. Add an entry to the default export array:
+   ```ts
+   { skill: '<name>', repo: 'public-skills', format: 'skills-sh' }
+   ```
+4. Push the change to `main`.
+5. The `Public skills` GitHub Actions workflow (`.github/workflows/public-skills.yml`) runs on `main` and publishes each entry via a matrix.
 
 Use `format: 'skills-sh'` for `skills.sh` distribution. Other targets (`claude`, `codex`, `agents`, `obsidian`) can be added to other repositories if needed.
 
