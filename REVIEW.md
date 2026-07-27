@@ -31,8 +31,9 @@ input, and check failure paths as carefully as happy paths.
 ## Fit — does it fit where it was put?
 
 Check the layer, directory, naming, file size, and existing components before
-accepting new structure. Duplicating or contradicting something already in the
-repository is a finding in its own right, not a style nit.
+accepting new structure. For interchangeable components, two components
+covering the same surface, a component contradicting a rule stated elsewhere,
+or a document duplicating another document is a finding, not a style nit.
 
 ## Evidence — what evidence supports the claim?
 
@@ -45,7 +46,8 @@ while behavioral changes need reproducible proof.
 Check whether the change leaves context clearer, smaller, and current. Update
 agent-facing documents before human-facing ones, and treat stale or
 contradictory documentation as context poisoning even when the diff did not
-create it.
+create it. Flag aged material near the diff as 🟣 Pre-existing with a
+`Prevention:` line; flag at most five such items per review and count the rest.
 
 ## How severe is the finding?
 
@@ -63,6 +65,11 @@ Before posting a behavioral claim, check whether it has a `file:line` citation
 or is only inferred from a name or plausible pattern. Publish inference as
 🔵 Question, never 🔴 Important; saying “I may be wrong because I did not see
 Y” is better than false confidence.
+
+Claims that a version, runtime, action, or dependency is latest, current, or
+supported require a live registry or release-page citation. This binds the
+reviewer too: do not correct a version from memory and replace one stale claim
+with another.
 
 Praise is not a finding. Do not add filler compliments; “no blocking issues” is
 one line, not a paragraph.
@@ -106,4 +113,4 @@ one-line tally by severity, then the findings.
 Close with prevention and automation proposals aggregated so they can be
 harvested into the project backlog rather than lost in a thread.
 
-Long-form principles: `$skill{two-axis-review}`, `$skill{security-and-hardening}`, `$skill{architecture-review}`, `$skill{evidence}`, `$skill{context-engineering}`, `$skill{critical-thinking}`, `$skill{retrospect}`, `$skill{loop-programming}`, and `$skill{harvest}`.
+Long-form principles: `$skill{two-axis-review}`, `$skill{security-and-hardening}`, `$skill{architecture-review}`, `$skill{evidence}`, `$skill{context-engineering}`, `$skill{critical-thinking}`, `$skill{retrospect}`, `$skill{loop-programming}`, `$skill{modern-stack}`, and `$skill{harvest}`.
