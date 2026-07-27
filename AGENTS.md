@@ -142,6 +142,8 @@ source: theplenkov-ai/skills
 
 ## Skill references
 
+The root review policy is in [REVIEW.md](REVIEW.md); it defines how changes are judged.
+
 When one skill references another, use `$name` or `$skill{name}` notation. Integration and tool skills are typically referenced by bare `$name` (e.g. `$github`, `$gitlab`, `$glab`); other skills may use `$skill{name}`:
 
 ```markdown
