@@ -3,24 +3,6 @@ import path from 'node:path';
 import { rewriteBody } from './common.js';
 import type { CompilerOptions, Skill, SkillLink } from '../types.js';
 
-function serializeFrontmatter(frontmatter: Record<string, unknown>): string {
-  const lines: string[] = ['---'];
-  for (const [key, value] of Object.entries(frontmatter)) {
-    if (value === undefined || value === null) continue;
-    if (Array.isArray(value)) {
-      lines.push(`${key}:`);
-      for (const item of value) {
-        lines.push(`  - ${item}`);
-      }
-    } else {
-      const str = String(value);
-      lines.push(str.includes(':') || str.includes(' ') ? `${key}: "${str}"` : `${key}: ${str}`);
-    }
-  }
-  lines.push('---');
-  return lines.join('\n') + '\n';
-}
-
 function copySkillDirectory(src: string, dest: string): void {
   if (!fs.existsSync(dest)) {
     fs.mkdirSync(dest, { recursive: true });
@@ -61,8 +43,11 @@ export function buildSkillsSh(options: CompilerOptions, skills: Skill[], project
       }
       return `[${link.text}](../${target.name}/SKILL.md)`;
     };
+    const original = fs.readFileSync(path.join(skill.dir, 'SKILL.md'), 'utf8');
+    const headerMatch = original.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n/);
+    const header = headerMatch ? headerMatch[0] : '';
     const body = rewriteBody(skill.body, skill.links, linkFormatter, skill);
-    fs.writeFileSync(path.join(destDir, 'SKILL.md'), serializeFrontmatter(skill.frontmatter) + body, 'utf8');
+    fs.writeFileSync(path.join(destDir, 'SKILL.md'), header + body, 'utf8');
   }
 
   for (const skill of skills) {

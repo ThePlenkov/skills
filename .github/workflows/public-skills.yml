@@ -1,0 +1,45 @@
+name: Public skills
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      include: ${{ steps.matrix.outputs.include }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - id: matrix
+        run: |
+          include=$(npx tsx scripts/generate-public-skills-matrix.ts)
+          echo "include<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$include" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+  publish:
+    needs: matrix
+    runs-on: ubuntu-latest
+    if: needs.matrix.outputs.include != '{"include":[]}'
+    strategy:
+      matrix: ${{ fromJSON(needs.matrix.outputs.include) }}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npx tsc -p tools/compiler/tsconfig.json
+      - run: npx tsx scripts/publish-skill.ts
+        env:
+          SKILL: ${{ matrix.skill }}
+          REPO: ${{ matrix.repo }}
+          FORMAT: ${{ matrix.format }}
+          GH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}

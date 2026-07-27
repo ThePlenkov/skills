@@ -185,3 +185,22 @@ argument-hint: pr|plan|backlog|harvest pr-number
 ```
 
 Use plain text for optional arguments, `|` for alternatives, `<name>` for placeholders, and `--flag=value1|value2` for flag options.
+
+## Publishing skills to `ThePlenkov/skills`
+
+`ThePlenkov/skills` is the public `skills.sh` distribution repo. Publication is **CI-only** — never push there manually.
+
+To publish a skill:
+
+1. Open `public-skills.config.ts` at the repo root.
+2. Add an entry to the default export array:
+   ```ts
+   { skill: '<name>', repo: 'ThePlenkov/skills', format: 'skills-sh' }
+   ```
+3. Push the change to `main`.
+4. The `Public skills` GitHub Actions workflow (`.github/workflows/public-skills.yml`) runs on `main` and publishes each entry via a matrix.
+
+Use `format: 'skills-sh'` for `skills.sh` distribution. Other targets (`claude`, `codex`, `agents`, `obsidian`) can be added to other repositories if needed.
+
+The workflow requires a repository secret `PUBLISH_TOKEN` with write access to the target repository. Do not add skill-specific flags to `SKILL.md` frontmatter — the publication list is the single source of truth.
+
