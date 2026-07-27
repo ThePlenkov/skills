@@ -36,10 +36,10 @@ skills/
 - `.codex-plugin/plugin.json` — ChatGPT/Codex plugin manifest. Same skills, different plugin format.
 - `.agents/plugins/marketplace.json` — ChatGPT/Codex plugin marketplace catalog (Codex-format entries for the Plugins Directory).
 - `.agents/agents/` — role prompts (tiered filenames only, role text without tiers).
-- `REVIEW.md` — review policy and merge-readiness standard.
 - `.agents/commands/` — command definitions (e.g. `/drill`, `/undrill`, `/recall`, `/retain`, `/reflect`).
 - `.agents/rules/` — agent behavior rules (e.g. `agent-memory.md`, `drill-troubleshooting.md`).
 - `.memory/` — transient memory files (facts, experience, observations, mental-models).
+- `REVIEW.md` — review policy: how any human or agent judges a change here.
 
 ## Repository rules
 
