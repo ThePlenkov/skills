@@ -25,3 +25,7 @@ scripts/reserved-names.sh
 # are committed for github.com mermaid rendering, but the adjacency JSON and
 # any out-of-tree build outputs are not.
 .build/
+
+# Local Obsidian vault preview (created by npm run obsidian:build)
+skills-obsidian/
+.obsidian/
