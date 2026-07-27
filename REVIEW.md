@@ -6,15 +6,21 @@ the source of truth for how it is judged.
 
 ## Before reviewing — establish the yardstick
 
-Read the available intent first: the pull request description, linked issue,
-and relevant specification, before reading the diff. Establish the baseline
-against which the change is judged.
+Read stated intent (pull request description, linked issue, relevant
+specification) before the diff and establish the baseline.
+If intent is absent or unverifiable, make that the first finding about the
+author, not the code. State inferred intent at the top: “I assumed the goal was
+X; if that is wrong, the findings below are unreliable.” Flawless code that
+does the wrong thing is the most expensive failure mode.
 
 ## How should the review be executed?
 
-Review each axis independently in fresh context; a single pass lets early findings bias later axes.
-If subagents are available, give each axis its own; otherwise run axes sequentially, one at a time, without blending them. If already one of several parallel reviewers, ensure every axis is covered independently rather than spawning another fleet.
-Fan-out increases coverage, not output volume: merge and deduplicate findings, apply the verification bar, and enforce the nit cap.
+Review each axis in fresh context; one pass lets early findings bias later axes.
+If subagents are available, give each axis one; otherwise run axes sequentially,
+without blending them. If already in a parallel review fleet, ensure every axis is
+covered independently rather than spawning another fleet.
+Fan-out increases coverage, not output: merge and deduplicate, apply verification,
+and enforce the nit cap.
 
 ## Intent — is it clear what this change is for, and does it do exactly that?
 
@@ -28,6 +34,7 @@ an inline comment only when a specific line's why is genuinely non-obvious (a
 workaround, non-intuitive ordering, or deliberate trade-off), or a
 specification for a new component. Missing comments are findings only when the
 code is non-obvious, never as a blanket requirement.
+
 ## Correctness & Security — will it break, leak, or misbehave on hostile input?
 
 Threat-model every trust boundary the diff touches: untrusted input, secrets,
