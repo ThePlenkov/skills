@@ -1,0 +1,5 @@
+interface:
+  display_name: "Sourcegraph"
+  short_description: "Cross-repo code search and AI research via corporate Sourcegraph"
+  brand_color: "#FF5543"
+  default_prompt: "Use $sourcegraph to search code or run deep research across many repos."

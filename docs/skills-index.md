@@ -4,12 +4,12 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-skills-inde
 
 ## Summary
 
-- **Total skills:** 91
+- **Total skills:** 93
 - **Context window (default):** 128,000 tokens
 - **Skills metadata budget (2%):** 2,560 tokens
-- **Total description tokens:** 6,264 tokens
-- **Overflow vs. 2% budget:** 2.45x
-- **Total skill file tokens:** 170,339 tokens
+- **Total description tokens:** 6,447 tokens
+- **Overflow vs. 2% budget:** 2.52x
+- **Total skill file tokens:** 174,264 tokens
 
 Token counts use the same approximation Codex uses for its skills context budget: `ceil(byte_length / 4)`.
 
@@ -23,11 +23,11 @@ Token counts use the same approximation Codex uses for its skills context budget
 | code-review | 6 | 472 | 17,857 |
 | engineering | 8 | 513 | 15,917 |
 | experimentation | 1 | 101 | 1,770 |
-| foundation | 4 | 320 | 8,338 |
-| integrations | 9 | 406 | 9,101 |
+| foundation | 4 | 320 | 8,777 |
+| integrations | 10 | 476 | 10,815 |
 | methodology | 20 | 1,405 | 43,729 |
 | orchestration | 5 | 366 | 9,666 |
-| research | 1 | 57 | 1,368 |
+| research | 2 | 170 | 3,140 |
 | safety | 3 | 224 | 4,584 |
 | self-learning | 2 | 169 | 3,552 |
 | tools | 7 | 425 | 12,220 |
@@ -62,7 +62,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`minimalist`](skills/foundation/minimalist/SKILL.md) | foundation | 2 | yes | 124 | 3,538 | user, model | yes | yes |
 | [`persistent-memory`](skills/foundation/persistent-memory/SKILL.md) | foundation | 1 | no | 78 | 2,449 | user | no | no |
 | [`skill-tiers`](skills/foundation/skill-tiers/SKILL.md) | foundation | 2 | yes | 55 | 1,095 | user, model | yes | yes |
-| [`token-rationalism`](skills/foundation/token-rationalism/SKILL.md) | foundation | 0 | always | 63 | 1,256 | always | yes | yes |
+| [`token-rationalism`](skills/foundation/token-rationalism/SKILL.md) | foundation | 0 | always | 63 | 1,695 | always | yes | yes |
 | [`atlassian`](skills/integrations/atlassian/SKILL.md) | integrations | 2 | yes | 58 | 257 | user, model | yes | yes |
 | [`bootstrap-gh-self-hosted-runner`](skills/integrations/bootstrap-gh-self-hosted-runner/SKILL.md) | integrations | 2 | no | 44 | 2,380 | user | no | no |
 | [`codacy`](skills/integrations/codacy/SKILL.md) | integrations | 2 | yes | 40 | 1,684 | user, model | yes | yes |
@@ -72,6 +72,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`gitlab-ci-local`](skills/integrations/gitlab-ci-local/SKILL.md) | integrations | 2 | yes | 39 | 375 | user, model | yes | yes |
 | [`glab`](skills/integrations/glab/SKILL.md) | integrations | 2 | yes | 33 | 579 | user, model | yes | yes |
 | [`glean`](skills/integrations/glean/SKILL.md) | integrations | 2 | yes | 44 | 877 | user, model | yes | yes |
+| [`sourcegraph`](skills/integrations/sourcegraph/SKILL.md) | integrations | 2 | yes | 70 | 1,714 | user, model | yes | yes |
 | [`code-review-and-quality`](skills/methodology/code-review-and-quality/SKILL.md) | methodology | 2 | yes | 60 | 2,833 | user, model | yes | yes |
 | [`code-simplification`](skills/methodology/code-simplification/SKILL.md) | methodology | 2 | yes | 61 | 3,378 | user, model | yes | yes |
 | [`codehome`](skills/methodology/codehome/SKILL.md) | methodology | 2 | no | 69 | 1,475 | user | no | no |
@@ -97,7 +98,8 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`subagent-capsule`](skills/orchestration/subagent-capsule/SKILL.md) | orchestration | 2 | yes | 79 | 558 | user, model | yes | yes |
 | [`unwind`](skills/orchestration/unwind/SKILL.md) | orchestration | 2 | no | 90 | 1,027 | user | no | no |
 | [`using-agent-skills`](skills/orchestration/using-agent-skills/SKILL.md) | orchestration | 2 | yes | 55 | 2,600 | user, model | yes | yes |
-| [`deepwiki`](skills/research/deepwiki/SKILL.md) | research | 2 | yes | 57 | 1,368 | user, model | yes | yes |
+| [`deepwiki`](skills/research/deepwiki/SKILL.md) | research | 2 | yes | 57 | 1,779 | user, model | yes | yes |
+| [`external-research`](skills/research/external-research/SKILL.md) | research | 2 | yes | 113 | 1,361 | user, model | yes | yes |
 | [`drill`](skills/safety/drill/SKILL.md) | safety | 2 | yes | 52 | 2,068 | user, model | yes | yes |
 | [`safeguard`](skills/safety/safeguard/SKILL.md) | safety | 2 | yes | 98 | 1,700 | user, model | yes | yes |
 | [`salvage`](skills/safety/salvage/SKILL.md) | safety | 2 | no | 74 | 816 | user | no | no |

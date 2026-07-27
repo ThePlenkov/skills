@@ -15,6 +15,40 @@ Use DeepWiki to analyze, scan, or understand any **public** GitHub repository.
 DeepWiki generates AI-powered documentation wikis and can answer questions
 grounded in a repo's actual code.
 
+## Scope discipline — the leak rule
+
+DeepWiki chat (`ask_question`) is grounded in a single repo's code —
+**the repo you pass as `repoName`**. Two failure modes if the prompt is
+sloppy:
+
+1. The model **confabulates** a mapping from your internal concept to
+   the target repo (it has no way to verify your concept exists there).
+   The answer comes back sounding authoritative and is wrong.
+2. You **leak** the shape of your internal design — file paths,
+   internal class names, env names, customer terminology — to a
+   third-party service that has no business knowing them.
+
+**Rules for the chat prompt:**
+
+- **Always pass `repoName` first**, on every call. Never invoke
+  `ask_question` without it — the answer must be drawn from one
+  target repo's corpus.
+- **Phrase in the target repo's vocabulary** — class names, function
+  names, file names that actually appear in the target. If you don't
+  know them, `read_wiki_structure` first.
+- **Do not include** the current project's: file paths, internal
+  class names, env / customer / org-specific terminology, or anything
+  you'd redact from a public post.
+- **If you need a mapping** between an internal concept and the
+  target, ask in general terms first
+  ("How is request validation typically done in Express?"), confirm,
+  then ask the targeted question using only the target's vocabulary.
+
+The same rule applies in reverse to `$skill{sourcegraph}` search
+queries: search by the symbol the target actually uses, not by your
+project's nickname for it. For the full decision tree, see
+`$skill{external-research}`.
+
 ## When to use
 
 - Understanding architecture or internals of a GitHub dependency
@@ -58,7 +92,7 @@ flow, not a specific runtime API.
 | Tool | Key args | Description |
 |------|----------|-------------|
 | `read_wiki_structure` | `repoName` (`owner/repo`) | List documentation topics for a repo |
-| `read_wiki_contents` | `repoName`, `topic` | Read documentation for a specific topic |
+| `read_wiki_contents` | `repoName` | Read the full wiki (large; use selectively) |
 | `ask_question` | `repoName`, `question` | AI-powered Q&A grounded in the repo's code |
 
 ## Workflow — always non-blocking
@@ -130,7 +164,7 @@ Setup: follow the Setup steps in the main deepwiki skill to dispatch the call th
 
 Steps:
 1. read_wiki_structure for fastify/fastify to see available topics
-2. read_wiki_contents for the plugin system and routing topics
+2. read_wiki_contents for the full wiki, then locate the plugin system and routing sections
 3. ask_question: "How does Fastify's plugin encapsulation work?"
 
 Return: summary of plugin architecture and routing internals.

@@ -19,6 +19,39 @@ Every interaction has a flat cost. Output tokens cost 2–5× input tokens. Bloa
 
 ---
 
+## Rule 0: Search before you read
+
+**Before any `git clone`, any grep across repos, any `Read` on a
+foreign file, any `web_search` for an external thing — pause
+and ask: "is there a native search engine or chat tool that
+already has this data?"** The catalog (Sourcegraph Deep Search,
+Glean, Rovo, Perplexity, DeepWiki, GitHub code search, Jira,
+Confluence, package registries) is in
+`$skill{external-research}`. The hard rule: if an engine has
+the answer, the query costs a few hundred tokens. If you skip
+the check, you burn 5–50× more tokens on a worse answer.
+
+This rule applies to **foreign** code and data. For the current
+project's own code, use `$skill{investigate-first}` — local search is
+the right default there.
+
+This rule is the **primary** mechanism by which the rest of
+this skill pays off. A few common patterns:
+
+- "How does library X work?" → DeepWiki / registry / Perplexity
+  chat. **Never** read its source by `git clone`.
+- "Where is symbol Y used?" → `src search` / GitHub code
+  search. **Never** grep across checked-out repos.
+- "What's the status of issue I?" → Jira / GitHub MCP. **Never**
+  web search the public issue tracker (slow, often wrong).
+- "Read file Z in repo W" → the host's MCP / `src` CLI.
+  **Never** `git clone` + Read.
+
+The web_search tool is the LAST RESORT and a weak signal —
+the 3rd-5th result is usually more accurate than the first.
+
+---
+
 ## Rule 1: Do the work, don't ask permission
 
 Default: act, then report. Ask only when the request is genuinely ambiguous, the action is destructive, or a required input is missing.
@@ -115,6 +148,7 @@ Heuristic: if the cost of being wrong significantly exceeds the cost of extra to
 4. Am I about to ask a clarifying question? → Can I infer? Yes: infer. Truly blocking? No: proceed with assumption.
 5. Does this warrant deeper reasoning? → High stakes / ambiguous / architectural: invest. Routine / clear / low-risk: be concise.
 6. Is my planned output longer than needed? → cut everything that doesn't add information.
+7. **Am I about to read a foreign file / clone a repo / grep across repos / web-search an external thing?** → **Run the two-token decision in `$skill{external-research}`. Search first.** If the answer is in a native engine (Sourcegraph, DeepWiki, Glean, Rovo, Perplexity, GitHub, registry), use it. If it isn't, then fall through to local work.
 
 ---
 
