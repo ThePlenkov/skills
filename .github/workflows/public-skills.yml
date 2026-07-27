@@ -36,10 +36,19 @@ jobs:
         with:
           node-version: 22
       - run: npm install
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.SKILLS_SYNC_APP_CLIENT_ID }}
+          private-key: ${{ secrets.SKILLS_SYNC_APP_PRIVATE_KEY }}
+          owner: ThePlenkov
+          repositories: skills
+          permission-contents: write
       - run: npx tsc -p tools/compiler/tsconfig.json
       - run: npx tsx scripts/publish-skill.ts
         env:
           SKILL: ${{ matrix.skill }}
           REPO: ${{ matrix.repo }}
           FORMAT: ${{ matrix.format }}
-          GH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}

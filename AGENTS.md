@@ -209,5 +209,5 @@ To publish a skill:
 
 Use `format: 'skills-sh'` for `skills.sh` distribution. Other targets (`claude`, `codex`, `agents`, `obsidian`) can be added to other repositories if needed.
 
-The workflow requires a repository secret `PUBLISH_TOKEN` with write access to the target repository. Do not add skill-specific flags to `SKILL.md` frontmatter — the publication list is the single source of truth.
+The workflow reuses the same GitHub App as `skills-sync` (`vars.SKILLS_SYNC_APP_CLIENT_ID` and `secrets.SKILLS_SYNC_APP_PRIVATE_KEY`) to generate a write token for the target repository. Do not add skill-specific flags to `SKILL.md` frontmatter — the publication list is the single source of truth.
 
