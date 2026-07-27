@@ -6,32 +6,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  actions: read
   contents: read
 
 jobs:
-  pick-runner:
-    runs-on: ubuntu-latest
-    outputs:
-      labels: ${{ steps.pick.outputs.labels }}
-    steps:
-      - id: pick
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          labels=$(gh api "repos/${{ github.repository }}/actions/runners" --jq '
-            [((.runners // []) | .[]) | select(.status == "online") | .labels[].name | ascii_downcase] |
-            if contains(["self-hosted"]) and contains(["linux"]) and contains(["x64"]) then
-              "[\"self-hosted\",\"linux\",\"x64\"]"
-            else
-              "[\"ubuntu-latest\"]"
-            end
-          ')
-          echo "labels=${labels}" >> "$GITHUB_OUTPUT"
-
   matrix:
-    needs: pick-runner
-    runs-on: ${{ fromJSON(needs.pick-runner.outputs.labels) }}
+    runs-on: [self-hosted, linux, x64]
     outputs:
       include: ${{ steps.matrix.outputs.include }}
     steps:
@@ -48,8 +27,8 @@ jobs:
           echo "EOF" >> "$GITHUB_OUTPUT"
 
   publish:
-    needs: [matrix, pick-runner]
-    runs-on: ${{ fromJSON(needs.pick-runner.outputs.labels) }}
+    needs: matrix
+    runs-on: [self-hosted, linux, x64]
     if: needs.matrix.outputs.include != '{"include":[]}'
     strategy:
       matrix: ${{ fromJSON(needs.matrix.outputs.include) }}
