@@ -5,9 +5,12 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   matrix:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     outputs:
       include: ${{ steps.matrix.outputs.include }}
     steps:
@@ -25,7 +28,7 @@ jobs:
 
   publish:
     needs: matrix
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     if: needs.matrix.outputs.include != '{"include":[]}'
     strategy:
       matrix: ${{ fromJSON(needs.matrix.outputs.include) }}
