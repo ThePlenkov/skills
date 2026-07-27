@@ -146,6 +146,15 @@ jobs:
           set -euo pipefail
           node --experimental-strip-types --no-warnings scripts/obsidian-vault.ts --source skills-sync/.agents/skills --out skills-sync/obsidian --clean
 
+      - name: Build skills index README in skills-sync
+        run: |
+          set -euo pipefail
+          node --experimental-strip-types --no-warnings scripts/skills-sync-readme.ts \
+            --source skills-sync/.agents/skills \
+            --skills-root skills \
+            --out skills-sync/README.md \
+            --vault-prefix obsidian/
+
       - name: Commit and push updates
         env:
           GIT_AUTHOR_NAME: github-actions[bot]
@@ -155,7 +164,7 @@ jobs:
         run: |
           set -euo pipefail
           cd skills-sync
-          git add .agents/skills obsidian
+          git add .agents/skills obsidian README.md
           if git diff --cached --quiet; then
             echo 'No changes to commit.'
             exit 0

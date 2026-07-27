@@ -43,6 +43,24 @@ runs on every push and PR touching skills or the generator. If the regenerated
 graphs differ from the committed copy, the workflow warns so a maintainer can
 regenerate and commit the updated `docs/graphs/generated/*.md`.
 
+## Distribution mirror and Obsidian vault
+
+The auto-generated distribution lives in
+[`theplenkov-ai/skills-sync`](https://github.com/theplenkov-ai/skills-sync). It
+is pushed by the
+[`Sync skills to skills-sync`](.github/workflows/skills-sync.yml) workflow on
+every push to `main`. Do not edit `skills-sync` directly — make changes here in
+`skills/<category>/<skill-name>/SKILL.md` and let CI propagate them.
+
+The mirror contains:
+
+- `.agents/skills/` — flat skill tree for agent runtimes.
+- `obsidian/` — an Obsidian vault with `[[wikilink]]`-resolved skill notes and a
+  pre-filtered Graph view. Open `obsidian/` as a vault in Obsidian to explore
+  skills and their connections without the large hub nodes from the generated
+  Mermaid index.
+- `README.md` — a generated skills index with per-category tables.
+
 ## Layout
 
 ```

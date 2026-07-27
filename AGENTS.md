@@ -91,6 +91,12 @@ Some skills are owned by other repos and pulled into `.agents/skills/` at instal
    `gh run download -R ThePlenkov/skills -n skills-index`
    Run `scripts/validate-skills-index.sh --update` locally to produce them for
    testing; `npm install` is required first.
+9. `theplenkov-ai/skills-sync` is the auto-generated distribution mirror. It is
+   populated by the `Sync skills to skills-sync` workflow in this repository
+   and should never be edited manually. It contains the flat `.agents/skills/`
+   tree, an `obsidian/` vault with `[[wikilink]]`-resolved skill notes for
+   graph view, and a generated `README.md` skills index. Source-of-truth always
+   stays in `skills/<category>/<skill-name>/`.
 
 ## Skill source metadata
 
