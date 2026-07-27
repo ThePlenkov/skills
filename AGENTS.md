@@ -36,6 +36,7 @@ skills/
 - `.codex-plugin/plugin.json` — ChatGPT/Codex plugin manifest. Same skills, different plugin format.
 - `.agents/plugins/marketplace.json` — ChatGPT/Codex plugin marketplace catalog (Codex-format entries for the Plugins Directory).
 - `.agents/agents/` — role prompts (tiered filenames only, role text without tiers).
+- `REVIEW.md` — review policy and merge-readiness standard.
 - `.agents/commands/` — command definitions (e.g. `/drill`, `/undrill`, `/recall`, `/retain`, `/reflect`).
 - `.agents/rules/` — agent behavior rules (e.g. `agent-memory.md`, `drill-troubleshooting.md`).
 - `.memory/` — transient memory files (facts, experience, observations, mental-models).
@@ -142,8 +143,6 @@ source: theplenkov-ai/skills
 
 ## Skill references
 
-The root review policy is in [REVIEW.md](REVIEW.md); it defines how changes are judged.
-
 When one skill references another, use `$name` or `$skill{name}` notation. Integration and tool skills are typically referenced by bare `$name` (e.g. `$github`, `$gitlab`, `$glab`); other skills may use `$skill{name}`:
 
 ```markdown
@@ -212,4 +211,3 @@ To publish a skill:
 Use `format: 'skills-sh'` for `skills.sh` distribution. Other targets (`claude`, `codex`, `agents`, `obsidian`) can be added to other repositories if needed.
 
 The workflow reuses the same GitHub App as `skills-sync` (`vars.SKILLS_SYNC_APP_CLIENT_ID` and `secrets.SKILLS_SYNC_APP_PRIVATE_KEY`) to generate a write token for the target repository. Do not add skill-specific flags to `SKILL.md` frontmatter — the publication list is the single source of truth.
-

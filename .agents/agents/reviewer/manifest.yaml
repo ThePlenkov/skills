@@ -3,6 +3,7 @@ notes: |
   Read-only review role. Applies REVIEW.md through independent axis
   investigations, then merges and deduplicates evidence-backed findings.
 required:
+  - token-rationalism
   - code-review-and-quality
   - two-axis-review
   - evidence
@@ -12,6 +13,7 @@ required:
   - security-and-hardening
   - architecture-review
 optional:
+  - shared-plan
   - harvest
   - retrospect
   - context-engineering

@@ -14,46 +14,36 @@ State the inferred intent at the top of the summary: “I assumed the goal was X
 if that is wrong, the findings below are unreliable.” Flawless code that does
 the wrong thing is the most expensive failure mode.
 
-## Does the change do exactly what was asked?
+## Intent — does the change do exactly what was asked?
 
 Review intent and scope, not just implementation. Scope creep and unnamed
 beneficiaries are findings; if you cannot name who or what this change is for,
 say so. Nothing more and nothing less is the target.
 
-(Human pointer: `$skill{two-axis-review}`.)
-
-## Will it break, leak, or misbehave on hostile input?
+## Correctness & Security — will it break, leak, or misbehave on hostile input?
 
 Threat-model every trust boundary the diff touches: untrusted input, secrets,
 authorization, and external calls. Treat model and agent output as untrusted
 input, and check failure paths as carefully as happy paths.
 
-(Human pointer: `$skill{security-and-hardening}`.)
-
-## Does it fit where it was put?
+## Fit — does it fit where it was put?
 
 Check the layer, directory, naming, file size, and existing components before
 accepting new structure. Duplicating or contradicting something already in the
 repository is a finding in its own right, not a style nit.
 
-(Human pointer: `$skill{architecture-review}`.)
-
-## What evidence supports the claim?
+## Evidence — what evidence supports the claim?
 
 Ask what command was run and what it printed; “should work” is not evidence.
 Scale the bar to the change: trivial changes need one command and its output,
 while behavioral changes need reproducible proof.
 
-(Human pointer: `$skill{evidence}`.)
-
-## Will the next agent understand the repository more cheaply?
+## Legibility — will the next agent understand the repository more cheaply?
 
 Check whether the change leaves context clearer, smaller, and current. Update
 agent-facing documents before human-facing ones, and treat stale or
 contradictory documentation as context poisoning even when the diff did not
 create it.
-
-(Human pointer: `$skill{context-engineering}`.)
 
 ## How severe is the finding?
 
@@ -75,8 +65,6 @@ Y” is better than false confidence.
 Praise is not a finding. Do not add filler compliments; “no blocking issues” is
 one line, not a paragraph.
 
-(Human pointer: `$skill{critical-thinking}`.)
-
 ## How will recurrence be prevented?
 
 Every 🔴 Important finding carries one line beginning `Prevention:` that names
@@ -88,8 +76,6 @@ document is at fault: it is unreadable, unfindable, or unenforced. Prevention
 must then be automation or a rewrite of that document, never “be more careful”.
 The repository is the only memory a stateless reviewer has, so unwritten
 prevention does not exist.
-
-(Human pointer: `$skill{retrospect}`.)
 
 ## What should not be reported?
 
@@ -108,7 +94,7 @@ review of a pull request, report 🔴 Important and 🔵 Question findings only;
 one-line fix must not reach round seven on style.
 
 Use bounded inspect, validate, and converge cycles rather than unbounded review
-loops. (Human pointer: `$skill{loop-programming}`.)
+loops.
 
 ## What shape should the summary take?
 
@@ -117,4 +103,5 @@ one-line tally by severity, then the findings.
 
 Close with prevention and automation proposals aggregated so they can be
 harvested into the project backlog rather than lost in a thread.
-(Human pointer: `$skill{harvest}`.)
+
+Long-form principles: `$skill{two-axis-review}`, `$skill{security-and-hardening}`, `$skill{architecture-review}`, `$skill{evidence}`, `$skill{context-engineering}`, `$skill{critical-thinking}`, `$skill{retrospect}`, `$skill{loop-programming}`, and `$skill{harvest}`.
