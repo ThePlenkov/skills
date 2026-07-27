@@ -6,20 +6,22 @@ the source of truth for how it is judged.
 
 ## Before reviewing — establish the yardstick
 
-Read the stated intent first: the pull request description, linked issue, and
-relevant specification. If intent is absent or unverifiable, make that the
-first finding about the author.
+Read the available intent first: the pull request description, linked issue,
+and relevant specification, before reading the diff. Establish the baseline
+against which the change is judged.
 
-State the inferred intent at the top of the summary: “I assumed the goal was X;
-if that is wrong, the findings below are unreliable.” Flawless code that does
-the wrong thing is the most expensive failure mode.
+## Intent — is it clear what this change is for, and does it do exactly that?
 
-## Intent — does the change do exactly what was asked?
+A change must be explained or self-evident. If the reviewer must reconstruct
+its intent, that is a finding, whether or not anyone requested the change.
+Keep scope to nothing more and nothing less; scope creep is a finding.
 
-Review intent and scope, not just implementation. Scope creep and unnamed
-beneficiaries are findings; if you cannot name who or what this change is for,
-say so. Nothing more and nothing less is the target.
-
+For a non-obvious unexplained change, name where the explanation belongs: the
+pull request body for one-off intent, a document or ADR for a durable decision,
+an inline comment only when a specific line's why is genuinely non-obvious (a
+workaround, non-intuitive ordering, or deliberate trade-off), or a
+specification for a new component. Missing comments are findings only when the
+code is non-obvious, never as a blanket requirement.
 ## Correctness & Security — will it break, leak, or misbehave on hostile input?
 
 Threat-model every trust boundary the diff touches: untrusted input, secrets,
