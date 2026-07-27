@@ -10,6 +10,12 @@ Read the available intent first: the pull request description, linked issue,
 and relevant specification, before reading the diff. Establish the baseline
 against which the change is judged.
 
+## How should the review be executed?
+
+Review each axis independently in fresh context; a single pass lets early findings bias later axes.
+If subagents are available, give each axis its own; otherwise run axes sequentially, one at a time, without blending them. If already one of several parallel reviewers, ensure every axis is covered independently rather than spawning another fleet.
+Fan-out increases coverage, not output volume: merge and deduplicate findings, apply the verification bar, and enforce the nit cap.
+
 ## Intent — is it clear what this change is for, and does it do exactly that?
 
 A change must be explained or self-evident. If the reviewer must reconstruct

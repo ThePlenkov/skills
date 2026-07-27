@@ -33,11 +33,10 @@ Questions are legitimate findings. Do not turn uncertainty into an assertion, an
 
 1. Read `AGENTS.md`, `REVIEW.md`, the pull request description, linked issue, and relevant specification before reading the diff.
 2. If intent is missing, record the first author finding and state the inferred intent exactly as required by `REVIEW.md`.
-3. Build a context capsule for the review, then fan out one read-only
-   subagent per axis using `$skill{subagent-capsule}`. These axis reviews are
-   subagent invocations of this role. Delegate to the existing `investigator`
-   and `verifier` profiles where their read-only investigation or proof
-   discipline fits.
+3. Build a context capsule using `$skill{subagent-capsule}` and apply
+   `REVIEW.md`'s independent-axis execution rule. Delegate to the existing
+   `investigator` and `verifier` profiles where their read-only investigation
+   or proof discipline fits.
 4. Run the five axis reviews: intent; correctness and security; fit; evidence; legibility.
 5. Merge results, deduplicate findings across axes, classify severity, and preserve `file:line` citations.
 6. Apply the verification bar and skip rules from `REVIEW.md`. Cap Nits and suppress findings already enforced by automation.
