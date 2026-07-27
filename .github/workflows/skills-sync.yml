@@ -92,10 +92,42 @@ jobs:
           set -euo pipefail
           which jq || (sudo apt-get update -qq && sudo apt-get install -y -qq jq)
 
+      - name: Install Node dependencies
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund --prefer-offline
+
       - name: Install skills into skills-sync
         run: |
           set -euo pipefail
           ./bin/skills.js --target=skills-sync/.agents/skills --force
+
+      - name: Generate skill dependency graphs
+        run: |
+          set -euo pipefail
+          npm run graph
+
+      - name: Generate skills index and validate it
+        run: |
+          set -euo pipefail
+          npm run validate:update
+
+      - name: Copy distribution artifacts into skills-sync
+        run: |
+          set -euo pipefail
+          # Mermaid per-skill graphs + gallery index
+          mkdir -p skills-sync/graphs
+          cp -r docs/graphs/generated/* skills-sync/graphs/
+          # Claude Code plugin manifest, marketplace catalog, and generated index
+          mkdir -p skills-sync/.claude-plugin
+          cp .claude-plugin/plugin.json skills-sync/.claude-plugin/plugin.json
+          cp .claude-plugin/marketplace.json skills-sync/.claude-plugin/marketplace.json
+          cp .claude-plugin/skills-index.json skills-sync/.claude-plugin/skills-index.json
+          cp .claude-plugin/skills-index.schema.json skills-sync/.claude-plugin/skills-index.schema.json
+          # Codex / ChatGPT plugin manifest and marketplace catalog
+          mkdir -p skills-sync/.codex-plugin skills-sync/.agents/plugins
+          cp .codex-plugin/plugin.json skills-sync/.codex-plugin/plugin.json
+          cp .agents/plugins/marketplace.json skills-sync/.agents/plugins/marketplace.json
 
       - name: Verify external skills re-materialised
         run: |
@@ -164,7 +196,7 @@ jobs:
         run: |
           set -euo pipefail
           cd skills-sync
-          git add .agents/skills obsidian README.md
+          git add .agents/skills .agents/plugins .claude-plugin .codex-plugin graphs obsidian README.md
           if git diff --cached --quiet; then
             echo 'No changes to commit.'
             exit 0

@@ -49,14 +49,6 @@ jobs:
       - name: Regenerate graphs
         run: npm run graph
 
-      - name: Check for graph drift
-        run: |
-          set -euo pipefail
-          if ! git diff --quiet -- docs/graphs/generated/ .build/skills-graph.json; then
-            echo "::warning file=docs/graphs/generated/index.md::Generated graphs are out of date. Run 'npm run graph:update' locally and commit the changes."
-            git diff --stat -- docs/graphs/generated/ .build/skills-graph.json
-          fi
-
       - name: Upload generated graphs
         if: always()
         uses: actions/upload-artifact@v7

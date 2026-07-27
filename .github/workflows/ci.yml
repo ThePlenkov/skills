@@ -15,7 +15,6 @@ on:
       - '.markdownlint.json'
       - '**/*.sh'
       - '**/*.md'
-      - '.agents/skills/**'
   pull_request:
     branches: [main]
     paths:
@@ -30,7 +29,6 @@ on:
       - '.markdownlint.json'
       - '**/*.sh'
       - '**/*.md'
-      - '.agents/skills/**'
 
 # Cancel duplicate runs on the same ref. Without this, a single push
 # to a PR branch can fire the workflow twice (once for the push event
@@ -132,30 +130,9 @@ jobs:
         # markdownlint.
         run: |
           set -o pipefail
-          ./node_modules/.bin/markdownlint-cli2 '**/*.md' '!.agents/skills/**' '!node_modules/**' --config .markdownlint.json \
+          ./node_modules/.bin/markdownlint-cli2 '**/*.md' '!node_modules/**' --config .markdownlint.json \
             | tee markdownlint.log \
             | .github/scripts/to-annotations.sh markdownlint
-
-  dotagents-skills:
-    name: Verify .agents/skills symlinks
-    runs-on: [self-hosted, linux, x64]
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: lts/*
-          check-latest: true
-          cache: npm
-
-      - name: Install Node dependencies
-        run: npm ci --no-audit --no-fund --prefer-offline
-
-      - name: Check .agents/skills is in sync
-        run: ./node_modules/.bin/tsx scripts/run.ts scripts/install.sh --check
 
   reserved-names:
     name: Check reserved skill names

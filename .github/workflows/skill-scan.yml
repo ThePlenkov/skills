@@ -8,7 +8,7 @@ on:
     branches: [main]
     paths:
       - 'skills/**'
-      - '.agents/skills/**'
+      - 'skills-lock.json'
       - '.github/workflows/skill-scan.yml'
       - 'actions/skillspector/**'
   # Pre-merge scan: when a PR is opened or updated. Provides inline
@@ -16,7 +16,7 @@ on:
   pull_request:
     paths:
       - 'skills/**'
-      - '.agents/skills/**'
+      - 'skills-lock.json'
       - '.github/workflows/skill-scan.yml'
       - 'actions/skillspector/**'
   workflow_dispatch:
@@ -62,6 +62,19 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+          check-latest: true
+          cache: npm
+
+      - name: Install Node dependencies
+        run: npm ci --no-audit --no-fund --prefer-offline
+
+      - name: Materialise .agents/skills for scanning
+        run: npm run install:skills
 
       # PRs scan changed skills by default, but a PR that touches the
       # scanner itself or this workflow should run a full scan so the

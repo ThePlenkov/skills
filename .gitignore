@@ -29,3 +29,7 @@ scripts/reserved-names.sh
 # Local Obsidian vault preview (created by npm run obsidian:build)
 skills-obsidian/
 .obsidian/
+
+# Generated flat skill view and Mermaid graphs; source of truth is skills/.
+.agents/skills/
+docs/graphs/generated/

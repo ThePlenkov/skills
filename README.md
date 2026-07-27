@@ -35,13 +35,14 @@ npx tsx scripts/generate-skills-graph.ts --graph-dir docs/graphs/generated \
 # CI before the missing skill lands) pass --allow-unknown-refs.
 ```
 
-Outputs land in `docs/graphs/generated/` (committed; github.com renders Mermaid
-interactively) and `.build/skills-graph.json` (gitignored; CI artifact).
+Outputs land in `docs/graphs/generated/` (gitignored build output; github.com
+renders Mermaid interactively) and `.build/skills-graph.json` (gitignored;
+CI artifact). The generated gallery is pushed to `skills-sync/graphs/`.
 
-**Drift check:** the [Skills Graph workflow](.github/workflows/skills-graph.yml)
-runs on every push and PR touching skills or the generator. If the regenerated
-graphs differ from the committed copy, the workflow warns so a maintainer can
-regenerate and commit the updated `docs/graphs/generated/*.md`.
+**Regeneration check:** the [Skills Graph workflow](.github/workflows/skills-graph.yml)
+runs on every push and PR touching skills or the generator to ensure the graph
+generator still completes without errors. The rendered gallery is published to
+`skills-sync/graphs/` rather than committed in this repository.
 
 ## Distribution mirror and Obsidian vault
 
