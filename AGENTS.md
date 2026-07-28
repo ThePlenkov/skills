@@ -111,7 +111,8 @@ without hard-coding the repo per skill.
 ---
 name: my-skill
 description: ...
-source: theplenkov-ai/skills
+metadata:
+  source: theplenkov-ai/skills
 ---
 ```
 
