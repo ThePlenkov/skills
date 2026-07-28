@@ -104,6 +104,12 @@ for agent_dir in "$AGENTS_DIR"/*/; do
       return
     fi
     seen_skills[$skill]=1
+    if [[ "$skill" == "$agent" ]]; then
+      printf '❌ %s: skill "%s" in %s must not be the agent itself (prevents recursive self-delegation)\n' \
+        "$agent" "$skill" "$list_label" >&2
+      FAILED=1; agent_failed=1
+      return
+    fi
     if [[ ! -e "$SKILLS_DIR/$skill" ]]; then
       printf '❌ %s: unknown skill "%s" in %s (not found in %s)\n' \
         "$agent" "$skill" "$list_label" "${SKILLS_DIR#$REPO_ROOT/}" >&2

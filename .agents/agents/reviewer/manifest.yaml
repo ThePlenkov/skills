@@ -12,8 +12,8 @@ required:
   - subagent-capsule
   - security-and-hardening
   - architecture-review
-optional:
   - shared-plan
+optional:
   - harvest
   - retrospect
   - context-engineering
