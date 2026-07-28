@@ -143,6 +143,10 @@ jobs:
       - name: Check reserved skill names
         run: ./node_modules/.bin/tsx scripts/run.ts scripts/validate-reserved-names.sh
 
+      - name: Install skill symlinks
+        if: success() || failure()
+        run: bash scripts/install.sh
+
       - name: Validate agent manifests
         if: success() || failure()
         run: ./node_modules/.bin/tsx scripts/run.ts scripts/validate-agent-manifests.sh
