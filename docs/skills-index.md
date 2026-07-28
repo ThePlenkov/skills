@@ -9,7 +9,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-skills-inde
 - **Skills metadata budget (2%):** 2,560 tokens
 - **Total description tokens:** 6,615 tokens
 - **Overflow vs. 2% budget:** 2.58x
-- **Total skill file tokens:** 178,977 tokens
+- **Total skill file tokens:** 179,178 tokens
 
 Token counts use the same approximation Codex uses for its skills context budget: `ceil(byte_length / 4)`.
 
@@ -20,10 +20,10 @@ Token counts use the same approximation Codex uses for its skills context budget
 | agents | 2 | 83 | 1,196 |
 | behavior | 1 | 106 | 1,923 |
 | coaching | 2 | 191 | 5,196 |
-| code-review | 6 | 472 | 17,857 |
+| code-review | 6 | 472 | 18,044 |
 | engineering | 8 | 513 | 15,917 |
 | experimentation | 1 | 101 | 1,770 |
-| foundation | 4 | 320 | 9,067 |
+| foundation | 4 | 320 | 9,081 |
 | integrations | 10 | 476 | 10,815 |
 | methodology | 22 | 1,573 | 47,839 |
 | orchestration | 5 | 366 | 9,666 |
@@ -44,7 +44,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`architecture-review`](skills/behavior/architecture-review/SKILL.md) | behavior | 2 | yes | 106 | 1,923 | user, model | yes | yes |
 | [`adhd`](skills/coaching/adhd/SKILL.md) | coaching | 2 | yes | 69 | 1,571 | user, model | yes | yes |
 | [`interview-me`](skills/coaching/interview-me/SKILL.md) | coaching | 2 | yes | 122 | 3,625 | user, model | yes | yes |
-| [`act`](skills/code-review/act/SKILL.md) | code-review | 2 | no | 116 | 7,331 | user | no | no |
+| [`act`](skills/code-review/act/SKILL.md) | code-review | 2 | no | 116 | 7,518 | user | no | no |
 | [`github-fix-main`](skills/code-review/github-fix-main/SKILL.md) | code-review | 2 | yes | 63 | 1,990 | user, model | yes | yes |
 | [`github-pr-review`](skills/code-review/github-pr-review/SKILL.md) | code-review | 2 | yes | 29 | 2,351 | user, model | yes | yes |
 | [`mr-address-review`](skills/code-review/mr-address-review/SKILL.md) | code-review | 2 | yes | 82 | 1,759 | user, model | yes | yes |
@@ -62,7 +62,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`minimalist`](skills/foundation/minimalist/SKILL.md) | foundation | 2 | yes | 124 | 3,538 | user, model | yes | yes |
 | [`persistent-memory`](skills/foundation/persistent-memory/SKILL.md) | foundation | 1 | no | 78 | 2,449 | user | no | no |
 | [`skill-tiers`](skills/foundation/skill-tiers/SKILL.md) | foundation | 2 | yes | 55 | 1,095 | user, model | yes | yes |
-| [`token-rationalism`](skills/foundation/token-rationalism/SKILL.md) | foundation | 0 | always | 63 | 1,985 | always | yes | yes |
+| [`token-rationalism`](skills/foundation/token-rationalism/SKILL.md) | foundation | 0 | always | 63 | 1,999 | always | yes | yes |
 | [`atlassian`](skills/integrations/atlassian/SKILL.md) | integrations | 2 | yes | 58 | 257 | user, model | yes | yes |
 | [`bootstrap-gh-self-hosted-runner`](skills/integrations/bootstrap-gh-self-hosted-runner/SKILL.md) | integrations | 2 | no | 44 | 2,380 | user | no | no |
 | [`codacy`](skills/integrations/codacy/SKILL.md) | integrations | 2 | yes | 40 | 1,684 | user, model | yes | yes |
