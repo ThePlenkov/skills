@@ -145,7 +145,7 @@ jobs:
 
       - name: Install skill symlinks
         if: success() || failure()
-        run: bash scripts/install.sh
+        run: ./node_modules/.bin/tsx scripts/run.ts scripts/install.sh
 
       - name: Validate agent manifests
         if: success() || failure()
