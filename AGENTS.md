@@ -39,6 +39,7 @@ skills/
 - `.agents/commands/` — command definitions (e.g. `/drill`, `/undrill`, `/recall`, `/retain`, `/reflect`).
 - `.agents/rules/` — agent behavior rules (e.g. `agent-memory.md`, `drill-troubleshooting.md`).
 - `.memory/` — transient memory files (facts, experience, observations, mental-models).
+- `REVIEW.md` — review policy: how any human or agent judges a change here.
 
 ## Repository rules
 
@@ -210,4 +211,3 @@ To publish a skill:
 Use `format: 'skills-sh'` for `skills.sh` distribution. Other targets (`claude`, `codex`, `agents`, `obsidian`) can be added to other repositories if needed.
 
 The workflow reuses the same GitHub App as `skills-sync` (`vars.SKILLS_SYNC_APP_CLIENT_ID` and `secrets.SKILLS_SYNC_APP_PRIVATE_KEY`) to generate a write token for the target repository. Do not add skill-specific flags to `SKILL.md` frontmatter — the publication list is the single source of truth.
-

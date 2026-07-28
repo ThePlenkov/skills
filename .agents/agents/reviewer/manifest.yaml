@@ -1,0 +1,32 @@
+agent: reviewer
+notes: |
+  Read-only review role. Applies REVIEW.md through independent axis
+  investigations, then merges and deduplicates evidence-backed findings.
+required:
+  - token-rationalism
+  - code-review-and-quality
+  - two-axis-review
+  - evidence
+  - critical-thinking
+  - minimalist
+  - subagent-capsule
+  - security-and-hardening
+  - architecture-review
+  - shared-plan
+optional:
+  - harvest
+  - retrospect
+  - context-engineering
+  - investigate-first
+  - drill
+forbidden:
+  - one-shot-patch
+  - refactoring
+  - git-commit
+  - git-push
+  - git-reset
+  - act
+  - github-fix-main
+  - mr-address-review
+  - triage-issue
+  - incremental-implementation

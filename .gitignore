@@ -33,3 +33,6 @@ skills-obsidian/
 # Generated flat skill view and Mermaid graphs; source of truth is skills/.
 .agents/skills/
 docs/graphs/generated/
+
+# Built compiler output; rebuilt on demand (npx tsc -p tools/compiler/tsconfig.json)
+tools/compiler/dist/
