@@ -1,6 +1,6 @@
 ---
 description: Fix PR review threads and CI issues - iterative loop until merge-ready
-argument-hint: pr|plan|backlog|harvest pr-number [--runner]
+argument-hint: pr|plan|backlog|harvest <pr-number> --no-merge|--merge --runner
 ---
 
 Use the `/act` skill to resolve review threads and CI issues on a pull request.
@@ -9,6 +9,8 @@ Use the `/act` skill to resolve review threads and CI issues on a pull request.
 - `/act` or `/act pr` - Fix open threads on current PR
 - `/act <pr-number>` - Fix specific PR by number
 - `/act ... --runner` - Explicitly request a local self-hosted runner if CI is blocked by runner limits
+- `/act ... --merge` - Merge the PR after the loop converges (requires explicit opt-in)
+- `/act ... --no-merge` - Default behavior: fix and validate, but never merge
 - `/act plan` - Process threads from `.agents/plans/*.md`
 - `/act backlog` - Process threads from `.agents/backlog/*.md`
 - `/act harvest` - Process threads from `.agents/review-debt/harvests/*.jsonl`
@@ -44,6 +46,7 @@ Use the `/act` skill to resolve review threads and CI issues on a pull request.
 - Skip reading SAST annotations on failing checks
 - Dismiss SAST findings as "not my responsibility"
 - Stop after one pass (loop until clean or context full)
+- Merge the PR unless `--merge` was explicitly passed
 
 **Merge-ready only when:**
 - Review feedback implemented in code
@@ -52,4 +55,6 @@ Use the `/act` skill to resolve review threads and CI issues on a pull request.
 - open_threads=0
 - P5 and P6 complete
 
-Apply the full `/act` skill protocol from `.agents/skills/act/SKILL.md`.
+`/act` stops at **merge-ready** unless `--merge` was given. Do not call `gh pr merge` or `gh api .../merge` by default.
+
+Apply the full `/act` skill protocol from `skills/code-review/act/SKILL.md`.
