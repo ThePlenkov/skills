@@ -26,6 +26,25 @@ Toolkit for creating and validating agent skills.
 - CI failures on skill validation → diagnose + fix
 - Adding a new agent → add YAML to `assets/agents/`
 
+## Before creating: reuse check
+
+Before scaffolding a new skill, run `$skill{reuse-first}` against the proposed skill's domain. Search for:
+
+- Skills with overlapping scope (same category, similar description)
+- Skills already cross-referenced from the same Tier 0 rule
+- Any existing procedure in the same category that this could extend
+
+If a sibling exists, decide explicitly one of:
+
+1. **Merge into the existing skill** — if your skill is a strict subset
+2. **Extend the existing skill** — if you have a section to add, not a whole skill
+3. **Cross-reference from the existing skill** — if you have a different angle
+4. **Genuinely new** — if no overlap; document the gap this fills
+
+Document the decision in the new skill's `## Cross-references` section when one is created, or in the surviving/extended skill's `## Cross-references` (or the change plan) when no new skill is created. This is `$skill{reuse-first}` applied to skill creation itself — the same principle that prevents code duplication prevents skill duplication.
+
+Failure mode this prevents: agents creating new skills that overlap with existing ones, inflating the skill registry with near-duplicates that fragment the agent's behavior across inconsistent procedures.
+
 ## Create a new skill
 
 ```bash

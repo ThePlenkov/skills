@@ -14,7 +14,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `experimentation` | Sandboxed experimentation | `sandboxed` |
 | `foundation` | Always-on behavioral primitives and activation tiers | `minimalist`, `persistent-memory`, `skill-tiers`, `token-rationalism` |
 | `integrations` | External platform connectors | `atlassian`, `bootstrap-gh-self-hosted-runner`, `codacy`, `codescene`, `github`, `gitlab`, `gitlab-ci-local`, `glab`, `glean`, `sourcegraph` |
-| `methodology` | Development methodology | `code-review-and-quality`, `code-simplification`, `codehome`, `context-engineering`, `critical-thinking`, `doubt-driven-development`, `idea-refine`, `incremental-implementation`, `investigate-first`, `loop-programming`, `minimal-root-cause`, `modern-stack`, `observability-and-instrumentation`, `one-shot-patch`, `refactoring`, `repository-onboarding`, `source-driven-development`, `spec-driven-development`, `spec-kit`, `test-driven-development` |
+| `methodology` | Development methodology | `code-review-and-quality`, `code-simplification`, `codehome`, `context-engineering`, `critical-thinking`, `dep-cost`, `doubt-driven-development`, `idea-refine`, `incremental-implementation`, `investigate-first`, `loop-programming`, `minimal-root-cause`, `modern-stack`, `observability-and-instrumentation`, `one-shot-patch`, `refactoring`, `repository-onboarding`, `reuse-first`, `source-driven-development`, `spec-driven-development`, `spec-kit`, `test-driven-development` |
 | `orchestration` | Agent coordination, isolation, context management, and skill discovery | `handoff`, `save-session`, `subagent-capsule`, `unwind`, `using-agent-skills` |
 | `research` | Codebase analysis and documentation tools | `deepwiki`, `external-research` |
 | `safety` | Destructive operation protection and recovery | `drill`, `safeguard`, `salvage` |
@@ -67,6 +67,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `codehome` | `methodology` | 2 | user | — | — |
 | `context-engineering` | `methodology` | 2 | user, model | — | — |
 | `critical-thinking` | `methodology` | 2 | user, model | — | — |
+| `dep-cost` | `methodology` | 2 | user, model | — | — |
 | `doubt-driven-development` | `methodology` | 2 | user, model | `$skill{investigate-first}`, `$skill{critical-thinking}` | — |
 | `idea-refine` | `methodology` | 2 | user, model | — | — |
 | `incremental-implementation` | `methodology` | 2 | user, model | `$skill{loop-programming}` | — |
@@ -78,6 +79,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `one-shot-patch` | `methodology` | 2 | user, model | `$skill{investigate-first}`, `$skill{debugging}` | — |
 | `refactoring` | `methodology` | 2 | user, model | — | — |
 | `repository-onboarding` | `methodology` | 2 | user, model | — | — |
+| `reuse-first` | `methodology` | 2 | user, model | — | — |
 | `source-driven-development` | `methodology` | 2 | user, model | — | — |
 | `spec-driven-development` | `methodology` | 2 | user, model | — | — |
 | `spec-kit` | `methodology` | 2 | user, model | — | — |

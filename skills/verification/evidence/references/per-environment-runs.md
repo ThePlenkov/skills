@@ -1,5 +1,7 @@
 # Per-Environment Minimum Viable Runs
 
+<!-- os-independence-exempt: intentional POSIX bash recipes; on Windows run under Git Bash or WSL -->
+
 The single most important part of this skill. **For each target
 environment, this is the minimum run that produces real evidence.**
 Anything less is `produced`, not `proved`. Pick the recipe that matches

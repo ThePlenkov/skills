@@ -1,0 +1,5 @@
+interface:
+  display_name: "Reuse First"
+  short_description: "Search local and open-source code before writing something new."
+  brand_color: "#10B981"
+  default_prompt: "Use $reuse-first to find existing solutions before writing new code."

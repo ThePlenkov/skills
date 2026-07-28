@@ -7,6 +7,7 @@
     "skills": "./bin/skills.js"
   },
   "scripts": {
+    "postinstall": "npm run build --prefix tools/compiler",
     "generate": "tsx scripts/generate-skills-index.ts",
     "generate:skills-index-md": "tsx scripts/generate-skills-index-md.ts",
     "check:skills-index-md": "tsx scripts/generate-skills-index-md.ts --check",

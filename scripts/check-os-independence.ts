@@ -131,30 +131,38 @@ async function* getFilesToCheck(): AsyncGenerator<string> {
 
 // Per-file exemption list. The check is meant for SKILL.md bodies
 // (loaded as agent context, where cross-platform portability matters
-// for the agent's runtime). References/ files that are explicitly
-// "copy these bash commands" recipes (e.g. per-environment runs for
-// /evidence) are exempt — their purpose is to show what to type in
-// the user's terminal, which is bash-by-design.
+// for the agent's runtime). A markdown file can also be exempted
+// in-place by placing an HTML comment near the top:
 //
-// Add a path + one-line reason. Keep this list short; every entry
-// should be a deliberate call, not a default.
-const EXEMPT_FILES = new Set<string>([
-  // /evidence per-environment runs: intentional POSIX bash recipes
-  // that the agent types into a shell to produce evidence. The file's
-  // whole purpose is to be a copy-paste-ready command list.
-  'skills/verification/evidence/references/per-environment-runs.md',
-]);
+//   <!-- os-independence-exempt: reason -->
+//
+// Use this for references/ files that are explicitly "copy these bash
+// commands" recipes (e.g. per-environment runs for /evidence). Their
+// purpose is to show what to type in the user's terminal, which is
+// bash-by-design, but the exemption must be visible in the file itself
+// and should note the Windows-compatible runner (Git Bash / WSL).
+//
+// Add a path here only for legacy files that cannot carry the marker.
+// Keep this list short; every entry should be a deliberate call.
+const EXEMPT_FILES = new Set<string>([]);
+
+function hasOsIndependenceExemption(text: string): boolean {
+  // Look at the first 20 lines only so the marker is deliberate and
+  // near the top of the file, not an incidental comment later.
+  const head = text.split('\n').slice(0, 20).join('\n');
+  return /^[ \t]*<!--[ \t]*os-independence-exempt:[ \t]*[^>\r\n]+-->[ \t]*$/im.test(head);
+}
 
 for await (const path of getFilesToCheck()) {
+  const text = await readFile(path, 'utf8');
   // Normalize to POSIX-style separators so the EXEMPT_FILES lookup
   // works on every platform. `relative()` on Windows uses
   // backslashes, but the exempt paths above are written with
   // forward slashes — a raw compare would never match there.
   const rel = relative(ROOT, path).replace(/\\/g, '/');
-  if (EXEMPT_FILES.has(rel)) {
-    continue; // see EXEMPT_FILES comment above
+  if (EXEMPT_FILES.has(rel) || hasOsIndependenceExemption(text)) {
+    continue; // see EXEMPT_FILES / marker comment above
   }
-  const text = await readFile(path, 'utf8');
   const lines = text.split('\n');
 
   let inShell = false;

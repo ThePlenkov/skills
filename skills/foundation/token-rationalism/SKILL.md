@@ -140,6 +140,20 @@ Heuristic: if the cost of being wrong significantly exceeds the cost of extra to
 
 ---
 
+## Rule 8: Reuse before write
+
+Before adding a new function, utility, or module, run `$skill{reuse-first}`. It searches the local codebase (`rg`, `ast-grep`) and the open-source ecosystem (`gh search`, DeepWiki, Sourcegraph.com) for existing solutions. Write new code only when no suitable candidate exists or a candidate is rejected by `$skill{dep-cost}`.
+
+When `$skill{reuse-first}` surfaces an existing library, run `$skill{dep-cost}` to decide whether the dep is worth its weight for the surface actually used. The default reflex — "just add it, it's on npm" — has made the median JS bundle 10x heavier than it needs to be.
+
+The cheapest code is the code that already exists and is already paid for. The most expensive code is the new code that duplicates existing code, because you pay it forever (maintenance) and forget why you wrote it (knowledge debt).
+
+Companion skills: `$skill{reuse-first}` (find candidates), `$skill{dep-cost}` (judge candidates), `$skill{minimal-root-cause}` (the underlying philosophy).
+
+Failure mode this prevents: agents writing impressive-looking code that duplicates existing local helpers or well-maintained libraries, inflating the maintainable code base for no value.
+
+---
+
 ## Decision gate (before each response)
 
 1. Can I complete this fully in one response? → Yes: do it all. No: do highest-value part, state what's left.
