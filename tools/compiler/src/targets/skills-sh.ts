@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { rewriteBody } from './common.js';
 import type { CompilerOptions, Skill, SkillLink } from '../types.js';
 
@@ -17,6 +18,60 @@ function copySkillDirectory(src: string, dest: string): void {
       fs.copyFileSync(srcPath, destPath);
     }
   }
+}
+
+function normalizeRepoShorthand(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const v = value.trim();
+  if (v === '') return null;
+  if (/^https?:\/\//.test(v)) return null;
+  if (v.toLowerCase().endsWith('.git')) return null;
+  const parts = v.split('/');
+  if (parts.length !== 2) return null;
+  const [owner, repo] = parts;
+  if (!owner || !repo) return null;
+  if (/\s/.test(owner) || /\s/.test(repo)) return null;
+  return v;
+}
+
+export function normalizeFrontmatter(input: Record<string, unknown>, publicSource?: string): string {
+  const safeInput =
+    input && typeof input === 'object' && !Array.isArray(input)
+      ? input
+      : ({} as Record<string, unknown>);
+
+  const output: Record<string, unknown> = { ...safeInput };
+
+  const rawSource =
+    typeof safeInput.source === 'string' ? safeInput.source : undefined;
+  const canonicalSource = normalizeRepoShorthand(rawSource) ?? 'theplenkov-ai/skills';
+  output.source = canonicalSource;
+
+  const metadata: Record<string, unknown> = {};
+  if (
+    safeInput.metadata &&
+    typeof safeInput.metadata === 'object' &&
+    !Array.isArray(safeInput.metadata)
+  ) {
+    Object.assign(metadata, safeInput.metadata as Record<string, unknown>);
+  }
+  for (const key of ['tags', 'author', 'version']) {
+    if (safeInput[key] !== undefined) metadata[key] = safeInput[key];
+  }
+  metadata.source = canonicalSource;
+
+  if (publicSource !== undefined) {
+    const normalizedPublic = normalizeRepoShorthand(publicSource);
+    if (!normalizedPublic) {
+      throw new Error(
+        `publicSource must be a non-empty owner/repo shorthand, got: ${JSON.stringify(publicSource)}`
+      );
+    }
+    metadata.publicSource = normalizedPublic;
+  }
+
+  output.metadata = metadata;
+  return stringifyYaml(output, { lineWidth: 0 });
 }
 
 export function buildSkillsSh(options: CompilerOptions, skills: Skill[], projectName: string): void {
@@ -43,9 +98,17 @@ export function buildSkillsSh(options: CompilerOptions, skills: Skill[], project
       }
       return `[${link.text}](../${target.name}/SKILL.md)`;
     };
+
     const original = fs.readFileSync(path.join(skill.dir, 'SKILL.md'), 'utf8');
-    const headerMatch = original.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n/);
-    const header = headerMatch ? headerMatch[0] : '';
+    const match = original.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
+    const parsed = match ? parseYaml(match[1]) : {};
+    const frontmatter: Record<string, unknown> =
+      parsed !== null &&
+      typeof parsed === 'object' &&
+      !Array.isArray(parsed)
+        ? (parsed as Record<string, unknown>)
+        : {};
+    const header = `---\n${normalizeFrontmatter(frontmatter, options.publicSource)}---\n`;
     const body = rewriteBody(skill.body, skill.links, linkFormatter, skill);
     fs.writeFileSync(path.join(destDir, 'SKILL.md'), header + body, 'utf8');
   }

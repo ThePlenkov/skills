@@ -43,4 +43,8 @@ export interface CompilerOptions {
    * - `external`: emit only the requested skills; references stay as `$skill{...}`
    */
   dependencies?: 'inline' | 'external';
+  /**
+   * Overrides `metadata.source` for published skills (e.g. ThePlenkov/skills).
+   */
+  publicSource?: string;
 }

@@ -34,6 +34,7 @@ build({
   projectRoot: skill.dir,
   target: format,
   outDir: buildDir,
+  publicSource: resolvedRepo,
 });
 
 const targetRepoDir = fs.mkdtempSync(path.join(process.cwd(), 'target-repo-'));
