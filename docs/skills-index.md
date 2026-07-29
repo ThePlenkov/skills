@@ -4,12 +4,12 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-skills-inde
 
 ## Summary
 
-- **Total skills:** 95
+- **Total skills:** 96
 - **Context window (default):** 128,000 tokens
 - **Skills metadata budget (2%):** 2,560 tokens
-- **Total description tokens:** 6,615 tokens
-- **Overflow vs. 2% budget:** 2.58x
-- **Total skill file tokens:** 179,178 tokens
+- **Total description tokens:** 6,699 tokens
+- **Overflow vs. 2% budget:** 2.62x
+- **Total skill file tokens:** 180,293 tokens
 
 Token counts use the same approximation Codex uses for its skills context budget: `ceil(byte_length / 4)`.
 
@@ -25,7 +25,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | experimentation | 1 | 101 | 1,770 |
 | foundation | 4 | 320 | 9,081 |
 | integrations | 10 | 476 | 10,815 |
-| methodology | 22 | 1,573 | 47,839 |
+| methodology | 23 | 1,657 | 48,954 |
 | orchestration | 5 | 366 | 9,666 |
 | research | 2 | 170 | 3,140 |
 | safety | 3 | 224 | 4,584 |
@@ -91,6 +91,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`refactoring`](skills/methodology/refactoring/SKILL.md) | methodology | 2 | yes | 105 | 1,947 | user, model | yes | yes |
 | [`repository-onboarding`](skills/methodology/repository-onboarding/SKILL.md) | methodology | 2 | yes | 99 | 1,830 | user, model | yes | yes |
 | [`reuse-first`](skills/methodology/reuse-first/SKILL.md) | methodology | 2 | yes | 73 | 2,176 | user, model | yes | yes |
+| [`review-methodology`](skills/methodology/review-methodology/SKILL.md) | methodology | 2 | yes | 84 | 1,115 | user, model | yes | yes |
 | [`source-driven-development`](skills/methodology/source-driven-development/SKILL.md) | methodology | 2 | yes | 55 | 2,065 | user, model | yes | yes |
 | [`spec-driven-development`](skills/methodology/sdd/spec-driven-development/SKILL.md) | methodology | 2 | yes | 51 | 2,166 | user, model | yes | yes |
 | [`spec-kit`](skills/methodology/sdd/spec-kit/SKILL.md) | methodology | 2 | yes | 41 | 2,214 | user, model | yes | yes |
