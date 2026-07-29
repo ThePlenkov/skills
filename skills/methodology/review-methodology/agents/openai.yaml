@@ -1,0 +1,10 @@
+interface:
+  display_name: "Review Methodology"
+  short_description: "Apply REVIEW.md and enforce independent review axes"
+  brand_color: "#3B82F6"
+  default_prompt: >-
+    Use $review-methodology when judging any change. Read REVIEW.md, establish
+    intent, evaluate the Intent, Correctness & Security, Fit, Evidence, and
+    Legibility axes in fresh context, classify every finding as Important, Nit,
+    Question, or Pre-existing, enforce the verification bar, and close with the
+    required summary. Delegate to axis-specific skills for detailed rubrics.

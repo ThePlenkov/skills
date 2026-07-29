@@ -14,7 +14,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `experimentation` | Sandboxed experimentation | `sandboxed` |
 | `foundation` | Always-on behavioral primitives and activation tiers | `minimalist`, `persistent-memory`, `skill-tiers`, `token-rationalism` |
 | `integrations` | External platform connectors | `atlassian`, `bootstrap-gh-self-hosted-runner`, `codacy`, `codescene`, `github`, `gitlab`, `gitlab-ci-local`, `glab`, `glean`, `sourcegraph` |
-| `methodology` | Development methodology | `code-review-and-quality`, `code-simplification`, `codehome`, `context-engineering`, `critical-thinking`, `dep-cost`, `doubt-driven-development`, `idea-refine`, `incremental-implementation`, `investigate-first`, `loop-programming`, `minimal-root-cause`, `modern-stack`, `observability-and-instrumentation`, `one-shot-patch`, `refactoring`, `repository-onboarding`, `reuse-first`, `source-driven-development`, `spec-driven-development`, `spec-kit`, `test-driven-development` |
+| `methodology` | Development methodology | `code-review-and-quality`, `code-simplification`, `codehome`, `context-engineering`, `critical-thinking`, `dep-cost`, `doubt-driven-development`, `idea-refine`, `incremental-implementation`, `investigate-first`, `loop-programming`, `minimal-root-cause`, `modern-stack`, `observability-and-instrumentation`, `one-shot-patch`, `refactoring`, `repository-onboarding`, `reuse-first`, `review-methodology`, `source-driven-development`, `spec-driven-development`, `spec-kit`, `test-driven-development` |
 | `orchestration` | Agent coordination, isolation, context management, and skill discovery | `handoff`, `save-session`, `subagent-capsule`, `unwind`, `using-agent-skills` |
 | `research` | Codebase analysis and documentation tools | `deepwiki`, `external-research` |
 | `safety` | Destructive operation protection and recovery | `drill`, `safeguard`, `salvage` |
@@ -80,6 +80,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `refactoring` | `methodology` | 2 | user, model | — | — |
 | `repository-onboarding` | `methodology` | 2 | user, model | — | — |
 | `reuse-first` | `methodology` | 2 | user, model | — | — |
+| `review-methodology` | `methodology` | 2 | user, model | — | — |
 | `source-driven-development` | `methodology` | 2 | user, model | — | — |
 | `spec-driven-development` | `methodology` | 2 | user, model | — | — |
 | `spec-kit` | `methodology` | 2 | user, model | — | — |
