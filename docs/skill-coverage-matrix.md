@@ -33,7 +33,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `architecture-review` | `behavior` | 2 | user, model | — | — |
 | `adhd` | `coaching` | 2 | user, model | — | — |
 | `interview-me` | `coaching` | 2 | user, model | — | — |
-| `act` | `code-review` | 2 | user | `$skill{github-pr-review}`, `$skill{code-review-and-quality}` | — |
+| `act` | `code-review` | 2 | user, model | `$skill{github-pr-review}`, `$skill{code-review-and-quality}` | — |
 | `github-fix-main` | `code-review` | 2 | user, model | — | — |
 | `github-pr-review` | `code-review` | 2 | user, model | `$skill{code-review-and-quality}` | — |
 | `mr-address-review` | `code-review` | 2 | user, model | — | — |
@@ -47,7 +47,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `prototype` | `engineering` | 2 | user, model | — | — |
 | `security-and-hardening` | `engineering` | 2 | user, model | — | — |
 | `typescript` | `engineering` | 2 | user, model | — | — |
-| `sandboxed` | `experimentation` | 2 | user | — | — |
+| `sandboxed` | `experimentation` | 2 | user, model | — | — |
 | `minimalist` | `foundation` | 2 | user, model | — | — |
 | `persistent-memory` | `foundation` | 1 | user | — | — |
 | `skill-tiers` | `foundation` | 2 | user, model | — | — |
@@ -85,10 +85,10 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `spec-driven-development` | `methodology` | 2 | user, model | — | — |
 | `spec-kit` | `methodology` | 2 | user, model | — | — |
 | `test-driven-development` | `methodology` | 2 | user, model | — | — |
-| `handoff` | `orchestration` | 2 | user | — | — |
-| `save-session` | `orchestration` | 2 | user | — | — |
+| `handoff` | `orchestration` | 2 | user, model | — | — |
+| `save-session` | `orchestration` | 2 | user, model | — | — |
 | `subagent-capsule` | `orchestration` | 2 | user, model | — | — |
-| `unwind` | `orchestration` | 2 | user | — | — |
+| `unwind` | `orchestration` | 2 | user, model | — | — |
 | `using-agent-skills` | `orchestration` | 2 | user, model | — | — |
 | `deepwiki` | `research` | 2 | user, model | — | — |
 | `external-research` | `research` | 2 | user, model | — | — |
@@ -103,7 +103,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `skillmaker` | `tools` | 2 | user, model | — | — |
 | `skills-cli` | `tools` | 2 | user, model | — | — |
 | `tsdown` | `tools` | 2 | user, model | — | — |
-| `writing-great-skills` | `tools` | 2 | user | — | — |
+| `writing-great-skills` | `tools` | 2 | user, model | — | — |
 | `debugging` | `troubleshooting` | 2 | user, model | `$skill{investigate-first}`, `$skill{one-shot-patch}` | — |
 | `performance-investigation` | `troubleshooting` | 2 | user, model | — | — |
 | `evidence` | `verification` | 2 | user, model | — | — |
@@ -113,12 +113,12 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `ci-local` | `workflow` | 2 | user, model | — | — |
 | `deprecation-and-migration` | `workflow` | 2 | user, model | — | — |
 | `documentation-and-adrs` | `workflow` | 2 | user, model | — | — |
-| `e2e` | `workflow` | 2 | user | — | — |
+| `e2e` | `workflow` | 2 | user, model | — | — |
 | `git-commit` | `workflow` | 2 | user, model | — | — |
 | `git-push` | `workflow` | 2 | user, model | — | — |
-| `git-reset` | `workflow` | 2 | user | — | — |
+| `git-reset` | `workflow` | 2 | user, model | — | — |
 | `git-workflow-and-versioning` | `workflow` | 2 | user, model | — | — |
-| `harvest` | `workflow` | 2 | user | — | — |
+| `harvest` | `workflow` | 2 | user, model | — | — |
 | `planning-and-task-breakdown` | `workflow` | 2 | user, model | — | — |
 | `resolving-merge-conflicts` | `workflow` | 2 | user, model | — | — |
 | `shadow-fork` | `workflow` | 2 | user, model | — | — |

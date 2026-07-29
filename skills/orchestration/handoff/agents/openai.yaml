@@ -10,4 +10,4 @@ interface:
     Redact secrets and PII. Honour any user argument as a description of the
     next session's focus.
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

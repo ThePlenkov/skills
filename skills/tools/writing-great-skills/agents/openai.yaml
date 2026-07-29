@@ -9,4 +9,4 @@ interface:
     prune for no-ops, duplication, and negation. Treat every section as
     reference consulted on demand, not a sequence to race through.
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

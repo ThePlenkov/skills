@@ -5,7 +5,8 @@ argument-hint: "[optional root objective or direction]"
 tier: 2
 triggers:
   - user
-disable-model-invocation: true
+  - model
+disable-model-invocation: false
 allowed-tools:
   - read
   - grep
@@ -102,7 +103,7 @@ Expected proof:
 
 1. Proceed.
 
-Immediately perform the next best action using available tools.
+If `unwind` was invoked by a model or implicitly, stop after selecting the next best action and output the `[NEXT ACTION SELECTED]` block; do not execute edits, commands, data transmission, or other high-impact operations without explicit user confirmation. When invoked directly by a user, immediately perform the next best action using available tools.
 
 This includes:
 

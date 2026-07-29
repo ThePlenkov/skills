@@ -5,9 +5,9 @@ description: >-
   principles that make a skill predictable. Use when authoring a new skill,
   reviewing a skill for retirement or merge, or debugging a skill that fires
   inconsistently. Companion to $skill{skillmaker}.
-disable-model-invocation: true
+disable-model-invocation: false
 tier: 2
-triggers: [user]
+triggers: [user, model]
 source: theplenkov-ai/skills
 metadata:
   upstream: mattpocock/skills

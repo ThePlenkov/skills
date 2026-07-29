@@ -6,9 +6,9 @@ description: >-
   worktrees on that machine. Use when a thread is full, crossing a
   context-window boundary, returning after `/clear`, or branching into a parallel
   session. Distinct from save-session and the built-in `/compact`.
-disable-model-invocation: true
+disable-model-invocation: false
 tier: 2
-triggers: [user]
+triggers: [user, model]
 argument-hint: what the next session will focus on | resume
 source: theplenkov-ai/skills
 metadata:

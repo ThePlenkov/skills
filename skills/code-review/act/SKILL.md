@@ -8,10 +8,10 @@ description: >-
   Never resolve-only. Harvest (collecting threads) lives in /harvest;
   triage (priority / grouping / wontfix) lives in /backlog. /act is the
   fix loop, not the collect or triage.
-disable-model-invocation: true
+disable-model-invocation: false
 compatibility: Requires gh, jq, git, bun, node.
 tier: 2
-triggers: [user]
+triggers: [user, model]
 allowed-tools:
   - read
   - exec
@@ -26,6 +26,10 @@ source: theplenkov-ai/skills
 ---
 
 # /act
+
+## Model invocation guard
+
+`/act` may be invoked by a model or implicitly. In that case it may run the discovery and analysis steps (fetch state, read threads, classify findings), but it must not edit product files, create commits, resolve threads, or push until the user has explicitly confirmed the planned actions in `message_user`. Do not proceed with mutating steps on an implicit or model invocation without that confirmation.
 
 Portable skill layout ([agentskills.io](https://agentskills.io/specification)):
 `scripts/` (helpers), `references/` (EVALUATE, RATING_FLOW,
