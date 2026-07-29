@@ -9,9 +9,13 @@ metadata:
     - session-tracking
     - delegation
   author: petr-plenkov
-  version: "1.1.0"
+  version: 1.1.0
+  source: theplenkov-ai/skills
+  publicSource: ThePlenkov/skills
 tier: 2
-triggers: [user, model]
+triggers:
+  - user
+  - model
 source: theplenkov-ai/skills
 ---
 
