@@ -2,7 +2,7 @@
 name: drill
 description: Scoped descent primitive for agent systems. Creates isolated execution frames, materializes them as directory trees, and returns a result plus a parallel prevention plan so the same problem does not recur.
 metadata:
-  tags:
+  tags: &a1
     - context-isolation
     - scope-management
     - filesystem-materialization
@@ -10,13 +10,21 @@ metadata:
     - delegation
   author: petr-plenkov
   version: 1.1.0
+  tier: 2
+  triggers: &a2
+    - user
+    - model
   source: theplenkov-ai/skills
+  name: drill
+  description: Scoped descent primitive for agent systems. Creates isolated execution frames, materializes them as directory trees, and returns a result plus a parallel prevention plan so the same problem does not recur.
   publicSource: ThePlenkov/skills
-tier: 2
-triggers:
-  - user
-  - model
 source: theplenkov-ai/skills
+tags: *a1
+author: petr-plenkov
+version: 1.1.0
+tier: 2
+triggers: *a2
+publicSource: ThePlenkov/skills
 ---
 
 # Drill
