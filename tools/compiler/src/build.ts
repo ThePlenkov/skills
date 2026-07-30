@@ -34,6 +34,29 @@ function mergeDependencies(manifestDeps: PluginDependency[], extraNames: string[
 
 export function build(options: CompilerOptions): void {
   const skillsByName = discoverSkills(options.skillsRoot);
+  for (const skill of skillsByName.values()) {
+    const extra = options.skillMetadata?.[skill.name]?.frontmatter;
+    if (extra) {
+      const extraMeta =
+        extra.metadata && typeof extra.metadata === 'object' && !Array.isArray(extra.metadata)
+          ? (extra.metadata as Record<string, unknown>)
+          : {};
+      const currentMeta =
+        skill.frontmatter.metadata &&
+        typeof skill.frontmatter.metadata === 'object' &&
+        !Array.isArray(skill.frontmatter.metadata)
+          ? (skill.frontmatter.metadata as Record<string, unknown>)
+          : {};
+      const extraTop = Object.fromEntries(
+        Object.entries(extra).filter(([k]) => k !== 'metadata' && k !== 'name' && k !== 'description'),
+      );
+      skill.frontmatter = {
+        ...skill.frontmatter,
+        ...extraTop,
+        metadata: { ...currentMeta, ...extraMeta },
+      };
+    }
+  }
   const pluginManifest = readPluginManifest(options.projectRoot);
 
   let include: string[];

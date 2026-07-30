@@ -47,4 +47,11 @@ export interface CompilerOptions {
    * Overrides `metadata.source` for published skills (e.g. ThePlenkov/skills).
    */
   publicSource?: string;
+  /**
+   * Per-skill frontmatter overrides merged into each skill's frontmatter before
+   * target resolvers run. Shape mirrors the canonical SKILL.md frontmatter so
+   * anything from `skills.config.ts` can be injected: source, tier, triggers,
+   * tags, etc. without editing SKILL.md files.
+   */
+  skillMetadata?: Record<string, { frontmatter?: Record<string, unknown> }>;
 }

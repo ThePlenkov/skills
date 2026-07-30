@@ -2,7 +2,7 @@
   "title": "Skill frontmatter",
   "description": "JSON Schema for SKILL.md YAML frontmatter validation",
   "type": "object",
-  "required": ["name", "description", "metadata"],
+  "required": ["name", "description"],
   "additionalProperties": true,
   "properties": {
     "name": {
@@ -23,25 +23,17 @@
     },
     "metadata": {
       "type": "object",
-      "required": ["tier", "triggers", "source"],
+      "description": "Runtime and distribution metadata managed by skills.config.ts",
       "additionalProperties": true,
       "properties": {
+        "argument-hint": {
+          "type": "string",
+          "description": "Hint for argument passing to the skill"
+        },
         "tier": {
           "type": "integer",
           "enum": [0, 1, 2],
           "description": "Skill activation tier"
-        },
-        "version": {
-          "type": "string",
-          "description": "Semantic version (optional, e.g. 1.0.0)",
-          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
-        },
-        "allowed-tools": {
-          "oneOf": [
-            { "type": "string" },
-            { "type": "array", "items": { "type": "string" } }
-          ],
-          "description": "Tools the agent is allowed to use when this skill is active"
         },
         "triggers": {
           "type": "array",
@@ -49,14 +41,17 @@
           "items": { "type": "string", "enum": ["user", "model", "always"] },
           "description": "When the skill should be activated"
         },
-        "argument-hint": {
-          "type": "string",
-          "description": "Hint for argument passing to the skill"
-        },
         "source": {
           "type": "string",
           "description": "Canonical source repository for upstream feedback (owner/repo)",
           "pattern": "^[^/\\s]+/[^/\\s]+(?<!\\.[gG][iI][tT])$"
+        },
+        "allowed-tools": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "string" } }
+          ],
+          "description": "Tools the agent is allowed to use when this skill is active"
         },
         "conflicts_with": {
           "oneOf": [
@@ -71,6 +66,10 @@
             { "type": "array", "items": { "type": "string" } }
           ],
           "description": "Skill names this skill builds upon"
+        },
+        "disable-model-invocation": {
+          "type": "boolean",
+          "description": "When true, the skill is only invoked by explicit user command"
         }
       }
     }

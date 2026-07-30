@@ -81,4 +81,47 @@ describe('build', () => {
 
     fs.rmSync(outDir, { recursive: true, force: true });
   });
+
+  it('merges skillMetadata into skills-sh frontmatter and hoists tier/triggers', () => {
+    const workspaceRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'skills-compiler-metadata-test-'));
+    const skillRoot = path.join(workspaceRoot, 'skills', 'my-skill');
+    fs.mkdirSync(skillRoot, { recursive: true });
+    fs.writeFileSync(
+      path.join(skillRoot, 'SKILL.md'),
+      '---\nname: my-skill\ndescription: A test skill.\n---\n# My Skill\n',
+      'utf8'
+    );
+    fs.mkdirSync(path.join(workspaceRoot, 'plugins'), { recursive: true });
+
+    const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'skills-compiler-metadata-out-'));
+    build({
+      workspaceRoot,
+      skillsRoot: path.join(workspaceRoot, 'skills'),
+      pluginsRoot: path.join(workspaceRoot, 'plugins'),
+      projectRoot: skillRoot,
+      target: 'skills-sh',
+      outDir,
+      skillMetadata: {
+        'my-skill': {
+          frontmatter: {
+            metadata: {
+              tier: 1,
+              triggers: ['user'],
+              source: 'owner/repo',
+              'allowed-tools': ['read'],
+            },
+          },
+        },
+      },
+    });
+
+    const skillMd = fs.readFileSync(path.join(outDir, 'SKILL.md'), 'utf8');
+    expect(skillMd).toContain('tier: 1');
+    expect(skillMd).toContain('- user');
+    expect(skillMd).toContain('source: owner/repo');
+    expect(skillMd).toContain('allowed-tools:');
+
+    fs.rmSync(outDir, { recursive: true, force: true });
+    fs.rmSync(workspaceRoot, { recursive: true, force: true });
+  });
 });

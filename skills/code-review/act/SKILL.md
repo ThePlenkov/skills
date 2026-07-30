@@ -1,38 +1,9 @@
 ---
 name: act
-description: Use when the user invokes /act on a PR/MR, /act with no arguments (uses
-  the PR in the current conversation context), or /act <context> with context ∈ {pr,
-  plan, backlog, harvest}. Resolves threads in product code (or posts a substantive
-  in-thread reply), commits, then closes threads. Never resolve-only. Harvest (collecting
-  threads) lives in /harvest; triage (priority / grouping / wontfix) lives in /backlog.
-  /act is the fix loop, not the collect or triage.
-metadata:
-  source: theplenkov-ai/skills
-  tier: 2
-  triggers:
-  - user
-  - model
-  disable-model-invocation: false
-  allowed-tools:
-  - read
-  - exec
-  - write
-  - edit
-  - web_search
-  - web_get_contents
-  - grep
-  - message_user
-  compatibility: Requires gh, jq, git, bun, node.
-  conflicts_with:
-  - github-pr-review
-  - code-review-and-quality
+description: Use when the user invokes /act on a PR/MR, /act with no arguments (uses the PR in the current conversation context), or /act <context> with context ∈ {pr, plan, backlog, harvest}. Resolves threads in product code (or posts a substantive in-thread reply), commits, then closes threads. Never resolve-only. Harvest (collecting threads) lives in /harvest; triage (priority / grouping / wontfix) lives in /backlog. /act is the fix loop, not the collect or triage.
 ---
 
 # /act
-
-## Model invocation guard
-
-`/act` may be invoked by a model or implicitly. In that case it may run the discovery and analysis steps (fetch state, read threads, classify findings), but it must not edit product files, create commits, resolve threads, or push until the user has explicitly confirmed the planned actions in `message_user`. Do not proceed with mutating steps on an implicit or model invocation without that confirmation.
 
 Portable skill layout ([agentskills.io](https://agentskills.io/specification)):
 `scripts/` (helpers), `references/` (EVALUATE, RATING_FLOW,
@@ -41,12 +12,7 @@ SAST-source-priority). Copy `.agents/skills/act/` to relocate.
 **`/act` means fix the PR, not hide review comments.**
 
 Applies to `/act`, `/act pr`, `/act plan`, `/act backlog`, `/act harvest`,
-`/act ... --no-merge` (default), `/act ... --merge` (explicit opt-in),
 `/act ... --runner`, `@claude /act`, `@codex /act`, `@copilot /act`.
-
-**Default: `--no-merge`.** `/act` fixes and validates until the PR is
-merge-ready, then stops. It never calls `gh pr merge` or `gh api .../merge`
-unless the `--merge` flag is explicitly passed.
 
 **No Playwright** for GitHub PR UI.
 
@@ -230,7 +196,6 @@ the harvest-style batch PR.
 | "Codacy is not my responsibility — it's a third-party tool" | Codacy findings on this PR are your problem. Read annotations, install linter, reproduce, fix. |
 | One pass through threads, then resolve | Loop: fetch → analyse → fix → verify → push → re-fetch. CI may surface new findings after each push. |
 | Stop when context gets large | Plan a handoff: summarize state, write remaining items to backlog/harvest, report to user. |
-| Merge the PR because `CI_REQUIRED_PENDING=0` | Stop at merge-ready. Only merge when `--merge` is passed and the user has explicitly opted in. |
 
 Long-tail footguns (git stash / `git add -A` / `scripts/run.ts`
 bypass / "what's the PR?" mid-flow) are catalogued in
@@ -525,12 +490,6 @@ file content at that line, and a one-line diagnosis of which of
 the two causes above is at play.
 
 ## Merge-ready — the loop has converged
-
-`/act` is a **validate-and-fix loop**, not a merge command. The default
-behavior (`--no-merge`) stops here and reports the PR as merge-ready. Only
-when the user explicitly invokes `/act ... --merge` may the agent perform the
-merge after the loop converges, and then only if the PR is actually
-mergeable and the token has permission.
 
 Say **merge-ready** only when all of these are true:
 

@@ -1,14 +1,6 @@
 ---
 name: skill-feedback
-description: Use when the user invokes /skill-feedback on a skill, or after /retrospect identifies a universal finding tied to a specific skill's instructions. Reads the `metadata.source:` field from that skill's SKILL.md frontmatter and files a structured GitHub issue (or draft PR with --pr) at the source repo it declares (fail-closed if `metadata.source:` is missing; `--repo` overrides). Idempotent (checks for open skill-feedback issues first), severity-labelled, pairs with /retrospect and /act.
-metadata:
-  tier: 2
-  triggers:
-    - user
-    - model
-  source: theplenkov-ai/skills
-  compatibility: Requires gh (authenticated), jq. Network access to api.github.com.
-  argument-hint: <skill-name>
+description: Use when the user invokes /skill-feedback on a skill, or after /retrospect identifies a universal finding tied to a specific skill's instructions. Resolves the skill's source from `skills.config.ts` and files a structured GitHub issue (or draft PR with --pr) at the source repo it declares (fail-closed if no source is configured; `--repo` overrides). Idempotent (checks for open skill-feedback issues first), severity-labelled, pairs with /retrospect and /act.
 ---
 
 # /skill-feedback
@@ -33,36 +25,31 @@ Do **not** use for:
 
 ## How to find the source
 
-Each skill declares its source in its SKILL.md frontmatter under `metadata`:
-
-```yaml
-metadata:
-  source: theplenkov-ai/skills
-```
+Each skill declares its source in `skills.config.ts` under `skillMetadata.<name>.frontmatter.metadata.source`. The canonical default is `defaultSkillMetadata.frontmatter.metadata.source` (`theplenkov-ai/skills`); per-skill `source` overrides are only needed for forks or external skills.
 
 Resolution order:
 
-1. **Argument**: `/skill-feedback <skill-name>` — look up `skills/**/<skill-name>/SKILL.md`, read its `metadata.source:` field.
+1. **Argument**: `/skill-feedback <skill-name>` — read `skillMetadata["<skill-name>"].frontmatter.metadata.source` from `skills.config.ts`, falling back to `defaultSkillMetadata.frontmatter.metadata.source`.
 2. **Skill in context**: if invoked from inside another skill's workflow (e.g. `/act` reaches a meta-finding), use the skill that owns the current loop.
-3. **Override**: `--repo <owner>/<repo>` (forces a specific target repo regardless of `metadata.source:` — useful for testing against a fork before upstreaming).
+3. **Override**: `--repo <owner>/<repo>` (forces a specific target repo regardless of configured source — useful for testing against a fork before upstreaming).
 
-**Fail-closed if `metadata.source:` is missing.** A missing `metadata.source:` field is a misconfiguration of the affected skill, not an excuse to misfile. When `metadata.source:` is absent and `--repo` is not supplied, `/skill-feedback` MUST stop and emit:
+**Fail-closed if no source is configured.** A missing `source` is a misconfiguration of the affected skill, not an excuse to misfile. When `source` is absent and `--repo` is not supplied, `/skill-feedback` MUST stop and emit:
 
 ```
-ERROR: skill '<name>' has no `metadata.source:` field in its SKILL.md frontmatter
+ERROR: skill '<name>' has no configured source in skills.config.ts
 (see AGENTS.md § Skill source metadata).
 Either:
-  - add `metadata.source: <owner>/<repo>` to the skill's SKILL.md (preferred), or
+  - add a `source: <owner>/<repo>` override in skills.config.ts for the skill, or
   - re-run with `--repo <owner>/<repo>` to file against a specific repo.
 ```
 
-Defaulting to a hard-coded repo on missing `metadata.source:` is **not** acceptable — feedback for a misconfigured skill would silently land on the wrong repo and miss its maintainer. `theplenkov-ai/skills` (the canonical host for skills that live in this repo) is targeted only when a skill explicitly declares `metadata.source: theplenkov-ai/skills`.
+Defaulting to a hard-coded repo on missing source is **not** acceptable — feedback for a misconfigured skill would silently land on the wrong repo and miss its maintainer. `theplenkov-ai/skills` (the canonical host for skills that live in this repo) is targeted only via the explicit `defaultSkillMetadata` default or a per-skill override.
 
-Path inside the source repo is derived from the on-disk location (`skills/<category>/<skill-name>/`) — do not encode it in `metadata.source:`.
+Path inside the source repo is derived from the on-disk location (`skills/<category>/<skill-name>/`) — do not encode it in `source`.
 
 ## Issue body — minimal contract
 
-`/skill-feedback` posts a GitHub issue on `metadata.source:` with this structure:
+`/skill-feedback` posts a GitHub issue on the resolved source repo with this structure:
 
 ```markdown
 ## Skill
@@ -92,9 +79,9 @@ Filed by `/skill-feedback` from <agent-id> on <iso-date>.
 ## Commands
 
 ```bash
-# Resolve the target repo for a skill: read the `metadata.source:` field from the
-# skill's SKILL.md frontmatter (use your file/read tools), then verify it:
-gh repo view "<metadata-source-from-frontmatter>" --json nameWithOwner --jq .nameWithOwner
+# Resolve the target repo for a skill: read `skillMetadata["<name>"].frontmatter.metadata.source`
+# from `skills.config.ts`, fall back to `defaultSkillMetadata.frontmatter.metadata.source`, then verify it:
+gh repo view "<resolved-source>" --json nameWithOwner --jq .nameWithOwner
 
 # Post the issue
 gh issue create \

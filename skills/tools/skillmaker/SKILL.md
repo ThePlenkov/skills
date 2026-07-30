@@ -1,19 +1,6 @@
 ---
 name: skillmaker
 description: Create, validate, and manage agent skills. Generates SKILL.md scaffolds, checks reserved names, validates frontmatter against schema, and helps rename conflicting skills.
-metadata:
-  tier: 2
-  triggers:
-    - user
-    - model
-  allowed-tools:
-    - read
-    - write
-    - edit
-    - bash
-    - grep
-    - glob
-  source: theplenkov-ai/skills
 ---
 
 # Skillmaker
@@ -100,27 +87,32 @@ This regenerates `scripts/reserved-names.sh` (single source of truth for all scr
 
 ## SKILL.md Frontmatter
 
+The `SKILL.md` frontmatter now contains only the canonical `name` and `description`. Runtime metadata such as `tier`, `triggers`, `source`, `allowed-tools`, `conflicts_with`, `depends_on`, and `disable-model-invocation` are defined centrally in [`skills.config.ts`](../../../skills.config.ts).
+
+```yaml
+---
+name: my-skill-name
+description: "One-sentence description (10-500 chars)"
+---
+```
+
+You may also include optional `metadata` for tags, author, version, or upstream notes:
+
 ```yaml
 ---
 name: my-skill-name
 description: "One-sentence description (10-500 chars)"
 metadata:
-  version: "1.0.0"           # optional semver
-  tier: 2                    # required; on-demand default
-  triggers:                  # required
-    - user                   # user invokes explicitly
-    - model                  # agent loads automatically
-  disable-model-invocation: false  # set to true for user-only skills
-  # When true, set `triggers` to user-only by removing `- model`.
-  # For Codex, also create agents/openai.yaml with:
-  #   policy:
-  #     allow_implicit_invocation: false
-  allowed-tools:             # optional
-    - read
-    - bash
-  source: theplenkov-ai/skills
-  argument-hint: --fix       # optional, shown in /help
+  version: "1.0.0"
+  author: "you"
 ---
+```
+
+`skillmaker` scaffolds both the `SKILL.md` and a default entry in `skills.config.ts` with `tier: 2` and `triggers: [user, model]`. It omits `source` for the canonical `theplenkov-ai/skills` repo and only writes it for forks or external skills. Update `skills.config.ts` to add `allowed-tools`, `conflicts_with`, `depends_on`, or `disable-model-invocation` as needed. For Codex, also create `agents/openai.yaml` with:
+
+```yaml
+policy:
+  allow_implicit_invocation: false
 ```
 
 ## File Structure
@@ -143,19 +135,20 @@ skills/tools/skillmaker/
 
 ## Craft layer
 
-After scaffolding a new skill (or revising an existing one), invoke
-`$skill{writing-great-skills}` — either manually by the human or automatically
-handed off by `skillmaker` — to review the result against the craft rules that
-make a skill predictable: invocation mode (model- vs. user-invoked), the
-description (front-loaded leading word, one trigger per branch, no
-duplication), the information hierarchy (steps vs. reference, progressive
-disclosure to a linked file), the leading-word technique, and the failure
-modes that the skill's body should defend against. `skillmaker` is the
-**procedure** (how to scaffold); `writing-great-skills` is the **craft** (how
-to make the result fire reliably). Both are required for a skill that ages
-well.
+After scaffolding a new skill (or revising an existing one), the **human**
+should invoke `$skill{writing-great-skills}` to review the result against
+the craft rules that make a skill predictable: invocation mode (model- vs.
+user-invoked), the description (front-loaded leading word, one trigger
+per branch, no duplication), the information hierarchy (steps vs.
+reference, progressive disclosure to a linked file), the leading-word
+technique, and the failure modes that the skill's body should defend
+against. `skillmaker` is the **procedure** (how to scaffold);
+`writing-great-skills` is the **craft** (how to make the result fire
+reliably). Both are required for a skill that ages well.
 
-**Agent handoff**: `writing-great-skills` is model-invocable
-(`disable-model-invocation: false`) so `skillmaker` can hand the
-scaffolded skill off for review automatically. Keep the description
-concise because it loads into the agent's context window.
+**Why both user and model triggers**: `writing-great-skills` is invoked by
+users (`user`) and can also be reached by agents (`model`,
+`disable-model-invocation: false`), so it is available both when a human
+explicitly asks for it and when an agent is scoping a skill. If your agent
+is running `skillmaker` autonomously, schedule a human review pass before the
+scaffolded skill is merged.

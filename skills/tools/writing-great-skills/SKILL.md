@@ -1,19 +1,6 @@
 ---
 name: writing-great-skills
-description: Reference for writing and editing skills well — the vocabulary and principles
-  that make a skill predictable. Use when authoring a new skill, reviewing a skill
-  for retirement or merge, or debugging a skill that fires inconsistently. Companion
-  to $skill{skillmaker}.
-metadata:
-  source: theplenkov-ai/skills
-  tier: 2
-  triggers:
-  - user
-  - model
-  disable-model-invocation: false
-  upstream: mattpocock/skills
-  upstream_path: skills/productivity/writing-great-skills/
-  note: Adapted from mattpocock/skills. GLOSSARY.md is the canonical source of vocabulary.
+description: Reference for writing and editing skills well — the vocabulary and principles that make a skill predictable. Use when authoring a new skill, reviewing a skill for retirement or merge, or debugging a skill that fires inconsistently. Companion to $skill{skillmaker}.
 ---
 
 <!--

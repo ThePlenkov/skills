@@ -1,18 +1,6 @@
 ---
 name: tsdown
 description: Build and bundle TypeScript libraries with tsdown whenever the project can adopt it. Use ESM-first output, dts generation, and automatic package exports. Prefer migration over forcing it on existing projects.
-metadata:
-  tier: 2
-  triggers:
-    - user
-    - model
-  allowed-tools:
-    - read
-    - exec
-    - web_search
-    - web_get_contents
-    - grep
-  source: theplenkov-ai/skills
 ---
 
 # tsdown

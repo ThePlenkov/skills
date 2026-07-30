@@ -1,20 +1,12 @@
 ---
 name: save-session
-description: Save work durably when the user says a save-session trigger phrase, or
-  generate a self-contained handoff for the next agent in a PR pipeline. NOT for ordinary
-  git commits, pushes, or memory-only saves.
+description: Save work durably when the user says a save-session trigger phrase, or generate a self-contained handoff for the next agent in a PR pipeline. NOT for ordinary git commits, pushes, or memory-only saves.
 metadata:
-  source: theplenkov-ai/skills
-  tier: 2
-  triggers:
-  - user
-  - model
-  disable-model-invocation: false
   tags:
-  - productivity
-  - workflow
-  - persistence
-  - handoff
+    - productivity
+    - workflow
+    - persistence
+    - handoff
   author: codex
   version: 1.0.0
 ---
@@ -96,11 +88,15 @@ Generate a durable handoff between subagent-driven PRs. The output is **self-con
 git fetch origin main
 git log origin/main --oneline -10
 gh pr list --state all --limit 5
-ls docs/handoff/ 2>/dev/null   # existing handoff chain
-cat docs/lessons-learned.md 2>/dev/null
+if [ -d docs/handoff/ ]; then
+  ls docs/handoff/   # existing handoff chain
+fi
+if [ -f docs/lessons-learned.md ]; then
+  cat docs/lessons-learned.md
+fi
 ```
 
-If the working tree is dirty, commit or stash before continuing.
+If the working tree is dirty, inspect ownership. Do not commit, stash, or otherwise touch unrelated or ambiguously owned changes — stop and ask before touching them.
 
 #### Step 2. Write a new handoff doc
 
@@ -158,13 +154,20 @@ npx --yes vitest@2.1.5 run src/<path>/<file>.test.ts
 # Expect: Test suite failure or test assertion failures — the expected TDD RED state
 ```
 
-#### Step 6. Commit + push + open draft PR
+#### Step 6. Commit + push + open draft PR (requires explicit approval)
+
+Stage only the handoff files. Do **not** use `git add -A`.
 
 ```bash
-git add -A
+git add docs/handoff/<file> docs/lessons-learned.md <scaffold-file>
 git commit -m "docs: add subagent-NN handoff + lessons Rules N, N+1; scaffold <name> RED tests"
+```
+
+Push and PR creation require explicit user approval. If the user approves:
+
+```bash
 git push -u origin task/NN-task-name
-gh pr create --base main --head task/NN-task-name --draft \
+gh pr create --base main --head=task/NN-task-name --draft \
   --title "feat(<scope>): <task-name> (subagent PR NN)" \
   --body "..."
 ```

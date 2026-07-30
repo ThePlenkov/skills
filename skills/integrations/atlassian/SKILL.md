@@ -1,12 +1,6 @@
 ---
 name: atlassian
 description: Work with Atlassian Jira and Confluence. Use when using the `acli` CLI, Jira/Confluence Cloud REST API endpoints (`*.atlassian.net`), or Atlassian MCP tools. NOT for general project management discussion or non-Atlassian trackers.
-metadata:
-  tier: 2
-  triggers:
-    - user
-    - model
-  source: theplenkov-ai/skills
 ---
 
 # Atlassian

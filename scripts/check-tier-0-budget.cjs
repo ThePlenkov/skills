@@ -4,6 +4,8 @@ const YAML = require('yaml');
 
 const repoRoot = process.argv[2] || path.resolve(__dirname, '..');
 
+const { skillMetadata } = require(path.join(repoRoot, 'skills.config.ts'));
+
 function* walk(dir) {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
   for (const entry of entries) {
@@ -24,20 +26,42 @@ function extractFrontmatter(filePath) {
   return content.slice(4, end).replace(/\r\n/g, '\n');
 }
 
+function getTier(frontmatter, name) {
+  const config = skillMetadata[name];
+  const configMeta =
+    config?.frontmatter?.metadata && typeof config.frontmatter.metadata === 'object' && !Array.isArray(config.frontmatter.metadata)
+      ? config.frontmatter.metadata
+      : {};
+  const currentMeta =
+    frontmatter.metadata && typeof frontmatter.metadata === 'object' && !Array.isArray(frontmatter.metadata)
+      ? frontmatter.metadata
+      : {};
+  return configMeta.tier ?? currentMeta.tier ?? frontmatter.tier;
+}
+
 let total = 0;
 const files = [];
 for (const skillPath of walk(path.join(repoRoot, 'skills'))) {
-  const frontmatter = extractFrontmatter(skillPath);
-  if (!frontmatter) continue;
+  const frontmatterText = extractFrontmatter(skillPath);
+  if (!frontmatterText) continue;
   let data;
   try {
-    data = YAML.parse(frontmatter);
+    data = YAML.parse(frontmatterText);
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     process.stderr.write(`::error::failed to parse YAML frontmatter in ${skillPath}: ${message}\n`);
     process.exit(1);
   }
-  const tier = data?.metadata?.tier ?? data?.tier;
+  const name = data?.name ?? '';
+  if (!name) {
+    process.stderr.write(`::error::SKILL.md at ${skillPath} is missing a name\n`);
+    process.exit(1);
+  }
+  if (!skillMetadata[name]) {
+    process.stderr.write(`::error::Skill '${name}' is missing a skills.config.ts entry (file: ${skillPath})\n`);
+    process.exit(1);
+  }
+  const tier = getTier(data, name);
   if (tier === 0 || (typeof tier === 'string' && tier.trim() === '0')) {
     const lines = fs.readFileSync(skillPath, 'utf8').trimEnd().split(/\r?\n/).length;
     files.push({ path: skillPath, lines });

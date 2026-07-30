@@ -21,6 +21,7 @@ import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import process from "node:process";
 import { isNestedSkill } from "./lib/nested-skill.js";
+import { getField, mergeConfigFrontmatter } from "./lib/skill-frontmatter.js";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const SKILLS_DIR = join(ROOT, "skills");
@@ -85,14 +86,6 @@ function asList(value: unknown): string[] {
   return [text];
 }
 
-function getField(frontmatter: Record<string, unknown>, key: string): unknown {
-  const metadata =
-    frontmatter.metadata && typeof frontmatter.metadata === 'object' && !Array.isArray(frontmatter.metadata)
-      ? (frontmatter.metadata as Record<string, unknown>)
-      : undefined;
-  return metadata?.[key] ?? frontmatter[key];
-}
-
 function readCodexPolicy(skillDir: string): boolean {
   const file = join(skillDir, "agents", "openai.yaml");
   if (!existsSync(file)) return true;
@@ -133,11 +126,15 @@ function loadSkills(): SkillIndexEntry[] {
     if (isNestedSkill(skillFile, SKILLS_DIR)) continue;
 
     const text = readFileSync(skillFile, "utf-8");
-    const frontmatter = parseFrontmatter(text);
+    const rawFrontmatter = parseFrontmatter(text);
+    const name = String(rawFrontmatter.name ?? "");
+    if (!name) {
+      throw new Error(`SKILL.md at ${skillFile} is missing a name`);
+    }
+    const frontmatter = mergeConfigFrontmatter(name, rawFrontmatter);
     const relPath = relative(ROOT, skillFile).replace(/\\/g, "/");
     const parts = relPath.split("/");
     const category = parts.length >= 3 ? parts[1] : "";
-    const name = String(frontmatter.name ?? "");
     const description = String(frontmatter.description ?? "")
       .replace(/\s+/g, " ")
       .trim();

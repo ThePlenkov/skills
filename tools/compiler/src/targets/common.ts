@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { stringify as stringifyYaml } from 'yaml';
 import type { Skill, SkillLink } from '../types.js';
 
 export function rewriteBody(
@@ -25,6 +26,7 @@ export function emitSkills(
     const targetDir = path.join(outputSkillsDir, skill.name);
     fs.mkdirSync(targetDir, { recursive: true });
     const body = rewriteBody(skill.body, skill.links, linkFormatter, skill);
-    fs.writeFileSync(path.join(targetDir, 'SKILL.md'), body, 'utf8');
+    const header = '---\n' + stringifyYaml(skill.frontmatter, { lineWidth: 0 }) + '---\n';
+    fs.writeFileSync(path.join(targetDir, 'SKILL.md'), header + body, 'utf8');
   }
 }

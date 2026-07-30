@@ -22,7 +22,7 @@ See [`AGENTS.md`](AGENTS.md) for the canonical layout description and repository
 3. Add `SKILL.md` with a clear description and workflow.
 4. Add `assets/`, `references/`, or `scripts/` only if needed.
 5. Update the category description in `.claude-plugin/marketplace.json` (Claude Code) and add a plugin entry in `.agents/plugins/marketplace.json` (ChatGPT/Codex).
-6. Declare the skill's upstream `source:` in its SKILL.md frontmatter
+6. Declare the skill's source, tier, and triggers in `skills.config.ts`
    (see [Skill source metadata](AGENTS.md#skill-source-metadata) in AGENTS.md).
    This is what `$skill{skill-feedback}` targets when a finding should flow
    back to the canonical maintainer.

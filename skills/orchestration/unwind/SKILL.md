@@ -1,41 +1,7 @@
 ---
 name: unwind
-description: Collapse a solved narrow branch into the parent/root task, rebuild the
-  execution plan from the new proven state, and continue automatically. Use when a
-  subtask, architecture spike, blocker, or investigation is resolved and the agent
-  must stop asking what to do next, integrate the result into the main plan, and proceed
-  with the next best parent-level action.
-metadata:
-  source: theplenkov-ai/skills
-  tier: 2
-  triggers:
-  - user
-  - model
-  disable-model-invocation: false
-  allowed-tools:
-  - read
-  - grep
-  - glob
-  - exec
-  - edit
-  - write
-  - run_subagent
-  permissions:
-    allow:
-    - Read(*)
-    - Grep(*)
-    - Glob(*)
-    - Exec(git status --short)
-    - Exec(git diff --stat)
-    - Exec(git diff)
-    - Exec(*test*)
-    - Exec(*lint*)
-    - Exec(*typecheck*)
-    - run_subagent
-    deny: []
-  argument-hint: '[optional root objective or direction]'
+description: Collapse a solved narrow branch into the parent/root task, rebuild the execution plan from the new proven state, and continue automatically. Use when a subtask, architecture spike, blocker, or investigation is resolved and the agent must stop asking what to do next, integrate the result into the main plan, and proceed with the next best parent-level action.
 ---
-
 # UNWIND MODE
 
 The user is not asking for a passive session summary.

@@ -1,18 +1,6 @@
 ---
 name: modern-stack
 description: Enforce the latest supported version for each dependency, CI action, and runtime, respecting the current major line. Ground decisions in live registry data, not training data.
-metadata:
-  tier: 2
-  triggers:
-    - user
-    - model
-  allowed-tools:
-    - read
-    - exec
-    - web_search
-    - web_get_contents
-    - grep
-  source: theplenkov-ai/skills
 ---
 
 # modern-stack

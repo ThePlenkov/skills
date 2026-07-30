@@ -1,11 +1,6 @@
 ---
 name: persistent-memory
 description: Persistent memory enforcement for AI agents. Recall prior work and findings before starting a task; persist learnings after completing work. Tier 1 — opt-in via `/recall <terms>` at task start and `/retain <learning>` or `/reflect` when work concludes. NOT always-on; do not auto-load for every interaction.
-metadata:
-  tier: 1
-  triggers:
-    - user
-  source: theplenkov-ai/skills
 ---
 
 # Memory Skill

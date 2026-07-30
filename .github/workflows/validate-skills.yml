@@ -21,6 +21,7 @@ on:
       - 'scripts/check-os-independence.ts'
       - 'scripts/check-skill-size.ts'
       - 'skills/**'
+      - 'skills.config.ts'
       - 'docs/skill-coverage-matrix.md'
   pull_request:
     paths:
@@ -41,6 +42,7 @@ on:
       - 'scripts/check-os-independence.ts'
       - 'scripts/check-skill-size.ts'
       - 'skills/**'
+      - 'skills.config.ts'
       - 'docs/skill-coverage-matrix.md'
 
 # Cancel duplicate runs on the same ref. Without this, a single push

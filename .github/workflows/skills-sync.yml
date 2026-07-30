@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'skills/**'
+      - 'skills.config.ts'
+      - 'public-skills.config.ts'
       - 'skills-lock.json'
       - 'bin/**'
       - 'scripts/**'
@@ -101,6 +103,11 @@ jobs:
         run: |
           set -euo pipefail
           ./bin/skills.js --target=skills-sync/.agents/skills --force
+
+      - name: Normalize SKILL.md frontmatter for skills-sync
+        run: |
+          set -euo pipefail
+          node --experimental-strip-types --no-warnings scripts/write-skills-sync-frontmatter.ts --source skills-sync/.agents/skills
 
       - name: Generate skill dependency graphs
         run: |

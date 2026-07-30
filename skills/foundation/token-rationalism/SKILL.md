@@ -1,11 +1,6 @@
 ---
 name: token-rationalism
 description: Token-rational agent behavior. Maximize value delivered per request, minimize waste in output and documentation. Use always — Tier 0 always-on skill. Covers do-it-now autonomy, output brevity, documentation skepticism, and when to invest more tokens.
-metadata:
-  tier: 0
-  triggers:
-    - always
-  source: theplenkov-ai/skills
 ---
 
 # Token Rationalism (Tier 0)

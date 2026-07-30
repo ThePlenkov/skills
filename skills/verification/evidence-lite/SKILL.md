@@ -1,18 +1,6 @@
 ---
 name: evidence-lite
 description: Lightweight proof discipline for trivial changes. Single command + quoted output is enough. No claim.json, no validate.py, no structured proof block. Use when files_changed ≤ 2 AND lines_changed ≤ 20 AND no test/config/build files are touched. For non-trivial changes use $skill{evidence} instead.
-metadata:
-  allowed-tools: read, grep, glob, write, exec
-  permissions:
-    bash: ask
-    edit: ask
-    write: ask
-  argument-hint: <trivial change to verify>
-  tier: 2
-  triggers:
-    - user
-    - model
-  source: theplenkov-ai/skills
 ---
 
 # /evidence-lite — proof for trivial changes

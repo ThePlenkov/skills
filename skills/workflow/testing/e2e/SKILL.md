@@ -1,16 +1,6 @@
 ---
 name: e2e
-description: Domain-agnostic AI-native scenario runner (e2e-agent CLI). Scenarios
-  are markdown prompts; evidence is written by the CLI. Use when the user invokes
-  /e2e or asks to run a live scenario test and collect evidence under .e2e/results/.
-  Agents use only e2e-agent commands — never import internal framework modules.
-metadata:
-  source: theplenkov-ai/skills
-  tier: 2
-  triggers:
-  - user
-  - model
-  disable-model-invocation: false
+description: Domain-agnostic AI-native scenario runner (e2e-agent CLI). Scenarios are markdown prompts; evidence is written by the CLI. Use when the user invokes /e2e or asks to run a live scenario test and collect evidence under .e2e/results/. Agents use only e2e-agent commands — never import internal framework modules.
 ---
 
 # /e2e — e2e-agent (domain-agnostic)

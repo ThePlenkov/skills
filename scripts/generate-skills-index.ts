@@ -20,6 +20,7 @@ import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { isNestedSkill } from "./lib/nested-skill.js";
+import { getField, mergeConfigFrontmatter, type Frontmatter } from "./lib/skill-frontmatter.js";
 
 const ALLOWED_TRIGGERS = new Set(["user", "model", "always"] as const);
 type Trigger = "user" | "model" | "always";
@@ -57,7 +58,6 @@ const indexSchema = z
   })
   .strict();
 
-type Frontmatter = Record<string, unknown>;
 
 const SCRIPT_DIR = path.resolve(path.dirname(new URL(import.meta.url).pathname));
 const SCRIPT_REPO_ROOT = path.resolve(SCRIPT_DIR, "..");
@@ -117,14 +117,6 @@ function toStringScalar(value: unknown, context: string): string {
     throw new Error(`${context} must be a scalar value`);
   }
   return String(value);
-}
-
-function getField(frontmatter: Record<string, unknown>, key: string): unknown {
-  const metadata =
-    frontmatter.metadata && typeof frontmatter.metadata === 'object' && !Array.isArray(frontmatter.metadata)
-      ? (frontmatter.metadata as Record<string, unknown>)
-      : undefined;
-  return metadata?.[key] ?? frontmatter[key];
 }
 
 function asList(value: unknown): string[] {
@@ -243,16 +235,17 @@ function buildEntry(
   const rel = path.relative(repoRoot, skillMd).replaceAll("\\", "/");
   const category = categoryTagFromPath(rel);
   const text = fs.readFileSync(skillMd, "utf-8");
-  const { frontmatter } = parseFrontmatter(text);
+  const { frontmatter: rawFrontmatter } = parseFrontmatter(text);
 
-  if (!frontmatter.name || !frontmatter.description) {
-    const missing = ["name", "description"].filter((k) => !frontmatter[k]);
+  if (!rawFrontmatter.name || !rawFrontmatter.description) {
+    const missing = ["name", "description"].filter((k) => !rawFrontmatter[k]);
     throw new Error(
       `${rel}: missing required frontmatter field(s): ${missing.join(", ")}`
     );
   }
 
-  const name = toStringScalar(frontmatter.name, "name");
+  const name = toStringScalar(rawFrontmatter.name, "name");
+  const frontmatter = mergeConfigFrontmatter(name, rawFrontmatter);
   const triggers = asList(getField(frontmatter, "triggers")).filter((t): t is Trigger => {
     const ok = ALLOWED_TRIGGERS.has(t as Trigger);
     if (!ok) {

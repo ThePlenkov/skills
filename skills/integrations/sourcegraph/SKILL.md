@@ -1,18 +1,6 @@
 ---
 name: sourcegraph
 description: "Use when searching or reading code across a corporate Sourcegraph instance — symbol definitions, usages, file contents, `src` CLI, GraphQL/streaming API, or Deep Search. Exposes an MCP server for read-only repo ops. Self-reference: use it to find skills in theplenkov-ai/skills."
-metadata:
-  upstream: sourcegraph/docs
-  upstream_path: docs/cli/, docs/deep-search/, docs/code-search/
-  refresh_via: DeepWiki MCP at https://mcp.deepwiki.com/mcp (see references/refresh.md)
-  refresh_via_alt: https://docs.devin.ai/work-with-devin/deepwiki-mcp
-  tier: 2
-  triggers:
-    - user
-    - model
-  source: theplenkov-ai/skills
-  depends_on:
-    - external-research
 ---
 
 # Sourcegraph — corporate code search

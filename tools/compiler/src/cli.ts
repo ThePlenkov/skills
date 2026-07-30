@@ -1,7 +1,28 @@
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { build } from './build.js';
+import type { CompilerOptions } from './types.js';
 
-function main(): void {
+async function loadSkillMetadata(workspaceRoot: string): Promise<CompilerOptions['skillMetadata'] | undefined> {
+  const configPath = path.join(workspaceRoot, 'skills.config.ts');
+  try {
+    const module = await import(pathToFileURL(configPath).href) as { skillMetadata?: Record<string, { frontmatter?: Record<string, unknown> }> };
+    return module.skillMetadata;
+  } catch (error) {
+    const isMissing = error instanceof Error && (
+      (error as NodeJS.ErrnoException).code === 'ERR_MODULE_NOT_FOUND' ||
+      (error as NodeJS.ErrnoException).code === 'ENOENT' ||
+      error.message.includes('Cannot find module') ||
+      error.message.includes('Cannot find package')
+    );
+    if (isMissing) {
+      return undefined;
+    }
+    throw error;
+  }
+}
+
+async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const getArg = (name: string): string | undefined => {
     const idx = args.indexOf(name);
@@ -32,6 +53,7 @@ function main(): void {
     target,
     outDir: finalOutDir,
     dependencies,
+    skillMetadata: await loadSkillMetadata(workspaceRoot),
   });
 
   console.log(`Built ${target} for ${project} -> ${finalOutDir}`);

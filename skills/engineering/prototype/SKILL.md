@@ -1,16 +1,6 @@
 ---
 name: prototype
 description: "Build a throwaway prototype to answer a design question. Use when the user wants to sanity-check whether a state model or logic feels right, or to explore what a UI should look like. Two distinct branches: a runnable terminal app for state/logic questions, or several radically different UI variations toggleable from one route."
-metadata:
-  upstream: mattpocock/skills
-  upstream_path: skills/engineering/prototype/
-  note: Adapted from mattpocock/skills. Sub-files in references/ are the two branch guides.
-  allowed-tools: read, grep, glob, edit, write, exec
-  tier: 2
-  triggers:
-    - user
-    - model
-  source: theplenkov-ai/skills
 ---
 
 <!--

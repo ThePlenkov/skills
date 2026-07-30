@@ -2,14 +2,6 @@
 name: minimalist
 description: |
   Activates the minimalist senior-dev persona: every line costs, the best code is the code never written. Forces the smallest solution that works — YAGNI, reuse, stdlib before custom code, native before dependencies, one line before fifty. Use on any coding task (write, refactor, fix, review, design, choose libraries) and on "minimalist", "yagni", "simplest solution", "do less", or complaints about over-engineering. Subcommands by first arg: review|audit|debt|gain|help|lite|full|ultra|off.
-metadata:
-  argument-hint: "[lite|full|ultra|off|review|audit|debt|gain|help]"
-  license: MIT
-  tier: 2
-  triggers:
-    - user
-    - model
-  source: theplenkov-ai/skills
 ---
 
 # Minimalist

@@ -1,16 +1,6 @@
 ---
 name: loop-programming
 description: 'Run bounded, validator-driven loops for tasks needing repeated inspect, modify, execute, and verify cycles. Use when the agent must iterate on a repository until measurable criteria pass: failing tests, debugging, refactoring, multi-file changes, performance thresholds. Trigger for "keep iterating until tests pass", "fix the repository autonomously", or "refactor and prove nothing broke". Not for one-shot explanations, tiny edits, or unbounded exploration.'
-metadata:
-  allowed-tools: read, grep, glob, edit, write, exec
-  argument-hint: <goal plus validators, e.g. "fix auth tests; npm test -- auth">
-  source: theplenkov-ai/skills
-  tier: 2
-  triggers:
-    - user
-    - model
-  conflicts_with:
-    - incremental-implementation
 ---
 
 # Loop Programming

@@ -18,7 +18,8 @@ usage() {
 [[ "${1:-}" = "--help" ]] && usage
 [[ $# -lt 2 ]] && usage
 
-# shellcheck source=ensure-reserved.sh
+# shellcheck disable=SC1091
+# shellcheck source=scripts/ensure-reserved.sh
 source "${REPO_ROOT}/scripts/ensure-reserved.sh"
 
 CATEGORY="$1"
@@ -86,19 +87,10 @@ if remote_url=$(git -C "$REPO_ROOT" remote get-url origin 2>/dev/null); then
     SKILL_SOURCE="$remote_url"
   fi
 fi
-
 cat > "${SKILL_DIR}/SKILL.md" << TEMPLATE
 ---
 name: ${NAME}
 description: "TODO: One-sentence description (10-500 chars)"
-metadata:
-  tier: 2
-  triggers:
-    - user
-    - model
-  allowed-tools:
-    - read
-  source: ${SKILL_SOURCE}
 ---
 
 # ${NAME}
@@ -122,8 +114,30 @@ interface:
   default_prompt: "Use \$${NAME} to get started."
 TEMPLATE
 
+# shellcheck disable=SC2016
+REPO_ROOT="$REPO_ROOT" SKILL_NAME="$NAME" SKILL_SOURCE="$SKILL_SOURCE" node -e '
+const fs = require("node:fs");
+const path = require("node:path");
+const repoRoot = process.env.REPO_ROOT;
+const configPath = path.join(repoRoot, "skills.config.ts");
+const name = process.env.SKILL_NAME;
+const source = process.env.SKILL_SOURCE || "theplenkov-ai/skills";
+if (!name) throw new Error("SKILL_NAME not set");
+let text = fs.readFileSync(configPath, "utf8");
+const sourceField = source && source !== "theplenkov-ai/skills"
+  ? `,\n        "source": "${source}"`
+  : "";
+const entry = `  "${name}": {\n    frontmatter: {\n      metadata: {\n        "tier": 2,\n        "triggers": ["user", "model"]${sourceField}\n      },\n    },\n  },\n`;
+if (!text.includes(`"${name}"`)) {
+  text = text.replace(/\n};\s*$/, "\n" + entry + "};");
+  fs.writeFileSync(configPath, text);
+  console.log(`Added ${name} to skills.config.ts`);
+}
+'
+
 printf 'Created %s and %s\n' "${SKILL_DIR}/SKILL.md" "${SKILL_DIR}/agents/openai.yaml"
 printf '\nNext steps:\n'
 printf '  1. Edit the description, workflow, and agents/openai.yaml\n'
-printf '  2. Run: npm run install:skills\n'
-printf '  3. Run: npx tsx scripts/run.ts scripts/validate-reserved-names.sh\n'
+printf '  2. Add any runtime metadata (allowed-tools, conflicts_with, etc.) to skills.config.ts if needed\n'
+printf '  3. Run: npm run install:skills\n'
+printf '  4. Run: npx tsx scripts/run.ts scripts/validate-reserved-names.sh\n'

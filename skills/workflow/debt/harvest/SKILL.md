@@ -1,19 +1,6 @@
 ---
 name: harvest
-description: 'Use when the user invokes /harvest on a PR or runs `harvest:pr` / `harvest:batch`.
-  Collects unresolved PR review threads into .agents/review-debt/harvests/*.jsonl
-  on PR merge (or via workflow_dispatch). Does not run during /act and does not open
-  a harvest bot PR — new files are append-only paths pushed straight to main. Downstream
-  consumers: /backlog (triage), /act (batch fix). Harvest is a one-way collect, not
-  a fix loop.'
-metadata:
-  source: theplenkov-ai/skills
-  tier: 2
-  triggers:
-  - user
-  disable-model-invocation: true
-  compatibility: Requires gh, jq, bun; writes to .agents/review-debt/harvests/ and
-    main.
+description: "Use when the user invokes /harvest on a PR or runs `harvest:pr` / `harvest:batch`. Collects unresolved PR review threads into .agents/review-debt/harvests/*.jsonl on PR merge (or via workflow_dispatch). Does not run during /act and does not open a harvest bot PR — new files are append-only paths pushed straight to main. Downstream consumers: /backlog (triage), /act (batch fix). Harvest is a one-way collect, not a fix loop."
 ---
 
 # /harvest

@@ -103,35 +103,50 @@ Some skills are owned by other repos and pulled into `.agents/skills/` at instal
 
 ## Skill source metadata
 
-Every `SKILL.md` frontmatter **must** declare where the skill's canonical source
-lives inside a `metadata` block so that `$skill{skill-feedback}` and other tools
-can route findings upstream without hard-coding the repo per skill.
+Skill metadata that changes independently of skill body (source, tier, triggers)
+lives in `skills.config.ts` at the repository root. `SKILL.md` frontmatter stays
+minimal — only `name`, `description`, and optional `metadata` for tags,
+`author`, and `version`. This keeps metadata edits fast and avoids full skill
+re-scans in CI.
 
 ```yaml
 ---
 name: my-skill
 description: ...
 metadata:
-  source: theplenkov-ai/skills
+  author: you
+  version: 1.0.0
+  tags: [example]
 ---
 ```
 
-- **Format**: `<owner>/<repo>` (GitHub shorthand). Accepted directly by `gh`.
-- **Default**: `theplenkov-ai/skills` (this repo's host). Set explicitly on
-  every skill inside `metadata.source:` — do not rely on a fallback in tools,
-  so the source is greppable.
-- **The canonical source is the repo where the skill actually lives.** This
-  repo is `theplenkov-ai/skills`. `ThePlenkov/skills` is the public
-  distribution mirror for `skills.sh`; published copies have their
-  `metadata.source` overwritten by the `Public skills` CI workflow to
-  `ThePlenkov/skills` so consumers know where the bundle came from.
+`skills.config.ts` example:
+
+```ts
+export const skillMetadata: Record<string, SkillMetadata> = {
+  "my-skill": {
+    frontmatter: {
+      metadata: {
+        tier: 2,
+        triggers: ["user", "model"],
+      },
+    },
+  },
+};
+```
+
+- **Canonical source** for skills in this repo is `theplenkov-ai/skills`.
+  `defaultSkillMetadata.source` provides the default; per-skill `source` overrides
+  are only needed for forks or external skills.
+- **Tier and triggers** are defined in `skills.config.ts`, not in `SKILL.md`.
+- **`ThePlenkov/skills`** is the public `skills.sh` distribution mirror; the
+  `Public skills` CI workflow overwrites `metadata.source` to `ThePlenkov/skills`
+  in the published bundle.
 - **Path inside the repo is derived** from the on-disk location
   (`skills/<category>/<skill-name>/`). Do not encode the path in `source:`.
-- **Forks**: set `metadata.source:` to the fork's `<owner>/<repo>`. The feedback
-  skill reads `metadata.source:` at runtime, so fork maintainers can route
-  feedback to themselves without touching the skill body.
-- **Optional override fields** (use only when genuinely needed): not defined yet.
-  Add them via a separate proposal rather than overloading `source:`.
+- **Forks**: set `source` in `skills.config.ts` for the fork's `<owner>/<repo>`.
+  The feedback skill reads `metadata.source` at runtime, so fork maintainers can
+  route feedback to themselves without touching the skill body.
 
 ## Skill references
 

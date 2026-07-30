@@ -1,15 +1,6 @@
 ---
 name: npm-publish
 description: Publish npm packages using OIDC-based trusted publishing, or short-lived scoped automation credentials when OIDC is unavailable. Use when publishing packages, setting up CI/CD publishing, or managing registry authentication. Includes /npm-publish prepare-ci to bootstrap CI publishing for new packages.
-metadata:
-  permissions:
-    network: registry.npmjs.org
-    scope: packages explicitly opted in via `npm publish` from a clean checkout
-  tier: 2
-  triggers:
-    - user
-    - model
-  source: theplenkov-ai/skills
 ---
 
 # npm-publish

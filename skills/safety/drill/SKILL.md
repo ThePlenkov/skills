@@ -10,11 +10,6 @@ metadata:
     - delegation
   author: petr-plenkov
   version: 1.1.0
-  tier: 2
-  triggers:
-    - user
-    - model
-  source: theplenkov-ai/skills
 ---
 
 # Drill

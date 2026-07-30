@@ -1,45 +1,6 @@
 ---
 name: salvage
 description: Emergency recovery mode after accidental deletion, git clean, git restore, reset, overwrite, or destructive agent action. Use when user work may have been lost. The goal is to stop further damage, preserve current disk state, inspect recovery sources, and report what can and cannot be recovered.
-metadata:
-  argument-hint: "[optional lost file or directory]"
-  tier: 2
-  triggers:
-    - user
-  allowed-tools:
-    - read
-    - grep
-    - glob
-    - exec
-    - write
-  permissions:
-    allow:
-      - Read(*)
-      - Grep(*)
-      - Glob(*)
-      - Exec(git status --short)
-      - Exec(git reflog *)
-      - Exec(git fsck *)
-      - Exec(git stash list)
-      - Exec(git log *)
-      - Exec(git show *)
-      - Exec(git diff *)
-      - Exec(find *)
-      - Exec(mkdir -p *)
-      - Exec(cp *)
-      - Exec(tar *)
-    deny:
-      - Exec(*clean*untracked*)
-      - Exec(*git*clean*)
-      - Exec(*reset*hard*)
-      - Exec(*restore*working*)
-      - Exec(*git*restore*)
-      - Exec(*recursively*force*)
-      - Exec(*find*delete*)
-      - Exec(*find*-exec*)
-      - Exec(*find*-execdir*)
-      - Exec(*find*exec*)
-  source: theplenkov-ai/skills
 ---
 
 # SALVAGE MODE

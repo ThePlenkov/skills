@@ -1,12 +1,6 @@
 ---
 name: sarif-to-annotations
 description: Convert SARIF 2.1.0 reports to GitHub Actions workflow-command annotations. Use when a tool already emits SARIF (CodeQL, Snyk, ESLint, Semgrep, Trivy, etc.) and you want inline PR annotations instead of (or in addition to) the Security tab. Exit code reflects the presence of error-severity findings so the same script can serve as both annotator and workflow gate.
-metadata:
-  tier: 2
-  triggers:
-    - user
-    - model
-  source: theplenkov-ai/skills
 ---
 
 # SARIF → GitHub Actions Annotations

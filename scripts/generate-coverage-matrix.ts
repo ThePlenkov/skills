@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import process from "node:process";
 import { isNestedSkill } from "./lib/nested-skill.js";
+import { getField, mergeConfigFrontmatter } from "./lib/skill-frontmatter.js";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const SKILLS_DIR = join(ROOT, "skills");
@@ -52,30 +53,35 @@ function asList(value: unknown): string[] {
   return [text];
 }
 
-function getField(frontmatter: Record<string, unknown>, key: string): unknown {
-  const metadata =
-    frontmatter.metadata && typeof frontmatter.metadata === 'object' && !Array.isArray(frontmatter.metadata)
-      ? (frontmatter.metadata as Record<string, unknown>)
-      : undefined;
-  return metadata?.[key] ?? frontmatter[key];
-}
-
 function loadSkills(): Skill[] {
   const skills: Skill[] = [];
   for (const skillFile of walkSkillFiles(SKILLS_DIR)) {
     if (isNestedSkill(skillFile, SKILLS_DIR)) continue;
     const text = readFileSync(skillFile, "utf-8");
-    const frontmatter = parseFrontmatter(text);
+    const rawFrontmatter = parseFrontmatter(text);
+    const name = String(rawFrontmatter.name ?? "");
+    if (!name) {
+      throw new Error(`SKILL.md at ${skillFile} is missing a name`);
+    }
+    const frontmatter = mergeConfigFrontmatter(name, rawFrontmatter);
     const relPath = relative(ROOT, skillFile).replace(/\\/g, "/");
     const parts = relPath.split("/");
     const category = parts.length >= 3 ? parts[1] : "";
+    const tier = getField(frontmatter, "tier");
+    const triggers = getField(frontmatter, "triggers");
+    if (tier === undefined) {
+      throw new Error(`Skill '${name}' is missing a tier in skills.config.ts`);
+    }
+    if (triggers === undefined || asList(triggers).length === 0) {
+      throw new Error(`Skill '${name}' is missing triggers in skills.config.ts`);
+    }
 
     skills.push({
-      name: String(frontmatter.name ?? ""),
+      name,
       category,
       description: String(frontmatter.description ?? "").replace(/\s+/g, " ").trim(),
-      tier: Number(getField(frontmatter, "tier") ?? 2),
-      triggers: asList(getField(frontmatter, "triggers")),
+      tier: Number(tier ?? 2),
+      triggers: asList(triggers),
       conflicts_with: asList(getField(frontmatter, "conflicts_with")),
       depends_on: asList(getField(frontmatter, "depends_on")),
       path: relPath,
