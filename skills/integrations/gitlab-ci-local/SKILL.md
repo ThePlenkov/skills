@@ -1,9 +1,12 @@
 ---
 name: gitlab-ci-local
 description: Test GitLab CI pipelines locally using gitlab-ci-local. Use when debugging CI jobs, validating pipeline changes, or running jobs without pushing to GitLab.
-tier: 2
-triggers: [user, model]
-source: theplenkov-ai/skills
+metadata:
+  tier: 2
+  triggers:
+    - user
+    - model
+  source: theplenkov-ai/skills
 ---
 
 # GitLab CI Local Testing

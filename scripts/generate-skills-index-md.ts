@@ -85,6 +85,14 @@ function asList(value: unknown): string[] {
   return [text];
 }
 
+function getField(frontmatter: Record<string, unknown>, key: string): unknown {
+  const metadata =
+    frontmatter.metadata && typeof frontmatter.metadata === 'object' && !Array.isArray(frontmatter.metadata)
+      ? (frontmatter.metadata as Record<string, unknown>)
+      : undefined;
+  return metadata?.[key] ?? frontmatter[key];
+}
+
 function readCodexPolicy(skillDir: string): boolean {
   const file = join(skillDir, "agents", "openai.yaml");
   if (!existsSync(file)) return true;
@@ -133,9 +141,9 @@ function loadSkills(): SkillIndexEntry[] {
     const description = String(frontmatter.description ?? "")
       .replace(/\s+/g, " ")
       .trim();
-    const triggers = asList(frontmatter.triggers);
-    const tier = Number(frontmatter.tier ?? 2);
-    const disableModelInvocation = frontmatter["disable-model-invocation"] === true;
+    const triggers = asList(getField(frontmatter, "triggers"));
+    const tier = Number(getField(frontmatter, "tier") ?? 2);
+    const disableModelInvocation = getField(frontmatter, "disable-model-invocation") === true;
     const codexAllowImplicit = readCodexPolicy(dirname(skillFile));
     const alwaysOn = triggers.includes("always");
     const claudeModelInvoked =

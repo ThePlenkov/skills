@@ -1,26 +1,49 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { parse as parseYaml } from 'yaml';
 import type { Skill, PluginManifest, SkillLink } from './types.js';
 
 interface ParsedSkill {
-  frontmatter: Record<string, string>;
+  frontmatter: Record<string, unknown>;
   body: string;
 }
 
-function parseFrontmatter(content: string): ParsedSkill {
+function parseFrontmatter(content: string, sourcePath?: string): ParsedSkill {
   const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
   if (!match) {
     return { frontmatter: {}, body: content };
   }
-  const frontmatter: Record<string, string> = {};
-  for (const line of match[1].split(/\r?\n/)) {
-    const idx = line.indexOf(':');
-    if (idx <= 0) continue;
-    const key = line.slice(0, idx).trim();
-    const value = line.slice(idx + 1).trim().replace(/^["']|["']$/g, '');
-    if (key && value) frontmatter[key] = value;
+  try {
+    const parsed = parseYaml(match[1]);
+    const frontmatter =
+      parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+        ? (parsed as Record<string, unknown>)
+        : {};
+    return { frontmatter, body: match[2] };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    throw new Error(
+      `Failed to parse YAML frontmatter${sourcePath ? ` in ${sourcePath}` : ''}: ${message}`
+    );
   }
-  return { frontmatter, body: match[2] };
+}
+
+function getSource(frontmatter: Record<string, unknown>): string {
+  const metadata =
+    frontmatter.metadata && typeof frontmatter.metadata === 'object' && !Array.isArray(frontmatter.metadata)
+      ? (frontmatter.metadata as Record<string, unknown>)
+      : {};
+  return String(metadata.source ?? frontmatter.source ?? '');
+}
+
+function getDescription(frontmatter: Record<string, unknown>): string {
+  return String(frontmatter.description ?? '');
+}
+
+function getName(frontmatter: Record<string, unknown>, dir: string): string {
+  const raw = frontmatter.name;
+  const candidate = typeof raw === 'string' ? raw.trim() : '';
+  return candidate || path.basename(dir);
 }
 
 export function discoverSkills(skillsRoot: string): Map<string, Skill> {
@@ -33,10 +56,10 @@ export function discoverSkills(skillsRoot: string): Map<string, Skill> {
 
     if (isSkill) {
       const text = fs.readFileSync(skillFile, 'utf8');
-      const { frontmatter, body } = parseFrontmatter(text);
-      const name = frontmatter.name ?? path.basename(dir);
-      const description = frontmatter.description ?? '';
-      const source = frontmatter.source ?? '';
+      const { frontmatter, body } = parseFrontmatter(text, skillFile);
+      const name = getName(frontmatter, dir);
+      const description = getDescription(frontmatter);
+      const source = getSource(frontmatter);
       const category = rel.split('/').filter((s) => s !== 'dependencies');
       const skill: Skill = {
         name,

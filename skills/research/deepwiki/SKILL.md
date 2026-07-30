@@ -1,12 +1,12 @@
 ---
 name: deepwiki
-description: >-
-  Analyze public GitHub repositories using DeepWiki's AI-generated documentation.
-  Use when code from a GitHub repo must be analyzed, scanned, or understood.
-  Spawns a background subagent so analysis never blocks the current thread.
-tier: 2
-triggers: [user, model]
-source: theplenkov-ai/skills
+description: Analyze public GitHub repositories using DeepWiki's AI-generated documentation. Use when code from a GitHub repo must be analyzed, scanned, or understood. Spawns a background subagent so analysis never blocks the current thread.
+metadata:
+  tier: 2
+  triggers:
+    - user
+    - model
+  source: theplenkov-ai/skills
 ---
 
 # DeepWiki — GitHub Repository Analysis

@@ -118,7 +118,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `git-push` | `workflow` | 2 | user, model | — | — |
 | `git-reset` | `workflow` | 2 | user, model | — | — |
 | `git-workflow-and-versioning` | `workflow` | 2 | user, model | — | — |
-| `harvest` | `workflow` | 2 | user, model | — | — |
+| `harvest` | `workflow` | 2 | user | — | — |
 | `planning-and-task-breakdown` | `workflow` | 2 | user, model | — | — |
 | `resolving-merge-conflicts` | `workflow` | 2 | user, model | — | — |
 | `shadow-fork` | `workflow` | 2 | user, model | — | — |

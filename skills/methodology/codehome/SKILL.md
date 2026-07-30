@@ -1,30 +1,31 @@
 ---
 name: codehome
-description: "Detect and fix code placed in the wrong architectural layer, config file, or oversized file. Use when runtime logic appears in config, server code leaks into UI components, or a file grows because everything was solved in-place. NOT for style refactoring or aesthetic moves."
-argument-hint: "[optional file, feature, or concern]"
-tier: 2
-triggers:
-  - user
-allowed-tools:
-  - read
-  - grep
-  - glob
-  - exec
-  - edit
-  - write
-permissions:
-  allow:
-    - Read(*)
-    - Grep(*)
-    - Glob(*)
-    - Exec(git status --short)
-    - Exec(git diff --stat)
-    - Exec(git diff)
-    - Exec(*test*)
-    - Exec(*lint*)
-    - Exec(*typecheck*)
-  deny: []
-source: theplenkov-ai/skills
+description: Detect and fix code placed in the wrong architectural layer, config file, or oversized file. Use when runtime logic appears in config, server code leaks into UI components, or a file grows because everything was solved in-place. NOT for style refactoring or aesthetic moves.
+metadata:
+  argument-hint: "[optional file, feature, or concern]"
+  tier: 2
+  triggers:
+    - user
+  allowed-tools:
+    - read
+    - grep
+    - glob
+    - exec
+    - edit
+    - write
+  permissions:
+    allow:
+      - Read(*)
+      - Grep(*)
+      - Glob(*)
+      - Exec(git status --short)
+      - Exec(git diff --stat)
+      - Exec(git diff)
+      - Exec(*test*)
+      - Exec(*lint*)
+      - Exec(*typecheck*)
+    deny: []
+  source: theplenkov-ai/skills
 ---
 
 # CODEHOME MODE

@@ -6,7 +6,7 @@ export interface Skill {
   description: string;
   source: string;
   body: string;
-  frontmatter: Record<string, string | number | boolean | string[]>;
+  frontmatter: Record<string, unknown>;
   links: SkillLink[];
 }
 

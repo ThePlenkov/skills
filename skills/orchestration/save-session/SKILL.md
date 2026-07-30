@@ -1,18 +1,22 @@
 ---
 name: save-session
-description: "Save work durably when the user says a save-session trigger phrase, or generate a self-contained handoff for the next agent in a PR pipeline. NOT for ordinary git commits, pushes, or memory-only saves."
+description: Save work durably when the user says a save-session trigger phrase, or
+  generate a self-contained handoff for the next agent in a PR pipeline. NOT for ordinary
+  git commits, pushes, or memory-only saves.
 metadata:
+  source: theplenkov-ai/skills
+  tier: 2
+  triggers:
+  - user
+  - model
+  disable-model-invocation: false
   tags:
-    - productivity
-    - workflow
-    - persistence
-    - handoff
+  - productivity
+  - workflow
+  - persistence
+  - handoff
   author: codex
-  version: "1.0.0"
-tier: 2
-triggers: [user, model]
-disable-model-invocation: false
-source: theplenkov-ai/skills
+  version: 1.0.0
 ---
 
 # Save Session

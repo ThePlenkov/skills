@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
+import { stringify as stringifyYaml } from 'yaml';
 import { rewriteBody } from './common.js';
 import type { CompilerOptions, Skill, SkillLink } from '../types.js';
 
@@ -42,22 +42,22 @@ export function normalizeFrontmatter(input: Record<string, unknown>, publicSourc
 
   const output: Record<string, unknown> = { ...safeInput };
 
-  const rawSource =
-    typeof safeInput.source === 'string' ? safeInput.source : undefined;
-  const canonicalSource = normalizeRepoShorthand(rawSource) ?? 'theplenkov-ai/skills';
-  output.source = canonicalSource;
+  const sourceMeta =
+    safeInput.metadata && typeof safeInput.metadata === 'object' && !Array.isArray(safeInput.metadata)
+      ? (safeInput.metadata as Record<string, unknown>)
+      : {};
 
-  const metadata: Record<string, unknown> = {};
-  if (
-    safeInput.metadata &&
-    typeof safeInput.metadata === 'object' &&
-    !Array.isArray(safeInput.metadata)
-  ) {
-    Object.assign(metadata, safeInput.metadata as Record<string, unknown>);
+  // Preserve all metadata from the source, then backfill legacy top-level keys
+  // so both pre- and post-migration layouts produce the same published output.
+  const metadata: Record<string, unknown> = { ...sourceMeta };
+  for (const key of Object.keys(safeInput)) {
+    if (key === 'metadata') continue;
+    if (metadata[key] === undefined) metadata[key] = safeInput[key];
   }
-  for (const key of ['tags', 'author', 'version']) {
-    if (safeInput[key] !== undefined) metadata[key] = safeInput[key];
-  }
+
+  const rawSource = String(metadata.source ?? safeInput.source ?? '');
+  const canonicalSource = normalizeRepoShorthand(rawSource) ?? 'theplenkov-ai/skills';
+
   metadata.source = canonicalSource;
 
   if (publicSource !== undefined) {
@@ -71,6 +71,18 @@ export function normalizeFrontmatter(input: Record<string, unknown>, publicSourc
   }
 
   output.metadata = metadata;
+  output.source = canonicalSource;
+
+  // Hoist metadata fields to top-level for consumers that read the skills-sh
+  // frontmatter directly (e.g., skills.sh indexers). Skip 'source' because
+  // top-level source stays canonical while metadata.source may be the public mirror.
+  for (const key of Object.keys(metadata)) {
+    if (key === 'source') continue;
+    if (output[key] === undefined) {
+      output[key] = metadata[key];
+    }
+  }
+
   return stringifyYaml(output, { lineWidth: 0 });
 }
 
@@ -99,16 +111,7 @@ export function buildSkillsSh(options: CompilerOptions, skills: Skill[], project
       return `[${link.text}](../${target.name}/SKILL.md)`;
     };
 
-    const original = fs.readFileSync(path.join(skill.dir, 'SKILL.md'), 'utf8');
-    const match = original.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
-    const parsed = match ? parseYaml(match[1]) : {};
-    const frontmatter: Record<string, unknown> =
-      parsed !== null &&
-      typeof parsed === 'object' &&
-      !Array.isArray(parsed)
-        ? (parsed as Record<string, unknown>)
-        : {};
-    const header = `---\n${normalizeFrontmatter(frontmatter, options.publicSource)}---\n`;
+    const header = `---\n${normalizeFrontmatter(skill.frontmatter, options.publicSource)}---\n`;
     const body = rewriteBody(skill.body, skill.links, linkFormatter, skill);
     fs.writeFileSync(path.join(destDir, 'SKILL.md'), header + body, 'utf8');
   }

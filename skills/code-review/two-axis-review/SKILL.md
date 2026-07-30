@@ -1,23 +1,21 @@
 ---
 name: two-axis-review
-description: >-
-  Review the changes since a fixed point (commit, branch, tag, or merge-base)
-  along two independent axes — Standards (does the code follow the repo's
-  documented coding standards plus a Fowler smell baseline?) and Spec (does
-  the code faithfully implement the originating issue / PRD / spec?). Runs
-  both reviews in parallel sub-agents. Distinct from $skill{github-pr-review}
-  (single-axis) and $skill{act} (thread remediation); this skill holds the
-  two-axis discipline.
-allowed-tools: read, grep, glob, exec, run_subagent
-argument-hint: <fixed-point ref, e.g. "main", "HEAD~5", "abc1234">
-tier: 2
-triggers: [user, model]
-conflicts_with: [github-pr-review, mr-address-review, code-review-and-quality]
-source: theplenkov-ai/skills
+description: Review the changes since a fixed point (commit, branch, tag, or merge-base) along two independent axes — Standards (does the code follow the repo's documented coding standards plus a Fowler smell baseline?) and Spec (does the code faithfully implement the originating issue / PRD / spec?). Runs both reviews in parallel sub-agents. Distinct from $skill{github-pr-review} (single-axis) and $skill{act} (thread remediation); this skill holds the two-axis discipline.
 metadata:
   upstream: mattpocock/skills
   upstream_path: skills/engineering/code-review/
   note: Adapted from mattpocock/skills. Renamed from `code-review` to `two-axis-review` to avoid collision with the existing `code-review/` category; the discipline (Standards + Spec) is the contribution.
+  allowed-tools: read, grep, glob, exec, run_subagent
+  argument-hint: <fixed-point ref, e.g. "main", "HEAD~5", "abc1234">
+  tier: 2
+  triggers:
+    - user
+    - model
+  conflicts_with:
+    - github-pr-review
+    - mr-address-review
+    - code-review-and-quality
+  source: theplenkov-ai/skills
 ---
 
 <!--

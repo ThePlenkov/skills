@@ -20,7 +20,7 @@ describe('normalizeFrontmatter', () => {
     expect((parsed.metadata as Record<string, unknown>).source).toBe('theplenkov-ai/skills');
   });
 
-  it('does not let publicSource override canonical metadata.source', () => {
+  it('lets publicSource override metadata.source while keeping top-level source canonical', () => {
     const out = normalizeFrontmatter(
       { name: 'x', source: 'theplenkov-ai/skills' },
       'ThePlenkov/skills'
@@ -42,5 +42,19 @@ describe('normalizeFrontmatter', () => {
     expect(() => normalizeFrontmatter({ name: 'x' }, 'https://github.com/foo/bar')).toThrow();
     expect(() => normalizeFrontmatter({ name: 'x' }, 'foo/bar.git')).toThrow();
     expect(() => normalizeFrontmatter({ name: 'x' }, 'not-a-shorthand')).toThrow();
+  });
+
+  it('hoists tier and triggers from metadata to top-level when not already present', () => {
+    const out = normalizeFrontmatter({
+      name: 'my-skill',
+      description: '...',
+      metadata: { tier: 1, triggers: ['user'], source: 'theplenkov-ai/skills' },
+    });
+    const parsed = parse(out) as Record<string, unknown>;
+    expect(parsed.tier).toBe(1);
+    expect(parsed.triggers).toEqual(['user']);
+    expect(parsed.source).toBe('theplenkov-ai/skills');
+    expect((parsed.metadata as Record<string, unknown>).tier).toBe(1);
+    expect((parsed.metadata as Record<string, unknown>).triggers).toEqual(['user']);
   });
 });

@@ -1,11 +1,12 @@
 ---
 name: codacy
-description: >-
-  Codacy static analysis — reproduce findings locally, debug "N issues (0 max.)"
-  failures, work with Codacy CLI, GitHub annotations API, and org-level secrets.
-tier: 2
-triggers: [user, model]
-source: theplenkov-ai/skills
+description: Codacy static analysis — reproduce findings locally, debug "N issues (0 max.)" failures, work with Codacy CLI, GitHub annotations API, and org-level secrets.
+metadata:
+  tier: 2
+  triggers:
+    - user
+    - model
+  source: theplenkov-ai/skills
 ---
 
 # Codacy

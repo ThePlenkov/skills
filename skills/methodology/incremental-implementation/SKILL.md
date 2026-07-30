@@ -1,10 +1,14 @@
 ---
 name: incremental-implementation
 description: Delivers changes incrementally. Use when implementing any feature or change that touches more than one file. Use when you're about to write a large amount of code at once, or when a task feels too big to land in one step.
-tier: 2
-triggers: [user, model]
-conflicts_with: [loop-programming]
-source: theplenkov-ai/skills
+metadata:
+  tier: 2
+  triggers:
+    - user
+    - model
+  conflicts_with:
+    - loop-programming
+  source: theplenkov-ai/skills
 ---
 
 # Incremental Implementation

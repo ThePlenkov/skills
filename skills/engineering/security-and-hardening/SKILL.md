@@ -1,9 +1,12 @@
 ---
 name: security-and-hardening
 description: Hardens code against vulnerabilities. Use when handling user input, authentication, data storage, or external integrations. Use when building any feature that accepts untrusted data, manages user sessions, or interacts with third-party services.
-tier: 2
-triggers: [user, model]
-source: theplenkov-ai/skills
+metadata:
+  tier: 2
+  triggers:
+    - user
+    - model
+  source: theplenkov-ai/skills
 ---
 
 # Security and Hardening

@@ -1,21 +1,26 @@
 ---
 name: sandboxed
-description: Isolate risky agent experiments in a dedicated git branch or git worktree, create explicit checkpoint commits, and prevent the agent from breaking the user's active working directory. Use before architecture experiments, dependency changes, framework rewrites, config changes, large refactors, generated-file changes, migration attempts, or any task where the agent may need to try multiple approaches.
-argument-hint: "[optional experiment name or root objective]"
-tier: 2
-triggers:
+description: Isolate risky agent experiments in a dedicated git branch or git worktree,
+  create explicit checkpoint commits, and prevent the agent from breaking the user's
+  active working directory. Use before architecture experiments, dependency changes,
+  framework rewrites, config changes, large refactors, generated-file changes, migration
+  attempts, or any task where the agent may need to try multiple approaches.
+metadata:
+  source: theplenkov-ai/skills
+  tier: 2
+  triggers:
   - user
   - model
-disable-model-invocation: false
-allowed-tools:
+  disable-model-invocation: false
+  allowed-tools:
   - read
   - grep
   - glob
   - exec
   - edit
   - write
-permissions:
-  allow:
+  permissions:
+    allow:
     - Read(*)
     - Grep(*)
     - Glob(*)
@@ -39,12 +44,12 @@ permissions:
     - Exec(*test*)
     - Exec(*lint*)
     - Exec(*typecheck*)
-  deny:
+    deny:
     - Exec(*reset*hard*)
     - Exec(*clean*untracked*)
     - Exec(*restore*working*)
     - Exec(*recursively*force*)
-source: theplenkov-ai/skills
+  argument-hint: '[optional experiment name or root objective]'
 ---
 
 # SANDBOX MODE

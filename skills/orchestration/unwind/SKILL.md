@@ -1,13 +1,18 @@
 ---
 name: unwind
-description: Collapse a solved narrow branch into the parent/root task, rebuild the execution plan from the new proven state, and continue automatically. Use when a subtask, architecture spike, blocker, or investigation is resolved and the agent must stop asking what to do next, integrate the result into the main plan, and proceed with the next best parent-level action.
-argument-hint: "[optional root objective or direction]"
-tier: 2
-triggers:
+description: Collapse a solved narrow branch into the parent/root task, rebuild the
+  execution plan from the new proven state, and continue automatically. Use when a
+  subtask, architecture spike, blocker, or investigation is resolved and the agent
+  must stop asking what to do next, integrate the result into the main plan, and proceed
+  with the next best parent-level action.
+metadata:
+  source: theplenkov-ai/skills
+  tier: 2
+  triggers:
   - user
   - model
-disable-model-invocation: false
-allowed-tools:
+  disable-model-invocation: false
+  allowed-tools:
   - read
   - grep
   - glob
@@ -15,8 +20,8 @@ allowed-tools:
   - edit
   - write
   - run_subagent
-permissions:
-  allow:
+  permissions:
+    allow:
     - Read(*)
     - Grep(*)
     - Glob(*)
@@ -27,8 +32,8 @@ permissions:
     - Exec(*lint*)
     - Exec(*typecheck*)
     - run_subagent
-  deny: []
-source: theplenkov-ai/skills
+    deny: []
+  argument-hint: '[optional root objective or direction]'
 ---
 
 # UNWIND MODE
@@ -103,7 +108,7 @@ Expected proof:
 
 1. Proceed.
 
-If `unwind` was invoked by a model or implicitly, stop after selecting the next best action and output the `[NEXT ACTION SELECTED]` block; do not execute edits, commands, data transmission, or other high-impact operations without explicit user confirmation. When invoked directly by a user, immediately perform the next best action using available tools.
+If `unwind` was invoked by a model or implicitly, stop after selecting the next best action and output the `[NEXT ACTION SELECTED]` block; do not execute edits, commands, data transmission, or other high-impact operations without explicit user confirmation. When invoked directly by a user, perform read-only verification immediately; for edits, writes, command execution, data transmission, or subagent launches, ask the user to confirm before proceeding.
 
 This includes:
 

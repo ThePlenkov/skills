@@ -1,9 +1,12 @@
 ---
 name: claude-skills
 description: Install or refresh skills for Claude Code using `npx skills add`. Use when setting up Claude Code for the first time or after adding new skills to the repository.
-tier: 2
-triggers: [user, model]
-source: theplenkov-ai/skills
+metadata:
+  tier: 2
+  triggers:
+    - user
+    - model
+  source: theplenkov-ai/skills
 ---
 
 # Claude Skills Manager
@@ -42,3 +45,5 @@ npx skills update
 
 - Skills are installed to `.claude/skills/` (project) or `~/.claude/skills/` (global).
 - Re-running the install command is safe and idempotent.
+- For reproducible or automated installs, add the `skills` CLI as a `devDependency` and invoke `npx skills` from a project with a locked `package-lock.json` instead of `npx -y` against the registry.
+- Pin `npx` to a known version or use `--no`/`--offline` when the CLI supports it to avoid supply-chain surprises from unpinned dynamic resolution.

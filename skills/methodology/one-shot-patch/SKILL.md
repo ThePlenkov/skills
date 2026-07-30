@@ -1,12 +1,17 @@
 ---
 name: one-shot-patch
 description: Use when the relevant file and fix hypothesis are known and the agent needs to make exactly one narrow change, then verify it. Prevents stacked fixes, broad refactors, and chaotic iteration. Best for isolated bug fixes after investigation has identified the likely cause.
-allowed-tools: read, grep, glob, edit, write, exec
-argument-hint: <exact files plus one fix hypothesis>
-tier: 2
-triggers: ["user", "model"]
-conflicts_with: [investigate-first, debugging]
-source: theplenkov-ai/skills
+metadata:
+  allowed-tools: read, grep, glob, edit, write, exec
+  argument-hint: <exact files plus one fix hypothesis>
+  tier: 2
+  triggers:
+    - user
+    - model
+  conflicts_with:
+    - investigate-first
+    - debugging
+  source: theplenkov-ai/skills
 ---
 
 # One-Shot Patch

@@ -1,9 +1,12 @@
 ---
 name: adhd
-description: "Goal anchoring for ADHD-impacted users. Detect false goals, prevent rabbit holes, externalize state, and keep work directed at the true objective. Tier 2 — opt-in per session (NOT always-on; load only when the user explicitly requests focus/coaching mode or signals drift)."
-tier: 2
-triggers: [user, model]
-source: theplenkov-ai/skills
+description: Goal anchoring for ADHD-impacted users. Detect false goals, prevent rabbit holes, externalize state, and keep work directed at the true objective. Tier 2 — opt-in per session (NOT always-on; load only when the user explicitly requests focus/coaching mode or signals drift).
+metadata:
+  tier: 2
+  triggers:
+    - user
+    - model
+  source: theplenkov-ai/skills
 ---
 
 # ADHD Goal Anchoring Skill

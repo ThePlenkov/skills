@@ -1,16 +1,12 @@
 ---
 name: external-research
-description: >-
-  Use FIRST when the answer might exist outside the current project.
-  Teaches the agent the "is there a native engine for this?" check
-  before git clone, grep across repos, or raw web search. The catalog
-  (DeepWiki, Sourcegraph, Glean, Rovo, Perplexity, GitHub, GitLab,
-  Jira, Confluence, Linear, Notion, npm, PyPI, crates.io) lives in
-  references/catalog.md. web_search is LAST resort. Implements
-  $skill{token-rationalism} Rule 0 ("search before you read").
-tier: 2
-triggers: [user, model]
-source: theplenkov-ai/skills
+description: Use FIRST when the answer might exist outside the current project. Teaches the agent the "is there a native engine for this?" check before git clone, grep across repos, or raw web search. The catalog (DeepWiki, Sourcegraph, Glean, Rovo, Perplexity, GitHub, GitLab, Jira, Confluence, Linear, Notion, npm, PyPI, crates.io) lives in references/catalog.md. web_search is LAST resort. Implements $skill{token-rationalism} Rule 0 ("search before you read").
+metadata:
+  tier: 2
+  triggers:
+    - user
+    - model
+  source: theplenkov-ai/skills
 ---
 
 # External Research — the philosophy, then the catalog

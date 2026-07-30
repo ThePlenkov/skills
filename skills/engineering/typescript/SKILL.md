@@ -1,15 +1,18 @@
 ---
 name: typescript
-description: "Use the latest supported TypeScript for the current major line. The latest stable TypeScript is recommended for new projects; otherwise stay on the installed line. Source is .ts, build with tsdown, and avoid legacy emit patterns."
-tier: 2
-triggers: [user, model]
-allowed-tools:
-  - read
-  - exec
-  - web_search
-  - web_get_contents
-  - grep
-source: theplenkov-ai/skills
+description: Use the latest supported TypeScript for the current major line. The latest stable TypeScript is recommended for new projects; otherwise stay on the installed line. Source is .ts, build with tsdown, and avoid legacy emit patterns.
+metadata:
+  tier: 2
+  triggers:
+    - user
+    - model
+  allowed-tools:
+    - read
+    - exec
+    - web_search
+    - web_get_contents
+    - grep
+  source: theplenkov-ai/skills
 ---
 
 # typescript

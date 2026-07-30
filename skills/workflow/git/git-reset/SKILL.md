@@ -1,10 +1,16 @@
 ---
 name: git-reset
-description: "Reset git state with mandatory $skill{safeguard} preservation and approval. Analyzes reset type, assesses impact, delegates checkpoint and confirmation to safeguard, and provides restore instructions. Never executes destructive operations without user approval."
-tier: 2
-triggers: [user, model]
-disable-model-invocation: false
-source: theplenkov-ai/skills
+description: Reset git state with mandatory $skill{safeguard} preservation and approval.
+  Analyzes reset type, assesses impact, delegates checkpoint and confirmation to safeguard,
+  and provides restore instructions. Never executes destructive operations without
+  user approval.
+metadata:
+  source: theplenkov-ai/skills
+  tier: 2
+  triggers:
+  - user
+  - model
+  disable-model-invocation: false
 ---
 
 # Git Reset

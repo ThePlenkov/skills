@@ -1,18 +1,19 @@
 ---
 name: skillmaker
 description: Create, validate, and manage agent skills. Generates SKILL.md scaffolds, checks reserved names, validates frontmatter against schema, and helps rename conflicting skills.
-tier: 2
-triggers:
-  - user
-  - model
-allowed-tools:
-  - read
-  - write
-  - edit
-  - bash
-  - grep
-  - glob
-source: theplenkov-ai/skills
+metadata:
+  tier: 2
+  triggers:
+    - user
+    - model
+  allowed-tools:
+    - read
+    - write
+    - edit
+    - bash
+    - grep
+    - glob
+  source: theplenkov-ai/skills
 ---
 
 # Skillmaker
@@ -103,21 +104,22 @@ This regenerates `scripts/reserved-names.sh` (single source of truth for all scr
 ---
 name: my-skill-name
 description: "One-sentence description (10-500 chars)"
-version: "1.0.0"           # optional semver
-tier: 2                    # required; on-demand default
-triggers:                  # required
-  - user                   # user invokes explicitly
-  - model                  # agent loads automatically
-disable-model-invocation: false  # set to true for user-only skills
-# When true, set `triggers` to user-only by removing `- model`.
-# For Codex, also create agents/openai.yaml with:
-#   policy:
-#     allow_implicit_invocation: false
-allowed-tools:             # optional
-  - read
-  - bash
-source: theplenkov-ai/skills
-argument-hint: --fix       # optional, shown in /help
+metadata:
+  version: "1.0.0"           # optional semver
+  tier: 2                    # required; on-demand default
+  triggers:                  # required
+    - user                   # user invokes explicitly
+    - model                  # agent loads automatically
+  disable-model-invocation: false  # set to true for user-only skills
+  # When true, set `triggers` to user-only by removing `- model`.
+  # For Codex, also create agents/openai.yaml with:
+  #   policy:
+  #     allow_implicit_invocation: false
+  allowed-tools:             # optional
+    - read
+    - bash
+  source: theplenkov-ai/skills
+  argument-hint: --fix       # optional, shown in /help
 ---
 ```
 

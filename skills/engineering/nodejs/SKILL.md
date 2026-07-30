@@ -1,15 +1,18 @@
 ---
 name: nodejs
-description: "Default Node.js projects to native TypeScript execution, ESM, and the current LTS runtime. Avoid .cjs/.mjs source files and legacy transpilers."
-tier: 2
-triggers: [user, model]
-allowed-tools:
-  - read
-  - exec
-  - web_search
-  - web_get_contents
-  - grep
-source: theplenkov-ai/skills
+description: Default Node.js projects to native TypeScript execution, ESM, and the current LTS runtime. Avoid .cjs/.mjs source files and legacy transpilers.
+metadata:
+  tier: 2
+  triggers:
+    - user
+    - model
+  allowed-tools:
+    - read
+    - exec
+    - web_search
+    - web_get_contents
+    - grep
+  source: theplenkov-ai/skills
 ---
 
 # nodejs

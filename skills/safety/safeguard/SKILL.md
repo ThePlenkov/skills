@@ -1,45 +1,45 @@
 ---
 name: safeguard
 description: "Prevent destructive agent actions from deleting user work, untracked files, experimental code, or recoverable evidence. Use before any rollback, cleanup, restore, reset, delete, git clean, git restore, git reset, rm, overwrite, mass edit, or dependency cleanup. This is a cross-agent safety skill: investigator, patcher, verifier, and any subagent must obey it before destructive commands."
-argument-hint: "[optional reason for destructive action]"
-tier: 2
-triggers:
-  - user
-  - model
-allowed-tools:
-  - read
-  - grep
-  - glob
-  - exec
-  - write
-permissions:
-  allow:
-    - Read(*)
-    - Grep(*)
-    - Glob(*)
-    - Exec(git status --short)
-    - Exec(git status --porcelain=v1)
-    - Exec(git diff --binary)
-    - Exec(git diff --cached --binary)
-    - Exec(git diff --stat)
-    - Exec(git ls-files --others --exclude-standard)
-    - Exec(mkdir -p *)
-    - Exec(cp *)
-    - Exec(tar *)
-    - Exec(git branch checkpoint/*)
-  deny:
-    # Block destructive operations by signature, not by exact
-    # command — safer because it covers aliases, PATH-shadowed
-    # binaries, and future re-introductions.
-    - Exec(*reset*hard*)
-    - Exec(*checkout*all*)
-    - Exec(*restore*working*)
-    - Exec(*clean*untracked*)
-    - Exec(*recursively*force*)
-    - Exec(*find*and*delete*)
-    - Exec(*xargs*remove*)
-    - Exec(*truncate*file*)
-source: theplenkov-ai/skills
+metadata:
+  argument-hint: "[optional reason for destructive action]"
+  tier: 2
+  triggers:
+    - user
+    - model
+  allowed-tools:
+    - read
+    - grep
+    - glob
+    - exec
+    - write
+  permissions:
+    allow:
+      - Read(*)
+      - Grep(*)
+      - Glob(*)
+      - Exec(git status --short)
+      - Exec(git status --porcelain=v1)
+      - Exec(git diff --binary)
+      - Exec(git diff --cached --binary)
+      - Exec(git diff --stat)
+      - Exec(git ls-files --others --exclude-standard)
+      - Exec(mkdir -p *)
+      - Exec(cp *)
+      - Exec(tar *)
+      - Exec(git branch checkpoint/*)
+    deny:
+      - Exec(*reset*hard*)
+      - Exec(*checkout*all*)
+      - Exec(*restore*working*)
+      - Exec(*git*restore*)
+      - Exec(*clean*untracked*)
+      - Exec(*git*clean*)
+      - Exec(*recursively*force*)
+      - Exec(*find*delete*)
+      - Exec(*xargs*rm*)
+      - Exec(*truncate*)
+  source: theplenkov-ai/skills
 ---
 
 # SAFEGUARD MODE

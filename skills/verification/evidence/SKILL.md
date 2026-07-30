@@ -1,20 +1,18 @@
 ---
 name: evidence
-description: >-
-  Full proof discipline for non-trivial changes. Every claim of done/fixed/passing/verified/green
-  MUST be backed by a real executed command and `.evidence/.../claim.json` validated by
-  `scripts/validate.py`. Required for HTML, UI, browser JavaScript, hydration, routing, and
-  client-side behavior. Use $skill{evidence-lite} for trivial changes.
-allowed-tools: read, grep, glob, write, exec
-permissions:
-  bash: ask
-  edit: ask
-  write: ask
-argument-hint: "<task or claim to evidence> [lite|full]"
-triggers: ["user", "model"]
-tier: 2
-# Tier 2 — on-demand. Load only when a task may produce a completion claim.
-source: theplenkov-ai/skills
+description: Full proof discipline for non-trivial changes. Every claim of done/fixed/passing/verified/green MUST be backed by a real executed command and `.evidence/.../claim.json` validated by `scripts/validate.py`. Required for HTML, UI, browser JavaScript, hydration, routing, and client-side behavior. Use $skill{evidence-lite} for trivial changes.
+metadata:
+  allowed-tools: read, grep, glob, write, exec
+  permissions:
+    bash: ask
+    edit: ask
+    write: ask
+  argument-hint: <task or claim to evidence> [lite|full]
+  triggers:
+    - user
+    - model
+  tier: 2
+  source: theplenkov-ai/skills
 ---
 
 # /evidence — file-first, run-first producer discipline

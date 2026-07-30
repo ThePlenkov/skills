@@ -119,6 +119,14 @@ function toStringScalar(value: unknown, context: string): string {
   return String(value);
 }
 
+function getField(frontmatter: Record<string, unknown>, key: string): unknown {
+  const metadata =
+    frontmatter.metadata && typeof frontmatter.metadata === 'object' && !Array.isArray(frontmatter.metadata)
+      ? (frontmatter.metadata as Record<string, unknown>)
+      : undefined;
+  return metadata?.[key] ?? frontmatter[key];
+}
+
 function asList(value: unknown): string[] {
   if (value === null || value === undefined) return [];
   if (Array.isArray(value)) {
@@ -221,7 +229,7 @@ function deriveTags(
   name: string
 ): string[] {
   const tags = new Set<string>([category, name]);
-  for (const trigger of asList(frontmatter.triggers)) {
+  for (const trigger of asList(getField(frontmatter, "triggers"))) {
     tags.add(trigger);
   }
   return [...tags].sort((a, b) => a.localeCompare(b));
@@ -245,7 +253,7 @@ function buildEntry(
   }
 
   const name = toStringScalar(frontmatter.name, "name");
-  const triggers = asList(frontmatter.triggers).filter((t): t is Trigger => {
+  const triggers = asList(getField(frontmatter, "triggers")).filter((t): t is Trigger => {
     const ok = ALLOWED_TRIGGERS.has(t as Trigger);
     if (!ok) {
       throw new Error(
@@ -255,7 +263,7 @@ function buildEntry(
     return ok;
   });
 
-  const allowedTools = asList(frontmatter["allowed-tools"]);
+  const allowedTools = asList(getField(frontmatter, "allowed-tools"));
 
   const raw = {
     name,
@@ -268,8 +276,8 @@ function buildEntry(
     lines: lineCount(text),
     always_on: triggers.includes("always"),
     allowed_tools: allowedTools,
-    conflicts_with: asList(frontmatter["conflicts_with"]),
-    depends_on: asList(frontmatter["depends_on"]),
+    conflicts_with: asList(getField(frontmatter, "conflicts_with")),
+    depends_on: asList(getField(frontmatter, "depends_on")),
   };
 
   return skillSchema.parse(raw);

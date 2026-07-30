@@ -1,9 +1,10 @@
 ---
 name: reuse-first
 description: "Search locally and in open-source for existing solutions before writing non-trivial code. Use before adding a new function, utility, module, or significant code block. Skip one-liners and trivial refactors. Operationalizes $skill{minimal-root-cause} with a decision matrix and tool bootstrap."
-tier: 2
-triggers: [user, model]
-source: theplenkov-ai/skills
+metadata:
+  tier: 2
+  triggers: [user, model]
+  source: theplenkov-ai/skills
 ---
 
 # reuse-first

@@ -1,17 +1,20 @@
 ---
 name: bootstrap-ts-repo
-description: "Bootstrap a new TypeScript repository with native TS, tsdown, oxlint, biome, husky, and Nx. Use the current Node LTS as the minimum runtime, the latest supported versions for each major line, and avoid .cjs/.mjs source and legacy toolchains."
-tier: 2
-triggers: [user, model]
-allowed-tools:
-  - read
-  - exec
-  - web_search
-  - web_get_contents
-  - edit
-  - write
-  - grep
-source: theplenkov-ai/skills
+description: Bootstrap a new TypeScript repository with native TS, tsdown, oxlint, biome, husky, and Nx. Use the current Node LTS as the minimum runtime, the latest supported versions for each major line, and avoid .cjs/.mjs source and legacy toolchains.
+metadata:
+  tier: 2
+  triggers:
+    - user
+    - model
+  allowed-tools:
+    - read
+    - exec
+    - web_search
+    - web_get_contents
+    - edit
+    - write
+    - grep
+  source: theplenkov-ai/skills
 ---
 
 # bootstrap-ts-repo

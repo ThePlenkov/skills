@@ -1,9 +1,12 @@
 ---
 name: git-commit
 description: Create git commits with validation of documentation and project structure. Analyzes git tree to determine what changed, generates conventional commit messages respecting project rules, and optionally breaks commits by component for semver automation. Supports --check flag to run CI checks locally and --fix flag to auto-fix issues.
-tier: 2
-triggers: [user, model]
-source: theplenkov-ai/skills
+metadata:
+  tier: 2
+  triggers:
+    - user
+    - model
+  source: theplenkov-ai/skills
 ---
 
 # Git Commit

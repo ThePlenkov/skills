@@ -1,24 +1,24 @@
 ---
 name: handoff
-description: >-
-  Write a handoff document so a fresh agent session can continue the work on the
-  same machine and user account, or resume the most recent handoff across git
-  worktrees on that machine. Use when a thread is full, crossing a
-  context-window boundary, returning after `/clear`, or branching into a parallel
-  session. Distinct from save-session and the built-in `/compact`.
-disable-model-invocation: false
-tier: 2
-triggers: [user, model]
-argument-hint: what the next session will focus on | resume
-source: theplenkov-ai/skills
+description: Write a handoff document so a fresh agent session can continue the work
+  on the same machine and user account, or resume the most recent handoff across git
+  worktrees on that machine. Use when a thread is full, crossing a context-window
+  boundary, returning after `/clear`, or branching into a parallel session. Distinct
+  from save-session and the built-in `/compact`.
 metadata:
+  source: theplenkov-ai/skills
+  tier: 2
+  triggers:
+  - user
+  - model
+  disable-model-invocation: false
+  argument-hint: what the next session will focus on | resume
   upstream: mattpocock/skills
   upstream_path: skills/productivity/handoff/
-  note: >-
-    Adapted from mattpocock/skills. Path resolution swapped from a single OS
-    temp directory to "OS temp handoff body + per-worktree
-    `.agents/handoffs/latest.md` pointer" so `/clear` sessions on the same
-    machine can find handoffs across git worktrees.
+  note: Adapted from mattpocock/skills. Path resolution swapped from a single OS temp
+    directory to "OS temp handoff body + per-worktree `.agents/handoffs/latest.md`
+    pointer" so `/clear` sessions on the same machine can find handoffs across git
+    worktrees.
 ---
 
 # Handoff

@@ -1,14 +1,16 @@
 ---
 name: bootstrap-gh-self-hosted-runner
 description: Spin up an ephemeral or persistent self-hosted GitHub Actions runner to work around GitHub-hosted runner billing limits, re-run PR checks, and tear it down safely when done.
-tier: 2
-triggers: [user]
-allowed-tools:
-  - read
-  - exec
-  - edit
-  - write
-source: theplenkov-ai/skills
+metadata:
+  tier: 2
+  triggers:
+    - user
+  allowed-tools:
+    - read
+    - exec
+    - edit
+    - write
+  source: theplenkov-ai/skills
 ---
 
 > **Repository placement:** This skill is kept under `skills/integrations/` as a

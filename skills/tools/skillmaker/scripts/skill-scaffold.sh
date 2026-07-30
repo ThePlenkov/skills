@@ -69,15 +69,36 @@ if [[ ${#SHORT_DESCRIPTION} -lt 25 ]]; then
   SHORT_DESCRIPTION="Help with ${SHORT_DESCRIPTION}"
 fi
 
+SKILL_SOURCE='theplenkov-ai/skills'
+if remote_url=$(git -C "$REPO_ROOT" remote get-url origin 2>/dev/null); then
+  case "$remote_url" in
+    *://*)
+      remote_url=${remote_url#*://}
+      remote_url=${remote_url#*/}
+      ;;
+    *:*/*)
+      remote_url=${remote_url#*:}
+      ;;
+  esac
+  remote_url=${remote_url%.git}
+  remote_url=${remote_url%/}
+  if [[ "$remote_url" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
+    SKILL_SOURCE="$remote_url"
+  fi
+fi
+
 cat > "${SKILL_DIR}/SKILL.md" << TEMPLATE
 ---
 name: ${NAME}
 description: "TODO: One-sentence description (10-500 chars)"
-tier: 2
-triggers: [user, model]
-allowed-tools:
-  - read
-source: theplenkov-ai/skills
+metadata:
+  tier: 2
+  triggers:
+    - user
+    - model
+  allowed-tools:
+    - read
+  source: ${SKILL_SOURCE}
 ---
 
 # ${NAME}

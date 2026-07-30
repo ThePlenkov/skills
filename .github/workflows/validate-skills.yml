@@ -15,7 +15,7 @@ on:
       - '.agents/agents/**/manifest.yaml'
       - 'scripts/validate-agent-manifests.sh'
       - 'scripts/validate-openai-metadata.sh'
-      - 'scripts/check-tier-0-budget.sh'
+      - 'scripts/check-tier-0-budget.cjs'
       - 'scripts/check-readme-categories.ts'
       - 'scripts/generate-coverage-matrix.ts'
       - 'scripts/check-os-independence.ts'
@@ -35,7 +35,7 @@ on:
       - '.agents/agents/**/manifest.yaml'
       - 'scripts/validate-agent-manifests.sh'
       - 'scripts/validate-openai-metadata.sh'
-      - 'scripts/check-tier-0-budget.sh'
+      - 'scripts/check-tier-0-budget.cjs'
       - 'scripts/check-readme-categories.ts'
       - 'scripts/generate-coverage-matrix.ts'
       - 'scripts/check-os-independence.ts'
@@ -153,7 +153,7 @@ jobs:
 
       - name: Check Tier 0 always-on budget
         if: success() || failure()
-        run: ./node_modules/.bin/tsx scripts/run.ts scripts/check-tier-0-budget.sh
+        run: ./node_modules/.bin/tsx scripts/run.ts scripts/check-tier-0-budget.cjs
 
   check-os-independence:
     name: Check OS independence

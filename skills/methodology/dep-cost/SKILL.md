@@ -1,9 +1,10 @@
 ---
 name: dep-cost
 description: "Measure whether a dependency is worth its cost (bundle, install, surface, maintenance) for the part you actually use, and reimplement locally when it is not. Use before adding a new dependency, or when reviewing an existing one that pulls disproportionate weight for a small use. Sibling of $skill{reuse-first} — that one finds candidates, this one judges whether to keep them."
-tier: 2
-triggers: [user, model]
-source: theplenkov-ai/skills
+metadata:
+  tier: 2
+  triggers: [user, model]
+  source: theplenkov-ai/skills
 ---
 
 # dep-cost

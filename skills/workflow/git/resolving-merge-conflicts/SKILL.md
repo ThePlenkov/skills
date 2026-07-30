@@ -1,18 +1,16 @@
 ---
 name: resolving-merge-conflicts
-description: >-
-  Use when an in-progress `git merge` or `git rebase` has produced conflict
-  markers. Resolves hunks by tracing each side's intent to its primary source
-  (commit message, PR, issue, ticket). Refuses to invent new behaviour, prefers
-  `--continue` over a bare commit, and asks the user before any `--abort`.
-allowed-tools: read, grep, glob, exec
-tier: 2
-triggers: [user, model]
-source: theplenkov-ai/skills
+description: Use when an in-progress `git merge` or `git rebase` has produced conflict markers. Resolves hunks by tracing each side's intent to its primary source (commit message, PR, issue, ticket). Refuses to invent new behaviour, prefers `--continue` over a bare commit, and asks the user before any `--abort`.
 metadata:
   upstream: mattpocock/skills
   upstream_path: skills/engineering/resolving-merge-conflicts/
   note: Adapted from mattpocock/skills.
+  allowed-tools: read, grep, glob, exec
+  tier: 2
+  triggers:
+    - user
+    - model
+  source: theplenkov-ai/skills
 ---
 
 <!--

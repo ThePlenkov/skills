@@ -1,10 +1,15 @@
 ---
 name: doubt-driven-development
 description: Subjects every non-trivial decision to a fresh-context adversarial review before it stands. Use when correctness matters more than speed, when working in unfamiliar code, when stakes are high (production, security-sensitive logic, irreversible operations), or any time a confident output would be cheaper to verify now than to debug later.
-tier: 2
-triggers: [user, model]
-conflicts_with: [investigate-first, critical-thinking]
-source: theplenkov-ai/skills
+metadata:
+  tier: 2
+  triggers:
+    - user
+    - model
+  conflicts_with:
+    - investigate-first
+    - critical-thinking
+  source: theplenkov-ai/skills
 ---
 
 # Doubt-Driven Development

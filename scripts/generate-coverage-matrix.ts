@@ -52,6 +52,14 @@ function asList(value: unknown): string[] {
   return [text];
 }
 
+function getField(frontmatter: Record<string, unknown>, key: string): unknown {
+  const metadata =
+    frontmatter.metadata && typeof frontmatter.metadata === 'object' && !Array.isArray(frontmatter.metadata)
+      ? (frontmatter.metadata as Record<string, unknown>)
+      : undefined;
+  return metadata?.[key] ?? frontmatter[key];
+}
+
 function loadSkills(): Skill[] {
   const skills: Skill[] = [];
   for (const skillFile of walkSkillFiles(SKILLS_DIR)) {
@@ -66,10 +74,10 @@ function loadSkills(): Skill[] {
       name: String(frontmatter.name ?? ""),
       category,
       description: String(frontmatter.description ?? "").replace(/\s+/g, " ").trim(),
-      tier: Number(frontmatter.tier ?? 2),
-      triggers: asList(frontmatter.triggers),
-      conflicts_with: asList(frontmatter.conflicts_with),
-      depends_on: asList(frontmatter.depends_on),
+      tier: Number(getField(frontmatter, "tier") ?? 2),
+      triggers: asList(getField(frontmatter, "triggers")),
+      conflicts_with: asList(getField(frontmatter, "conflicts_with")),
+      depends_on: asList(getField(frontmatter, "depends_on")),
       path: relPath,
     });
   }

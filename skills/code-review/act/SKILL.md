@@ -1,18 +1,19 @@
 ---
 name: act
-description: >-
-  Use when the user invokes /act on a PR/MR, /act with no arguments
-  (uses the PR in the current conversation context), or /act <context> with
-  context ∈ {pr, plan, backlog, harvest}. Resolves threads in product code
-  (or posts a substantive in-thread reply), commits, then closes threads.
-  Never resolve-only. Harvest (collecting threads) lives in /harvest;
-  triage (priority / grouping / wontfix) lives in /backlog. /act is the
-  fix loop, not the collect or triage.
-disable-model-invocation: false
-compatibility: Requires gh, jq, git, bun, node.
-tier: 2
-triggers: [user, model]
-allowed-tools:
+description: Use when the user invokes /act on a PR/MR, /act with no arguments (uses
+  the PR in the current conversation context), or /act <context> with context ∈ {pr,
+  plan, backlog, harvest}. Resolves threads in product code (or posts a substantive
+  in-thread reply), commits, then closes threads. Never resolve-only. Harvest (collecting
+  threads) lives in /harvest; triage (priority / grouping / wontfix) lives in /backlog.
+  /act is the fix loop, not the collect or triage.
+metadata:
+  source: theplenkov-ai/skills
+  tier: 2
+  triggers:
+  - user
+  - model
+  disable-model-invocation: false
+  allowed-tools:
   - read
   - exec
   - write
@@ -21,8 +22,10 @@ allowed-tools:
   - web_get_contents
   - grep
   - message_user
-conflicts_with: [github-pr-review, code-review-and-quality]
-source: theplenkov-ai/skills
+  compatibility: Requires gh, jq, git, bun, node.
+  conflicts_with:
+  - github-pr-review
+  - code-review-and-quality
 ---
 
 # /act

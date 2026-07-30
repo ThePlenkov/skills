@@ -6,9 +6,12 @@ description: >-
   review axis in fresh context, classify findings, enforce the verification
   bar, and produce the required summary. Does not replace axis-specific skills;
   it governs how they are composed.
-tier: 2
-triggers: [user, model]
-source: theplenkov-ai/skills
+metadata:
+  tier: 2
+  triggers:
+    - user
+    - model
+  source: theplenkov-ai/skills
 ---
 
 # Review Methodology
