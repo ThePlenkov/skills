@@ -107,6 +107,5 @@ Reporting them separately stops one axis from masking the other.
 - $skill{subagent-capsule} — orchestration rules this skill honours (downward-only delegation, explicit user permission for parallel runs, read-only investigator profile, the `SUBAGENT_CONTEXT_CAPSULE` envelope this step's sub-agents are required to wrap their prompts in).
 - $skill{shared-plan} — when a review reveals a multi-step follow-up (refactor, ADR, or split-PR plan), feed it into the active shared plan rather than the PR thread.
 - $skill{github-pr-review} — single-axis, GitHub-aware review writer; use when you only need one axis or are posting back to a PR.
-- $skill{mr-address-review} — GitLab-side thread remediation loop; complementary on a different platform.
-- $skill{act} — when the review findings are ready to be turned into per-thread fixes and resolved.
+- $skill{act} — when the review findings are ready to be turned into per-thread fixes and resolved on GitHub or GitLab.
 - $skill{api-and-interface-design} / $skill{code-simplification} / $skill{codehome} — concrete standards to feed the Standards sub-agent p

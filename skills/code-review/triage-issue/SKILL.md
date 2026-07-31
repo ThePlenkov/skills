@@ -17,7 +17,7 @@ Act as the first responder on an incoming issue. Do not just summarize — *work
 
 - The user only wants a summary of the issue (use $github / $gitlab directly).
 - The issue is a feature request or discussion with no concrete failure — just comment and hand back.
-- The user explicitly wants a code review, not triage (use $mr-address-review / $github-pr-review).
+- The user explicitly wants a code review, not triage (use $skill{act} / $skill{github-pr-review}).
 
 ## Principles
 

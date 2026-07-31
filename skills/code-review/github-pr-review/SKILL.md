@@ -9,10 +9,9 @@ Review a GitHub PR the way a senior reviewer does: understand intent, inspect th
 
 ## Scope (not to be confused with)
 
-- `mr-review-buddy` — same job, but for GitLab MRs.
-- `responding-to-pr-reviews` — handling comments left on a PR *you* own (react → evaluate → reply → resolve). Different direction.
-- `receiving-code-review` — rubric for evaluating feedback you got (agree / partial / disagree). Not about writing a review.
-- `requesting-code-review` — asking someone else to review your PR.
+- `$skill{two-axis-review}` — two-axis review methodology; use when you want parallel Standards + Spec reviews rather than a single reviewer pass.
+- `$skill{act}` — handling comments left on a PR/MR you own (react → evaluate → reply → resolve). Different direction.
+- `$skill{code-review-and-quality}` — rubric for evaluating feedback you got (agree / partial / disagree). Not about writing a review.
 
 This skill is: **you are the reviewer, the PR lives on GitHub, you produce a review.**
 
@@ -165,6 +164,8 @@ Keys per comment: `path`, `line` (or `start_line`+`line` for a range), `side` (d
 ### Fixing cosmetic issues yourself
 
 If the finding is a one-line cosmetic fix and you have write access, it's often cleaner to push a commit on top of the PR branch (or open a follow-up) than to leave an inline comment. Mention the commit SHA in the review body. Do NOT force-push or rewrite history on someone else's branch.
+
+For addressing review comments written by someone else on a PR/MR you own, use `$skill{act}` (`/act`).
 
 ### Resolving threads is NOT a one-shot operation
 
