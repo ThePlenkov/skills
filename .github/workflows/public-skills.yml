@@ -55,3 +55,43 @@ jobs:
           REPO: ${{ matrix.repo }}
           FORMAT: ${{ matrix.format }}
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
+
+  readme:
+    needs: publish
+    runs-on: [self-hosted, linux, x64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.SKILLS_SYNC_APP_CLIENT_ID }}
+          private-key: ${{ secrets.SKILLS_SYNC_APP_PRIVATE_KEY }}
+          owner: ThePlenkov
+          repositories: skills
+          permission-contents: write
+      - run: npx tsx scripts/generate-public-readme.ts --out .build/public-readme.md
+      - name: Publish README to ThePlenkov/skills
+        run: |
+          targetRepoDir=$(mktemp -d)
+          gh auth setup-git
+          gh repo clone ThePlenkov/skills "$targetRepoDir"
+          cp .build/public-readme.md "$targetRepoDir/README.md"
+          cd "$targetRepoDir"
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          if [ -n "$(git status --porcelain)" ]; then
+            git add README.md
+            git commit -m 'chore: update public skills README [skip ci]'
+            for attempt in 1 2 3; do
+              git pull --rebase --autostash origin "$(git branch --show-current)"
+              git push origin "HEAD:$(git branch --show-current)" && break
+            done
+          fi
+          rm -rf "$targetRepoDir"
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}

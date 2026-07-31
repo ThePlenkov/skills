@@ -1,0 +1,33 @@
+{
+  "name": "@theplenkov/nx-skill",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc"
+  },
+  "description": "Nx executor for compiling agent skills to skills-sh, claude, codex, agents, or obsidian targets.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "@nx/nx-source": "./src/index.ts",
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./executors": "./src/executors.json",
+    "./executors/build": "./dist/executors/build/executor.js",
+    "./executors/build/schema.json": "./src/executors/build/schema.json",
+    "./plugin": {
+      "@nx/nx-source": "./src/plugin.ts",
+      "types": "./src/plugin.ts",
+      "default": "./dist/plugin.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "peerDependencies": {
+    "@nx/devkit": ">=20.0.0"
+  },
+  "files": ["src", "dist", "executors.json"],
+  "executors": "./executors.json"
+}

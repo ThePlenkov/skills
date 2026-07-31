@@ -36,3 +36,4 @@ docs/graphs/generated/
 
 # Built compiler output; rebuilt on demand (npx tsc -p tools/compiler/tsconfig.json)
 tools/compiler/dist/
+tools/nx-skill/dist/
