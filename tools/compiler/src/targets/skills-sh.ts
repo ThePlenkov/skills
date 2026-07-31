@@ -58,8 +58,6 @@ export function normalizeFrontmatter(input: Record<string, unknown>, publicSourc
   const rawSource = String(metadata.source ?? safeInput.source ?? '');
   const canonicalSource = normalizeRepoShorthand(rawSource) ?? 'theplenkov-ai/skills';
 
-  metadata.source = canonicalSource;
-
   if (publicSource !== undefined) {
     const normalizedPublic = normalizeRepoShorthand(publicSource);
     if (!normalizedPublic) {
@@ -67,22 +65,13 @@ export function normalizeFrontmatter(input: Record<string, unknown>, publicSourc
         `publicSource must be a non-empty owner/repo shorthand, got: ${JSON.stringify(publicSource)}`
       );
     }
-    metadata.publicSource = normalizedPublic;
+    metadata.source = normalizedPublic;
+  } else {
+    metadata.source = canonicalSource;
   }
 
   output.metadata = metadata;
   output.source = canonicalSource;
-
-  // Hoist metadata fields to top-level for consumers that read the skills-sh
-  // frontmatter directly (e.g., skills.sh indexers). Skip 'source' because
-  // top-level source stays canonical while metadata.source may be the public mirror.
-  for (const key of Object.keys(metadata)) {
-    if (key === 'source') continue;
-    if (output[key] === undefined) {
-      output[key] = metadata[key];
-    }
-  }
-
   return stringifyYaml(output, { lineWidth: 0 });
 }
 
