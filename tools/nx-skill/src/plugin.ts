@@ -11,6 +11,7 @@ export const createNodes: CreateNodes = [
       const result: CreateNodesResult = {
         projects: {
           [projectName]: {
+            name: projectName,
             root: relRoot,
             targets: {
               build: {

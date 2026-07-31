@@ -28,6 +28,9 @@ scripts/reserved-names.sh
 
 # Local Obsidian vault preview (created by npm run obsidian:build)
 skills-obsidian/
+
+# Drill artifacts (transient, do not commit)
+.drills/
 .obsidian/
 
 # Generated flat skill view and Mermaid graphs; source of truth is skills/.
