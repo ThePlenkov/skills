@@ -4,6 +4,8 @@ import { stringify as stringifyYaml } from 'yaml';
 import { rewriteBody } from './common.js';
 import type { CompilerOptions, Skill, SkillLink } from '../types.js';
 
+const DEFAULT_CANONICAL_SOURCE = 'theplenkov-ai/skills';
+
 function copySkillDirectory(src: string, dest: string): void {
   if (!fs.existsSync(dest)) {
     fs.mkdirSync(dest, { recursive: true });
@@ -22,16 +24,30 @@ function copySkillDirectory(src: string, dest: string): void {
 
 function normalizeRepoShorthand(value: unknown): string | null {
   if (typeof value !== 'string') return null;
-  const v = value.trim();
+  let v = value.trim();
   if (v === '') return null;
-  if (/^https?:\/\//.test(v)) return null;
-  if (v.toLowerCase().endsWith('.git')) return null;
-  const parts = v.split('/');
+
+  // Accept `https://github.com/owner/repo.git` and `git@github.com:owner/repo.git`.
+  const httpsMatch = /^https?:\/\/([^/]+)\/(.+)$/.exec(v);
+  const gitMatch = /^git@[^:]+:(.+)$/.exec(v);
+  if (httpsMatch) {
+    v = httpsMatch[2];
+  } else if (gitMatch) {
+    v = gitMatch[1];
+  } else if (v.includes('://') || v.startsWith('git@')) {
+    // Looks like a URL/SCP form but did not match the expected patterns.
+    return null;
+  }
+
+  // Strip a trailing `.git` (with optional trailing slash) to normalise.
+  v = v.replace(/\.git\/?$/i, '');
+
+  const parts = v.split('/').filter((p) => p !== '');
   if (parts.length !== 2) return null;
   const [owner, repo] = parts;
   if (!owner || !repo) return null;
   if (/\s/.test(owner) || /\s/.test(repo)) return null;
-  return v;
+  return `${owner}/${repo}`;
 }
 
 export function normalizeFrontmatter(input: Record<string, unknown>, publicSource?: string): string {
@@ -58,6 +74,7 @@ export function normalizeFrontmatter(input: Record<string, unknown>, publicSourc
   const rawSource = String(metadata.source ?? safeInput.source ?? '');
   const canonicalSource = normalizeRepoShorthand(rawSource) ?? 'theplenkov-ai/skills';
 
+  let targetSource = canonicalSource;
   if (publicSource !== undefined) {
     const normalizedPublic = normalizeRepoShorthand(publicSource);
     if (!normalizedPublic) {
@@ -65,13 +82,16 @@ export function normalizeFrontmatter(input: Record<string, unknown>, publicSourc
         `publicSource must be a non-empty owner/repo shorthand, got: ${JSON.stringify(publicSource)}`
       );
     }
-    metadata.source = normalizedPublic;
-  } else {
-    metadata.source = canonicalSource;
+    // Only override the public mirror for skills owned by this repo.
+    // Forks and external skills keep their declared canonical source.
+    if (canonicalSource === DEFAULT_CANONICAL_SOURCE) {
+      targetSource = normalizedPublic;
+    }
   }
 
+  metadata.source = targetSource;
   output.metadata = metadata;
-  output.source = canonicalSource;
+  output.source = targetSource;
   return stringifyYaml(output, { lineWidth: 0 });
 }
 

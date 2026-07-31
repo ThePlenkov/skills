@@ -20,13 +20,33 @@ describe('normalizeFrontmatter', () => {
     expect((parsed.metadata as Record<string, unknown>).source).toBe('theplenkov-ai/skills');
   });
 
-  it('lets publicSource override metadata.source while keeping top-level source canonical', () => {
+  it('overwrites source for the public mirror when canonical is the repo default', () => {
     const out = normalizeFrontmatter(
       { name: 'x', source: 'theplenkov-ai/skills' },
       'ThePlenkov/skills'
     );
     const parsed = parse(out) as Record<string, unknown>;
-    expect(parsed.source).toBe('theplenkov-ai/skills');
+    expect(parsed.source).toBe('ThePlenkov/skills');
+    expect((parsed.metadata as Record<string, unknown>).source).toBe('ThePlenkov/skills');
+  });
+
+  it('preserves fork source when publicSource is provided', () => {
+    const out = normalizeFrontmatter(
+      { name: 'x', source: 'fork/skills' },
+      'ThePlenkov/skills'
+    );
+    const parsed = parse(out) as Record<string, unknown>;
+    expect(parsed.source).toBe('fork/skills');
+    expect((parsed.metadata as Record<string, unknown>).source).toBe('fork/skills');
+  });
+
+  it('normalises publicSource forms like .git and https URLs', () => {
+    const out = normalizeFrontmatter(
+      { name: 'x', source: 'theplenkov-ai/skills' },
+      'https://github.com/ThePlenkov/skills.git'
+    );
+    const parsed = parse(out) as Record<string, unknown>;
+    expect(parsed.source).toBe('ThePlenkov/skills');
     expect((parsed.metadata as Record<string, unknown>).source).toBe('ThePlenkov/skills');
   });
 
@@ -38,8 +58,8 @@ describe('normalizeFrontmatter', () => {
   });
 
   it('throws for malformed publicSource values', () => {
-    expect(() => normalizeFrontmatter({ name: 'x' }, 'https://github.com/foo/bar')).toThrow();
-    expect(() => normalizeFrontmatter({ name: 'x' }, 'foo/bar.git')).toThrow();
     expect(() => normalizeFrontmatter({ name: 'x' }, 'not-a-shorthand')).toThrow();
+    expect(() => normalizeFrontmatter({ name: 'x' }, 'owner/repo/extra')).toThrow();
+    expect(() => normalizeFrontmatter({ name: 'x' }, 'https://example.com/')).toThrow();
   });
 });

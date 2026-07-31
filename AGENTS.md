@@ -140,8 +140,10 @@ export const skillMetadata: Record<string, SkillMetadata> = {
   are only needed for forks or external skills.
 - **Tier and triggers** are defined in `skills.config.ts`, not in `SKILL.md`.
 - **`ThePlenkov/skills`** is the public `skills.sh` distribution mirror; the
-  `Public skills` CI workflow overwrites `metadata.source` to `ThePlenkov/skills`
-  in the published bundle.
+  `Public skills` CI workflow overwrites the source (both top-level `source` and
+  `metadata.source`) to `ThePlenkov/skills` in the published bundle for skills
+  whose canonical source is the repo default. Forks and external skills keep
+  their declared `source`.
 - **Path inside the repo is derived** from the on-disk location
   (`skills/<category>/<skill-name>/`). Do not encode the path in `source:`.
 - **Forks**: set `source` in `skills.config.ts` for the fork's `<owner>/<repo>`.
