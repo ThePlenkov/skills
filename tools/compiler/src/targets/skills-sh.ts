@@ -51,7 +51,7 @@ export function normalizeFrontmatter(input: Record<string, unknown>, publicSourc
   // so both pre- and post-migration layouts produce the same published output.
   const metadata: Record<string, unknown> = { ...sourceMeta };
   for (const key of Object.keys(safeInput)) {
-    if (key === 'metadata') continue;
+    if (key === 'metadata' || key === 'name' || key === 'description') continue;
     if (metadata[key] === undefined) metadata[key] = safeInput[key];
   }
 
