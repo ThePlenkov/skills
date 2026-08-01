@@ -82,5 +82,6 @@ describe('normalizeFrontmatter', () => {
     expect(() => normalizeFrontmatter({ name: 'x' }, 'owner/repo/extra')).toThrow();
     expect(() => normalizeFrontmatter({ name: 'x' }, 'https://example.com/')).toThrow();
     expect(() => normalizeFrontmatter({ name: 'x' }, 'https://example.com/owner/repo')).toThrow();
+    expect(() => normalizeFrontmatter({ name: 'x' }, 'http://github.com/owner/repo')).toThrow();
   });
 });
