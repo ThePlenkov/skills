@@ -40,7 +40,7 @@ these in order; stop at the first one that answers.
 |---|---|---|
 | **Sourcegraph Deep Search** (corporate) | `${SRC_ENDPOINT}/deep-search` (web UI); MCP `${SRC_ENDPOINT}/.api/mcp/deepsearch` for the `deepsearch` tool | HTTP API `POST ${SRC_ENDPOINT}/.api/deepsearch/` |
 | **Glean** | `glean chat --query "..."` (via `$skill{glean}` wrapper) | web UI; REST API with OAuth |
-| **Atlassian Rovo** | `acli rovo chat --query "..."` (via `$skill{atlassian}`) | web UI; Rovo API |
+| **Atlassian Rovo** | `acli rovo chat --query "..."` (via `$skill{external-tools}`) | web UI; Rovo API |
 | **Perplexity** | Perplexity API / chat UI | (no public MCP yet) |
 | **Notion AI / Linear AI** | the product's native chat | the product's REST API |
 | **ChatGPT / Claude with web search** | the chat UI with web search enabled | the host's API (if your runtime is itself Claude) |

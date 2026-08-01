@@ -18,7 +18,7 @@ not link lists** — and they cite their sources.
 |---|---|---|---|
 | **Sourcegraph Deep Search** | Corporate code (private repos, internal forks). Agentic LLM loop. | MCP `${SRC_ENDPOINT}/.api/mcp/deepsearch` (registered or dynamic) | web UI `${SRC_ENDPOINT}/deep-search`; HTTP API `POST ${SRC_ENDPOINT}/.api/deepsearch/` |
 | **Glean** | Corporate Slack, Drive, Jira, Confluence, GitHub, Notion, etc. — the internal "Google." Has chat + grounded Q&A. | `glean chat --query "..."` (via `$skill{glean}`) | web UI; REST API with OAuth |
-| **Atlassian Rovo** | Jira, Confluence, Bitbucket, plus connected Atlassian products. Agent + chat. | `acli rovo chat --query "..."` (via `$skill{atlassian}`) | web UI; Rovo API |
+| **Atlassian Rovo** | Jira, Confluence, Bitbucket, plus connected Atlassian products. Agent + chat. | `acli rovo chat --query "..."` (via `$skill{external-tools}`) | web UI; Rovo API |
 | **Perplexity** | Public web + AI citations. The "thinking search engine" for any general knowledge question. | Perplexity API / chat UI | (no public MCP yet) |
 | **Notion AI** / **Linear AI** | Product docs, project plans, issues. Chat + retrieval. | the product's native chat | the product's REST API |
 | **ChatGPT / Claude with web search** | Public web. Use as a last-resort search engine WITH retrieval, not as a substitute for grounded engines. | the chat UI with web search enabled | the host's API (if your runtime is itself Claude) |

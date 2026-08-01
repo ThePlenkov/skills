@@ -127,5 +127,5 @@ the tool to discover which other tool to use.
   first when the question is about one well-known GitHub
   project. DeepWiki MCP is also the recommended way to
   **refresh this skill** (see top of file).
-- `$skill{github}` / `$skill{gitlab}` — for file-fetch on a
+- `$skill{external-tools}` / `$skill{external-tools}` — for file-fetch on a
   known host, prefer the host MCP / CLI over Sourcegraph.

@@ -52,14 +52,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "atlassian": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
   "backlog": {
     frontmatter: {
       metadata: {
@@ -297,6 +289,14 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
+  "external-tools": {
+    frontmatter: {
+      metadata: {
+        "tier": 2,
+        "triggers": ["user", "model"],
+      },
+    },
+  },
   "external-research": {
     frontmatter: {
       metadata: {
@@ -346,14 +346,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "github": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
   "github-fix-main": {
     frontmatter: {
       metadata: {
@@ -371,23 +363,7 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "gitlab": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
   "gitlab-ci-local": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
-  "glab": {
     frontmatter: {
       metadata: {
         "tier": 2,

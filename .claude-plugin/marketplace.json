@@ -57,7 +57,7 @@
       "name": "integrations",
       "source": "./",
       "skills": ["./skills/integrations"],
-      "description": "External platform connectors (GitHub, GitLab, Atlassian, Codacy, bootstrap-gh-self-hosted-runner, etc.)"
+      "description": "External platform connectors (Codacy, CodeScene, GitLab CI local, Glean, Sourcegraph, bootstrap-gh-self-hosted-runner, etc.)"
     },
     {
       "name": "tools",
