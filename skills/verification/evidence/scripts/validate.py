@@ -4,7 +4,7 @@ validate.py — runtime cross-check for evidence.claim.v1.
 
 For every claim.json passed on the command line, this script:
 
-  1. Validates the parsed claim against `templates/claim.json` (JSON Schema
+  1. Validates the parsed claim against `references/claim.json` (JSON Schema
      v1) using `jsonschema`. Any schema violation fails the claim
      immediately, BEFORE the runtime quote check.
   2. For every `assertions[].evidence_quote`, verifies that the quoted
@@ -37,7 +37,7 @@ import sys
 from pathlib import Path
 
 
-SCHEMA_PATH = Path(__file__).resolve().parent.parent / "templates" / "claim.json"
+SCHEMA_PATH = Path(__file__).resolve().parent.parent / "references" / "claim.json"
 
 
 # Path-traversal guard. A path is considered safe if, after resolution
@@ -130,7 +130,7 @@ def validate_against_schema(claim: object) -> list[str]:
     except ImportError:
         return [
             "  schema validation SKIPPED — install jsonschema "
-            "(pip install jsonschema) to enforce templates/claim.json"
+            "(pip install jsonschema) to enforce references/claim.json"
         ]
     try:
         schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))

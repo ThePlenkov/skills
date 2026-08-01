@@ -100,6 +100,7 @@ do not skip steps.
 
 `<claim-slug>` is a kebab-case label for the claim (e.g.
 `private-section-handled`, `e2e-suite-green`, `login-form-renders`).
+Sample claims live in [`references/examples/`](references/examples/).
 
 ### Schema (v1)
 
@@ -107,7 +108,7 @@ The full schema (mandatory keys, per-`target_environment` artifact
 rules, `commands` / `assertions` shape) is in
 [`references/evidence-schema.md`](references/evidence-schema.md). The
 JSON template is at
-[`./templates/claim.json`](./templates/claim.json).
+[`references/claim.json`](./references/claim.json).
 
 ### The three-state rule
 
