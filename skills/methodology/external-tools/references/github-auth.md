@@ -54,7 +54,7 @@ For older curl versions, drop `--fail-with-body` and check `%{response_code}` in
 curl -sSL -w '\n%{response_code}\n' --connect-timeout 10 --max-time 30 \
   -H "Authorization: token ${GH_TOKEN}" \
   -H "Accept: application/vnd.github+json" \
-  -o /tmp/response.json \
+  -o tmp/response.json \
   "https://api.github.com/repos/<owner>/<repo>/contents/<path>"
 ```
 
