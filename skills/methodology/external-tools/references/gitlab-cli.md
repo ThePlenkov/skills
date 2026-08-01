@@ -102,7 +102,8 @@ Wrong (misses linting):
 
 ```bash
 # Edit .gitlab-ci.yml
-git add .gitlab-ci.yml && git commit -m "Update CI"
+git add .gitlab-ci.yml
+git commit -m "Update CI"
 ```
 
 Correct (proper workflow):
@@ -110,5 +111,6 @@ Correct (proper workflow):
 ```bash
 # Edit .gitlab-ci.yml
 GLAB_NO_PROMPT=true glab ci lint
-git add .gitlab-ci.yml && git commit -m "Update CI"
+git add .gitlab-ci.yml
+git commit -m "Update CI"
 ```
