@@ -16,7 +16,13 @@ Choose an action:
   Exit
 ```
 
-Always set `GLAB_NO_PROMPT=true` when running any `glab` command in automation.
+## Environment prerequisite
+
+Always set `GLAB_NO_PROMPT` before running any `glab` command in automation.
+
+- POSIX: `export GLAB_NO_PROMPT=true`
+- PowerShell: `$env:GLAB_NO_PROMPT = "true"`
+- CMD: `set GLAB_NO_PROMPT=true`
 
 ## Core CLI operations
 
@@ -35,22 +41,22 @@ From `glab --help`:
 ## Workflow
 
 1. Prefer MCP tools if available.
-2. If MCP/tools are unavailable, use `glab` with `GLAB_NO_PROMPT=true`.
-3. If `glab` is missing, recommend installing it and continue with guidance.
+2. If MCP/tools are unavailable, use `glab` with `GLAB_NO_PROMPT` set.
+3. If `glab` is missing or insufficient, use the GitLab REST / GraphQL API directly (see [gitlab-api.md](gitlab-api.md)).
 
 ## Pipeline status checks
 
 ```bash
-GLAB_NO_PROMPT=true glab ci status
+glab ci status
 ```
 
 ## Pipeline operations
 
 ```bash
-GLAB_NO_PROMPT=true glab ci run -b main
-GLAB_NO_PROMPT=true glab ci list
-GLAB_NO_PROMPT=true glab ci trigger <job-id>
-GLAB_NO_PROMPT=true glab ci lint
+glab ci run -b main
+glab ci list
+glab ci trigger <job-id>
+glab ci lint
 ```
 
 ## CI/CD validation
@@ -58,14 +64,14 @@ GLAB_NO_PROMPT=true glab ci lint
 Always lint CI/CD YAML before committing changes:
 
 ```bash
-GLAB_NO_PROMPT=true glab ci lint
+glab ci lint
 ```
 
 ## Repository management
 
 ```bash
-GLAB_NO_PROMPT=true glab project view
-GLAB_NO_PROMPT=true glab mr list
+glab project view
+glab mr list
 ```
 
 ## Commands to avoid in automation
@@ -79,14 +85,14 @@ These commands are interactive even with `GLAB_NO_PROMPT=true`:
 
 ## Automation rule
 
-**Rule**: Every `glab` command must be prefixed with `GLAB_NO_PROMPT=true`.
+**Rule**: Every `glab` command must be run with `GLAB_NO_PROMPT` set.
 
-**Critical**: Always run `GLAB_NO_PROMPT=true glab ci lint` before committing any changes to `.gitlab-ci.yml`.
+**Critical**: Always run `glab ci lint` before committing any changes to `.gitlab-ci.yml`.
 
 ## CI/CD development workflow
 
 1. Make changes to `.gitlab-ci.yml`.
-2. **Always lint**: `GLAB_NO_PROMPT=true glab ci lint`.
+2. **Always lint**: `glab ci lint`.
 3. If lint passes, commit and push.
 4. If lint fails, fix errors and repeat.
 
@@ -110,7 +116,7 @@ Correct (proper workflow):
 
 ```bash
 # Edit .gitlab-ci.yml
-GLAB_NO_PROMPT=true glab ci lint
+glab ci lint
 git add .gitlab-ci.yml
 git commit -m "Update CI"
 ```

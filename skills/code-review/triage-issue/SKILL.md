@@ -15,7 +15,7 @@ Act as the first responder on an incoming issue. Do not just summarize — *work
 
 ## When NOT to Use
 
-- The user only wants a summary of the issue (use $skill{external-tools} / $skill{external-tools} directly).
+- The user only wants a summary of the issue (use $skill{external-tools} directly).
 - The issue is a feature request or discussion with no concrete failure — just comment and hand back.
 - The user explicitly wants a code review, not triage (use $skill{act} / $skill{github-pr-review}).
 
@@ -33,7 +33,7 @@ Act as the first responder on an incoming issue. Do not just summarize — *work
 
 Identify the platform from the URL. Use the appropriate skill:
 
-- GitLab → `$skill{external-tools}` / `$skill{external-tools}` (`glab api`, `glab issue view`, `glab ci trace`).
+- GitLab → `$skill{external-tools}` (`glab api`, `glab issue view`, `glab ci trace`).
 - GitHub → `$skill{external-tools}` (`gh issue view`, `gh run view`, `gh pr view`).
 
 Pull: issue title/body, labels, assignees, linked MR/PR, latest pipeline / workflow run, failing job traces.
@@ -155,7 +155,7 @@ Reassigning back to you for now.
 
 ## Tools & references
 
-- `$skill{external-tools}` / `$skill{external-tools}` — GitLab CLI (`glab api`, `glab issue note`, `glab ci trace`, `glab mr create --draft`).
+- `$skill{external-tools}` — GitLab CLI (`glab api`, `glab issue note`, `glab ci trace`, `glab mr create --draft`).
 - `$skill{external-tools}` — GitHub CLI (`gh issue view`, `gh issue comment`, `gh run view`, `gh pr create --draft`).
 - `$blame-trace` — find the commit that introduced the suspected code.
 - `$split-draft-mrs` — when the fix is large enough that stacked draft MRs make sense.

@@ -17,7 +17,7 @@
 
 1. Prefer MCP tools if available.
 2. If MCP/tools are unavailable, use `glab` for the task (see [gitlab-cli.md](gitlab-cli.md)).
-3. If `glab` is missing or insufficient, use the REST or GraphQL API directly with a `GITLAB_TOKEN` or `PRIVATE-TOKEN` header.
+3. If `glab` is missing or insufficient, use the REST or GraphQL API directly. Pass the token in the `PRIVATE-TOKEN: <GITLAB_TOKEN>` header, or `Authorization: Bearer <GITLAB_TOKEN>` for OAuth tokens.
 
 ## Notes
 

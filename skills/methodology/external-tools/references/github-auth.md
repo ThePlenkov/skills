@@ -28,30 +28,50 @@ From `gh --help`:
 
 1. **`gh` CLI** — if installed and already authenticated (`gh auth status`), prefer `gh` for everything. It inherits the token automatically and handles the `x-access-token` URL form for `git clone`.
 2. **Secret store** — for `curl` / raw API / environments without `gh`, read `GH_TOKEN` (or repo-scoped PAT) from the platform secret store. Reference it as `${GH_TOKEN}` — never paste the value into code, commits, or chat output.
-3. **Environment variable** — when scripting, `export GH_TOKEN="${GH_TOKEN}"` from the secret store, or `gh auth login --with-token <<<"$GH_TOKEN"` once per shell.
+3. **Environment variable** — when scripting, make `GH_TOKEN` available to the shell once:
+
+   - POSIX: `export GH_TOKEN="${GH_TOKEN}"` then `printf '%s\n' "${GH_TOKEN}" | gh auth login --with-token`
+   - PowerShell: `$env:GH_TOKEN = $GH_TOKEN` then `gh auth login --with-token`
+   - CMD: `set GH_TOKEN=%GH_TOKEN%` then `gh auth login --with-token`
+
+   The Bash examples below assume a POSIX shell. On Windows, run them in Git Bash or WSL, or use the equivalent PowerShell/CMD forms above.
 
 ## Authenticated curl pattern
 
+Use `--fail-with-body` (curl 7.76.0+) so HTTP errors return a non-zero exit code while still preserving the response body. Add `--connect-timeout` and `--max-time` so hangs do not run forever.
+
 ```bash
 # Read-only REST
-curl -sSL -H "Authorization: token ${GH_TOKEN}" \
-  https://api.github.com/repos/<owner>/<repo>/contents/<path>
-
-# git clone (HTTPS + token in URL — safe for short-lived shells, not for logs)
-git clone https://x-access-token:${GH_TOKEN}@github.com/<owner>/<repo>.git
+curl -sSL --fail-with-body --connect-timeout 10 --max-time 30 \
+  -H "Authorization: token ${GH_TOKEN}" \
+  -H "Accept: application/vnd.github+json" \
+  "https://api.github.com/repos/<owner>/<repo>/contents/<path>"
 ```
 
-## git push / fetch with token
+For older curl versions, drop `--fail-with-body` and check `%{response_code}` instead:
 
 ```bash
-# One-shot, scoped to this command — prefer this
-git -c "http.extraHeader=Authorization: token ${GH_TOKEN}" \
-    push https://github.com/<owner>/<repo>.git <ref>
-
-# Persistent remote with token (less safe — visible in `.git/config`)
-git remote set-url origin \
-  https://x-access-token:${GH_TOKEN}@github.com/<owner>/<repo>.git
+curl -sSL -w '\n%{response_code}\n' --connect-timeout 10 --max-time 30 \
+  -H "Authorization: token ${GH_TOKEN}" \
+  -H "Accept: application/vnd.github+json" \
+  -o /tmp/response.json \
+  "https://api.github.com/repos/<owner>/<repo>/contents/<path>"
 ```
+
+## git authentication
+
+Keep remotes credential-free. Let `gh` or a credential helper supply the token.
+
+```bash
+# Clone or add a remote without credentials
+git clone https://github.com/<owner>/<repo>.git
+git remote set-url origin https://github.com/<owner>/<repo>.git
+
+# Ensure git operations use the authenticated gh credential helper
+gh auth setup-git
+```
+
+If `gh` is not available, use Git Credential Manager or a secret-backed `GIT_ASKPASS` script. Never pass the token in a remote URL or via `http.extraHeader` on the command line.
 
 ## Red flags — stop and re-check the token
 
@@ -61,6 +81,17 @@ git remote set-url origin \
 | 401 Bad credentials | Token expired or revoked — rotate via the secret store |
 | 403 with `Resource not accessible by integration` | Token lacks the scope (need `repo` for private code) |
 | 403 rate limit | Authenticated quota is 5 000/h; wait or use a different token |
+
+## PAT permissions
+
+- **Fine-grained PATs**
+  - Read private content: `Contents: read`
+  - Push code / create branches: `Contents: read/write`
+  - Modify workflows: also `Workflows: read/write`
+- **Classic PATs**
+  - Use `repo` for full private repository access.
+- **GitHub Apps**
+  - Need the equivalent repository permissions granted by the app installation, not a PAT scope.
 
 ## Security rules
 

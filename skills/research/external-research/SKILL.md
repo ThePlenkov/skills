@@ -62,8 +62,7 @@ decision tree is in
 - **The user wants a tutorial on a technology** → that's
   coaching territory, not research.
 - **The user wants to change the external code** (open a PR
-  upstream) → `$skill{external-tools}` / `$skill{external-tools}` territory,
-  not research.
+  upstream) → `$skill{external-tools}` territory, not research.
 - **The data is in the agent's own memory / scratchpad** → use
   that, no engine needed.
 
@@ -108,7 +107,6 @@ above before any local work.
   Drive, Jira, Confluence, etc.). The internal "Google."
 - `$skill{external-tools}` — Tier C for Jira/Confluence/Bitbucket.
   Includes Rovo (Tier A chat).
-- `$skill{external-tools}` / `$skill{external-tools}` — Tier C for VCS
-  operations on a known host.
+- `$skill{external-tools}` — Tier C for VCS operations on a known host.
 - `$skill{investigate-first}` — for the current project's own
   code. **Do not blur with this skill.**

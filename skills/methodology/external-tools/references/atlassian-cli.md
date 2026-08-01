@@ -19,7 +19,7 @@ From `acli --help`:
 
 1. Prefer MCP tools if available.
 2. If MCP/tools are unavailable, use `acli` for the task.
-3. If `acli` is missing, recommend installing it and continue with guidance.
+3. If `acli` is missing or insufficient, use the Atlassian Cloud REST / GraphQL API directly with an API token in the `Authorization: Basic <base64(email:token)>` header.
 
 ## Notes
 

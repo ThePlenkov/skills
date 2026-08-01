@@ -27,7 +27,7 @@
       "name": "methodology",
       "source": "./",
       "skills": ["./skills/methodology"],
-      "description": "Development methodology (SDD, TDD, incremental implementation, modern-stack, context/source/doubt-driven dev, code simplification, loop programming, observability)"
+      "description": "Development methodology (SDD, TDD, incremental implementation, modern-stack, context/source/doubt-driven dev, code simplification, loop programming, observability, external-tools)"
     },
     {
       "name": "engineering",

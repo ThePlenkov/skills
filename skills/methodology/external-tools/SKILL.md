@@ -9,7 +9,7 @@ Most tasks can be solved through one of three interfaces, in this order:
 
 1. **MCP / native agent integration** — fastest and most reliable when available.
 2. **Official CLI** — the tool's first-party command-line client.
-3. **Raw REST / GraphQL API** — the fallback that always works, but costs more context.
+3. **Raw REST / GraphQL API** — the last-resort interface when the endpoint is reachable and credentials are valid.
 
 Pick the highest interface that is already authenticated and reachable. Only drop to the next one when the higher one is missing, broken, or lacks the required capability. Document the decision in the chat so the user can reproduce it.
 
@@ -32,6 +32,7 @@ For each interface:
 - **Respect `NO_PROMPT` / non-interactive flags** when automating CLIs (`gh`, `glab`, etc.) so menus don't hang.
 - **Never commit tokens.** Reference secrets through the platform secret store or environment variables; never paste values into files, commits, or chat output.
 - **Validate against live sources** when the claim matters (e.g. issue exists, pipeline status, artifact present).
+- **Gate every write.** For non-idempotent operations (`glab ci run`, `glab ci trigger`, `git push`, etc.), validate the target/ref, obtain explicit authorization, confirm the exact target, and verify postconditions. Retry only when an idempotency mechanism is available.
 
 ## Tool-specific playbooks
 
