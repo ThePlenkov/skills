@@ -28,10 +28,10 @@ function normalizeRepoShorthand(value: unknown): string | null {
   if (repoShorthand === '') return null;
 
   // Accept `https://github.com/owner/repo.git` and `git@github.com:owner/repo.git`.
-  const httpsMatch = /^https?:\/\/([^/]+)\/(.+)$/.exec(repoShorthand);
-  const gitMatch = /^git@[^:]+:(.+)$/.exec(repoShorthand);
+  const httpsMatch = /^https?:\/\/github\.com\/(.+)$/i.exec(repoShorthand);
+  const gitMatch = /^git@github\.com:(.+)$/i.exec(repoShorthand);
   if (httpsMatch) {
-    repoShorthand = httpsMatch[2];
+    repoShorthand = httpsMatch[1];
   } else if (gitMatch) {
     repoShorthand = gitMatch[1];
   } else if (repoShorthand.includes('://') || repoShorthand.startsWith('git@')) {
