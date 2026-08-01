@@ -16,4 +16,4 @@ Common mistakes when running `/act` and what to do instead.
 | One pass through threads, then resolve | Loop: fetch → analyse → fix → verify → push → re-fetch. CI may surface new findings after each push. |
 | Stop when context gets large | Plan a handoff: summarize state, write remaining items to backlog/harvest, report to user. |
 
-Long-tail footguns (git stash / `git add -A` / `scripts/run.ts` bypass / "what's the PR?" mid-flow) are catalogued in [`references/footguns.md`](references/footguns.md). Read it when about to take a shortcut.
+Long-tail footguns (git stash / `git add -A` / `scripts/run.ts` bypass / "what's the PR?" mid-flow) are catalogued in [`footguns.md`](footguns.md). Read it when about to take a shortcut.

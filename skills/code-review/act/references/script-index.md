@@ -7,8 +7,9 @@ The `review-*` scripts auto-detect GitHub vs GitLab from the `origin` remote; ov
 | Step | Use |
 | ---------------------------- | --------------------------------------------------------- |
 | **Review state + open threads** | `npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/review-state.sh [PROJECT] [NUMBER]` |
-| **Move review to draft/ready** | `npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/set-review-state.sh --draft or --ready [PROJECT] [NUMBER]` |
-| **Post N thread replies**    | `npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/review-reply.sh --file tmp/agent/replies.tsv [--reaction EYES or THUMBS_UP]` |
+| **Move review to draft**     | `npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/set-review-state.sh --draft [PROJECT] [NUMBER]` |
+| **Move review to ready**     | `npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/set-review-state.sh --ready [PROJECT] [NUMBER]` |
+| **Post N thread replies**    | `npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/review-reply.sh --file tmp/agent/replies.tsv [--reaction <reaction>]` |
 | **Resolve open threads (P4)**| `npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/review-resolve.sh --file tmp/open_ids.txt` |
 | **GitHub-only state**        | `npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/pr-state.sh OWNER REPO PR` (legacy, richer CI/SAST detail) |
 | **GitHub-only replies**      | `npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/reply-threads.sh --file tmp/agent/replies.tsv` |
@@ -21,4 +22,6 @@ The `review-*` scripts auto-detect GitHub vs GitLab from the `origin` remote; ov
 | **Mark debt done (D6)**      | `bun run act:debt:done -- --status done …`                |
 | **Archive harvests (post-D7)**| `bun run harvest:archive`                                |
 
-Scratch artifact rules (`tmp/`, `replies.tsv` format, GraphQL `-f` / `-F` gotcha, `MERGEABLE=UNKNOWN` cache note) live in [`references/script-gotchas.md`](script-gotchas.md).
+For `review-reply.sh`, use `EYES` or `THUMBS_UP` as the reaction value.
+
+Scratch artifact rules (`tmp/`, `replies.tsv` format, GraphQL `-f` / `-F` gotcha, `MERGEABLE=UNKNOWN` cache note) live in [`script-gotchas.md`](script-gotchas.md).
