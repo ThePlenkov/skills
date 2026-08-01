@@ -30,6 +30,16 @@ describe('normalizeFrontmatter', () => {
     expect((parsed.metadata as Record<string, unknown>).source).toBe('ThePlenkov/skills');
   });
 
+  it('overwrites source when canonical differs only in casing', () => {
+    const out = normalizeFrontmatter(
+      { name: 'x', source: 'ThePlenkov-AI/skills' },
+      'ThePlenkov/skills'
+    );
+    const parsed = parse(out) as Record<string, unknown>;
+    expect(parsed.source).toBe('ThePlenkov/skills');
+    expect((parsed.metadata as Record<string, unknown>).source).toBe('ThePlenkov/skills');
+  });
+
   it('preserves fork source when publicSource is provided', () => {
     const out = normalizeFrontmatter(
       { name: 'x', source: 'fork/skills' },
@@ -44,6 +54,16 @@ describe('normalizeFrontmatter', () => {
     const out = normalizeFrontmatter(
       { name: 'x', source: 'theplenkov-ai/skills' },
       'https://github.com/ThePlenkov/skills.git'
+    );
+    const parsed = parse(out) as Record<string, unknown>;
+    expect(parsed.source).toBe('ThePlenkov/skills');
+    expect((parsed.metadata as Record<string, unknown>).source).toBe('ThePlenkov/skills');
+  });
+
+  it('strips query strings and fragments from https publicSource', () => {
+    const out = normalizeFrontmatter(
+      { name: 'x', source: 'theplenkov-ai/skills' },
+      'https://github.com/ThePlenkov/skills.git?ref=main#readme'
     );
     const parsed = parse(out) as Record<string, unknown>;
     expect(parsed.source).toBe('ThePlenkov/skills');

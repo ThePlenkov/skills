@@ -24,25 +24,26 @@ function copySkillDirectory(src: string, dest: string): void {
 
 function normalizeRepoShorthand(value: unknown): string | null {
   if (typeof value !== 'string') return null;
-  let v = value.trim();
-  if (v === '') return null;
+  let repoShorthand = value.trim();
+  if (repoShorthand === '') return null;
 
   // Accept `https://github.com/owner/repo.git` and `git@github.com:owner/repo.git`.
-  const httpsMatch = /^https?:\/\/([^/]+)\/(.+)$/.exec(v);
-  const gitMatch = /^git@[^:]+:(.+)$/.exec(v);
+  const httpsMatch = /^https?:\/\/([^/]+)\/(.+)$/.exec(repoShorthand);
+  const gitMatch = /^git@[^:]+:(.+)$/.exec(repoShorthand);
   if (httpsMatch) {
-    v = httpsMatch[2];
+    repoShorthand = httpsMatch[2];
   } else if (gitMatch) {
-    v = gitMatch[1];
-  } else if (v.includes('://') || v.startsWith('git@')) {
+    repoShorthand = gitMatch[1];
+  } else if (repoShorthand.includes('://') || repoShorthand.startsWith('git@')) {
     // Looks like a URL/SCP form but did not match the expected patterns.
     return null;
   }
 
-  // Strip a trailing `.git` (with optional trailing slash) to normalise.
-  v = v.replace(/\.git\/?$/i, '');
+  // Drop query/fragment and a trailing `.git` (with optional trailing slash).
+  repoShorthand = repoShorthand.split(/[?#]/, 1)[0];
+  repoShorthand = repoShorthand.replace(/\.git\/?$/i, '');
 
-  const parts = v.split('/').filter((p) => p !== '');
+  const parts = repoShorthand.split('/').filter((p) => p !== '');
   if (parts.length !== 2) return null;
   const [owner, repo] = parts;
   if (!owner || !repo) return null;
@@ -84,7 +85,7 @@ export function normalizeFrontmatter(input: Record<string, unknown>, publicSourc
     }
     // Only override the public mirror for skills owned by this repo.
     // Forks and external skills keep their declared canonical source.
-    if (canonicalSource === DEFAULT_CANONICAL_SOURCE) {
+    if (canonicalSource.toLowerCase() === DEFAULT_CANONICAL_SOURCE) {
       targetSource = normalizedPublic;
     }
   }
