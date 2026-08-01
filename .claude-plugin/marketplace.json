@@ -15,7 +15,7 @@
       "name": "behavior",
       "source": "./",
       "skills": ["./skills/behavior"],
-      "description": "Behavioral primitives and decision quality (minimalist, critical-thinking)"
+      "description": "Behavioral primitives and decision quality ($skill{minimalist}, $skill{critical-thinking})"
     },
     {
       "name": "foundation",
