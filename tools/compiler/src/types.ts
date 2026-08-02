@@ -44,7 +44,10 @@ export interface CompilerOptions {
    */
   dependencies?: 'inline' | 'external';
   /**
-   * Overrides `metadata.source` for published skills (e.g. ThePlenkov/skills).
+   * Overrides the canonical source in the skills-sh bundle for skills owned by
+   * this repo (default `theplenkov-ai/skills`). Forks/external skills keep their
+   * declared `source`. The override is applied to both top-level `source` and
+   * `metadata.source`.
    */
   publicSource?: string;
   /**
