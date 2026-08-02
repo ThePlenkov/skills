@@ -14,7 +14,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `experimentation` | Sandboxed experimentation | `sandboxed` |
 | `foundation` | Always-on behavioral primitives and activation tiers | `minimalist`, `persistent-memory`, `skill-tiers`, `token-rationalism` |
 | `integrations` | External platform connectors | `bootstrap-gh-self-hosted-runner`, `codacy`, `codescene`, `gitlab-ci-local`, `glean`, `sourcegraph` |
-| `methodology` | Development methodology | `code-review-and-quality`, `code-simplification`, `codehome`, `context-engineering`, `critical-thinking`, `dep-cost`, `doubt-driven-development`, `external-tools`, `idea-refine`, `incremental-implementation`, `investigate-first`, `loop-programming`, `minimal-root-cause`, `modern-stack`, `observability-and-instrumentation`, `one-shot-patch`, `refactoring`, `repository-onboarding`, `reuse-first`, `review-methodology`, `source-driven-development`, `spec-driven-development`, `spec-kit`, `test-driven-development` |
+| `methodology` | Development methodology | `code-review-and-quality`, `code-simplification`, `codehome`, `context-engineering`, `critical-thinking`, `dep-cost`, `doubt-driven-development`, `external-tools`, `idea-refine`, `incremental-implementation`, `investigate-first`, `loop-programming`, `minimal-root-cause`, `modern-stack`, `observability-and-instrumentation`, `one-shot-patch`, `refactoring`, `repository-onboarding`, `reuse-first`, `review-methodology`, `source-driven-development`, `spec-driven-development`, `test-driven-development` |
 | `orchestration` | Agent coordination, isolation, context management, and skill discovery | `handoff`, `save-session`, `subagent-capsule`, `unwind`, `using-agent-skills` |
 | `research` | Codebase analysis and documentation tools | `deepwiki`, `external-research` |
 | `safety` | Destructive operation protection and recovery | `drill`, `safeguard`, `salvage` |
@@ -80,7 +80,6 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `review-methodology` | `methodology` | 2 | user, model | — | — |
 | `source-driven-development` | `methodology` | 2 | user, model | — | — |
 | `spec-driven-development` | `methodology` | 2 | user, model | — | — |
-| `spec-kit` | `methodology` | 2 | user, model | — | — |
 | `test-driven-development` | `methodology` | 2 | user, model | — | — |
 | `handoff` | `orchestration` | 2 | user, model | — | — |
 | `save-session` | `orchestration` | 2 | user, model | — | — |

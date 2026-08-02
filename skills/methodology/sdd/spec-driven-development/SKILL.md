@@ -9,6 +9,8 @@ description: Creates specs before coding. Use when starting a new project, featu
 
 Write a structured specification before writing any code. The spec is the shared source of truth between you and the human engineer — it defines what we're building, why, and how we'll know it's done. Code without a spec is guessing.
 
+For GitHub's `specify` CLI workflow, see [references/spec-kit.md](references/spec-kit.md).
+
 ## When to Use
 
 - Starting a new project or feature
