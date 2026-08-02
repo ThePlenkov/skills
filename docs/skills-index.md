@@ -9,7 +9,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-skills-inde
 - **Skills metadata budget (2%):** 2,560 tokens
 - **Total description tokens:** 6,637 tokens
 - **Overflow vs. 2% budget:** 2.59x
-- **Total skill file tokens:** 175,459 tokens
+- **Total skill file tokens:** 175,468 tokens
 
 Token counts use the same approximation Codex uses for its skills context budget: `ceil(byte_length / 4)`.
 
@@ -24,7 +24,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | engineering | 8 | 513 | 15,669 |
 | experimentation | 1 | 101 | 1,511 |
 | foundation | 4 | 320 | 8,427 |
-| integrations | 10 | 476 | 10,557 |
+| integrations | 10 | 476 | 10,566 |
 | methodology | 23 | 1,657 | 48,283 |
 | orchestration | 5 | 366 | 9,501 |
 | research | 2 | 170 | 3,101 |
@@ -69,7 +69,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`codescene`](skills/integrations/codescene/SKILL.md) | integrations | 2 | yes | 34 | 1,697 | user, model | yes | yes |
 | [`github`](skills/integrations/github/SKILL.md) | integrations | 2 | yes | 54 | 912 | user, model | yes | yes |
 | [`gitlab`](skills/integrations/gitlab/SKILL.md) | integrations | 2 | yes | 60 | 287 | user, model | yes | yes |
-| [`gitlab-ci-local`](skills/integrations/gitlab-ci-local/SKILL.md) | integrations | 2 | yes | 39 | 358 | user, model | yes | yes |
+| [`gitlab-ci-local`](skills/integrations/gitlab-ci-local/SKILL.md) | integrations | 2 | yes | 39 | 367 | user, model | yes | yes |
 | [`glab`](skills/integrations/glab/SKILL.md) | integrations | 2 | yes | 33 | 562 | user, model | yes | yes |
 | [`glean`](skills/integrations/glean/SKILL.md) | integrations | 2 | yes | 44 | 859 | user, model | yes | yes |
 | [`sourcegraph`](skills/integrations/sourcegraph/SKILL.md) | integrations | 2 | yes | 70 | 1,622 | user, model | yes | yes |
