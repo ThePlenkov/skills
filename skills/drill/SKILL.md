@@ -14,10 +14,8 @@ metadata:
   triggers:
     - user
     - model
-  name: drill
-  description: Scoped descent primitive for agent systems. Creates isolated execution frames, materializes them as directory trees, and returns a result plus a parallel prevention plan so the same problem does not recur.
   source: ThePlenkov/skills
-source: theplenkov-ai/skills
+source: ThePlenkov/skills
 ---
 
 # Drill
