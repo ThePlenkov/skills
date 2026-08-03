@@ -9,7 +9,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-skills-inde
 - **Skills metadata budget (2%):** 2,560 tokens
 - **Total description tokens:** 6,491 tokens
 - **Overflow vs. 2% budget:** 2.54x
-- **Total skill file tokens:** 172,981 tokens
+- **Total skill file tokens:** 173,035 tokens
 
 Token counts use the same approximation Codex uses for its skills context budget: `ceil(byte_length / 4)`.
 
@@ -25,7 +25,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | experimentation | 1 | 101 | 1,511 |
 | foundation | 4 | 320 | 8,427 |
 | integrations | 6 | 271 | 8,563 |
-| methodology | 24 | 1,716 | 48,961 |
+| methodology | 24 | 1,716 | 49,015 |
 | orchestration | 5 | 366 | 9,501 |
 | research | 2 | 170 | 3,096 |
 | safety | 3 | 224 | 4,146 |
@@ -76,7 +76,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`critical-thinking`](skills/methodology/critical-thinking/SKILL.md) | methodology | 2 | yes | 81 | 2,565 | user, model | yes | yes |
 | [`dep-cost`](skills/methodology/dep-cost/SKILL.md) | methodology | 2 | yes | 95 | 1,938 | user, model | yes | yes |
 | [`doubt-driven-development`](skills/methodology/doubt-driven-development/SKILL.md) | methodology | 2 | yes | 85 | 3,861 | user, model | yes | yes |
-| [`external-tools`](skills/methodology/external-tools/SKILL.md) | methodology | 2 | yes | 59 | 696 | user, model | yes | yes |
+| [`external-tools`](skills/methodology/external-tools/SKILL.md) | methodology | 2 | yes | 59 | 750 | user, model | yes | yes |
 | [`idea-refine`](skills/methodology/idea-refine/SKILL.md) | methodology | 2 | yes | 84 | 2,006 | user, model | yes | yes |
 | [`incremental-implementation`](skills/methodology/incremental-implementation/SKILL.md) | methodology | 2 | yes | 56 | 2,314 | user, model | yes | yes |
 | [`investigate-first`](skills/methodology/investigate-first/SKILL.md) | methodology | 2 | yes | 82 | 385 | user, model | yes | yes |

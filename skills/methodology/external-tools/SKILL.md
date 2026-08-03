@@ -29,8 +29,8 @@ For each interface:
 
 - **Verify auth first.** A failing command because of missing auth looks like a bug. Run `auth status`, `login`, or a lightweight read before the real work.
 - **Use pinned versions** for `npx` invocations (`npx --yes tool@x.y.z`) to avoid supply-chain surprises.
-- **Respect `NO_PROMPT` / non-interactive flags** when automating CLIs (`gh`, `glab`, etc.) so menus don't hang.
-- **Never commit tokens.** Reference secrets through the platform secret store or environment variables; never paste values into files, commits, or chat output.
+- **Use CLI-specific non-interactive controls** (`GH_PROMPT_DISABLED` or `gh config set prompt disabled` for `gh`, `GLAB_NO_PROMPT` for `glab`, etc.) so menus don't hang.
+- **Never expose tokens.** Reference secrets through the platform secret store, native CLI auth, environment variables consumed by the CLI, stdin, or file descriptors; never paste values into files, commits, chat output, or command arguments. Disable shell tracing (`set +x`) and redact command output around secrets.
 - **Validate against live sources** when the claim matters (e.g. issue exists, pipeline status, artifact present).
 - **Gate every write.** For non-idempotent operations (`glab ci run`, `glab ci trigger`, `git push`, etc.), validate the target/ref, obtain explicit authorization, confirm the exact target, and verify postconditions. Retry only when an idempotency mechanism is available.
 

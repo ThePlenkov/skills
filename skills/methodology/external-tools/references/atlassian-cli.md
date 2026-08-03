@@ -19,6 +19,8 @@ From `acli --help`:
 
 1. Prefer MCP tools if available.
 2. If MCP/tools are unavailable, use `acli` for the task.
+   - Authenticate non-interactively before running commands: use the product-specific `acli <product> auth login --token` flow with the token supplied via stdin from the secret store, then verify with `acli auth status`.
+   - Do not use browser-based OAuth in automation.
 3. If `acli` is missing or insufficient, use the Atlassian Cloud REST / GraphQL API directly.
    - Pick the product, endpoint, and authentication method supported by that product (Jira Cloud, Confluence Cloud, etc. have different supported flows).
    - For one-off scripts, read the API token from a secret store and use `Authorization: Basic <base64(email:token)>`.
