@@ -9,7 +9,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-skills-inde
 - **Skills metadata budget (2%):** 2,560 tokens
 - **Total description tokens:** 6,637 tokens
 - **Overflow vs. 2% budget:** 2.59x
-- **Total skill file tokens:** 175,287 tokens
+- **Total skill file tokens:** 174,327 tokens
 
 Token counts use the same approximation Codex uses for its skills context budget: `ceil(byte_length / 4)`.
 
@@ -20,7 +20,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | agents | 2 | 83 | 1,216 |
 | behavior | 1 | 106 | 1,880 |
 | coaching | 2 | 191 | 5,163 |
-| code-review | 6 | 412 | 16,738 |
+| code-review | 6 | 412 | 15,778 |
 | engineering | 8 | 513 | 15,490 |
 | experimentation | 1 | 101 | 1,511 |
 | foundation | 4 | 320 | 8,427 |
@@ -44,7 +44,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`architecture-review`](skills/behavior/architecture-review/SKILL.md) | behavior | 2 | yes | 106 | 1,880 | user, model | yes | yes |
 | [`adhd`](skills/coaching/adhd/SKILL.md) | coaching | 2 | yes | 69 | 1,554 | user, model | yes | yes |
 | [`interview-me`](skills/coaching/interview-me/SKILL.md) | coaching | 2 | yes | 122 | 3,609 | user, model | yes | yes |
-| [`act`](skills/code-review/act/SKILL.md) | code-review | 2 | yes | 116 | 8,042 | user, model | yes | yes |
+| [`act`](skills/code-review/act/SKILL.md) | code-review | 2 | yes | 116 | 7,082 | user, model | yes | yes |
 | [`github-fix-main`](skills/code-review/github-fix-main/SKILL.md) | code-review | 2 | yes | 63 | 1,975 | user, model | yes | yes |
 | [`github-pr-review`](skills/code-review/github-pr-review/SKILL.md) | code-review | 2 | yes | 29 | 2,356 | user, model | yes | yes |
 | [`mr-address-review`](skills/code-review/mr-address-review/SKILL.md) | code-review | 2 | yes | 22 | 120 | user, model | yes | yes |
