@@ -74,6 +74,49 @@ relpath() {
   fi
 }
 
+# Validate that every symlink inside a skill directory resolves to a regular
+# file within SOURCE_DIR. This guards copy-mode (`cp -R -L`) from following
+# links outside the skills tree, and guarantees that content comparisons see
+# only files we control.
+validate_skill_symlinks() {
+  local dir="$1" source_root="$2"
+  local errors=0
+
+  if command -v python3 >/dev/null 2>&1; then
+    python3 - "$dir" "$source_root" <<'PYEOF'
+import os, sys
+skill_dir = os.path.realpath(sys.argv[1])
+source_root = os.path.realpath(sys.argv[2])
+if skill_dir != source_root and not skill_dir.startswith(source_root + os.sep):
+  print(f"Skill directory {skill_dir} is outside source root {source_root}", file=sys.stderr)
+  sys.exit(1)
+errors = 0
+for root, dirs, files in os.walk(skill_dir, followlinks=False):
+  for name in files:
+    path = os.path.join(root, name)
+    if os.path.islink(path):
+      target = os.path.realpath(path)
+      if not os.path.isfile(target):
+        print(f"Symlink does not resolve to a regular file: {path} -> {os.readlink(path)}", file=sys.stderr)
+        errors += 1
+      elif target != source_root and not target.startswith(source_root + os.sep):
+        print(f"Symlink points outside skills tree: {path} -> {target}", file=sys.stderr)
+        errors += 1
+if errors:
+  sys.exit(1)
+PYEOF
+    return
+  fi
+
+  # python3 is unavailable: still fail if any symlink exists, because we
+  # cannot safely verify the target without a portable realpath helper.
+  while IFS= read -r -d '' link; do
+    printf 'Cannot validate symlink without python3: %s\n' "$link" >&2
+    errors=1
+  done < <(find "$dir" -type l -print0 2>/dev/null)
+  [[ "$errors" -eq 0 ]] || exit 1
+}
+
 REPO_ROOT=$(cd "$(dirname "$0")/.." && pwd -P)
 SOURCE_DIR="${REPO_ROOT}/skills"
 
@@ -138,12 +181,11 @@ write_managed_marker() {
   printf 'skills-managed-by-install-sh\n' > "$dir/$MANAGED_MARKER"
 }
 # Compare two trees, treating the managed marker as invisible. diff -r
-# doesn't have a portable --exclude (GNU-only), so temporarily move the
-# marker aside for the comparison and put it back regardless of result.
-# If diff is unavailable, fall back to Git's built-in recursive diff and then
-# to a Python 3 directory comparison so the wrapper smoke test (and other
-# --copy --check runs) work on minimal self-hosted runner images that omit
-# diffutils or Python.
+# follows symlinks and doesn't have a portable --exclude (GNU-only), so
+# temporarily move the marker aside for the comparison and put it back
+# regardless of result. If diff is unavailable, fall back to a Python 3
+# directory comparison that dereferences symlinks so copy-mode source trees
+# (which may contain internal symlinks) are compared by their target contents.
 content_matches() {
   local src="$1" dst="$2" marker_tmp="" status=0
   if [[ -f "$dst/$MANAGED_MARKER" ]]; then
@@ -154,22 +196,24 @@ content_matches() {
     if ! diff -r "$src" "$dst" >/dev/null 2>&1; then
       status=1
     fi
-  elif command -v git >/dev/null 2>&1; then
-    # Self-hosted runners can be minimal and omit both diffutils and python3;
-    # Git is already required by `npx skills add` and provides a built-in
-    # recursive diff.
-    if ! git diff --no-index "$src" "$dst" >/dev/null 2>&1; then
-      status=1
-    fi
   elif command -v python3 >/dev/null 2>&1; then
     if ! python3 - "$src" "$dst" <<'PYEOF'
 import os, sys
+def dereferenced_type(path):
+    real = os.path.realpath(path)
+    if os.path.isdir(real):
+        return 'dir'
+    if os.path.isfile(real):
+        return 'file'
+    return None
 def same(a, b):
-    if os.path.islink(a) and os.path.islink(b):
-        return os.readlink(a) == os.readlink(b)
-    if os.path.isdir(a) and os.path.isdir(b):
+    ta = dereferenced_type(a)
+    tb = dereferenced_type(b)
+    if ta != tb:
+        return False
+    if ta == 'dir':
         return True
-    if os.path.isfile(a) and os.path.isfile(b):
+    if ta == 'file':
         if os.path.getsize(a) != os.path.getsize(b):
             return False
         with open(a, 'rb') as fa, open(b, 'rb') as fb:
@@ -211,7 +255,7 @@ PYEOF
       status=1
     fi
   else
-    printf 'Error: content_matches requires diff, git, or python3; none found on PATH.\n' >&2
+    printf 'Error: content_matches requires diff or python3; neither found on PATH.\n' >&2
     status=1
   fi
   [[ -n "$marker_tmp" ]] && mv "$marker_tmp" "$dst/$MANAGED_MARKER"
@@ -369,6 +413,9 @@ for name in $(printf '%s\n' "${!WANT_DIRS[@]}" | sort); do
   skill_dir="${SOURCE_DIR}/${category}/${name}"
   link="${TARGET_DIR}/${name}"
   if [[ "$COPY" = 1 ]]; then
+    # Reject external or unresolvable symlinks before copy-mode follows them.
+    validate_skill_symlinks "$skill_dir" "$SOURCE_DIR"
+
     # Copy mode: the target directory holds a fresh copy of every source
     # skill. The install is idempotent — a second run replaces prior
     # copies — and --check compares file contents rather than relying on a
