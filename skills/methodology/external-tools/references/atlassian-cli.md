@@ -20,13 +20,17 @@ From `acli --help`:
 
 1. Prefer MCP tools if available.
 2. If MCP/tools are unavailable, use `acli` for Jira or admin tasks.
-   - Authenticate non-interactively **before** running any automated Jira or admin commands. Use the product-specific `acli <product> auth login` flow with the API token supplied via stdin from the secret store, and verify with `acli <product> auth status`.
-   - For Jira, the token login requires `--site` and `--email`:
+   - Authenticate non-interactively **before** running any automated Jira or admin commands.
+   - For Jira, use an **API token** from the secret store. The login requires `--site` and `--email`:
      ```bash
      printf '%s\n' "$JIRA_API_TOKEN" | acli jira auth login --site mysite.atlassian.net --email user@example.com --token
      acli jira auth status
      ```
-   - For admin tasks, use `acli admin auth login` and `acli admin auth status`.
+   - For admin tasks, use an **organization API key** from the secret store:
+     ```bash
+     printf '%s\n' "$ATLASSIAN_ADMIN_API_KEY" | acli admin auth login --email admin@example.com --token
+     acli admin auth status
+     ```
    - Do not use browser-based OAuth (`--web`) in automation.
 3. If `acli` is missing or insufficient, use the Atlassian Cloud REST / GraphQL API directly.
    - Pick the product, endpoint, and authentication method supported by that product (Jira Cloud, Confluence Cloud, etc. have different supported flows).
