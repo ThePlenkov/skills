@@ -9,7 +9,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-skills-inde
 - **Skills metadata budget (2%):** 2,560 tokens
 - **Total description tokens:** 6,637 tokens
 - **Overflow vs. 2% budget:** 2.59x
-- **Total skill file tokens:** 175,269 tokens
+- **Total skill file tokens:** 175,287 tokens
 
 Token counts use the same approximation Codex uses for its skills context budget: `ceil(byte_length / 4)`.
 
@@ -32,7 +32,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | self-learning | 2 | 167 | 3,575 |
 | tools | 7 | 425 | 12,367 |
 | troubleshooting | 2 | 216 | 3,596 |
-| verification | 2 | 161 | 3,353 |
+| verification | 2 | 161 | 3,371 |
 | workflow | 16 | 1,049 | 26,376 |
 
 ## Skill catalog
@@ -117,7 +117,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`writing-great-skills`](skills/tools/writing-great-skills/SKILL.md) | tools | 2 | yes | 67 | 2,584 | user, model | yes | yes |
 | [`debugging`](skills/troubleshooting/debugging/SKILL.md) | troubleshooting | 2 | yes | 109 | 1,771 | user, model | yes | yes |
 | [`performance-investigation`](skills/troubleshooting/performance-investigation/SKILL.md) | troubleshooting | 2 | yes | 107 | 1,825 | user, model | yes | yes |
-| [`evidence`](skills/verification/evidence/SKILL.md) | verification | 2 | yes | 85 | 2,716 | user, model | yes | yes |
+| [`evidence`](skills/verification/evidence/SKILL.md) | verification | 2 | partial | 85 | 2,734 | user, model | no | yes |
 | [`evidence-lite`](skills/verification/evidence-lite/SKILL.md) | verification | 2 | yes | 76 | 637 | user, model | yes | yes |
 | [`backlog`](skills/workflow/planning/backlog/SKILL.md) | workflow | 2 | yes | 26 | 628 | user, model | yes | yes |
 | [`ci-cd-and-automation`](skills/workflow/ci-cd-and-automation/SKILL.md) | workflow | 2 | yes | 52 | 1,514 | user, model | yes | yes |
