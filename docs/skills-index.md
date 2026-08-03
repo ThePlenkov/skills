@@ -9,7 +9,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-skills-inde
 - **Skills metadata budget (2%):** 2,560 tokens
 - **Total description tokens:** 6,637 tokens
 - **Overflow vs. 2% budget:** 2.59x
-- **Total skill file tokens:** 175,468 tokens
+- **Total skill file tokens:** 175,269 tokens
 
 Token counts use the same approximation Codex uses for its skills context budget: `ceil(byte_length / 4)`.
 
@@ -21,11 +21,11 @@ Token counts use the same approximation Codex uses for its skills context budget
 | behavior | 1 | 106 | 1,880 |
 | coaching | 2 | 191 | 5,163 |
 | code-review | 6 | 412 | 16,738 |
-| engineering | 8 | 513 | 15,669 |
+| engineering | 8 | 513 | 15,490 |
 | experimentation | 1 | 101 | 1,511 |
 | foundation | 4 | 320 | 8,427 |
 | integrations | 10 | 476 | 10,566 |
-| methodology | 23 | 1,657 | 48,283 |
+| methodology | 23 | 1,657 | 48,263 |
 | orchestration | 5 | 366 | 9,501 |
 | research | 2 | 170 | 3,101 |
 | safety | 3 | 224 | 4,146 |
@@ -55,7 +55,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`frontend-ui-engineering`](skills/engineering/frontend-ui-engineering/SKILL.md) | engineering | 2 | yes | 77 | 2,675 | user, model | yes | yes |
 | [`nodejs`](skills/engineering/nodejs/SKILL.md) | engineering | 2 | yes | 36 | 1,378 | user, model | yes | yes |
 | [`performance-optimization`](skills/engineering/performance-optimization/SKILL.md) | engineering | 2 | yes | 74 | 2,914 | user, model | yes | yes |
-| [`prototype`](skills/engineering/prototype/SKILL.md) | engineering | 2 | yes | 82 | 1,022 | user, model | yes | yes |
+| [`prototype`](skills/engineering/prototype/SKILL.md) | engineering | 2 | partial | 82 | 843 | user, model | no | yes |
 | [`security-and-hardening`](skills/engineering/security-and-hardening/SKILL.md) | engineering | 2 | yes | 62 | 1,990 | user, model | yes | yes |
 | [`typescript`](skills/engineering/typescript/SKILL.md) | engineering | 2 | yes | 58 | 1,072 | user, model | yes | yes |
 | [`sandboxed`](skills/experimentation/sandboxed/SKILL.md) | experimentation | 2 | yes | 101 | 1,511 | user, model | yes | yes |
@@ -91,7 +91,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`refactoring`](skills/methodology/refactoring/SKILL.md) | methodology | 2 | yes | 105 | 1,903 | user, model | yes | yes |
 | [`repository-onboarding`](skills/methodology/repository-onboarding/SKILL.md) | methodology | 2 | yes | 99 | 1,789 | user, model | yes | yes |
 | [`reuse-first`](skills/methodology/reuse-first/SKILL.md) | methodology | 2 | yes | 73 | 2,180 | user, model | yes | yes |
-| [`review-methodology`](skills/methodology/review-methodology/SKILL.md) | methodology | 2 | yes | 84 | 1,121 | user, model | yes | yes |
+| [`review-methodology`](skills/methodology/review-methodology/SKILL.md) | methodology | 2 | yes | 84 | 1,101 | user, model | yes | yes |
 | [`source-driven-development`](skills/methodology/source-driven-development/SKILL.md) | methodology | 2 | yes | 55 | 2,050 | user, model | yes | yes |
 | [`spec-driven-development`](skills/methodology/sdd/spec-driven-development/SKILL.md) | methodology | 2 | yes | 51 | 2,151 | user, model | yes | yes |
 | [`spec-kit`](skills/methodology/sdd/spec-kit/SKILL.md) | methodology | 2 | yes | 41 | 2,197 | user, model | yes | yes |
