@@ -393,7 +393,7 @@ for name in $(printf '%s\n' "${!WANT_DIRS[@]}" | sort); do
         DIFF=1
       else
         printf 'Creating: %s (copy from %s)\n' "$link" "$skill_dir"
-        cp -R "$skill_dir" "$link"
+        cp -R -L "$skill_dir" "$link"
         write_managed_marker "$link"
       fi
       continue
@@ -450,7 +450,7 @@ for name in $(printf '%s\n' "${!WANT_DIRS[@]}" | sort); do
     fi
     printf 'Replacing: %s (copy from %s)\n' "$link" "$skill_dir"
     rm -rf "$link"
-    cp -R "$skill_dir" "$link"
+    cp -R -L "$skill_dir" "$link"
     write_managed_marker "$link"
     continue
   fi
