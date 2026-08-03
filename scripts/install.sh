@@ -180,23 +180,18 @@ write_managed_marker() {
   local dir="$1"
   printf 'skills-managed-by-install-sh\n' > "$dir/$MANAGED_MARKER"
 }
-# Compare two trees, treating the managed marker as invisible. diff -r
-# follows symlinks and doesn't have a portable --exclude (GNU-only), so
-# temporarily move the marker aside for the comparison and put it back
-# regardless of result. If diff is unavailable, fall back to a Python 3
-# directory comparison that dereferences symlinks so copy-mode source trees
-# (which may contain internal symlinks) are compared by their target contents.
+# Compare two trees, treating the managed marker as invisible. Python 3 is
+# preferred because it reliably dereferences symlinks: copy-mode source trees
+# may contain internal symlinks, and `diff -r` behaviour for symlink-vs-regular
+# files varies between implementations (GNU, BSD, busybox). If python3 is
+# unavailable, fall back to `diff -r`.
 content_matches() {
   local src="$1" dst="$2" marker_tmp="" status=0
   if [[ -f "$dst/$MANAGED_MARKER" ]]; then
     marker_tmp=$(mktemp)
     mv "$dst/$MANAGED_MARKER" "$marker_tmp"
   fi
-  if command -v diff >/dev/null 2>&1; then
-    if ! diff -r "$src" "$dst" >/dev/null 2>&1; then
-      status=1
-    fi
-  elif command -v python3 >/dev/null 2>&1; then
+  if command -v python3 >/dev/null 2>&1; then
     if ! python3 - "$src" "$dst" <<'PYEOF'
 import os, sys
 def dereferenced_type(path):
@@ -254,8 +249,12 @@ PYEOF
     then
       status=1
     fi
+  elif command -v diff >/dev/null 2>&1; then
+    if ! diff -r "$src" "$dst" >/dev/null 2>&1; then
+      status=1
+    fi
   else
-    printf 'Error: content_matches requires diff or python3; neither found on PATH.\n' >&2
+    printf 'Error: content_matches requires python3 or diff; neither found on PATH.\n' >&2
     status=1
   fi
   [[ -n "$marker_tmp" ]] && mv "$marker_tmp" "$dst/$MANAGED_MARKER"
