@@ -75,6 +75,11 @@ jobs:
       - name: Install Node dependencies
         run: npm ci --no-audit --no-fund --prefer-offline
 
+      - name: Set up Python
+        # scripts/install.sh validates and compares symlinked skill trees
+        # with Python 3 helpers; ensure it is available on self-hosted runners.
+        uses: ./.github/actions/setup-python-with-fallback
+
       - name: Validate all SKILL.md frontmatter
         # For each SKILL.md: extract YAML frontmatter, convert to JSON,
         # validate against the JSON schema with ajv. On failure, emit a

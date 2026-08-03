@@ -182,6 +182,11 @@ jobs:
         # wrapper is shipped as a source file and resolved at runtime.
         run: npm ci --no-audit --no-fund --prefer-offline
 
+      - name: Set up Python
+        # scripts/install.sh validates and compares symlinked skill trees
+        # with Python 3 helpers; ensure it is available on self-hosted runners.
+        uses: ./.github/actions/setup-python-with-fallback
+
       - name: Build local compiler package
         run: npx tsc -p tools/compiler/tsconfig.json
 
