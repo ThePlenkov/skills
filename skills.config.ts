@@ -276,6 +276,7 @@ export const skillMetadata: Record<string, SkillMetadata> = {
           "write": "ask"
         },
         "argument-hint": "<task or claim to evidence> [lite|full]",
+        "disable-model-invocation": true,
         "triggers": ["user", "model"],
         "tier": 2,
       },

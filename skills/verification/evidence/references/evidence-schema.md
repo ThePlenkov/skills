@@ -1,7 +1,7 @@
 # Evidence File Schema (v1)
 
 The canonical schema for `.evidence/<date>/<task>/<claim-slug>/claim.json`.
-See [`./templates/claim.json`](./templates/claim.json) for the JSON
+See [`./claim.json`](./claim.json) for the JSON
 template. Mandatory keys + rules:
 
 - `claim` — exact sentence you intend to send
