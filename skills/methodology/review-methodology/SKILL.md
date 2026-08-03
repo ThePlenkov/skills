@@ -31,9 +31,9 @@ these files are the contract.
 
 ## When not to use
 
-- Fixing findings → `$skill{act}`.
-- Platform-specific PR review workflow on GitHub → `$skill{github-pr-review}`.
-- Two-axis Standards + Spec review → `$skill{two-axis-review}`.
+- Fixing findings → `act`.
+- Platform-specific PR review workflow on GitHub → `github-pr-review`.
+- Two-axis Standards + Spec review → `two-axis-review`.
 
 ## The contract
 
@@ -53,11 +53,11 @@ not an Intent finding.
 | **Legibility** | Will the next agent understand the repository more cheaply? |
 
 For detailed execution of a specific axis, delegate to the relevant skill:
-`$skill{two-axis-review}` for Standards/Spec decomposition,
-`$skill{security-and-hardening}` for threat modelling,
-`$skill{evidence}` for verification discipline,
-`$skill{codehome}` and `$skill{architecture-review}` for fit,
-`$skill{code-simplification}` and `$skill{critical-thinking}` for legibility.
+`two-axis-review` for Standards/Spec decomposition,
+`security-and-hardening` for threat modelling,
+`evidence` for verification discipline,
+`codehome` and `architecture-review` for fit,
+`code-simplification` and `critical-thinking` for legibility.
 
 ### Severity (from `REVIEW.md`)
 
