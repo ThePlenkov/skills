@@ -1,6 +1,8 @@
 interface:
   display_name: "Prototype"
   short_description: "Prototype to answer a design question"
+  policy:
+    allow_implicit_invocation: false
   default_prompt: >-
     Build a throwaway prototype to answer a design question. Identify whether
     the question is about logic / state model or about UI look-and-feel, then

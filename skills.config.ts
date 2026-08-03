@@ -591,6 +591,7 @@ export const skillMetadata: Record<string, SkillMetadata> = {
         "upstream_path": "skills/engineering/prototype/",
         "note": "Adapted from mattpocock/skills. Sub-files in references/ are the two branch guides.",
         "allowed-tools": "read, grep, glob, edit, write, exec",
+        "disable-model-invocation": true,
         "tier": 2,
         "triggers": ["user", "model"],
       },
