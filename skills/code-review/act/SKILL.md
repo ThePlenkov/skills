@@ -182,26 +182,9 @@ its alias `/act debt`). If it's in `.agents/backlog/*.md`, run
 a separate mode; the scripts under `bun run act:debt:*` resolve to
 the harvest-style batch PR.
 
-## Wrong vs right
+Common `/act` anti-patterns and the right alternatives: [references/wrong-vs-right.md](references/wrong-vs-right.md).
 
-| Wrong (do not do this) | Right |
-|------------------------|--------|
-| Run `resolve-open-threads.sh` to clear open threads | Read threads → fix code → reply in thread → then resolve |
-| One PR comment "addressed feedback" | Per-thread fix or per-thread reply, then resolve that thread |
-| Only touch `.agents/skills/` or the resolve script | Change `apps/`, `tools/`, `specs/`, `packaging/`, workflows per feedback |
-| "Merge-ready" because `open_threads=0` | Merge-ready only if feedback is **implemented** and CI green on HEAD |
-| Edit PR title/body to track agent progress | Leave author PR summary alone; reply in threads + commits |
-| Pass `--record` (or `ACT_RECORD_SCORES=1`) without an explicit decision to grow the dataset | Default OFF; recording opt-in is a deliberate action, not a habit. The scratch JSONL still has the per-run data |
-| Mark a failing SAST check green without reading its `annotation_level=failure` entries | Inspect annotations via `gh api repos/<o>/<r>/check-runs/<id>/annotations`; fix or suppress with documented reason before claiming P0 done |
-| "SonarCloud is an external service, I don't have access" | Read annotations via `gh api` — they're already on the PR. Check for CLI + env vars. Attempt local reproduction. |
-| "Codacy is not my responsibility — it's a third-party tool" | Codacy findings on this PR are your problem. Read annotations, install linter, reproduce, fix. |
-| One pass through threads, then resolve | Loop: fetch → analyse → fix → verify → push → re-fetch. CI may surface new findings after each push. |
-| Stop when context gets large | Plan a handoff: summarize state, write remaining items to backlog/harvest, report to user. |
-
-Long-tail footguns (git stash / `git add -A` / `scripts/run.ts`
-bypass / "what's the PR?" mid-flow) are catalogued in
-[`references/footguns.md`](references/footguns.md). Read it when
-about to take a shortcut.
+Long-tail footguns are catalogued in [`references/footguns.md`](references/footguns.md). Read it when about to take a shortcut.
 
 ## PR metadata
 
@@ -590,33 +573,7 @@ If feedback is already fixed on HEAD and threads are closed → short
 
 ## Token-rationalized workflow
 
-Use the helpers under [`scripts/`](scripts/) instead of issuing
-ad-hoc `gh`/`glab` calls. They collapse the typical 30+ tool calls per
-`/act` into ~10. From repo root, prefix paths with
-`.agents/skills/act/` (or use `bun run act:debt:*` for ledger ops).
-The `review-*` scripts auto-detect GitHub vs GitLab from the `origin`
-remote; override with `ACT_PROVIDER=github|gitlab` or `GITLAB_HOST`.
-
-| Step | Use |
-| ---------------------------- | --------------------------------------------------------- |
-| **Review state + open threads** | `npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/review-state.sh [PROJECT] [NUMBER]` |
-| **Move review to draft/ready** | `npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/set-review-state.sh --draft or --ready [PROJECT] [NUMBER]` |
-| **Post N thread replies**    | `npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/review-reply.sh --file tmp/agent/replies.tsv [--reaction EYES or THUMBS_UP]` |
-| **Resolve open threads (P4)**| `npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/review-resolve.sh --file tmp/open_ids.txt` |
-| **GitHub-only state**        | `npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/pr-state.sh OWNER REPO PR` (legacy, richer CI/SAST detail) |
-| **GitHub-only replies**      | `npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/reply-threads.sh --file tmp/agent/replies.tsv` |
-| **GitHub-only resolve**      | `npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/resolve-open-threads.sh OWNER REPO PR` |
-| **Verify a CLI claim**       | `bun scripts/derive-cli-surface.ts --check "openadt X"`   |
-| **Extract findings (P5)**    | `bun scripts/extract-findings.ts OWNER REPO PR`           |
-| **Submit scores (P5)**       | `bun scripts/submit-scores.ts … --findings F --scores S [--record]` (CSV upsert only with `--record` / env / config) |
-| **Query debt (D0)**          | `bun run act:debt:query -- --status open --format tsv`    |
-| **Plan debt batch (D1)**     | `bun run act:debt:plan -- --limit 25`                     |
-| **Mark debt done (D6)**      | `bun run act:debt:done -- --status done …`                |
-| **Archive harvests (post-D7)**| `bun run harvest:archive`                                |
-
-Scratch artifact rules (`tmp/`, `replies.tsv` format, GraphQL
-`-f` / `-F` gotcha, `MERGEABLE=UNKNOWN` cache note) live in
-[`references/script-gotchas.md`](references/script-gotchas.md).
+Use the helpers under [`scripts/`](scripts/) instead of issuing ad-hoc `gh`/`glab` calls. See [references/script-index.md](references/script-index.md) for the per-step command index and [`references/script-gotchas.md`](references/script-gotchas.md) for scratch-artifact rules.
 
 ## Runtime extras
 
