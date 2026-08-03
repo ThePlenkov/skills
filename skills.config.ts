@@ -248,22 +248,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "git-commit": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
-  "git-push": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
   "git-reset": {
     frontmatter: {
       metadata: {

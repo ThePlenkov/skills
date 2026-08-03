@@ -22,7 +22,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `tools` | Agent development utilities | `docker-agent-config`, `npm-publish`, `sarif-to-annotations`, `skillmaker`, `skills-cli`, `tsdown`, `writing-great-skills` |
 | `troubleshooting` | Scoped descent, debugging, and performance investigation | `debugging`, `performance-investigation` |
 | `verification` | Runtime proof and evidence-backed claims | `evidence`, `evidence-lite` |
-| `workflow` | Development workflow | `backlog`, `ci-cd-and-automation`, `ci-local`, `e2e`, `git-commit`, `git-push`, `git-reset`, `git-workflow-and-versioning`, `harvest`, `resolving-merge-conflicts`, `shadow-fork`, `shared-plan` |
+| `workflow` | Development workflow | `backlog`, `ci-cd-and-automation`, `ci-local`, `e2e`, `git-reset`, `git-workflow-and-versioning`, `harvest`, `resolving-merge-conflicts`, `shadow-fork`, `shared-plan` |
 
 ## Skill catalog
 
@@ -96,8 +96,6 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `ci-cd-and-automation` | `workflow` | 2 | user, model | — | — |
 | `ci-local` | `workflow` | 2 | user, model | — | — |
 | `e2e` | `workflow` | 2 | user | — | — |
-| `git-commit` | `workflow` | 2 | user, model | — | — |
-| `git-push` | `workflow` | 2 | user, model | — | — |
 | `git-reset` | `workflow` | 2 | user, model | — | — |
 | `git-workflow-and-versioning` | `workflow` | 2 | user, model | — | — |
 | `harvest` | `workflow` | 2 | user | — | — |

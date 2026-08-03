@@ -22,8 +22,7 @@ optional:
 forbidden:
   - one-shot-patch
   - refactoring
-  - git-commit
-  - git-push
+  - git-workflow-and-versioning
   - git-reset
   - act
   - github-fix-main

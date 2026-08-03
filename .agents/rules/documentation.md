@@ -73,7 +73,7 @@ Before committing, review changes and check:
 
 ### Example 2: Renaming a Skill
 
-**Change**: Rename `git-commit` skill to `conventional-commit`
+**Change**: Rename `git-workflow-and-versioning` skill to `conventional-workflow`
 
 **Documentation Impact**:
 - Run `npm run install:skills` to update `.agents/skills/` symlinks
@@ -205,4 +205,4 @@ Files updated:
 
 - `retrospect`: Capture documentation mistakes
 - `memory`: Remember project-specific documentation patterns
-- `git-commit`: Structured commit messages that include doc updates
+- `git-workflow-and-versioning`: Structured commits and pushes that include doc updates

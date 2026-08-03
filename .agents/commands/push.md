@@ -5,7 +5,7 @@ argument-hint: --check --fix <target>
 
 Push commits to remote after analyzing target, validating branch, commit scope, and optionally running local CI checks before pushing.
 
-**This command wraps the `git-push` skill workflow.**
+**This command wraps the `git-workflow-and-versioning` skill workflow.**
 
 ## Usage
 
@@ -167,7 +167,7 @@ Before pushing, agent validates:
 
 ## Full Workflow
 
-See `.agents/skills/git-push/SKILL.md` for the complete workflow including:
+See `.agents/skills/git-workflow-and-versioning/SKILL.md` for the complete workflow including:
 
 - Target analysis and resolution (branch, PR, remote, fork, submodule)
 - Local CI checks (--check flag)
@@ -191,7 +191,6 @@ This command enforces:
 
 ## Related
 
-- `.agents/skills/git-push/SKILL.md` - Full workflow implementation
+- `.agents/skills/git-workflow-and-versioning/SKILL.md` - Full workflow implementation (commit and push)
 - `.agents/skills/ci-local/SKILL.md` - Local CI checks and auto-fix
 - `.agents/rules/branch-workflow.md` - Branch workflow enforcement
-- `.agents/skills/git-commit/SKILL.md` - Commit workflow

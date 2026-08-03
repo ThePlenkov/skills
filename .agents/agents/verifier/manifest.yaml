@@ -17,8 +17,7 @@ optional:
   - persistent-memory
 forbidden:
   - one-shot-patch
-  - git-commit
-  - git-push
+  - git-workflow-and-versioning
   - git-reset
   - act
   - harvest
