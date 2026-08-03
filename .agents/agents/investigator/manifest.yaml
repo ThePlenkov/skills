@@ -27,6 +27,5 @@ forbidden:
   - act
   - harvest
   - github-pr-review
-  - mr-address-review
   - triage-issue
   - npm-publish

@@ -29,6 +29,5 @@ forbidden:
   - git-reset
   - act
   - github-fix-main
-  - mr-address-review
   - triage-issue
   - incremental-implementation

@@ -9,7 +9,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `agents` | Framework management and agent configuration | `claude-skills`, `dotagents` |
 | `behavior` | Evidence, code quality, and critical thinking | `critical-thinking`, `minimalist` |
 | `coaching` | User guidance and focus support | `adhd`, `idea-refine`, `interview-me` |
-| `code-review` | PR/MR review and remediation | `act`, `github-fix-main`, `github-pr-review`, `mr-address-review`, `triage-issue`, `two-axis-review` |
+| `code-review` | PR/MR review and remediation | `act`, `github-fix-main`, `github-pr-review`, `triage-issue`, `two-axis-review` |
 | `engineering` | Cross-cutting engineering practices (API/UI design, performance, security) | `api-and-interface-design`, `architecture-review`, `bootstrap-ts-repo`, `frontend-ui-engineering`, `nodejs`, `performance-optimization`, `prototype`, `security-and-hardening`, `typescript` |
 | `experimentation` | Sandboxed experimentation | `sandboxed` |
 | `foundation` | Always-on behavioral primitives and activation tiers | `persistent-memory`, `skill-tiers`, `token-rationalism` |
@@ -38,9 +38,8 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `act` | `code-review` | 2 | user, model | `$skill{github-pr-review}`, `$skill{code-review-and-quality}` | — |
 | `github-fix-main` | `code-review` | 2 | user, model | — | — |
 | `github-pr-review` | `code-review` | 2 | user, model | `$skill{code-review-and-quality}` | — |
-| `mr-address-review` | `code-review` | 2 | user, model | — | — |
 | `triage-issue` | `code-review` | 2 | user, model | — | — |
-| `two-axis-review` | `code-review` | 2 | user, model | `$skill{github-pr-review}`, `$skill{mr-address-review}`, `$skill{code-review-and-quality}` | — |
+| `two-axis-review` | `code-review` | 2 | user, model | `$skill{github-pr-review}`, `$skill{code-review-and-quality}` | — |
 | `api-and-interface-design` | `engineering` | 2 | user, model | — | — |
 | `architecture-review` | `engineering` | 2 | user, model | — | — |
 | `bootstrap-ts-repo` | `engineering` | 2 | user, model | — | — |
@@ -125,7 +124,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 
 - **`$skill{act}`** — Use when the user invokes /act on a PR/MR, /act with no arguments (uses the PR in the current conversation context), or /act <context> with context ∈ {pr, plan, backlog, harvest}. Resolves threads in product code (or posts a substantive in-thread reply), commits, then closes threads. Never resolve-only. Harvest (collecting threads) lives in /harvest; triage (priority / grouping / wontfix) lives in /backlog. /act is the fix loop, not the collect or triage. Use this, not `$skill{github-pr-review}`, `$skill{code-review-and-quality}`.
 - **`$skill{github-pr-review}`** — Use when the user asks for a GitHub pull request review or wants review comments prepared for a PR on github.com. Use this, not `$skill{code-review-and-quality}`.
-- **`$skill{two-axis-review}`** — Review the changes since a fixed point (commit, branch, tag, or merge-base) along two independent axes — Standards (does the code follow the repo's documented coding standards plus a Fowler smell baseline?) and Spec (does the code faithfully implement the originating issue / PRD / spec?). Runs both reviews in parallel sub-agents. Distinct from $skill{github-pr-review} (single-axis) and $skill{act} (thread remediation); this skill holds the two-axis discipline. Use this, not `$skill{github-pr-review}`, `$skill{mr-address-review}`, `$skill{code-review-and-quality}`.
+- **`$skill{two-axis-review}`** — Review the changes since a fixed point (commit, branch, tag, or merge-base) along two independent axes — Standards (does the code follow the repo's documented coding standards plus a Fowler smell baseline?) and Spec (does the code faithfully implement the originating issue / PRD / spec?). Runs both reviews in parallel sub-agents. Distinct from $skill{github-pr-review} (single-axis) and $skill{act} (thread remediation); this skill holds the two-axis discipline. Use this, not `$skill{github-pr-review}`, `$skill{code-review-and-quality}`.
 - **`$skill{code-review-and-quality}`** — Conducts multi-axis code review. Use before merging any change. Use when reviewing code written by yourself, another agent, or a human. Use when you need to assess code quality across multiple dimensions before it enters the main branch. Use this, not `$skill{github-pr-review}`.
 - **`$skill{doubt-driven-development}`** — Subjects every non-trivial decision to a fresh-context adversarial review before it stands. Use when correctness matters more than speed, when working in unfamiliar code, when stakes are high (production, security-sensitive logic, irreversible operations), or any time a confident output would be cheaper to verify now than to debug later. Use this, not `$skill{investigate-first}`, `$skill{critical-thinking}`.
 - **`$skill{incremental-implementation}`** — Delivers changes incrementally. Use when implementing any feature or change that touches more than one file. Use when you're about to write a large amount of code at once, or when a task feels too big to land in one step. Use this, not `$skill{loop-programming}`.
