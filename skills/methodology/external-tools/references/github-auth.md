@@ -36,26 +36,27 @@ From `gh --help`:
 
    The Bash examples below assume a POSIX shell. On Windows, run them in Git Bash or WSL, or use the equivalent PowerShell/CMD forms above.
 
-## Authenticated curl pattern
+## Authenticated API pattern
 
-Use `--fail-with-body` (curl 7.76.0+) so HTTP errors return a non-zero exit code while still preserving the response body. Add `--connect-timeout` and `--max-time` so hangs do not run forever.
+Prefer `gh api` for read-only REST calls. It reuses the active `gh` token and never exposes it on the command line.
 
 ```bash
-# Read-only REST
-curl -sSL --fail-with-body --connect-timeout 10 --max-time 30 \
-  -H "Authorization: token ${GH_TOKEN}" \
-  -H "Accept: application/vnd.github+json" \
-  "https://api.github.com/repos/<owner>/<repo>/contents/<path>"
+gh api repos/<owner>/<repo>/contents/<path>
 ```
 
-For older curl versions, drop `--fail-with-body` and check `%{response_code}` instead:
+If you must use `curl` (e.g., a non-GitHub host or a container without `gh`), keep the token out of process arguments by using a `--netrc-file` created outside this command, and make HTTP failures exit non-zero:
 
 ```bash
-curl -sSL -w '\n%{response_code}\n' --connect-timeout 10 --max-time 30 \
-  -H "Authorization: token ${GH_TOKEN}" \
+# Ensure tmp/ exists and tmp/github.netrc contains the token (create it with your platform's file tools)
+status=$(curl -sSL --netrc-file tmp/github.netrc -w '%{response_code}' \
+  --connect-timeout 10 --max-time 30 \
   -H "Accept: application/vnd.github+json" \
-  -o tmp/response.json \
-  "https://api.github.com/repos/<owner>/<repo>/contents/<path>"
+  --create-dirs -o tmp/response.json \
+  "https://api.github.com/repos/<owner>/<repo>/contents/<path>")
+case "$status" in
+  2[0-9][0-9]) ;;
+  *) printf 'HTTP %s\n' "$status" >&2; exit 1 ;;
+esac
 ```
 
 ## git authentication
@@ -63,12 +64,14 @@ curl -sSL -w '\n%{response_code}\n' --connect-timeout 10 --max-time 30 \
 Keep remotes credential-free. Let `gh` or a credential helper supply the token.
 
 ```bash
-# Clone or add a remote without credentials
-git clone https://github.com/<owner>/<repo>.git
-git remote set-url origin https://github.com/<owner>/<repo>.git
-
-# Ensure git operations use the authenticated gh credential helper
+# Set up git to use the gh credential helper first
 gh auth setup-git
+
+# Clone or add a remote without embedding credentials
+git clone https://github.com/<owner>/<repo>.git
+
+# Update the remote from inside the cloned repository
+git -C <repo> remote set-url origin https://github.com/<owner>/<repo>.git
 ```
 
 If `gh` is not available, use Git Credential Manager or a secret-backed `GIT_ASKPASS` script. Never pass the token in a remote URL or via `http.extraHeader` on the command line.
@@ -80,7 +83,7 @@ If `gh` is not available, use Git Credential Manager or a secret-backed `GIT_ASK
 | 404 on a known private repo | No / wrong token — retry with `${GH_TOKEN}` |
 | 401 Bad credentials | Token expired or revoked — rotate via the secret store |
 | 403 with `Resource not accessible by integration` | Token lacks the scope (need `repo` for private code) |
-| 403 rate limit | Authenticated quota is 5 000/h; wait or use a different token |
+| 403 rate limit | If `retry-after` is present, wait that many seconds. If `x-ratelimit-remaining` is `0`, wait until `x-ratelimit-reset`. Use exponential backoff for secondary limits. |
 
 ## PAT permissions
 
@@ -95,7 +98,9 @@ If `gh` is not available, use Git Credential Manager or a secret-backed `GIT_ASK
 
 ## Security rules
 
-- **Never** commit a token, paste it in a file under `.git/`, or echo it in logs. Use `${GH_TOKEN}` everywhere.
+- **Never** commit a token, paste it in a file under `.git/`, or echo it in logs.
+- **Never** expand a secret on the command line (e.g., `curl -H "Authorization: token ${GH_TOKEN}"`). Prefer `gh api`, or load the token from a credential file / netrc.
+- Reference secrets through environment variables or your platform secret store; never paste the literal value into code, commits, or chat output.
 - **Never** store a token in agent memory (`MEMORY.md`) — secrets belong in the secret store only. Memory is injected into every prompt and would leak it.
 - Prefer **fine-grained PATs** scoped to the smallest set of repos and permissions needed. Org-owned tokens should be read-only unless write access is required.
 

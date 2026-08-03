@@ -19,7 +19,10 @@ From `acli --help`:
 
 1. Prefer MCP tools if available.
 2. If MCP/tools are unavailable, use `acli` for the task.
-3. If `acli` is missing or insufficient, use the Atlassian Cloud REST / GraphQL API directly with an API token in the `Authorization: Basic <base64(email:token)>` header.
+3. If `acli` is missing or insufficient, use the Atlassian Cloud REST / GraphQL API directly.
+   - Pick the product, endpoint, and authentication method supported by that product (Jira Cloud, Confluence Cloud, etc. have different supported flows).
+   - For one-off scripts, read the API token from a secret store and use `Authorization: Basic <base64(email:token)>`.
+   - For integrations, prefer OAuth 2.0 / 2LO or the product-specific authentication path documented by Atlassian.
 
 ## Notes
 
