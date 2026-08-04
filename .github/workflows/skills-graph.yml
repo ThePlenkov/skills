@@ -32,7 +32,7 @@ permissions:
 jobs:
   regenerate:
     name: Regenerate and check skill graphs
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v7
 

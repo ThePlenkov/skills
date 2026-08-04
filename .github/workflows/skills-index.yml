@@ -35,7 +35,7 @@ permissions:
 jobs:
   build:
     name: Generate skills-index.json
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v7
 
