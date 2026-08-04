@@ -136,7 +136,7 @@ With the validated spec, generate a technical implementation plan:
 4. Identify what can be built in parallel vs. what must be sequential
 5. Define verification checkpoints between phases
 
-> Follow $skill{planning-and-task-breakdown} for the dependency-graph mapping and vertical-slicing mechanics behind these steps; it is the canonical source. The bullets above are a lightweight summary; if they ever diverge, $skill{planning-and-task-breakdown} takes precedence.
+> Use task breakdown to map the dependency graph and identify vertical slices. The bullets above are a lightweight summary.
 >
 > **Output convention:** Save the plan to `tasks/plan.md` and the task list to `tasks/todo.md`, per the `/plan` command convention. Create `tasks/` if it does not exist. Downstream commands (`/build`, etc.) expect these paths.
 
@@ -152,7 +152,7 @@ Break the plan into discrete, implementable tasks:
 - Tasks are ordered by dependency, not by perceived importance
 - No task should require changing more than ~5 files
 
-> Follow $skill{planning-and-task-breakdown} for the full task-sizing and dependency-ordering mechanics; it is the canonical source. The template below is a lightweight inline form; if they ever diverge, $skill{planning-and-task-breakdown} takes precedence.
+> Size tasks so none touches more than a handful of files and each has clear acceptance criteria. The template below is a lightweight inline form.
 #### Task template:
 ```markdown
 - [ ] Task: [Description]

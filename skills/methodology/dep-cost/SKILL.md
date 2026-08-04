@@ -85,7 +85,7 @@ Before deciding, look at the dep's own health:
 | Large | Low (<10% of API) | Trivial | **Reimplement** |
 | Large | Low | Tricky | **Reimplement only if you have time to test it** |
 | Any | Any | Critical | **Keep** — the dep is the value |
-| Unmaintained | Any | Any | **Reimplement or replace** — hand to `$skill{deprecation-and-migration}` |
+| Unmaintained | Any | Any | **Reimplement or replace** — document the exit strategy and timeline if a migration is needed |
 
 **Always produce an evidence trail.** Output the install size, bundle size, used-surface / unused signal, transitive count, last release date, and your call. The point is not the decision; it is that the next reviewer can verify it in 30 seconds.
 
@@ -106,7 +106,7 @@ This skill is an orchestrator. Load the cited skills too, plus `$subagents-setup
 - **`$skill{security-and-hardening}`** (Tier 2) — CVE and supply-chain surface of the dep
 - **`$skill{performance-optimization}`** (Tier 2) — overall app perf, of which deps are one input
 - **`$skill{evidence}`** (Tier 2) — every claim in this skill must be backed by a measurement, not a hunch
-- **`$skill{deprecation-and-migration}`** (Tier 2) — when the dep is unmaintained and you need to plan the exit
+- **Deprecation planning** — when the dep is unmaintained and you need to plan the exit, document the migration strategy and timeline
 - **`$skill{minimal-root-cause}`** (Tier 2) — the philosophy this operationalizes
 
 ## Top 5 mistakes

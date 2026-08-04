@@ -51,7 +51,7 @@
       "name": "workflow",
       "source": "./",
       "skills": ["./skills/workflow"],
-      "description": "Development workflow (git, CI/CD, planning, testing, merge conflict resolution, documentation, deprecation, shipping, and launch)"
+      "description": "Development workflow (git, CI/CD, planning, testing, and merge conflict resolution)"
     },
     {
       "name": "integrations",
