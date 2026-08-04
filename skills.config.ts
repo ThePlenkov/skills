@@ -333,7 +333,8 @@ export const skillMetadata: Record<string, SkillMetadata> = {
     frontmatter: {
       metadata: {
         "tier": 2,
-        "triggers": ["user", "model"],
+        "triggers": ["user"],
+        "disable-model-invocation": true,
       },
     },
   },
