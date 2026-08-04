@@ -479,14 +479,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "mr-address-review": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
   "nodejs": {
     frontmatter: {
       metadata: {
@@ -842,7 +834,7 @@ export const skillMetadata: Record<string, SkillMetadata> = {
         "argument-hint": "<fixed-point ref, e.g. \"main\", \"HEAD~5\", \"abc1234\">",
         "tier": 2,
         "triggers": ["user", "model"],
-        "conflicts_with": ["github-pr-review", "mr-address-review", "code-review-and-quality"],
+        "conflicts_with": ["github-pr-review", "code-review-and-quality"],
       },
     },
   },
