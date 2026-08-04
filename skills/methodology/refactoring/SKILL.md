@@ -1,6 +1,6 @@
 ---
 name: refactoring
-description: Use when an agent needs to safely restructure existing code without changing observable behavior — extract method/class/module, move method/file, rename with impact analysis, inline dead code, or large code reorganization. Guarantees test-first refactoring discipline and explicit behavior preservation. Differs from $skill{one-shot-patch} (small fix) and $skill{architecture-review} (critical read-only diagnosis).
+description: Use when an agent needs to safely restructure existing code without changing observable behavior — extract method/class/module, move method/file, rename with impact analysis, inline dead code, or large code reorganization. Guarantees test-first refactoring discipline and explicit behavior preservation. Differs from one-shot-patch (small fix) and architecture-review (critical read-only diagnosis).
 ---
 
 # Refactoring
@@ -18,9 +18,9 @@ Use this skill when:
 
 Do not use this skill when:
 
-- behavior must change (use $skill{one-shot-patch} or feature work)
-- the question is "should we redesign?" (use $skill{architecture-review} first)
-- the area is not yet understood (use $skill{investigate-first})
+- behavior must change (use one-shot-patch or feature work)
+- the question is "should we redesign?" (use architecture-review first)
+- the area is not yet understood (use investigate-first)
 - the change is across multiple unrelated modules with no test coverage (build coverage first)
 
 ## Core Invariant
@@ -125,7 +125,7 @@ For every refactor:
 
 ### 1. Identify the refactor
 
-From the issue, code review, or $skill{architecture-review} finding:
+From the issue, code review, or architecture-review finding:
 
 - name the refactor (Extract X, Move Y, Rename Z)
 - describe the outcome in one sentence
@@ -161,7 +161,7 @@ For each step:
 - lint passes
 - typecheck passes
 - no behavior changes; demonstrate with diff and tests
-- build artifact size and runtime unchanged (apply $skill{performance-investigation} if needed)
+- build artifact size and runtime unchanged (apply performance-investigation if needed)
 
 ### 6. Commit
 
@@ -202,10 +202,4 @@ Stop and report blocked if:
 
 ## Related skills
 
-- $skill{investigate-first} — gather evidence before scoping.
-- $skill{minimal-root-cause} — avoid speculative restructuring disguised as refactoring.
-- $skill{one-shot-patch} — use for narrow behavior-preserving edits that are not part of a larger refactor.
-- $skill{architecture-review} — produce the diagnosis that motivates a refactor.
-- $skill{codehome} — corrective re-placement of misplaced code, often a step inside refactoring.
-- $skill{evidence} — record the test runs that prove no behavior changed.
-- $skill{git-commit} — atomic, scoped commits per step.
+See [related-skills.md](references/related-skills.md) for the full cross-reference list.
