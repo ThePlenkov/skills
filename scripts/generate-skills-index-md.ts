@@ -14,8 +14,13 @@
  */
 
 import { parse as parseYaml } from "yaml";
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { readdirSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+} from "node:fs";
 import { join, relative, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
@@ -308,5 +313,6 @@ if (values.check) {
   process.exit(0);
 }
 
+mkdirSync(dirname(values.output), { recursive: true });
 writeFileSync(values.output, generated, "utf-8");
 console.log(`wrote ${skills.length} skills to ${values.output}`);

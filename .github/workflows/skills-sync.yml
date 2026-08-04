@@ -194,6 +194,11 @@ jobs:
             --out skills-sync/README.md \
             --vault-prefix obsidian/
 
+      - name: Build skills index page in skills-sync
+        run: |
+          set -euo pipefail
+          npx tsx scripts/generate-skills-index-md.ts --output skills-sync/docs/skills-index.md
+
       - name: Commit and push updates
         env:
           GIT_AUTHOR_NAME: github-actions[bot]
@@ -203,7 +208,7 @@ jobs:
         run: |
           set -euo pipefail
           cd skills-sync
-          git add .agents/skills .agents/plugins .claude-plugin .codex-plugin graphs obsidian README.md
+          git add .agents/skills .agents/plugins .claude-plugin .codex-plugin graphs obsidian README.md docs/skills-index.md
           if git diff --cached --quiet; then
             echo 'No changes to commit.'
             exit 0

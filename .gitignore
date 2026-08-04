@@ -34,5 +34,8 @@ skills-obsidian/
 .agents/skills/
 docs/graphs/generated/
 
+# Generated human-readable skills index; published to theplenkov-ai/skills-sync
+docs/skills-index.md
+
 # Built compiler output; rebuilt on demand (npx tsc -p tools/compiler/tsconfig.json)
 tools/compiler/dist/
