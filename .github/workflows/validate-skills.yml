@@ -59,7 +59,7 @@ permissions:
 jobs:
   validate:
     name: Validate skills structure
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -164,7 +164,7 @@ jobs:
 
   check-os-independence:
     name: Check OS independence
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -207,7 +207,7 @@ jobs:
 
   check-skill-size:
     name: Warn on oversized skill files
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v7
 
@@ -226,7 +226,7 @@ jobs:
 
   coverage-matrix:
     name: Check skill coverage matrix
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v7
 
@@ -245,7 +245,7 @@ jobs:
 
   readme-categories:
     name: Check README skill categories
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v7
 
