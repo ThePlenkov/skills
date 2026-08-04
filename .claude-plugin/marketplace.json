@@ -27,7 +27,7 @@
       "name": "methodology",
       "source": "./",
       "skills": ["./skills/methodology"],
-      "description": "Development methodology (SDD, TDD, incremental implementation, modern-stack, context/source/doubt-driven dev, code simplification, loop programming, observability)"
+      "description": "Development methodology (SDD, TDD, incremental implementation, modern-stack, context/source/doubt-driven dev, code simplification, loop programming, observability, external-tools)"
     },
     {
       "name": "engineering",
@@ -57,7 +57,7 @@
       "name": "integrations",
       "source": "./",
       "skills": ["./skills/integrations"],
-      "description": "External platform connectors (GitHub, GitLab, Atlassian, Codacy, bootstrap-gh-self-hosted-runner, etc.)"
+      "description": "External platform connectors (Codacy, CodeScene, GitLab CI local, Glean, Sourcegraph, bootstrap-gh-self-hosted-runner, etc.)"
     },
     {
       "name": "tools",

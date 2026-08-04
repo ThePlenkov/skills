@@ -1,5 +1,0 @@
-interface:
-  display_name: "Glab"
-  short_description: "GitLab CLI automation with non-interactive mode"
-  brand_color: "#3B82F6"
-  default_prompt: "Use $glab to get started."

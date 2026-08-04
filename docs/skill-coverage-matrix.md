@@ -13,8 +13,8 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `engineering` | Cross-cutting engineering practices (API/UI design, performance, security) | `api-and-interface-design`, `bootstrap-ts-repo`, `frontend-ui-engineering`, `nodejs`, `performance-optimization`, `prototype`, `security-and-hardening`, `typescript` |
 | `experimentation` | Sandboxed experimentation | `sandboxed` |
 | `foundation` | Always-on behavioral primitives and activation tiers | `minimalist`, `persistent-memory`, `skill-tiers`, `token-rationalism` |
-| `integrations` | External platform connectors | `atlassian`, `bootstrap-gh-self-hosted-runner`, `codacy`, `codescene`, `github`, `gitlab`, `gitlab-ci-local`, `glab`, `glean`, `sourcegraph` |
-| `methodology` | Development methodology | `code-review-and-quality`, `code-simplification`, `codehome`, `context-engineering`, `critical-thinking`, `dep-cost`, `doubt-driven-development`, `idea-refine`, `incremental-implementation`, `investigate-first`, `loop-programming`, `minimal-root-cause`, `modern-stack`, `observability-and-instrumentation`, `one-shot-patch`, `refactoring`, `repository-onboarding`, `reuse-first`, `review-methodology`, `source-driven-development`, `spec-driven-development`, `spec-kit`, `test-driven-development` |
+| `integrations` | External platform connectors | `bootstrap-gh-self-hosted-runner`, `codacy`, `codescene`, `gitlab-ci-local`, `glean`, `sourcegraph` |
+| `methodology` | Development methodology | `code-review-and-quality`, `code-simplification`, `codehome`, `context-engineering`, `critical-thinking`, `dep-cost`, `doubt-driven-development`, `external-tools`, `idea-refine`, `incremental-implementation`, `investigate-first`, `loop-programming`, `minimal-root-cause`, `modern-stack`, `observability-and-instrumentation`, `one-shot-patch`, `refactoring`, `repository-onboarding`, `reuse-first`, `review-methodology`, `source-driven-development`, `spec-driven-development`, `spec-kit`, `test-driven-development` |
 | `orchestration` | Agent coordination, isolation, context management, and skill discovery | `handoff`, `save-session`, `subagent-capsule`, `unwind`, `using-agent-skills` |
 | `research` | Codebase analysis and documentation tools | `deepwiki`, `external-research` |
 | `safety` | Destructive operation protection and recovery | `drill`, `safeguard`, `salvage` |
@@ -52,14 +52,10 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `persistent-memory` | `foundation` | 1 | user | — | — |
 | `skill-tiers` | `foundation` | 2 | user, model | — | — |
 | `token-rationalism` | `foundation` | 0 | always | — | — |
-| `atlassian` | `integrations` | 2 | user, model | — | — |
 | `bootstrap-gh-self-hosted-runner` | `integrations` | 2 | user | — | — |
 | `codacy` | `integrations` | 2 | user, model | — | — |
 | `codescene` | `integrations` | 2 | user, model | — | — |
-| `github` | `integrations` | 2 | user, model | — | — |
-| `gitlab` | `integrations` | 2 | user, model | — | — |
 | `gitlab-ci-local` | `integrations` | 2 | user, model | — | — |
-| `glab` | `integrations` | 2 | user, model | — | — |
 | `glean` | `integrations` | 2 | user, model | — | — |
 | `sourcegraph` | `integrations` | 2 | user, model | — | `$skill{external-research}` |
 | `code-review-and-quality` | `methodology` | 2 | user, model | `$skill{github-pr-review}` | — |
@@ -69,6 +65,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `critical-thinking` | `methodology` | 2 | user, model | — | — |
 | `dep-cost` | `methodology` | 2 | user, model | — | — |
 | `doubt-driven-development` | `methodology` | 2 | user, model | `$skill{investigate-first}`, `$skill{critical-thinking}` | — |
+| `external-tools` | `methodology` | 2 | user, model | — | — |
 | `idea-refine` | `methodology` | 2 | user, model | — | — |
 | `incremental-implementation` | `methodology` | 2 | user, model | `$skill{loop-programming}` | — |
 | `investigate-first` | `methodology` | 2 | user, model | `$skill{debugging}`, `$skill{one-shot-patch}` | `$skill{minimal-root-cause}` |

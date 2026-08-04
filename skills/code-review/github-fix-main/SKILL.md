@@ -67,8 +67,8 @@ git switch -c fix/main-health origin/"$MAIN"
 ```bash
 gh run list --branch "$MAIN" --limit 1 --json databaseId,status,conclusion,workflowName,headSha,url
 gh api "repos/$REPO/code-scanning/alerts?state=open&per_page=100" --paginate > tmp/fix-main/code-scanning.json
-ls sonar-project.properties .sonarcloud.properties 2>/dev/null
-grep -RIl "SONAR_TOKEN\|sonarcloud\|sonarqube" .github/ 2>/dev/null
+ls sonar-project.properties .sonarcloud.properties
+git grep -Il -e "SONAR_TOKEN" -e "sonarcloud" -e "sonarqube" -- .github/
 ```
 
 Dump all raw responses under `tmp/fix-main/`. Verify Sonar credentials before assuming SonarCloud fix is in-scope.
@@ -137,7 +137,7 @@ Write `tmp/fix-main/pr-body.md` per the template in [references/pr-body.md](refe
 
 ```bash
 git push -u origin fix/main-health
-gh pr create --base "$MAIN" --head fix/main-health \
+gh pr create --base "$MAIN" \
   --title "fix(main): restore health of main (CI + security + quality)" \
   --body-file tmp/fix-main/pr-body.md
 ```
@@ -180,6 +180,6 @@ Per thread:
 - [references/ci-parity.md](references/ci-parity.md) — §6 reproducible CI command set.
 - [references/pr-body.md](references/pr-body.md) — PR body template + `gh pr create` invocation.
 - [references/terminal-states.md](references/terminal-states.md) — stop conditions and follow-up message template.
-- `$skill{github}` — raw `gh` patterns.
+- `$skill{external-tools}` — raw `gh` patterns.
 - `$skill{github-pr-review}` — reviewer side once the PR is open.
 - `$skill{git-commit}` — atomic commit conventions.

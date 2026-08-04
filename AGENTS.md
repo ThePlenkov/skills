@@ -152,12 +152,12 @@ export const skillMetadata: Record<string, SkillMetadata> = {
 
 ## Skill references
 
-When one skill references another, use `$name` or `$skill{name}` notation. Integration and tool skills are typically referenced by bare `$name` (e.g. `$github`, `$gitlab`, `$glab`); other skills may use `$skill{name}`:
+When one skill references another, use `$name` or `$skill{name}` notation. Hyphenated or integration/tool skills should use `$skill{name}` (e.g. `$skill{external-tools}`); other skills may use bare `$name`:
 
 ```markdown
 See $skill{evidence} for proof requirements.
 Use $skill{safeguard} before destructive operations.
-See $github for authentication.
+See $skill{external-tools} for authentication.
 ```
 
 ## Required UI metadata
