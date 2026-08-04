@@ -8,9 +8,6 @@
  * - Works with both `bun` and `node --import tsx`.
  */
 import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
-import { basename, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 
 export type Provider = "github" | "gitlab";
 

@@ -13,12 +13,9 @@
 import { githubPrState } from "./pr-state.ts";
 import {
   detectProvider,
-  gitlabHost,
-  gitlabToken,
   graphqlGitLab,
   parseArgs,
   resolveTarget,
-  type Provider,
 } from "./lib/platform.ts";
 
 interface GitLabNote {
@@ -55,13 +52,6 @@ interface GitLabMrJson {
       };
     };
   };
-}
-
-function normalizeMergeable(value: string | undefined | null): string {
-  const v = (value || "UNKNOWN").toString().toLowerCase();
-  if (v === "mergeable") return "MERGEABLE";
-  if (v === "conflicting") return "CONFLICTING";
-  return v.toUpperCase();
 }
 
 function gitlabMrState(projectPath: string, number: string) {

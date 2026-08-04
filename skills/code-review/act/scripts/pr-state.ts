@@ -6,18 +6,14 @@
  * Output: key=value lines followed by an OPEN_THREADS_TABLE TSV.
  */
 import {
-  detectProvider,
   execJson,
-  execText,
   ghAuthOk,
   graphqlGh,
   paginatedGithubAnnotations,
   paginatedGithubCheckRuns,
-  parseArgs,
   requireBin,
   resolveGitHubNumber,
   resolveGitHubOwnerRepo,
-  type Provider,
 } from "./lib/platform.ts";
 
 const AI_REVIEWER_RE = /cubic|code\s*rabbit|amazon\s*q|qodo|chatgpt\s*codex|gemini|kilo/i;
@@ -110,7 +106,6 @@ export function fetchPullRequest(owner: string, repo: string, number: string): P
       isDraft
       reviewThreads(first:$n`;
 
-  let afterClause = "";
   let cursor: string | undefined;
   const allThreads: ThreadNode[] = [];
 

@@ -10,8 +10,6 @@
 import {
   detectProvider,
   ghAuthOk,
-  gitlabHost,
-  gitlabToken,
   graphqlGh,
   graphqlGitLab,
   parseArgs,
