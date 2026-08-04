@@ -102,7 +102,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `backlog` | `workflow` | 2 | user, model | — | — |
 | `ci-cd-and-automation` | `workflow` | 2 | user, model | — | — |
 | `ci-local` | `workflow` | 2 | user, model | — | — |
-| `e2e` | `workflow` | 2 | user, model | — | — |
+| `e2e` | `workflow` | 2 | user | — | — |
 | `git-commit` | `workflow` | 2 | user, model | — | — |
 | `git-push` | `workflow` | 2 | user, model | — | — |
 | `git-reset` | `workflow` | 2 | user, model | — | — |

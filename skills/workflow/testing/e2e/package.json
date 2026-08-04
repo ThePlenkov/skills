@@ -11,10 +11,10 @@
   },
   "files": [
     "cli.ts",
-    "scripts/framework/**/*.ts",
-    "!scripts/framework/**/*.test.ts",
+    "references/scripts/framework/**/*.ts",
+    "!references/scripts/framework/**/*.test.ts",
     "SKILL.md",
-    "SPEC.md"
+    "references/SPEC.md"
   ],
   "keywords": [
     "e2e",
