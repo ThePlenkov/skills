@@ -27,7 +27,7 @@
       "name": "methodology",
       "source": "./",
       "skills": ["./skills/methodology"],
-      "description": "Development methodology (SDD, TDD, modern-stack, source/doubt-driven dev, code simplification, loop programming, external-tools)"
+      "description": "Development methodology (SDD, TDD, modern-stack, external-tools, loop programming, review-methodology, investigate-first, one-shot-patch, minimal-root-cause, dep-cost, reuse-first, refactoring)"
     },
     {
       "name": "engineering",
