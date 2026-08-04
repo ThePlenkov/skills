@@ -197,7 +197,7 @@ function generateMatrix(skills: Skill[]): string {
   output += `- **Have a runtime failure or regression?** → \`$skill{debugging}\`\n`;
   output += `- **Know the exact fix and want one narrow change?** → \`$skill{one-shot-patch}\`\n`;
   output += `- **Before patching, want to avoid overengineering or symptom-only fixes?** → \`$skill{minimal-root-cause}\`\n`;
-  output += `- **Need adversarial review of a non-trivial decision?** → \`$skill{doubt-driven-development}\`\n`;
+  output += `- **Need adversarial review of a non-trivial decision?** → \`$skill{critical-thinking}\`\n`;
   output += `- **Implementing a multi-file or large change?** → \`$skill{test-driven-development}\`\n`;
   output += `- **Need repeated inspect-edit-validate cycles with explicit stop conditions?** → \`$skill{loop-programming}\`\n`;
   output += `- **Reviewing a PR on GitHub?** → \`$skill{github-pr-review}\`\n`;
