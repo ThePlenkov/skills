@@ -7,13 +7,11 @@ description: Use when the user asks for a GitHub pull request review or wants re
 
 Review a GitHub PR the way a senior reviewer does: understand intent, inspect the diff for real risk, and return findings prioritised by severity. Use `gh` CLI for everything — never screen-scrape the UI.
 
-## Scope (not to be confused with)
-
-- `$skill{two-axis-review}` — two-axis review methodology; use when you want parallel Standards + Spec reviews rather than a single reviewer pass.
-- `$skill{act}` — handling comments left on a PR/MR you own (react → evaluate → reply → resolve). Different direction.
-- `$skill{review-methodology}` — rubric for evaluating feedback you got (agree / partial / disagree). Not about writing a review.
+## Scope
 
 This skill is: **you are the reviewer, the PR lives on GitHub, you produce a review.**
+
+See [references/related-skills.md](references/related-skills.md) for related skills and scope distinctions.
 
 ## Invocation
 
@@ -165,7 +163,7 @@ Keys per comment: `path`, `line` (or `start_line`+`line` for a range), `side` (d
 
 If the finding is a one-line cosmetic fix and you have write access, it's often cleaner to push a commit on top of the PR branch (or open a follow-up) than to leave an inline comment. Mention the commit SHA in the review body. Do NOT force-push or rewrite history on someone else's branch.
 
-For addressing review comments written by someone else on a PR/MR you own, use `$skill{act}` (`/act`).
+For addressing review comments written by someone else on a PR/MR you own, use `act` (`/act`).
 
 ### Resolving threads is NOT a one-shot operation
 

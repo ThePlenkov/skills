@@ -15,9 +15,9 @@ One-shot cleanup of the default branch: green CI + no open security/quality find
 
 ## When NOT to use
 
-- Reviewing someone else's PR → `$skill{github-pr-review}`.
-- Triaging a reported issue → `$skill{triage-issue}`.
-- Writing a commit message only → `$skill{git-workflow-and-versioning}`.
+- Reviewing someone else's PR → `github-pr-review`.
+- Triaging a reported issue → `triage-issue`.
+- Writing a commit message only → `git-workflow-and-versioning`.
 - Fixing a red PR branch (not main) → work the PR directly.
 
 ## Invocation
@@ -158,7 +158,7 @@ CI should already be green because §6 mirrored it. Confirm with `gh pr checks "
 
 ### 7c. Review-response loop
 
-Resolve review feedback inline or delegate to `$skill{github-pr-review}`.
+Resolve review feedback inline or delegate to `github-pr-review`.
 
 ```bash
 gh pr view "$PR" --json reviewDecision,reviews,comments,latestReviews
@@ -182,6 +182,4 @@ Per thread:
 - [references/ci-parity.md](references/ci-parity.md) — §6 reproducible CI command set.
 - [references/pr-body.md](references/pr-body.md) — PR body template + `gh pr create` invocation.
 - [references/terminal-states.md](references/terminal-states.md) — stop conditions and follow-up message template.
-- `$skill{external-tools}` — raw `gh` patterns.
-- `$skill{github-pr-review}` — reviewer side once the PR is open.
-- `$skill{git-workflow-and-versioning}` — atomic commit and push conventions.
+- [references/related-skills.md](references/related-skills.md) — related skills this skill may delegate to.
