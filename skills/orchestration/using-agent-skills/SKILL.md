@@ -19,6 +19,7 @@ Task arrives
     ├── Don't know what you want yet? ──────→ interview-me
     ├── Have a rough concept, need variants? → idea-refine
     ├── New project/feature/change? ──→ spec-driven-development
+    ├── Have a spec, need tasks? ──────→ shared-plan
     ├── Implementing code? ────────────→ test-driven-development
     │   ├── API work? ────────────────→ architecture-review
     │   ├── Need doc-verified code? ───→ external-research
@@ -125,7 +126,7 @@ These are the subtle errors that look like productivity but create problems:
 
 2. **Skills are workflows, not suggestions.** Follow the steps in order. Don't skip verification steps.
 
-3. **Multiple skills can apply.** A feature implementation might involve idea-refine → spec-driven-development → test-driven-development → code-review-and-quality → code-simplification in sequence.
+3. **Multiple skills can apply.** A feature implementation might involve idea-refine → spec-driven-development → test-driven-development → review-methodology → minimalist in sequence.
 
 4. **When in doubt, start with a spec.** If the task is non-trivial and there's no spec, begin with spec-driven-development.
 
@@ -139,9 +140,9 @@ For a complete feature, the typical skill sequence is:
 3.  spec-driven-development     → Define what we're building
 4.  external-research   → Verify against official docs
 5.  test-driven-development     → Prove each slice works
-6.  doubt-driven-development    → Cross-examine non-trivial decisions in-flight
-7.  code-review-and-quality     → Review before merge
-8.  code-simplification         → Reduce unnecessary complexity while preserving behavior
+6.  critical-thinking    → Cross-examine non-trivial decisions in-flight
+7.  review-methodology     → Review before merge
+8.  minimalist         → Reduce unnecessary complexity while preserving behavior
 9.  git-workflow-and-versioning → Clean commit history
 ```
 
@@ -155,7 +156,7 @@ Not every task needs every skill. A bug fix might only need: debugging → test-
 | Define | idea-refine | Refine ideas through structured divergent and convergent thinking |
 | Define | spec-driven-development | Requirements and acceptance criteria before code |
 | Build | external-research | Verify against official docs before implementing |
-| Build | doubt-driven-development | Adversarial fresh-context review of every non-trivial decision |
+| Build | critical-thinking | Adversarial fresh-context review of every non-trivial decision |
 | Build | architecture-review | Stable interfaces with clear contracts |
 | Verify | test-driven-development | Failing test first, then make it pass |
 | Verify | debugging | Reproduce → localize → fix → guard |
