@@ -192,23 +192,7 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "deprecation-and-migration": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
   "docker-agent-config": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
-  "documentation-and-adrs": {
     frontmatter: {
       metadata: {
         "tier": 2,
@@ -553,14 +537,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "planning-and-task-breakdown": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
   "prototype": {
     frontmatter: {
       metadata: {
@@ -710,14 +686,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
     },
   },
   "shared-plan": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
-  "shipping-and-launch": {
     frontmatter: {
       metadata: {
         "tier": 2,

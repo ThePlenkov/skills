@@ -120,7 +120,7 @@ Three options:
 
 1. **Fork and maintain** — last resort, only if the lib is critical and small
 2. **Find a maintained successor** — usually exists, search the same category
-3. **Hand to `deprecation-and-migration`** — if you need a real plan
+3. **Plan the deprecation** — if you need a real migration plan, document the exit strategy and timeline
 
 For greenfield, always pick option 2.
 
