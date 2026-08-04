@@ -18,14 +18,14 @@ Token counts use the same approximation Codex uses for its skills context budget
 | Category | Skills | Description tokens | Total tokens |
 | --- | --- | --- | --- |
 | agents | 2 | 83 | 1,216 |
-| behavior | 1 | 106 | 1,880 |
-| coaching | 2 | 191 | 5,163 |
+| behavior | 2 | 205 | 6,063 |
+| coaching | 3 | 275 | 7,169 |
 | code-review | 6 | 412 | 15,742 |
-| engineering | 8 | 513 | 15,490 |
+| engineering | 9 | 619 | 17,370 |
 | experimentation | 1 | 101 | 1,511 |
-| foundation | 4 | 320 | 8,427 |
+| foundation | 3 | 196 | 4,929 |
 | integrations | 6 | 271 | 8,563 |
-| methodology | 24 | 1,716 | 49,015 |
+| methodology | 22 | 1,551 | 44,444 |
 | orchestration | 5 | 366 | 9,433 |
 | research | 2 | 170 | 3,096 |
 | safety | 3 | 224 | 4,146 |
@@ -41,8 +41,10 @@ Token counts use the same approximation Codex uses for its skills context budget
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | [`claude-skills`](skills/agents/claude-skills/SKILL.md) | agents | 2 | yes | 41 | 358 | user, model | yes | yes |
 | [`dotagents`](skills/agents/dotagents/SKILL.md) | agents | 2 | yes | 42 | 858 | user, model | yes | yes |
-| [`architecture-review`](skills/behavior/architecture-review/SKILL.md) | behavior | 2 | yes | 106 | 1,880 | user, model | yes | yes |
+| [`critical-thinking`](skills/behavior/critical-thinking/SKILL.md) | behavior | 2 | yes | 81 | 2,565 | user, model | yes | yes |
+| [`minimalist`](skills/behavior/minimalist/SKILL.md) | behavior | 2 | yes | 124 | 3,498 | user, model | yes | yes |
 | [`adhd`](skills/coaching/adhd/SKILL.md) | coaching | 2 | yes | 69 | 1,554 | user, model | yes | yes |
+| [`idea-refine`](skills/coaching/idea-refine/SKILL.md) | coaching | 2 | yes | 84 | 2,006 | user, model | yes | yes |
 | [`interview-me`](skills/coaching/interview-me/SKILL.md) | coaching | 2 | yes | 122 | 3,609 | user, model | yes | yes |
 | [`act`](skills/code-review/act/SKILL.md) | code-review | 2 | yes | 116 | 7,082 | user, model | yes | yes |
 | [`github-fix-main`](skills/code-review/github-fix-main/SKILL.md) | code-review | 2 | yes | 63 | 1,969 | user, model | yes | yes |
@@ -51,6 +53,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`triage-issue`](skills/code-review/triage-issue/SKILL.md) | code-review | 2 | yes | 65 | 1,579 | user, model | yes | yes |
 | [`two-axis-review`](skills/code-review/two-axis-review/SKILL.md) | code-review | 2 | yes | 117 | 2,636 | user, model | yes | yes |
 | [`api-and-interface-design`](skills/engineering/api-and-interface-design/SKILL.md) | engineering | 2 | yes | 63 | 2,579 | user, model | yes | yes |
+| [`architecture-review`](skills/engineering/architecture-review/SKILL.md) | engineering | 2 | yes | 106 | 1,880 | user, model | yes | yes |
 | [`bootstrap-ts-repo`](skills/engineering/bootstrap-ts-repo/SKILL.md) | engineering | 2 | yes | 61 | 2,039 | user, model | yes | yes |
 | [`frontend-ui-engineering`](skills/engineering/frontend-ui-engineering/SKILL.md) | engineering | 2 | yes | 77 | 2,675 | user, model | yes | yes |
 | [`nodejs`](skills/engineering/nodejs/SKILL.md) | engineering | 2 | yes | 36 | 1,378 | user, model | yes | yes |
@@ -59,7 +62,6 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`security-and-hardening`](skills/engineering/security-and-hardening/SKILL.md) | engineering | 2 | yes | 62 | 1,990 | user, model | yes | yes |
 | [`typescript`](skills/engineering/typescript/SKILL.md) | engineering | 2 | yes | 58 | 1,072 | user, model | yes | yes |
 | [`sandboxed`](skills/experimentation/sandboxed/SKILL.md) | experimentation | 2 | yes | 101 | 1,511 | user, model | yes | yes |
-| [`minimalist`](skills/foundation/minimalist/SKILL.md) | foundation | 2 | yes | 124 | 3,498 | user, model | yes | yes |
 | [`persistent-memory`](skills/foundation/persistent-memory/SKILL.md) | foundation | 1 | no | 78 | 2,433 | user | no | no |
 | [`skill-tiers`](skills/foundation/skill-tiers/SKILL.md) | foundation | 2 | yes | 55 | 512 | user, model | yes | yes |
 | [`token-rationalism`](skills/foundation/token-rationalism/SKILL.md) | foundation | 0 | always | 63 | 1,984 | always | yes | yes |
@@ -73,11 +75,9 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`code-simplification`](skills/methodology/code-simplification/SKILL.md) | methodology | 2 | yes | 61 | 3,363 | user, model | yes | yes |
 | [`codehome`](skills/methodology/codehome/SKILL.md) | methodology | 2 | no | 69 | 1,369 | user | no | no |
 | [`context-engineering`](skills/methodology/context-engineering/SKILL.md) | methodology | 2 | yes | 50 | 2,773 | user, model | yes | yes |
-| [`critical-thinking`](skills/methodology/critical-thinking/SKILL.md) | methodology | 2 | yes | 81 | 2,565 | user, model | yes | yes |
 | [`dep-cost`](skills/methodology/dep-cost/SKILL.md) | methodology | 2 | yes | 95 | 1,938 | user, model | yes | yes |
 | [`doubt-driven-development`](skills/methodology/doubt-driven-development/SKILL.md) | methodology | 2 | yes | 85 | 3,861 | user, model | yes | yes |
 | [`external-tools`](skills/methodology/external-tools/SKILL.md) | methodology | 2 | yes | 59 | 750 | user, model | yes | yes |
-| [`idea-refine`](skills/methodology/idea-refine/SKILL.md) | methodology | 2 | yes | 84 | 2,006 | user, model | yes | yes |
 | [`incremental-implementation`](skills/methodology/incremental-implementation/SKILL.md) | methodology | 2 | yes | 56 | 2,314 | user, model | yes | yes |
 | [`investigate-first`](skills/methodology/investigate-first/SKILL.md) | methodology | 2 | yes | 82 | 385 | user, model | yes | yes |
 | [`loop-programming`](skills/methodology/loop-programming/SKILL.md) | methodology | 2 | yes | 115 | 2,431 | user, model | yes | yes |

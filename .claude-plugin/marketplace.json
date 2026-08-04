@@ -9,19 +9,19 @@
       "name": "coaching",
       "source": "./",
       "skills": ["./skills/coaching"],
-      "description": "Agent coaching and user guidance (requirement interviews, idea refinement, meta skill orchestration)"
+      "description": "Agent coaching and user guidance (requirement interviews, idea refinement, adhd focus coaching)"
     },
     {
       "name": "behavior",
       "source": "./",
       "skills": ["./skills/behavior"],
-      "description": "Architecture review and design critique"
+      "description": "Behavioral primitives and decision quality ($skill{minimalist}, $skill{critical-thinking})"
     },
     {
       "name": "foundation",
       "source": "./",
       "skills": ["./skills/foundation"],
-      "description": "Always-on behavioral primitives and activation tiers (token economy, memory, minimalist senior-dev persona, skill tiers)"
+      "description": "Always-on behavioral primitives and activation tiers (token economy, memory, skill tiers)"
     },
     {
       "name": "methodology",
@@ -33,7 +33,7 @@
       "name": "engineering",
       "source": "./",
       "skills": ["./skills/engineering"],
-      "description": "Cross-cutting engineering practices (API and interface design, frontend UI engineering, nodejs, typescript, bootstrap-ts-repo, performance optimization, prototype-driven design, security and hardening)"
+      "description": "Cross-cutting engineering practices (API and interface design, architecture review, frontend UI engineering, nodejs, typescript, bootstrap-ts-repo, performance optimization, prototype-driven design, security and hardening)"
     },
     {
       "name": "verification",
