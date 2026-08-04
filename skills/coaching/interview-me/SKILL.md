@@ -173,7 +173,7 @@ Two questions in, the agent has discovered the actual ask isn't "a dashboard." I
 - **$skill{spec-driven-development}**: downstream. If the confirmed intent is concrete ("I want X for Y users with Z success criteria"), hand off to $skill{spec-driven-development} to write it down.
 - **Task breakdown**: two hops downstream of this skill (after the spec), when the spec needs to be split into verifiable tasks.
 - **$skill{doubt-driven-development}**: opposite end of the timeline. Interview-me is pre-decision intent extraction; doubt-driven is post-decision artifact review. Both catch divergence, but at different moments.
-- **$skill{source-driven-development}**: orthogonal. Interview-me clarifies what the user wants; SDD verifies framework facts. They don't compete.
+- **$skill{external-research}**: orthogonal. Interview-me clarifies what the user wants; SDD verifies framework facts. They don't compete.
 
 ## Common Rationalizations
 

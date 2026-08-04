@@ -100,7 +100,7 @@ function categoryDescription(category: string): string {
     behavior: "Evidence, code quality, and critical thinking",
     coaching: "User guidance and focus support",
     "code-review": "PR/MR review and remediation",
-    engineering: "Cross-cutting engineering practices (API/UI design, performance, security)",
+    engineering: "Cross-cutting engineering practices (frontend, nodejs/typescript, bootstrap-ts-repo, prototype, security)",
     experimentation: "Sandboxed experimentation",
     foundation: "Always-on behavioral primitives and activation tiers",
     integrations: "External platform connectors",

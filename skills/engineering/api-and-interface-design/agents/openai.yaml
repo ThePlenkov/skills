@@ -1,5 +1,0 @@
-interface:
-  display_name: "Api And Interface Design"
-  short_description: "Guides stable API and interface design"
-  brand_color: "#3B82F6"
-  default_prompt: "Use $api-and-interface-design to get started."

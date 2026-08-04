@@ -1,6 +1,6 @@
 ---
 name: architecture-review
-description: Use when an agent or developer needs a holistic evaluation of a codebase's architecture — module boundaries, layer violations, coupling/cohesion, SOLID adherence, and technology-stack fitness — typically before a large refactor, design decision, or major PR merge. Goes deeper than $skill{codehome} (wrong placement of one piece) and broader than $skill{investigate-first} (one area). Outputs a review report, not a fix.
+description: Use when an agent or developer needs a holistic evaluation of a codebase's architecture and public interfaces — module boundaries, layer violations, coupling/cohesion, SOLID adherence, technology-stack fitness, and API/interface design principles — typically before a large refactor, design decision, or major PR merge. Goes deeper than $skill{codehome} (wrong placement of one piece) and broader than $skill{investigate-first} (one area). Outputs a review report, not a fix.
 ---
 
 # Architecture Review
@@ -199,6 +199,19 @@ Stop and report blocked if:
 - the codebase has no reproducible build and review depends on guessing
 - access to architecture docs / ADRs is required and unavailable
 - the review becomes speculative without sufficient static evidence — narrow the lens
+
+## API and interface design principles
+
+Architecture reviews often surface API, module, and type boundaries. Keep the design principles in `references/api-design-principles.md` close when evaluating those boundaries:
+
+- **Hyrum's Law** — any observable behavior becomes a de-facto contract.
+- **One-Version Rule** — design for one version at a time; extend rather than fork.
+- **Contract First** — define the interface before the implementation.
+- **Validate at Boundaries** — trust internal code; validate where external input enters.
+- **Prefer Addition Over Modification** — make new fields additive and optional.
+- **Predictable Naming** — plural nouns for REST resources, camelCase for fields, `is/has/can` for booleans.
+
+For concrete REST/GraphQL/TypeScript patterns and a full verification checklist, see [`references/api-design-principles.md`](references/api-design-principles.md).
 
 ## Related skills
 

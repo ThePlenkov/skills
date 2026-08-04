@@ -126,7 +126,7 @@ Contention:
 
 ### 7. Before/after benchmarking
 
-Once a fix is applied:
+Once a fix is applied (see the [Fixes](#fixes) section for the fix catalog):
 
 1. Re-run the exact same benchmark as the baseline.
 2. Confirm numbers improved on the same machine, same input, same iterations.
@@ -144,6 +144,15 @@ Performance fixes often trade off:
 - cold latency vs steady-state latency
 
 Add or run the relevant unit/integration test to make sure correctness and key invariants still hold.
+
+## Fixes
+
+Once the bottleneck is identified, apply a targeted fix. The fix catalogues live in `references/`:
+
+- [`references/optimization-patterns.md`](references/optimization-patterns.md) — common anti-patterns and fixes for frontend, backend, queries, and caches.
+- [`references/performance-checklist.md`](references/performance-checklist.md) — at-a-glance Core Web Vitals, TTFB, frontend, backend, and measurement commands.
+
+Use these references after profiling, not before. Measure, fix the specific bottleneck, then benchmark again.
 
 ## Common Pitfalls
 

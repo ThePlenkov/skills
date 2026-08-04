@@ -203,7 +203,7 @@ rejected before any read.
   SHOULD NOT delegate verification to themselves and call it done; if
   only the producer ran the check, the claim is `produced`/`checked`,
   not `proved`-in-the-PR-sense.
-- **/act, $save-session, $github-pr-review, $triage-issue** — every
+- **/act, $skill{handoff}, $github-pr-review, $triage-issue** — every
   "fixed" / "resolved" / "verified" / "green" sentence in a reply must
   reference its evidence file path.
 

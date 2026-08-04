@@ -36,7 +36,7 @@ lives in
 | **2. Readability & Simplicity** | Can another engineer understand it without the author explaining? Abstractions earning their complexity? |
 | **3. Architecture** | Does it fit the system? Does the refactor reduce complexity or just relocate it? |
 | **4. Security** | For details, see $skill{security-and-hardening}. Any vulnerabilities introduced? |
-| **5. Performance** | For details, see $skill{performance-optimization}. Any bottlenecks introduced? |
+| **5. Performance** | For details, see $skill{performance-investigation}. Any bottlenecks introduced? |
 
 Two recurring smells worth flagging explicitly: **a new conditional
 bolted onto an unrelated flow** (push into a helper or state) and

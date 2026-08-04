@@ -1,6 +1,6 @@
 ---
 name: external-research
-description: Use FIRST when the answer might exist outside the current project. Teaches the agent the "is there a native engine for this?" check before git clone, grep across repos, or raw web search. The catalog (DeepWiki, Sourcegraph, Glean, Rovo, Perplexity, GitHub, GitLab, Jira, Confluence, Linear, Notion, npm, PyPI, crates.io) lives in references/catalog.md. web_search is LAST resort. Implements $skill{token-rationalism} Rule 0 ("search before you read").
+description: Use FIRST when the answer might exist outside the current project. Teaches the agent the "is there a native engine for this?" check before git clone, grep across repos, or raw web search; also covers source-verified implementation guidance for framework-specific decisions. The catalog (DeepWiki, Sourcegraph, Glean, Rovo, Perplexity, GitHub, GitLab, Jira, Confluence, Linear, Notion, npm, PyPI, crates.io) lives in references/catalog.md. web_search is LAST resort. Implements $skill{token-rationalism} Rule 0 ("search before you read").
 ---
 
 # External Research — the philosophy, then the catalog
@@ -93,6 +93,7 @@ above before any local work.
 | [`references/catalog.md`](references/catalog.md) | The full catalog — Tier A through E with "first try / fallback" per engine |
 | [`references/decision-tree.md`](references/decision-tree.md) | Full decision tree + use-case table |
 | [`references/deepwiki-mcp.md`](references/deepwiki-mcp.md) | "How to use DeepWiki MCP" — three ways in, common pitfalls, scope discipline |
+| [`references/source-verification.md`](references/source-verification.md) | Verifying framework-specific implementation decisions against official documentation |
 
 ## Related skills
 

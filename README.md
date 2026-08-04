@@ -70,11 +70,11 @@ skills/
 ├── behavior/           # Evidence, code quality, critical thinking
 ├── coaching/           # User guidance (adhd)
 ├── code-review/        # PR/MR review and remediation (act, triage-issue, etc.)
-├── engineering/        # Cross-cutting engineering practices (API/UI design, performance, security)
+├── engineering/        # Cross-cutting engineering practices (frontend, nodejs/typescript, bootstrap-ts-repo, prototype, security)
 ├── experimentation/    # Sandboxed experimentation (sandboxed)
 ├── foundation/         # Always-on behavioral primitives (token economy, memory)
 ├── integrations/       # Platform connectors (GitHub, GitLab, Atlassian, Codacy, ...)
-├── methodology/        # Development methodology (patching, critical thinking, code home, SDD)
+├── methodology/        # Development methodology (patching, critical thinking, code home)
 ├── orchestration/      # Agent coordination, isolation, and session state
 ├── research/           # Codebase analysis (deepwiki)
 ├── safety/             # Destructive operation protection (safeguard, salvage)

@@ -88,7 +88,7 @@ skill. The questions to answer on every change:
 ## 5. Performance
 
 For detailed profiling and optimization, see the
-$skill{performance-optimization} skill. The questions to answer:
+$skill{performance-investigation} skill. The questions to answer:
 
 - [ ] Any N+1 query patterns?
 - [ ] Any unbounded loops or unconstrained data fetching?
