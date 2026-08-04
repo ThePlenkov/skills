@@ -132,9 +132,9 @@ These are the subtle errors that look like productivity but create problems:
 
 2. **Skills are workflows, not suggestions.** Follow the steps in order. Don't skip verification steps.
 
-3. **Multiple skills can apply.** A feature implementation might involve $skill{idea-refine} → $skill{spec-driven-development} → $skill{planning-and-task-breakdown} → $skill{incremental-implementation} → $skill{test-driven-development} → $skill{code-review-and-quality} → $skill{code-simplification} → $skill{shipping-and-launch} in sequence.
+3. **Multiple skills can apply.** A feature implementation might involve idea-refine → spec-driven-development → planning-and-task-breakdown → incremental-implementation → test-driven-development → code-review-and-quality → code-simplification → shipping-and-launch in sequence.
 
-4. **When in doubt, start with a spec.** If the task is non-trivial and there's no spec, begin with $skill{spec-driven-development}.
+4. **When in doubt, start with a spec.** If the task is non-trivial and there's no spec, begin with spec-driven-development.
 
 ## Lifecycle Sequence
 
@@ -159,31 +159,31 @@ For a complete feature, the typical skill sequence is:
 16. shipping-and-launch         → Deploy safely
 ```
 
-Not every task needs every skill. A bug fix might only need: $skill{debugging} → $skill{test-driven-development} → $skill{code-review-and-quality}.
+Not every task needs every skill. A bug fix might only need: debugging → test-driven-development → code-review-and-quality.
 
 ## Quick Reference
 
 | Phase | Skill | One-Line Summary |
 |-------|-------|-----------------|
-| Define | $skill{interview-me} | Surface what the user actually wants before any plan, spec, or code exists |
-| Define | $skill{idea-refine} | Refine ideas through structured divergent and convergent thinking |
-| Define | $skill{spec-driven-development} | Requirements and acceptance criteria before code |
-| Plan | $skill{planning-and-task-breakdown} | Decompose into small, verifiable tasks |
-| Build | $skill{incremental-implementation} | Thin vertical slices, test each before expanding |
-| Build | $skill{source-driven-development} | Verify against official docs before implementing |
-| Build | $skill{doubt-driven-development} | Adversarial fresh-context review of every non-trivial decision |
-| Build | $skill{context-engineering} | Right context at the right time |
-| Build | $skill{frontend-ui-engineering} | Production-quality UI with accessibility |
-| Build | $skill{api-and-interface-design} | Stable interfaces with clear contracts |
-| Verify | $skill{test-driven-development} | Failing test first, then make it pass |
-| Verify | $skill{debugging} | Reproduce → localize → fix → guard |
-| Review | $skill{code-review-and-quality} | Five-axis review with quality gates |
-| Review | $skill{code-simplification} | Preserve behavior while reducing unnecessary complexity |
-| Review | $skill{security-and-hardening} | OWASP prevention, input validation, least privilege |
-| Review | $skill{performance-optimization} | Measure first, optimize only what matters |
-| Ship | $skill{git-workflow-and-versioning} | Atomic commits, clean history |
-| Ship | $skill{ci-cd-and-automation} | Automated quality gates on every change |
-| Ship | $skill{deprecation-and-migration} | Remove old systems and migrate users safely |
-| Ship | $skill{documentation-and-adrs} | Document the why, not just the what |
-| Ship | $skill{observability-and-instrumentation} | Structured logs, RED metrics, traces, symptom-based alerts |
-| Ship | $skill{shipping-and-launch} | Pre-launch checklist, monitoring, rollback plan |
+| Define | interview-me | Surface what the user actually wants before any plan, spec, or code exists |
+| Define | idea-refine | Refine ideas through structured divergent and convergent thinking |
+| Define | spec-driven-development | Requirements and acceptance criteria before code |
+| Plan | planning-and-task-breakdown | Decompose into small, verifiable tasks |
+| Build | incremental-implementation | Thin vertical slices, test each before expanding |
+| Build | source-driven-development | Verify against official docs before implementing |
+| Build | doubt-driven-development | Adversarial fresh-context review of every non-trivial decision |
+| Build | context-engineering | Right context at the right time |
+| Build | frontend-ui-engineering | Production-quality UI with accessibility |
+| Build | api-and-interface-design | Stable interfaces with clear contracts |
+| Verify | test-driven-development | Failing test first, then make it pass |
+| Verify | debugging | Reproduce → localize → fix → guard |
+| Review | code-review-and-quality | Five-axis review with quality gates |
+| Review | code-simplification | Preserve behavior while reducing unnecessary complexity |
+| Review | security-and-hardening | OWASP prevention, input validation, least privilege |
+| Review | performance-optimization | Measure first, optimize only what matters |
+| Ship | git-workflow-and-versioning | Atomic commits, clean history |
+| Ship | ci-cd-and-automation | Automated quality gates on every change |
+| Ship | deprecation-and-migration | Remove old systems and migrate users safely |
+| Ship | documentation-and-adrs | Document the why, not just the what |
+| Ship | observability-and-instrumentation | Structured logs, RED metrics, traces, symptom-based alerts |
+| Ship | shipping-and-launch | Pre-launch checklist, monitoring, rollback plan |
