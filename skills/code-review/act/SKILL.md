@@ -60,7 +60,7 @@ loop** that runs until the PR is clean:
 | **CONFIRM / REJECT** | Is this a real issue? Reject false positives with documented reason |
 | **FIX** | Change product code — one logical fix per commit, grouped sensibly |
 | **REPLY & RESOLVE** | Per-thread response + resolve — reply pointing to commit, then resolve that thread |
-| **VERIFY CLEAN** | `pr-state.sh` → `SAST_FINDINGS_PENDING=0`, `CI_REQUIRED_PENDING=0` |
+| **VERIFY CLEAN** | `pr-state.ts` → `SAST_FINDINGS_PENDING=0`, `CI_REQUIRED_PENDING=0` |
 | **PUSH** | Atomic push with clear commit messages |
 | **LOOP** | Re-fetch state. New CI run may surface new findings. Repeat until clean. |
 
@@ -81,7 +81,7 @@ trigger new CI findings.
 The loop does NOT terminate on the first clean pass — it terminates
 only when **all four** are true on the same HEAD:
 
-1. `open_threads == 0` from `review-state.sh` showing `OPEN_THREADS=0`.
+1. `open_threads == 0` from `review-state.ts` showing `OPEN_THREADS=0`.
 2. `CI_REQUIRED_PENDING == 0`, `SAST_FINDINGS_PENDING == 0`, and
    `SAST_FINDINGS_UNKNOWN == 0`.
 3. No new comments / annotations appeared in the last CI run
@@ -202,7 +202,7 @@ or CI notes. On GitHub Copilot, repository rules live in
 2. **Move the PR/MR to draft** if it is not already. This prevents
    reviewers and automation from re-evaluating the branch on every
    intermediate commit while the agent is actively fixing feedback.
-   Use `set-review-state.sh --draft`.
+   Use `set-review-state.ts --draft`.
 3. **Verify environment preconditions** before any state work:
    - GitHub: `gh auth status` must succeed (request `GH_TOKEN` and stop if
      missing/invalid); network allowlist must include `api.github.com`
@@ -214,7 +214,7 @@ or CI notes. On GitHub Copilot, repository rules live in
    - Override auto-detection with `ACT_PROVIDER=github|gitlab` or
      `GITLAB_HOST=gitlab.example.com` when needed.
 4. **Resolve the PR/MR context** from a number, URL, or
-   `pr-from-context.sh` / `review-state.sh` (the most recently updated
+   `pr-from-context.sh` / `review-state.ts` (the most recently updated
    open review for the current branch). If ambiguous, ask the user before
    proceeding.
 5. **Shadow-fork guard (PR/MR context only).** If the repo is a fork
@@ -223,7 +223,7 @@ or CI notes. On GitHub Copilot, repository rules live in
    scope on exit `20` (fork `main` ahead of upstream) or `21`
    (diverged). Exit `0` means the fork is equal or already
    fast-forwarded.
-6. **HEAD SHA** — `review-state.sh` (resolves the review from context,
+6. **HEAD SHA** — `review-state.ts` (resolves the review from context,
    works on GitHub and GitLab) or `gh pr view NUMBER --json
    headRefOid,statusCheckRollup,url` for GitHub.
 7. **Inventory threads** — for each unresolved thread/discussion, capture:
@@ -254,7 +254,7 @@ PR.
 | **D4** | Verify | Same verify block as PR context where applicable |
 | **D5** | PR | Title lists source PRs; body maps themes → commits |
 | **D6** | Close loop | `bun run act:debt:done -- --status done --fix-pr N --threads-file …` |
-| **D7** | Resolve | `resolve-open-threads.sh` on source PRs only after reply + fix |
+| **D7** | Resolve | `resolve-open-threads.ts` on source PRs only after reply + fix |
 
 Batch PR **merge-ready:** CI green on HEAD
 (`CI_REQUIRED_PENDING=0` AND `SAST_FINDINGS_PENDING=0`) + summary of
@@ -279,7 +279,7 @@ After the batch PR merges, run `bun run harvest:archive` (or
 
 ### P0a — CI green, no merge blockers
 
-`review-state.sh` (or `pr-state.sh` on GitHub) reports
+`review-state.ts` (or `pr-state.ts` on GitHub) reports
 `CI_REQUIRED_PENDING=N` for the **required** checks / pipeline that
 are blocking. Treat every non-AI-reviewer failing check as P0: green
 it locally, push, or document why it cannot be fixed in this review.
@@ -336,7 +336,7 @@ in-thread reply. The full procedure and per-tool reproduction
 commands are in
 [`references/sast-source-priority.md`](references/sast-source-priority.md).
 
-`review-state.sh` / `pr-state.sh` surfaces this as
+`review-state.ts` / `pr-state.ts` surfaces this as
 `SAST_FINDINGS_PENDING=N` — count of `annotation_level=failure`
 entries on **failing** SAST runs (zero extra calls when CI is fully
 green). On GitLab, inspect the `PIPELINE_STATUS` and any failed job
@@ -374,7 +374,7 @@ state to see if CI has surfaced new findings.
 
 Skipping steps 2–5 and only running the batch resolve script
 **violates `/act`**. After all threads are processed, re-fetch state
-(`review-state.sh` for GitHub and GitLab); new CI findings may have
+(`review-state.ts` for GitHub and GitLab); new CI findings may have
 appeared from the last push. Start the main loop again.
 
 ## What to change
@@ -383,8 +383,8 @@ appeared from the last push. Start the main loop again.
 `.github/workflows/`, etc.
 
 **Out of scope for "addressing review":** `.agents/skills/`,
-`resolve-open-threads.sh` — unless the script literally cannot run
-(`npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/resolve-open-threads.sh --dry-run`
+`resolve-open-threads.ts` — unless the script literally cannot run
+(`npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/resolve-open-threads.ts --dry-run`
 fails).
 
 ## Resolve pass (P4 only)
@@ -393,27 +393,27 @@ fails).
 from the agent containing the **fix commit SHA and evidence**; `gh auth status`
 (GitHub) or `GITLAB_TOKEN`/`glab auth status` (GitLab) succeeds. If a thread
 was auto-resolved by the review platform or another bot, the agent must still
-post the evidence reply before calling `review-resolve.sh`.
+post the evidence reply before calling `review-resolve.ts`.
 
 Provider-agnostic:
 
-1. Run `review-state.sh` and read the `OPEN_THREADS_TABLE:` section.
+1. Run `review-state.ts` and read the `OPEN_THREADS_TABLE:` section.
 2. Extract the first column (the thread/discussion global ID) from each row
    and write one ID per line to `tmp/open_ids.txt` using a Node script or
    file tool.
 3. Resolve them:
 
 ```bash
-npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/review-resolve.sh --file tmp/open_ids.txt
+npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/review-resolve.ts --file tmp/open_ids.txt
 ```
 
 GitHub-only legacy helper (still valid):
 
 ```bash
-npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/resolve-open-threads.sh --dry-run OWNER REPO NUMBER
-npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/resolve-open-threads.sh OWNER REPO NUMBER
+npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/resolve-open-threads.ts --dry-run OWNER REPO NUMBER
+npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/resolve-open-threads.ts OWNER REPO NUMBER
 # Final verification dry-run: must report open_threads=0 before the PR is merge-ready
-npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/resolve-open-threads.sh --dry-run OWNER REPO NUMBER
+npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/resolve-open-threads.ts --dry-run OWNER REPO NUMBER
 ```
 
 The resolve script only clicks "Resolve conversation" / "Resolve
@@ -470,7 +470,7 @@ a fix commit) is normal re-evaluation, not a cycle — feed it into
 the next iteration's FIX step and do not block or escalate on it.
 
 **Input source.** This signal is not computable from a single
-`pr-state.sh` call — that helper deliberately reports only the
+`pr-state.ts` call — that helper deliberately reports only the
 *current* `HEAD_SHA` and `OPEN_THREADS`. The guard compares that
 snapshot against the resolved-thread state the agent observed
 **earlier in this `/act` run** (its iteration memory, including
@@ -523,11 +523,11 @@ Say **merge-ready** only when all of these are true:
    failing SAST check is fixed, suppressed with reason, or triaged
    to backlog (P0b). A non-zero `SAST_FINDINGS_UNKNOWN` means the
    annotations probe failed for some check — coverage is unknown, so
-   re-run `review-state.sh` (or read the annotations manually) until it
+   re-run `review-state.ts` (or read the annotations manually) until it
    is zero; never claim SAST clean while any check is unverified. On
    GitLab, inspect the `PIPELINE_STATUS` and any failed job logs for
    security findings.
-4. `open_threads=0` from `review-state.sh` showing `OPEN_THREADS=0`.
+4. `open_threads=0` from `review-state.ts` showing `OPEN_THREADS=0`.
 5. Summary lists **what you changed per theme/file**, not only
    "resolved N threads".
 6. **P5 done** — per-run scratch report written; persistent
@@ -540,7 +540,7 @@ Say **merge-ready** only when all of these are true:
    rule flags, empty `/act` loop); retrospective + sink update done
    if anything went wrong this session.
 8. **Move the PR/MR out of draft** to ready for review with
-   `set-review-state.sh --ready`. This is the final step so external
+   `set-review-state.ts --ready`. This is the final step so external
    reviewers and automation only see the branch once it is clean.
 
 **If the loop is still producing new findings on each push, it has

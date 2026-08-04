@@ -11,7 +11,7 @@ wontfix) lives in $backlog.
 | Path | Purpose |
 | ---- | ------- |
 | `SKILL.md` | Agent instructions (load on `/act`) |
-| `scripts/` | gh/bun helpers (`pr-state.sh`, `query-debt`, `plan-debt-batch`, `update-debt-status`, P5 extract/submit, …) |
+| `scripts/` | gh/bun helpers (`pr-state.ts`, `review-state.ts`, `review-reply.ts`, `review-resolve.ts`, `query-debt`, `plan-debt-batch`, `update-debt-status`, P5 extract/submit, …) |
 | `references/` | `EVALUATE.md` (P6), `RATING_FLOW.md` (P5) |
 
 The shared ledger types/helpers (`scripts/review-debt-{lib,gh,text}.ts`) live in
@@ -36,7 +36,7 @@ exact switch priority.
 
 ## Pipeline gating (P0 = CI + critical SAST)
 
-[pr-state.sh](scripts/pr-state.sh) (`npx tsx scripts/run.ts skills/code-review/act/scripts/pr-state.sh`) surfaces two P0-relevant signals:
+[pr-state.ts](scripts/pr-state.ts) (`npx tsx scripts/run.ts skills/code-review/act/scripts/pr-state.ts`) surfaces two P0-relevant signals:
 
 - `CI_REQUIRED_PENDING=N` — required non-AI-reviewer checks that are not
   passing.
@@ -53,7 +53,7 @@ failed SAST runs — see [SKILL.md § P0b](SKILL.md) and
 Copy this directory (and `.agents/skills/harvest/` plus `.agents/review-debt/`).
 Requirements:
 
-- `gh`, `jq`, `bun`
+- `gh`, `bun` (GitLab workflows need `GITLAB_TOKEN` or `GLAB_TOKEN`)
 - Wire `package.json` scripts or call `bun scripts/review-debt-cli.ts` from the skill root
 - Set `OPENADT_DEBT_FILE` / `OPENADT_DEBT_SUMMARY` if the ledger path differs
 

@@ -11,7 +11,7 @@ runner and restore workflow labels.
 
 ## When to use
 
-- `pr-state.sh` reports `CI_REQUIRED_PENDING > 0` and one of the failing/pending
+- `pr-state.ts` reports `CI_REQUIRED_PENDING > 0` and one of the failing/pending
   check annotations says the job could not start due to payment/spending limits.
 - The user typed `/act --runner` or `/act pr <number> --runner`.
 - You are otherwise blocked from running the required checks and the user has
@@ -112,7 +112,7 @@ gh run watch "$RUN_ID" --repo <owner>/<repo>
 ```
 
 `gh run watch` blocks until the run finishes. After it exits, re-run
-`pr-state.sh` or `gh pr checks <pr>` to verify all required checks are green.
+`pr-state.ts` or `gh pr checks <pr>` to verify all required checks are green.
 
 If checks fail, fix the code and repeat from step 4. Do not stop the runner
 while there are still jobs to run.
