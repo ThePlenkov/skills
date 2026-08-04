@@ -16,7 +16,7 @@ Toolkit for creating and validating agent skills.
 
 ## Before creating: reuse check
 
-Before scaffolding a new skill, run `$skill{reuse-first}` against the proposed skill's domain. Search for:
+Before scaffolding a new skill, run `reuse-first` against the proposed skill's domain. Search for:
 
 - Skills with overlapping scope (same category, similar description)
 - Skills already cross-referenced from the same Tier 0 rule
@@ -29,7 +29,7 @@ If a sibling exists, decide explicitly one of:
 3. **Cross-reference from the existing skill** — if you have a different angle
 4. **Genuinely new** — if no overlap; document the gap this fills
 
-Document the decision in the new skill's `## Cross-references` section when one is created, or in the surviving/extended skill's `## Cross-references` (or the change plan) when no new skill is created. This is `$skill{reuse-first}` applied to skill creation itself — the same principle that prevents code duplication prevents skill duplication.
+Document the decision in the new skill's `## Cross-references` section when one is created, or in the surviving/extended skill's `## Cross-references` (or the change plan) when no new skill is created. This is the `reuse-first` principle applied to skill creation itself — the same principle that prevents code duplication prevents skill duplication.
 
 Failure mode this prevents: agents creating new skills that overlap with existing ones, inflating the skill registry with near-duplicates that fragment the agent's behavior across inconsistent procedures.
 
@@ -136,7 +136,7 @@ skills/tools/skillmaker/
 ## Craft layer
 
 After scaffolding a new skill (or revising an existing one), the **human**
-should invoke `$skill{writing-great-skills}` to review the result against
+should invoke `writing-great-skills` to review the result against
 the craft rules that make a skill predictable: invocation mode (model- vs.
 user-invoked), the description (front-loaded leading word, one trigger
 per branch, no duplication), the information hierarchy (steps vs.
@@ -152,3 +152,7 @@ users (`user`) and can also be reached by agents (`model`,
 explicitly asks for it and when an agent is scoping a skill. If your agent
 is running `skillmaker` autonomously, schedule a human review pass before the
 scaffolded skill is merged.
+
+## Related skills
+
+See [related-skills.md](references/related-skills.md) for the full cross-reference list.

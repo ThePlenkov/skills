@@ -1,6 +1,6 @@
 ---
 name: writing-great-skills
-description: Reference for writing and editing skills well — the vocabulary and principles that make a skill predictable. Use when authoring a new skill, reviewing a skill for retirement or merge, or debugging a skill that fires inconsistently. Companion to $skill{skillmaker}.
+description: Reference for writing and editing skills well — the vocabulary and principles that make a skill predictable. Use when authoring a new skill, reviewing a skill for retirement or merge, or debugging a skill that fires inconsistently. Companion to skillmaker.
 ---
 
 <!--
@@ -92,5 +92,4 @@ Use these to diagnose issues the user may be having with the skill.
 
 ## Related skills
 
-- $skill{skillmaker} — the harness-level procedure for creating skills end-to-end; this skill is the craft layer underneath.
-- $skill{retrospect} / $skill{skill-feedback} — when a skill has caused friction, capture the lesson and route feedback upstream.
+See [related-skills.md](references/related-skills.md) for the full cross-reference list.
