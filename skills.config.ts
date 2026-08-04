@@ -22,7 +22,7 @@ export const skillMetadata: Record<string, SkillMetadata> = {
         "tier": 2,
         "triggers": ["user", "model"],
         "allowed-tools": ["read", "exec", "write", "edit", "web_search", "web_get_contents", "grep", "message_user"],
-        "conflicts_with": ["github-pr-review", "code-review-and-quality"],
+        "conflicts_with": ["github-pr-review", "review-methodology"],
       },
     },
   },
@@ -95,23 +95,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
     },
   },
   "codacy": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
-  "code-review-and-quality": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-        "conflicts_with": ["github-pr-review"],
-      },
-    },
-  },
-  "code-simplification": {
     frontmatter: {
       metadata: {
         "tier": 2,
@@ -202,15 +185,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
         },
         "tier": 2,
         "triggers": ["user", "model"],
-      },
-    },
-  },
-  "doubt-driven-development": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-        "conflicts_with": ["investigate-first", "critical-thinking"],
       },
     },
   },
@@ -336,7 +310,7 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       metadata: {
         "tier": 2,
         "triggers": ["user", "model"],
-        "conflicts_with": ["code-review-and-quality"],
+        "conflicts_with": ["review-methodology"],
       },
     },
   },
@@ -767,7 +741,7 @@ export const skillMetadata: Record<string, SkillMetadata> = {
         "argument-hint": "<fixed-point ref, e.g. \"main\", \"HEAD~5\", \"abc1234\">",
         "tier": 2,
         "triggers": ["user", "model"],
-        "conflicts_with": ["github-pr-review", "code-review-and-quality"],
+        "conflicts_with": ["github-pr-review", "review-methodology"],
       },
     },
   },

@@ -1,5 +1,0 @@
-interface:
-  display_name: "Code Review And Quality"
-  short_description: "Conducts multi-axis code review"
-  brand_color: "#3B82F6"
-  default_prompt: "Use $code-review-and-quality to get started."

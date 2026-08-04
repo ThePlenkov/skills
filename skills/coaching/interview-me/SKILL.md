@@ -11,7 +11,7 @@ What people ask for and what they actually want are different things. They ask f
 
 The cheapest moment to find this gap is before any plan, spec, or code exists. Once you've started building, switching costs are real, and the user will rationalize the wrong thing into a "good enough" thing. The misfit gets locked in.
 
-This skill closes the gap before it costs anything. The other Define-phase skills assume you already know roughly what you want: $skill{idea-refine} generates variations from an idea, $skill{spec-driven-development} writes the requirements down, $skill{doubt-driven-development} stress-tests a plan after you've drafted one. Interview-me is the part before all of those, where you ask one question at a time, with your best guess attached, until you can predict what the user is going to say before they say it.
+This skill closes the gap before it costs anything. The other Define-phase skills assume you already know roughly what you want: $skill{idea-refine} generates variations from an idea, $skill{spec-driven-development} writes the requirements down, $skill{critical-thinking} stress-tests a plan after you've drafted one. Interview-me is the part before all of those, where you ask one question at a time, with your best guess attached, until you can predict what the user is going to say before they say it.
 
 ## When to Use
 
@@ -171,8 +171,8 @@ Two questions in, the agent has discovered the actual ask isn't "a dashboard." I
 
 - **$skill{idea-refine}**: downstream. If the confirmed intent is "I want X but I don't know how to scope it," hand off to $skill{idea-refine} to generate variations against the now-explicit intent.
 - **$skill{spec-driven-development}**: downstream. If the confirmed intent is concrete ("I want X for Y users with Z success criteria"), hand off to $skill{spec-driven-development} to write it down.
-- **Task breakdown**: two hops downstream of this skill (after the spec), when the spec needs to be split into verifiable tasks.
-- **$skill{doubt-driven-development}**: opposite end of the timeline. Interview-me is pre-decision intent extraction; doubt-driven is post-decision artifact review. Both catch divergence, but at different moments.
+- **$skill{shared-plan}**: two hops downstream of this skill (after the spec).
+- **$skill{critical-thinking}**: opposite end of the timeline. Interview-me is pre-decision intent extraction; doubt-driven is post-decision artifact review. Both catch divergence, but at different moments.
 - **$skill{external-research}**: orthogonal. Interview-me clarifies what the user wants; SDD verifies framework facts. They don't compete.
 
 ## Common Rationalizations

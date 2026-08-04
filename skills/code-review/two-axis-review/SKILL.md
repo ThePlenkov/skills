@@ -43,9 +43,9 @@ Look for the originating spec, in this order:
 
 Anything in the repo that documents how code should be written, such as `CODING_STANDARDS.md` or `CONTRIBUTING.md`, or the existing skills themselves. **The default standards-source set the Standards sub-agent should always receive, in addition to whatever the repo documents:**
 
-- `methodology/code-review-and-quality` — the multi-axis review rubric covering correctness, readability, architecture, security, and performance. **Include this by default** so the Standards axis doesn't miss any of those dimensions when the repo's own standards doc is silent on one of them.
-- `behavior/architecture-review`, `engineering/frontend-ui-engineering`, `troubleshooting/performance-investigation`, `engineering/security-and-hardening` — module-shape and cross-cutting concerns.
-- `methodology/code-simplification`, `methodology/codehome`, `methodology/refactoring` — simplification and placement rules.
+- `methodology/review-methodology` — the multi-axis review rubric covering correctness, readability, architecture, security, and performance. **Include this by default** so the Standards axis doesn't miss any of those dimensions when the repo's own standards doc is silent on one of them.
+- `engineering/architecture-review`, `engineering/frontend-ui-engineering`, `troubleshooting/performance-investigation`, `engineering/security-and-hardening` — module-shape and cross-cutting concerns.
+- `behavior/minimalist`, `methodology/codehome`, `methodology/refactoring` — simplification and placement rules.
 
 On top of whatever the repo documents, the Standards axis always carries the **smell baseline** below — a fixed set of Fowler code smells (_Refactoring_, ch.3) that applies even when a repo documents nothing. Two rules bind it:
 
@@ -108,4 +108,4 @@ Reporting them separately stops one axis from masking the other.
 - $skill{shared-plan} — when a review reveals a multi-step follow-up (refactor, ADR, or split-PR plan), feed it into the active shared plan rather than the PR thread.
 - $skill{github-pr-review} — single-axis, GitHub-aware review writer; use when you only need one axis or are posting back to a PR.
 - $skill{act} — when the review findings are ready to be turned into per-thread fixes and resolved on GitHub or GitLab.
-- $skill{architecture-review} / $skill{code-simplification} / $skill{codehome} — concrete standards to feed the Standards sub-agent p
+- $skill{architecture-review} / $skill{minimalist} / $skill{codehome} — concrete standards to feed the Standards sub-agent.

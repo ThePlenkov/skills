@@ -111,7 +111,7 @@ updates:
 ```
 
 For upgrade discipline (one dep per change, changelog review, lockfile
-hygiene) see the $skill{code-review-and-quality} skill.
+hygiene) see the $skill{review-methodology} skill.
 
 ## Build Cop Role
 
