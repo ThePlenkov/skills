@@ -83,7 +83,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `using-agent-skills` | `orchestration` | 2 | user, model | — | — |
 | `deepwiki` | `research` | 2 | user, model | — | — |
 | `external-research` | `research` | 2 | user, model | — | — |
-| `drill` | `safety` | 2 | user, model | — | — |
+| `drill` | `safety` | 2 | user | — | — |
 | `safeguard` | `safety` | 2 | user, model | — | — |
 | `salvage` | `safety` | 2 | user | — | — |
 | `retrospect` | `self-learning` | 2 | user, model | — | — |
