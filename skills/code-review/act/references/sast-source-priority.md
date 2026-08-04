@@ -6,7 +6,7 @@ it whenever a required check fails from a SAST tool.
 
 ## Step 1: Read GitHub CI run annotations (primary source)
 
-Use the project's own `pr-state.sh` to read the head SHA's check-runs
+Use the project's own `pr-state.ts` to read the head SHA's check-runs
 and surface `SAST_FINDINGS_PENDING`; for manual triage outside that
 script, query the head SHA's check-runs directly. `gh pr checks
 --json name,status,conclusion` does NOT return a check-run ID, so
@@ -59,9 +59,9 @@ CLI can reproduce:
 See the relevant skill (`codacy`, `codescene`, etc.) for installation
 instructions.
 
-## Recognised SAST tools (in `pr-state.sh`)
+## Recognised SAST tools (in `pr-state.ts`)
 
-`pr-state.sh` surfaces SAST load as `SAST_FINDINGS_PENDING=N` — count
+`pr-state.ts` surfaces SAST load as `SAST_FINDINGS_PENDING=N` — count
 of `annotation_level=failure` entries on **failing** SAST runs (zero
 extra `gh` calls when CI is fully green).
 
@@ -85,7 +85,7 @@ first.
 
 ## Locally reproducible path
 
-| Signal in `pr-state.sh` / `gh pr checks` | Reproduce locally |
+| Signal in `pr-state.ts` / `gh pr checks` | Reproduce locally |
 |---|---|
 | `Codacy Static Code Analysis` fail / action_required | Step 1: Read annotations via `gh api`. Step 2: If `annotations=0`, install linter per Codacy skill and run locally. |
 | `Opengrep OSS` / `OpenGrep` fail | Step 1: Read annotations. Step 2: `opengrep --config .semgrep.yaml <changed-paths>` |

@@ -4,7 +4,7 @@ Common mistakes when running `/act` and what to do instead.
 
 | Wrong (do not do this) | Right |
 |------------------------|--------|
-| Run `resolve-open-threads.sh` to clear open threads | Read threads → fix code → reply in thread → then resolve |
+| Run `resolve-open-threads.ts` to clear open threads | Read threads → fix code → reply in thread → then resolve |
 | One PR comment "addressed feedback" | Per-thread fix or per-thread reply, then resolve that thread |
 | Only touch `.agents/skills/` or the resolve script | Change `apps/`, `tools/`, `specs/`, `packaging/`, workflows per feedback |
 | "Merge-ready" because `open_threads=0` | Merge-ready only if feedback is **implemented** and CI green on HEAD |

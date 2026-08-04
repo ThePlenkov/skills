@@ -22,7 +22,7 @@ If **any** box is “yes”: write **what / root cause / prevention** and update
 
 ## 2b. Critical SAST error annotations (required every /act)
 
-`pr-state.sh` surfaces `SAST_FINDINGS_PENDING=N` (count of
+`pr-state.ts` surfaces `SAST_FINDINGS_PENDING=N` (count of
 `annotation_level=failure` entries on FAILING SAST checks). Before merge-ready:
 
 - [ ] **Annotation-level=failure entries were read** for every failing SAST

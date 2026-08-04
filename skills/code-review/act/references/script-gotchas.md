@@ -8,7 +8,7 @@ points here when a "gotcha" can waste a tool call.
 **Scratch artifacts (e.g. `replies.tsv`, `findings.jsonl`) MUST live
 under repo `./tmp/`** — e.g. `tmp/agent/<run>/`. **Not** system `/tmp`
 (cloud agents may write outside the clone). **Not** `scripts/` or repo
-root. `tmp/` is gitignored. `reply-threads.sh --file` accepts
+root. `tmp/` is gitignored. `review-reply.ts --file` accepts
 repo-relative or absolute paths under the clone.
 
 ## `replies.tsv` format
@@ -29,7 +29,7 @@ and `-F` or `-f` for variables.
 
 ## `MERGEABLE=UNKNOWN` cache note
 
-If `MERGEABLE=UNKNOWN` in `pr-state.sh` output, the GraphQL
+If `MERGEABLE=UNKNOWN` in `pr-state.ts` output, the GraphQL
 `mergeable` field is cached (computed asynchronously by GitHub's
 merge-queue worker; see gh-cli #9583). Note that `mergeable` (merge
 conflict status: `MERGEABLE`/`CONFLICTING`) and `mergeStateStatus`
