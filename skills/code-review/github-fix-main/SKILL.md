@@ -182,6 +182,6 @@ Per thread:
 - [references/ci-parity.md](references/ci-parity.md) — §6 reproducible CI command set.
 - [references/pr-body.md](references/pr-body.md) — PR body template + `gh pr create` invocation.
 - [references/terminal-states.md](references/terminal-states.md) — stop conditions and follow-up message template.
-- `$skill{github}` — raw `gh` patterns.
+- `$skill{external-tools}` — raw `gh` patterns.
 - `$skill{github-pr-review}` — reviewer side once the PR is open.
 - `$skill{git-workflow-and-versioning}` — atomic commit and push conventions.
