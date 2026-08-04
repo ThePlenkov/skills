@@ -789,14 +789,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "spec-kit": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
   "subagent-capsule": {
     frontmatter: {
       metadata: {

@@ -4,12 +4,12 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-skills-inde
 
 ## Summary
 
-- **Total skills:** 93
+- **Total skills:** 92
 - **Context window (default):** 128,000 tokens
 - **Skills metadata budget (2%):** 2,560 tokens
-- **Total description tokens:** 6,491 tokens
-- **Overflow vs. 2% budget:** 2.54x
-- **Total skill file tokens:** 172,967 tokens
+- **Total description tokens:** 6,450 tokens
+- **Overflow vs. 2% budget:** 2.52x
+- **Total skill file tokens:** 170,830 tokens
 
 Token counts use the same approximation Codex uses for its skills context budget: `ceil(byte_length / 4)`.
 
@@ -25,7 +25,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | experimentation | 1 | 101 | 1,511 |
 | foundation | 3 | 196 | 4,929 |
 | integrations | 6 | 271 | 8,563 |
-| methodology | 22 | 1,551 | 44,444 |
+| methodology | 21 | 1,510 | 42,307 |
 | orchestration | 5 | 366 | 9,433 |
 | research | 2 | 170 | 3,096 |
 | safety | 3 | 224 | 4,146 |
@@ -90,8 +90,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`reuse-first`](skills/methodology/reuse-first/SKILL.md) | methodology | 2 | yes | 73 | 2,182 | user, model | yes | yes |
 | [`review-methodology`](skills/methodology/review-methodology/SKILL.md) | methodology | 2 | yes | 84 | 1,101 | user, model | yes | yes |
 | [`source-driven-development`](skills/methodology/source-driven-development/SKILL.md) | methodology | 2 | yes | 55 | 2,050 | user, model | yes | yes |
-| [`spec-driven-development`](skills/methodology/sdd/spec-driven-development/SKILL.md) | methodology | 2 | yes | 51 | 2,151 | user, model | yes | yes |
-| [`spec-kit`](skills/methodology/sdd/spec-kit/SKILL.md) | methodology | 2 | yes | 41 | 2,197 | user, model | yes | yes |
+| [`spec-driven-development`](skills/methodology/sdd/spec-driven-development/SKILL.md) | methodology | 2 | yes | 51 | 2,211 | user, model | yes | yes |
 | [`test-driven-development`](skills/methodology/test-driven-development/SKILL.md) | methodology | 2 | yes | 58 | 3,741 | user, model | yes | yes |
 | [`handoff`](skills/orchestration/handoff/SKILL.md) | orchestration | 2 | yes | 91 | 3,009 | user, model | yes | yes |
 | [`save-session`](skills/orchestration/save-session/SKILL.md) | orchestration | 2 | yes | 51 | 2,421 | user, model | yes | yes |
