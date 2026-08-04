@@ -633,6 +633,14 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
+  "source-driven-development": {
+    frontmatter: {
+      metadata: {
+        "tier": 2,
+        "triggers": ["user", "model"],
+      },
+    },
+  },
   "sourcegraph": {
     frontmatter: {
       metadata: {
