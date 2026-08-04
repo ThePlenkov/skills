@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Write a handoff document so a fresh agent session can continue the work on the same machine and user account, or resume the most recent handoff across git worktrees on that machine. Use when a thread is full, crossing a context-window boundary, returning after `/clear`, or branching into a parallel session. Distinct from save-session and the built-in `/compact`.
+description: Write a handoff document so a fresh agent session can continue the work on the same machine and user account, or resume the most recent handoff across git worktrees on that machine. Use when a thread is full, crossing a context-window boundary, returning after `/clear`, or branching into a parallel session. Distinct from the built-in `/compact`.
 ---
 
 # Handoff
@@ -28,7 +28,7 @@ commits of working notes.
 An OS temp path and a per-worktree pointer are not available on a different
 machine. For cross-machine continuation, copy the handoff file to a shared
 artifact store (S3, an internal file share, etc.) and pass a reference, or use
-`$skill{save-session}` for durable cross-work preservation.
+`$skill{handoff}` for durable cross-work preservation.
 
 ## Creating a handoff
 
@@ -207,7 +207,7 @@ A handoff that the next agent can pick up cold usually has:
 
 ## Related skills
 
-- `$skill{save-session}` — durable cross-work preservation; lives inside the
+- `$skill{handoff}` — durable cross-work preservation; lives inside the
   workspace, not in OS temp.
 - `$skill{shared-plan}` — when the next session is one of many agents continuing
   a long plan.
