@@ -1,6 +1,6 @@
 ---
 name: reuse-first
-description: "Search locally and in open-source for existing solutions before writing non-trivial code. Use before adding a new function, utility, module, or significant code block. Skip one-liners and trivial refactors. Operationalizes $skill{minimal-root-cause} with a decision matrix and tool bootstrap."
+description: "Search locally and in open-source for existing solutions before writing non-trivial code. Use before adding a new function, utility, module, or significant code block. Skip one-liners and trivial refactors. Operationalizes minimal-root-cause with a decision matrix and tool bootstrap."
 metadata:
   tier: 2
   triggers: [user, model]
@@ -9,13 +9,13 @@ metadata:
 
 # reuse-first
 
-**When to use:** you are about to write a new function, utility, module, or > 30 LOC of net-new code, and you have not yet proved that nothing existing does the job. Not a debugging skill (`$skill{investigate-first}`) and not a "be lazy about patching" skill (`$skill{minimal-root-cause}`) — those are siblings, see Cross-references.
+**When to use:** you are about to write a new function, utility, module, or > 30 LOC of net-new code, and you have not yet proved that nothing existing does the job. Not a debugging skill (`investigate-first`) and not a "be lazy about patching" skill (`minimal-root-cause`) — those are siblings, see Cross-references.
 
 ## The principle
 
 The cheapest code is code that already exists and is already paid for. The most expensive code is the new code that duplicates existing code, because you pay it forever (maintenance) and forget why you wrote it (knowledge debt). Before writing anything non-trivial, prove — don't assume — that nothing existing does the job.
 
-This skill operationalizes `$skill{minimal-root-cause}` and Rule 0 of `$skill{token-rationalism}` (search before you read). The philosophy says "be lazy about the new solution"; this skill says "here are the exact CLI calls to be lazy with, and here is the decision matrix when nothing matches".
+This skill operationalizes `minimal-root-cause` and Rule 0 of `token-rationalism` (search before you read). The philosophy says "be lazy about the new solution"; this skill says "here are the exact CLI calls to be lazy with, and here is the decision matrix when nothing matches".
 
 ## Procedure
 
@@ -102,7 +102,7 @@ In order of cost, lowest first:
 3. **Sourcegraph.com public** (no auth for public code): `curl -s 'https://sourcegraph.com/.api/search/stream?q=context:global+<term>&v=V3' | head -100`
 4. **Sourcegraph Deep Search** (semantic): public web UI or MCP at `mcp.sourcegraph.com` — best when the term is fuzzy or the task is "find libraries that handle X kind of problem"
 
-For each candidate library, check: (a) last release date, (b) weekly downloads, (c) license, (d) whether the dep is heavier than the use case. If (d) fails, hand off to `$skill{dep-cost}` for the reimplement-or-keep analysis.
+For each candidate library, check: (a) last release date, (b) weekly downloads, (c) license, (d) whether the dep is heavier than the use case. If (d) fails, hand off to `dep-cost` for the reimplement-or-keep analysis.
 
 ### 5. Decision
 
@@ -110,29 +110,20 @@ For each candidate library, check: (a) last release date, (b) weekly downloads, 
 |---|---|---|---|
 | Yes (≥80% coverage) | — | — | **Reuse local** |
 | No | Yes | Yes | **Add dependency** |
-| No | Yes | **No** (heavy for one function) | **Hand to `$skill{dep-cost}`** |
+| No | Yes | **No** (heavy for one function) | **Hand to `dep-cost`** |
 | No | No | — | **Write new** — and document what was searched and why nothing matched |
 
 **Always produce an evidence trail.** Output the commands you ran, the matches you got, and the reasoning. The point is not the decision — it is that the decision is defensible by the next person who reads the diff.
 
 ## What this skill is NOT
 
-- Not a replacement for `$skill{minimal-root-cause}` — that is the philosophy; this is the procedure. Both load together.
+- Not a replacement for `minimal-root-cause` — that is the philosophy; this is the procedure. Both load together.
 - Not a license to doomscroll OSS for hours. Set a time budget. 5 minutes of searching is usually enough; if nothing surfaces, the answer is "write it", not "search for 45 more minutes".
 - Not always required. One-liners, typo fixes, trivial refactors, and tests do not need it. Threshold: "would I add a new function or new file?" If yes, run this.
 
 ## Cross-references
 
-This skill is an orchestrator. Load the cited skills too — they hold the depth.
-
-- **`$skill{token-rationalism}`** (Tier 0, always loaded) — Rule 0 (search before you read) + Rule 8 (reuse before write)
-- **`$skill{minimal-root-cause}`** (Tier 2) — the philosophy this operationalizes
-- **`$skill{sourcegraph}`** (Tier 2) — `src` CLI, LSIF/SCIP, Deep Search (private endpoint)
-- **`$skill{deepwiki}`** (Tier 2) — AI-summary of any GitHub repo
-- **`$skill{external-research}`** (Tier 2) — Tier 2 catalog of search engines and package registries
-- **`$skill{external-tools}`** (Tier 2) — `gh search code` for the GitHub-native path
-- **`$skill{dep-cost}`** (Tier 2, sibling) — when reuse-first finds a lib but it is heavier than the use case
-- **`$skill{skillmaker}`** (Tier 2) — for the meta case: applying reuse-first when creating a new skill
+This skill is an orchestrator. Load the cited skills too — they hold the depth. See [related-skills.md](references/related-skills.md) for the full list.
 
 ## Top 5 mistakes
 
