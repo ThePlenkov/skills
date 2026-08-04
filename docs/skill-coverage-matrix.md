@@ -7,14 +7,14 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | Category | Description | Skills |
 | --- | --- | --- |
 | `agents` | Framework management and agent configuration | `claude-skills`, `dotagents` |
-| `behavior` | Evidence, code quality, and critical thinking | `architecture-review` |
-| `coaching` | User guidance and focus support | `adhd`, `interview-me` |
+| `behavior` | Evidence, code quality, and critical thinking | `critical-thinking`, `minimalist` |
+| `coaching` | User guidance and focus support | `adhd`, `idea-refine`, `interview-me` |
 | `code-review` | PR/MR review and remediation | `act`, `github-fix-main`, `github-pr-review`, `mr-address-review`, `triage-issue`, `two-axis-review` |
-| `engineering` | Cross-cutting engineering practices (API/UI design, performance, security) | `api-and-interface-design`, `bootstrap-ts-repo`, `frontend-ui-engineering`, `nodejs`, `performance-optimization`, `prototype`, `security-and-hardening`, `typescript` |
+| `engineering` | Cross-cutting engineering practices (API/UI design, performance, security) | `api-and-interface-design`, `architecture-review`, `bootstrap-ts-repo`, `frontend-ui-engineering`, `nodejs`, `performance-optimization`, `prototype`, `security-and-hardening`, `typescript` |
 | `experimentation` | Sandboxed experimentation | `sandboxed` |
-| `foundation` | Always-on behavioral primitives and activation tiers | `minimalist`, `persistent-memory`, `skill-tiers`, `token-rationalism` |
+| `foundation` | Always-on behavioral primitives and activation tiers | `persistent-memory`, `skill-tiers`, `token-rationalism` |
 | `integrations` | External platform connectors | `bootstrap-gh-self-hosted-runner`, `codacy`, `codescene`, `gitlab-ci-local`, `glean`, `sourcegraph` |
-| `methodology` | Development methodology | `code-review-and-quality`, `code-simplification`, `codehome`, `context-engineering`, `critical-thinking`, `dep-cost`, `doubt-driven-development`, `external-tools`, `idea-refine`, `incremental-implementation`, `investigate-first`, `loop-programming`, `minimal-root-cause`, `modern-stack`, `observability-and-instrumentation`, `one-shot-patch`, `refactoring`, `repository-onboarding`, `reuse-first`, `review-methodology`, `source-driven-development`, `spec-driven-development`, `test-driven-development` |
+| `methodology` | Development methodology | `code-review-and-quality`, `code-simplification`, `codehome`, `context-engineering`, `dep-cost`, `doubt-driven-development`, `external-tools`, `incremental-implementation`, `investigate-first`, `loop-programming`, `minimal-root-cause`, `modern-stack`, `observability-and-instrumentation`, `one-shot-patch`, `refactoring`, `repository-onboarding`, `reuse-first`, `review-methodology`, `source-driven-development`, `spec-driven-development`, `test-driven-development` |
 | `orchestration` | Agent coordination, isolation, context management, and skill discovery | `handoff`, `save-session`, `subagent-capsule`, `unwind`, `using-agent-skills` |
 | `research` | Codebase analysis and documentation tools | `deepwiki`, `external-research` |
 | `safety` | Destructive operation protection and recovery | `drill`, `safeguard`, `salvage` |
@@ -30,8 +30,10 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | --- | --- | --- | --- | --- | --- |
 | `claude-skills` | `agents` | 2 | user, model | — | — |
 | `dotagents` | `agents` | 2 | user, model | — | — |
-| `architecture-review` | `behavior` | 2 | user, model | — | — |
+| `critical-thinking` | `behavior` | 2 | user, model | — | — |
+| `minimalist` | `behavior` | 2 | user, model | — | — |
 | `adhd` | `coaching` | 2 | user, model | — | — |
+| `idea-refine` | `coaching` | 2 | user, model | — | — |
 | `interview-me` | `coaching` | 2 | user, model | — | — |
 | `act` | `code-review` | 2 | user, model | `$skill{github-pr-review}`, `$skill{code-review-and-quality}` | — |
 | `github-fix-main` | `code-review` | 2 | user, model | — | — |
@@ -40,6 +42,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `triage-issue` | `code-review` | 2 | user, model | — | — |
 | `two-axis-review` | `code-review` | 2 | user, model | `$skill{github-pr-review}`, `$skill{mr-address-review}`, `$skill{code-review-and-quality}` | — |
 | `api-and-interface-design` | `engineering` | 2 | user, model | — | — |
+| `architecture-review` | `engineering` | 2 | user, model | — | — |
 | `bootstrap-ts-repo` | `engineering` | 2 | user, model | — | — |
 | `frontend-ui-engineering` | `engineering` | 2 | user, model | — | — |
 | `nodejs` | `engineering` | 2 | user, model | — | — |
@@ -48,7 +51,6 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `security-and-hardening` | `engineering` | 2 | user, model | — | — |
 | `typescript` | `engineering` | 2 | user, model | — | — |
 | `sandboxed` | `experimentation` | 2 | user, model | — | — |
-| `minimalist` | `foundation` | 2 | user, model | — | — |
 | `persistent-memory` | `foundation` | 1 | user | — | — |
 | `skill-tiers` | `foundation` | 2 | user, model | — | — |
 | `token-rationalism` | `foundation` | 0 | always | — | — |
@@ -62,11 +64,9 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `code-simplification` | `methodology` | 2 | user, model | — | — |
 | `codehome` | `methodology` | 2 | user | — | — |
 | `context-engineering` | `methodology` | 2 | user, model | — | — |
-| `critical-thinking` | `methodology` | 2 | user, model | — | — |
 | `dep-cost` | `methodology` | 2 | user, model | — | — |
 | `doubt-driven-development` | `methodology` | 2 | user, model | `$skill{investigate-first}`, `$skill{critical-thinking}` | — |
 | `external-tools` | `methodology` | 2 | user, model | — | — |
-| `idea-refine` | `methodology` | 2 | user, model | — | — |
 | `incremental-implementation` | `methodology` | 2 | user, model | `$skill{loop-programming}` | — |
 | `investigate-first` | `methodology` | 2 | user, model | `$skill{debugging}`, `$skill{one-shot-patch}` | `$skill{minimal-root-cause}` |
 | `loop-programming` | `methodology` | 2 | user, model | `$skill{incremental-implementation}` | — |
