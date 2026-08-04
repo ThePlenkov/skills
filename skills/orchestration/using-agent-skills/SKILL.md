@@ -19,10 +19,9 @@ Task arrives
     ├── Don't know what you want yet? ──────→ interview-me
     ├── Have a rough concept, need variants? → idea-refine
     ├── New project/feature/change? ──→ spec-driven-development
-    ├── Implementing code? ────────────→ incremental-implementation
-    │   ├── UI work? ─────────────────→ frontend-ui-engineering
+    ├── Have a spec, need tasks? ──────→ shared-plan
+    ├── Implementing code? ────────────→ test-driven-development
     │   ├── API work? ────────────────→ architecture-review
-    │   ├── Need better context? ─────→ context-engineering
     │   ├── Need doc-verified code? ───→ external-research
     │   └── Stakes high / unfamiliar code? ──→ critical-thinking
     ├── Writing/running tests? ────────→ test-driven-development
@@ -32,8 +31,7 @@ Task arrives
     │   ├── Security concerns? ───────→ security-and-hardening
     │   └── Performance concerns? ────→ performance-investigation
     ├── Committing/branching? ─────────→ git-workflow-and-versioning
-    ├── CI/CD pipeline work? ──────────→ ci-cd-and-automation
-    └── Adding logs/metrics/alerts? ───→ observability-and-instrumentation
+    └── CI/CD pipeline work? ──────────→ ci-cd-and-automation
 ```
 
 ## Core Operating Behaviors
@@ -128,7 +126,7 @@ These are the subtle errors that look like productivity but create problems:
 
 2. **Skills are workflows, not suggestions.** Follow the steps in order. Don't skip verification steps.
 
-3. **Multiple skills can apply.** A feature implementation might involve idea-refine → spec-driven-development → incremental-implementation → test-driven-development → review-methodology → minimalist in sequence.
+3. **Multiple skills can apply.** A feature implementation might involve idea-refine → spec-driven-development → test-driven-development → review-methodology → minimalist in sequence.
 
 4. **When in doubt, start with a spec.** If the task is non-trivial and there's no spec, begin with spec-driven-development.
 
@@ -140,15 +138,13 @@ For a complete feature, the typical skill sequence is:
 1.  interview-me                → Extract what the user actually wants
 2.  idea-refine                 → Refine vague ideas
 3.  spec-driven-development     → Define what we're building
-4.  context-engineering         → Load the right context
+4.  shared-plan                 → Break into verifiable tasks
 5.  external-research   → Verify against official docs
-6.  incremental-implementation  → Build slice by slice
-7.  observability-and-instrumentation → Instrument as you build (runs parallel with 6-8, not after)
-8.  critical-thinking    → Cross-examine non-trivial decisions in-flight
-9.  test-driven-development     → Prove each slice works
-10. review-methodology     → Review before merge
-11. minimalist         → Reduce unnecessary complexity while preserving behavior
-12. git-workflow-and-versioning → Clean commit history
+6.  test-driven-development     → Prove each slice works
+7.  critical-thinking    → Cross-examine non-trivial decisions in-flight
+8.  review-methodology     → Review before merge
+9.  minimalist         → Reduce unnecessary complexity while preserving behavior
+10. git-workflow-and-versioning → Clean commit history
 ```
 
 Not every task needs every skill. A bug fix might only need: debugging → test-driven-development → review-methodology.
@@ -160,11 +156,9 @@ Not every task needs every skill. A bug fix might only need: debugging → test-
 | Define | interview-me | Surface what the user actually wants before any plan, spec, or code exists |
 | Define | idea-refine | Refine ideas through structured divergent and convergent thinking |
 | Define | spec-driven-development | Requirements and acceptance criteria before code |
-| Build | incremental-implementation | Thin vertical slices, test each before expanding |
+| Plan | shared-plan | Break into verifiable tasks |
 | Build | external-research | Verify against official docs before implementing |
 | Build | critical-thinking | Adversarial fresh-context review of every non-trivial decision |
-| Build | context-engineering | Right context at the right time |
-| Build | frontend-ui-engineering | Production-quality UI with accessibility |
 | Build | architecture-review | Stable interfaces with clear contracts |
 | Verify | test-driven-development | Failing test first, then make it pass |
 | Verify | debugging | Reproduce → localize → fix → guard |
@@ -174,4 +168,3 @@ Not every task needs every skill. A bug fix might only need: debugging → test-
 | Review | performance-investigation | Measure first, optimize only what matters |
 | Ship | git-workflow-and-versioning | Atomic commits, clean history |
 | Ship | ci-cd-and-automation | Automated quality gates on every change |
-| Ship | observability-and-instrumentation | Structured logs, RED metrics, traces, symptom-based alerts |

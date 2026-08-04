@@ -44,7 +44,7 @@ Look for the originating spec, in this order:
 Anything in the repo that documents how code should be written, such as `CODING_STANDARDS.md` or `CONTRIBUTING.md`, or the existing skills themselves. **The default standards-source set the Standards sub-agent should always receive, in addition to whatever the repo documents:**
 
 - `methodology/review-methodology` — the multi-axis review rubric covering correctness, readability, architecture, security, and performance. **Include this by default** so the Standards axis doesn't miss any of those dimensions when the repo's own standards doc is silent on one of them.
-- `engineering/architecture-review`, `engineering/frontend-ui-engineering`, `troubleshooting/performance-investigation`, `engineering/security-and-hardening` — module-shape and cross-cutting concerns.
+- `engineering/architecture-review`, `troubleshooting/performance-investigation`, `engineering/security-and-hardening` — module-shape and cross-cutting concerns.
 - `behavior/minimalist`, `methodology/codehome`, `methodology/refactoring` — simplification and placement rules.
 
 On top of whatever the repo documents, the Standards axis always carries the **smell baseline** below — a fixed set of Fowler code smells (_Refactoring_, ch.3) that applies even when a repo documents nothing. Two rules bind it:
