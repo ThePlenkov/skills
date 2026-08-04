@@ -27,13 +27,13 @@
       "name": "methodology",
       "source": "./",
       "skills": ["./skills/methodology"],
-      "description": "Development methodology (SDD, TDD, modern-stack, external-tools, loop programming, review-methodology, investigate-first, one-shot-patch, minimal-root-cause, dep-cost, reuse-first, refactoring)"
+      "description": "Development methodology (SDD, TDD, modern-stack, source/doubt-driven dev, code simplification, loop programming, external-tools)"
     },
     {
       "name": "engineering",
       "source": "./",
       "skills": ["./skills/engineering"],
-      "description": "Cross-cutting engineering practices (architecture review, frontend UI engineering, nodejs, typescript, bootstrap-ts-repo, prototype-driven design, security and hardening)"
+      "description": "Cross-cutting engineering practices (architecture review, nodejs, typescript, bootstrap-ts-repo, prototype-driven design, security and hardening)"
     },
     {
       "name": "verification",

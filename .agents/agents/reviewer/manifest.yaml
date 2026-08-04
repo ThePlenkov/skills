@@ -17,7 +17,6 @@ required:
 optional:
   - harvest
   - retrospect
-  - context-engineering
   - investigate-first
   - drill
 forbidden:
@@ -29,4 +28,3 @@ forbidden:
   - act
   - github-fix-main
   - triage-issue
-  - incremental-implementation

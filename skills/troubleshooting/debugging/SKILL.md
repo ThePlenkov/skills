@@ -203,3 +203,7 @@ Stop and report blocked if:
 - $skill{one-shot-patch} — switch to it once the fix hypothesis is known.
 - $skill{evidence} — record the run that proves the fix.
 - $skill{performance-investigation} — switch when the symptom is "too slow" rather than "wrong."
+
+## See Also
+
+- `references/observability-checklist.md` — instrument production code so failures become queryable.

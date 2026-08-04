@@ -56,7 +56,7 @@ PR (out of scope here) to call out the mirror and the routing rule.
 | `tdd` | `methodology/test-driven-development` already covers the same ground; the anti-pattern section (tautological / implementation-coupled / horizontal slicing) is the borrow candidate (see below). |
 | `diagnosing-bugs` | `troubleshooting/debugging` already covers the 4-phase methodology; the "tight feedback loop / red-capable" framing is the borrow candidate (see below). |
 | `code-review` | Renamed to `two-axis-review` (above) to avoid name collision. |
-| `to-spec` / `to-tickets` / `implement` | Duplicates the SDD chain we already have (`methodology/sdd/spec-driven-development` + `workflow/planning/planning-and-task-breakdown` + `methodology/incremental-implementation`). |
+| `to-spec` / `to-tickets` / `implement` | Duplicates the SDD chain we already have (`methodology/sdd/spec-driven-development` + `workflow/planning/planning-and-task-breakdown` + `methodology/test-driven-development`). |
 | `codebase-design` | Vocab (module, depth, seam, leverage, locality) is excellent but the existing `engineering/architecture-review` covers the surface. Borrow vocab into a shared reference doc, not a new skill. |
 | `domain-modeling` | `workflow/documentation-and-adrs` already covers ADR discipline. The glossary-side "active sharpening" concept is a borrow candidate. |
 | `improve-codebase-architecture` | `behavior/architecture-review` is broader. |

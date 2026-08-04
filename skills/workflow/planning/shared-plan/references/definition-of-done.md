@@ -1,6 +1,6 @@
 # Definition of Done
 
-A standing, project-wide bar that every change must clear before it counts as done. Unlike acceptance criteria, which vary per task and answer "did we build the right thing?", the Definition of Done is the same every time and answers "is this finished to our standard?". Use it as the final gate during planning, implementation, and shipping.
+A standing, project-wide bar that every change must clear before it counts as done. Unlike acceptance criteria, which vary per task and answer "did we build the right thing?", the Definition of Done is the same every time and answers "is this finished to our standard?". Use it as the final gate in $skill{shared-plan} and any shipping workflow.
 
 ## Definition of Done vs. Acceptance Criteria
 
@@ -41,12 +41,12 @@ The depth behind these items lives in $skill{review-methodology} (the five-axis 
 
 ### Documentation
 - [ ] Public interfaces, APIs, and user-facing behavior are documented
-- [ ] Architectural decisions worth preserving are recorded
+- [ ] Architectural decisions worth preserving are recorded (see documentation and ADRs)
 - [ ] Documentation describes the current state in timeless language, not the change history
 
 ### Ship-readiness
 - [ ] Security implications reviewed for any untrusted input, auth, or data handling (see $skill{security-and-hardening})
-- [ ] Observability in place for new critical paths (logs, metrics, traces) (see $skill{observability-and-instrumentation})
+- [ ] Observability in place for new critical paths (logs, metrics, traces) (see $skill{debugging})
 - [ ] Rollback path exists for anything risky
 - [ ] The human has reviewed and approved before merge or deploy
 
@@ -54,7 +54,7 @@ The depth behind these items lives in $skill{review-methodology} (the five-axis 
 
 - **Per task**: confirm the Correctness and Quality sections before checking the task off.
 - **Per feature**: confirm Integration and Documentation before considering the feature complete.
-- **Per release**: the full checklist is the floor; add deploy-specific gates (pre-launch checks, monitoring, rollback plan) on top.
+- **Per release**: the full checklist is the floor; add deploy-specific gates on top.
 
 Tailor the list to the project once, then reuse it unchanged. A Definition of Done that is renegotiated every sprint is not a Definition of Done.
 

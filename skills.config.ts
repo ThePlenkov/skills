@@ -124,14 +124,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "context-engineering": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
   "critical-thinking": {
     frontmatter: {
       metadata: {
@@ -256,14 +248,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "frontend-ui-engineering": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
   "git-commit": {
     frontmatter: {
       metadata: {
@@ -361,15 +345,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "incremental-implementation": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-        "conflicts_with": ["loop-programming"],
-      },
-    },
-  },
   "interview-me": {
     frontmatter: {
       metadata: {
@@ -396,8 +371,7 @@ export const skillMetadata: Record<string, SkillMetadata> = {
         "allowed-tools": "read, grep, glob, edit, write, exec",
         "argument-hint": "<goal plus validators, e.g. \"fix auth tests; npm test -- auth\">",
         "tier": 2,
-        "triggers": ["user", "model"],
-        "conflicts_with": ["incremental-implementation"]
+        "triggers": ["user", "model"]
       },
     },
   },
@@ -446,14 +420,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
           "network": "registry.npmjs.org",
           "scope": "packages explicitly opted in via `npm publish` from a clean checkout"
         },
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
-  "observability-and-instrumentation": {
-    frontmatter: {
-      metadata: {
         "tier": 2,
         "triggers": ["user", "model"],
       },

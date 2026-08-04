@@ -344,6 +344,8 @@ This separation ensures the test is written without knowledge of the fix, making
 
 For detailed testing patterns, examples, and anti-patterns across frameworks, see `references/testing-patterns.md`.
 
+For incremental slicing and task-sizing strategies, see `references/incremental-slices.md`.
+
 ## Common Rationalizations
 
 | Rationalization | Reality |

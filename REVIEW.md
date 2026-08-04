@@ -126,4 +126,4 @@ one-line tally by severity, then the findings.
 Close with prevention and automation proposals aggregated so they can be
 harvested into the project backlog rather than lost in a thread.
 
-Long-form principles: `$skill{two-axis-review}`, `$skill{security-and-hardening}`, `$skill{architecture-review}`, `$skill{evidence}`, `$skill{context-engineering}`, `$skill{critical-thinking}`, `$skill{retrospect}`, `$skill{loop-programming}`, `$skill{modern-stack}`, and `$skill{harvest}`.
+Long-form principles: `$skill{two-axis-review}`, `$skill{security-and-hardening}`, `$skill{architecture-review}`, `$skill{evidence}`, `$skill{critical-thinking}`, `$skill{retrospect}`, `$skill{loop-programming}`, `$skill{modern-stack}`, and `$skill{harvest}`.
