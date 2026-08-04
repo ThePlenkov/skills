@@ -199,8 +199,8 @@ A handoff that the next agent can pick up cold usually has:
    issues when they exist; never restate their content.
 4. **Open questions / next actions** — what the next session should do first.
 5. **Suggested skills** — short list of skills the next session should consult
-   (for example `$shared-plan` if work spans agents, `$evidence` if a claim must
-   be proven, `$skill{code-review-and-quality}` before a merge).
+   (for example `shared-plan` if work spans agents, `evidence` if a claim must
+   be proven, `review-methodology` before a merge).
 6. **Constraints** — secrets locations (redacted), tool versions, environment
    quirks the next session will trip over otherwise, and that the handoff is
    scoped to the same machine and user account.
@@ -211,7 +211,4 @@ For durable cross-work preservation across machines or a self-contained handoff 
 
 ## Related skills
 
-- `$skill{shared-plan}` — when the next session is one of many agents continuing
-  a long plan.
-- `$skill{unwind}` — collapse a solved subtask into the parent plan instead of
-  forking a new session.
+See [related-skills.md](references/related-skills.md) for the full cross-reference list.
