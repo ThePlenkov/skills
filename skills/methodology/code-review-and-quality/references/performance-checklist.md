@@ -1,6 +1,6 @@
 # Performance Checklist
 
-Quick reference checklist for web application performance. Use alongside the $skill{performance-optimization} skill.
+Quick reference checklist for web application performance. Use alongside the $skill{performance-investigation} skill.
 
 ## Table of Contents
 

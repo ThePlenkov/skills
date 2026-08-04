@@ -10,12 +10,12 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `behavior` | Evidence, code quality, and critical thinking | `critical-thinking`, `minimalist` |
 | `coaching` | User guidance and focus support | `adhd`, `idea-refine`, `interview-me` |
 | `code-review` | PR/MR review and remediation | `act`, `github-fix-main`, `github-pr-review`, `triage-issue`, `two-axis-review` |
-| `engineering` | Cross-cutting engineering practices (API/UI design, performance, security) | `api-and-interface-design`, `architecture-review`, `bootstrap-ts-repo`, `frontend-ui-engineering`, `nodejs`, `performance-optimization`, `prototype`, `security-and-hardening`, `typescript` |
+| `engineering` | Cross-cutting engineering practices (frontend, nodejs/typescript, bootstrap-ts-repo, prototype, security) | `architecture-review`, `bootstrap-ts-repo`, `frontend-ui-engineering`, `nodejs`, `prototype`, `security-and-hardening`, `typescript` |
 | `experimentation` | Sandboxed experimentation | `sandboxed` |
 | `foundation` | Always-on behavioral primitives and activation tiers | `persistent-memory`, `skill-tiers`, `token-rationalism` |
 | `integrations` | External platform connectors | `bootstrap-gh-self-hosted-runner`, `codacy`, `codescene`, `gitlab-ci-local`, `glean`, `sourcegraph` |
-| `methodology` | Development methodology | `code-review-and-quality`, `code-simplification`, `codehome`, `context-engineering`, `dep-cost`, `doubt-driven-development`, `external-tools`, `incremental-implementation`, `investigate-first`, `loop-programming`, `minimal-root-cause`, `modern-stack`, `observability-and-instrumentation`, `one-shot-patch`, `refactoring`, `repository-onboarding`, `reuse-first`, `review-methodology`, `source-driven-development`, `spec-driven-development`, `test-driven-development` |
-| `orchestration` | Agent coordination, isolation, context management, and skill discovery | `handoff`, `save-session`, `subagent-capsule`, `unwind`, `using-agent-skills` |
+| `methodology` | Development methodology | `code-review-and-quality`, `code-simplification`, `codehome`, `context-engineering`, `dep-cost`, `doubt-driven-development`, `external-tools`, `incremental-implementation`, `investigate-first`, `loop-programming`, `minimal-root-cause`, `modern-stack`, `observability-and-instrumentation`, `one-shot-patch`, `refactoring`, `repository-onboarding`, `reuse-first`, `review-methodology`, `spec-driven-development`, `test-driven-development` |
+| `orchestration` | Agent coordination, isolation, context management, and skill discovery | `handoff`, `subagent-capsule`, `unwind`, `using-agent-skills` |
 | `research` | Codebase analysis and documentation tools | `deepwiki`, `external-research` |
 | `safety` | Destructive operation protection and recovery | `drill`, `safeguard`, `salvage` |
 | `self-learning` | Retrospective learning and skill-improvement feedback | `retrospect`, `skill-feedback` |
@@ -40,12 +40,10 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `github-pr-review` | `code-review` | 2 | user, model | `$skill{code-review-and-quality}` | — |
 | `triage-issue` | `code-review` | 2 | user, model | — | — |
 | `two-axis-review` | `code-review` | 2 | user, model | `$skill{github-pr-review}`, `$skill{code-review-and-quality}` | — |
-| `api-and-interface-design` | `engineering` | 2 | user, model | — | — |
 | `architecture-review` | `engineering` | 2 | user, model | — | — |
 | `bootstrap-ts-repo` | `engineering` | 2 | user, model | — | — |
 | `frontend-ui-engineering` | `engineering` | 2 | user, model | — | — |
 | `nodejs` | `engineering` | 2 | user, model | — | — |
-| `performance-optimization` | `engineering` | 2 | user, model | — | — |
 | `prototype` | `engineering` | 2 | user, model | — | — |
 | `security-and-hardening` | `engineering` | 2 | user, model | — | — |
 | `typescript` | `engineering` | 2 | user, model | — | — |
@@ -77,11 +75,9 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `repository-onboarding` | `methodology` | 2 | user, model | — | — |
 | `reuse-first` | `methodology` | 2 | user, model | — | — |
 | `review-methodology` | `methodology` | 2 | user, model | — | — |
-| `source-driven-development` | `methodology` | 2 | user, model | — | — |
 | `spec-driven-development` | `methodology` | 2 | user, model | — | — |
 | `test-driven-development` | `methodology` | 2 | user, model | — | — |
 | `handoff` | `orchestration` | 2 | user, model | — | — |
-| `save-session` | `orchestration` | 2 | user, model | — | — |
 | `subagent-capsule` | `orchestration` | 2 | user, model | — | — |
 | `unwind` | `orchestration` | 2 | user, model | — | — |
 | `using-agent-skills` | `orchestration` | 2 | user, model | — | — |

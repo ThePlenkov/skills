@@ -93,6 +93,7 @@ above before any local work.
 | [`references/catalog.md`](references/catalog.md) | The full catalog — Tier A through E with "first try / fallback" per engine |
 | [`references/decision-tree.md`](references/decision-tree.md) | Full decision tree + use-case table |
 | [`references/deepwiki-mcp.md`](references/deepwiki-mcp.md) | "How to use DeepWiki MCP" — three ways in, common pitfalls, scope discipline |
+| [`references/source-verification.md`](references/source-verification.md) | Verifying framework-specific implementation decisions against official documentation |
 
 ## Related skills
 

@@ -1,7 +1,0 @@
-interface:
-  display_name: "Save Session"
-  short_description: "Help with Save Session tasks and workflows"
-  brand_color: "#3B82F6"
-  default_prompt: "Use $save-session to get started."
-policy:
-  allow_implicit_invocation: true

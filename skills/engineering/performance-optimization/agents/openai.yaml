@@ -1,5 +1,0 @@
-interface:
-  display_name: "Performance Optimization"
-  short_description: "Help with Performance Optimization"
-  brand_color: "#3B82F6"
-  default_prompt: "Use $performance-optimization to get started."

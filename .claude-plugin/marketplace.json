@@ -33,7 +33,7 @@
       "name": "engineering",
       "source": "./",
       "skills": ["./skills/engineering"],
-      "description": "Cross-cutting engineering practices (API and interface design, architecture review, frontend UI engineering, nodejs, typescript, bootstrap-ts-repo, performance optimization, prototype-driven design, security and hardening)"
+      "description": "Cross-cutting engineering practices (architecture review, frontend UI engineering, nodejs, typescript, bootstrap-ts-repo, prototype-driven design, security and hardening)"
     },
     {
       "name": "verification",

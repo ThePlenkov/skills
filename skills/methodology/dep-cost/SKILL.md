@@ -9,7 +9,7 @@ metadata:
 
 # dep-cost
 
-**When to use:** you are about to add a new dependency, or you are reviewing an existing one and suspect it is heavier than the use case justifies. Not a security audit (`$skill{security-and-hardening}`), not a perf review of the whole app (`$skill{performance-optimization}`), not a "is this the right version" check (`$skill{modern-stack}`) — those are siblings, see Cross-references.
+**When to use:** you are about to add a new dependency, or you are reviewing an existing one and suspect it is heavier than the use case justifies. Not a security audit (`$skill{security-and-hardening}`), not a perf review of the whole app (`$skill{performance-investigation}`), not a "is this the right version" check (`$skill{modern-stack}`) — those are siblings, see Cross-references.
 
 ## The principle
 
@@ -93,7 +93,7 @@ Before deciding, look at the dep's own health:
 
 - Not a security audit. For CVE / supply-chain risk, hand to `$skill{security-and-hardening}`.
 - Not a version-bump check. For "is this the latest line", hand to `$skill{modern-stack}`.
-- Not a "is the bundle small" optimization. For overall app perf, hand to `$skill{performance-optimization}`.
+- Not a "is the bundle small" optimization. For overall app perf, hand to `$skill{performance-investigation}`.
 - Not a license review. For license compatibility, see SPDX / ScanCode / `license-checker`.
 
 ## Cross-references
@@ -104,7 +104,7 @@ This skill is an orchestrator. Load the cited skills too, plus `$subagents-setup
 - **`$skill{reuse-first}`** (Tier 2, sibling) — finds candidates; this one judges whether to keep them
 - **`$skill{modern-stack}`** (Tier 2) — checks current supported version line for the dep
 - **`$skill{security-and-hardening}`** (Tier 2) — CVE and supply-chain surface of the dep
-- **`$skill{performance-optimization}`** (Tier 2) — overall app perf, of which deps are one input
+- **`$skill{performance-investigation}`** (Tier 2) — overall app perf, of which deps are one input
 - **`$skill{evidence}`** (Tier 2) — every claim in this skill must be backed by a measurement, not a hunch
 - **Deprecation planning** — when the dep is unmaintained and you need to plan the exit, document the migration strategy and timeline
 - **`$skill{minimal-root-cause}`** (Tier 2) — the philosophy this operationalizes

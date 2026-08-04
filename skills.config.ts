@@ -34,14 +34,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "api-and-interface-design": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
   "architecture-review": {
     frontmatter: {
       metadata: {
@@ -513,14 +505,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "performance-optimization": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
   "persistent-memory": {
     frontmatter: {
       metadata: {
@@ -649,18 +633,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "save-session": {
-    frontmatter: {
-      metadata: {
-        "tags": ["productivity", "workflow", "persistence", "handoff"],
-        "author": "codex",
-        "version": "1.0.0",
-        "tier": 2,
-        "triggers": ["user", "model"],
-        "disable-model-invocation": false,
-      },
-    },
-  },
   "security-and-hardening": {
     frontmatter: {
       metadata: {
@@ -713,14 +685,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
     },
   },
   "skills-cli": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
-  "source-driven-development": {
     frontmatter: {
       metadata: {
         "tier": 2,
