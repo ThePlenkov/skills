@@ -77,7 +77,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `review-methodology` | `methodology` | 2 | user, model | — | — |
 | `spec-driven-development` | `methodology` | 2 | user, model | — | — |
 | `test-driven-development` | `methodology` | 2 | user, model | — | — |
-| `handoff` | `orchestration` | 2 | user, model | — | — |
+| `handoff` | `orchestration` | 2 | user | — | — |
 | `subagent-capsule` | `orchestration` | 2 | user, model | — | — |
 | `unwind` | `orchestration` | 2 | user, model | — | — |
 | `using-agent-skills` | `orchestration` | 2 | user, model | — | — |
