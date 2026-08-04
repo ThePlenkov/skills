@@ -24,12 +24,12 @@ and ask: "is there a native search engine or chat tool that
 already has this data?"** The catalog (Sourcegraph Deep Search,
 Glean, Rovo, Perplexity, DeepWiki, GitHub code search, Jira,
 Confluence, package registries) is in
-`$skill{external-research}`. The hard rule: if an engine has
+`external-research`. The hard rule: if an engine has
 the answer, the query costs a few hundred tokens. If you skip
 the check, you burn 5–50× more tokens on a worse answer.
 
 This rule applies to **foreign** code and data. For the current
-project's own code, use `$skill{investigate-first}` — local search is
+project's own code, use `investigate-first` — local search is
 the right default there.
 
 This rule is the **primary** mechanism by which the rest of
@@ -139,13 +139,13 @@ Heuristic: if the cost of being wrong significantly exceeds the cost of extra to
 
 ## Rule 8: Reuse before write
 
-Before adding a new function, utility, or module, run `$skill{reuse-first}`. It searches the local codebase (`rg`, `ast-grep`) and the open-source ecosystem (`gh search`, DeepWiki, Sourcegraph.com) for existing solutions. Write new code only when no suitable candidate exists or a candidate is rejected by `$skill{dep-cost}`.
+Before adding a new function, utility, or module, run `reuse-first`. It searches the local codebase (`rg`, `ast-grep`) and the open-source ecosystem (`gh search`, DeepWiki, Sourcegraph.com) for existing solutions. Write new code only when no suitable candidate exists or a candidate is rejected by `dep-cost`.
 
-When `$skill{reuse-first}` surfaces an existing library, run `$skill{dep-cost}` to decide whether the dep is worth its weight for the surface actually used. The default reflex — "just add it, it's on npm" — has made the median JS bundle 10x heavier than it needs to be.
+When `reuse-first` surfaces an existing library, run `dep-cost` to decide whether the dep is worth its weight for the surface actually used. The default reflex — "just add it, it's on npm" — has made the median JS bundle 10x heavier than it needs to be.
 
 The cheapest code is the code that already exists and is already paid for. The most expensive code is the new code that duplicates existing code, because you pay it forever (maintenance) and forget why you wrote it (knowledge debt).
 
-Companion skills: `$skill{reuse-first}` (find candidates), `$skill{dep-cost}` (judge candidates), `$skill{minimal-root-cause}` (the underlying philosophy).
+Companion skills: `reuse-first` (find candidates), `dep-cost` (judge candidates), `minimal-root-cause` (the underlying philosophy).
 
 Failure mode this prevents: agents writing impressive-looking code that duplicates existing local helpers or well-maintained libraries, inflating the maintainable code base for no value.
 
@@ -159,7 +159,7 @@ Failure mode this prevents: agents writing impressive-looking code that duplicat
 4. Am I about to ask a clarifying question? → Can I infer? Yes: infer. Truly blocking? No: proceed with assumption.
 5. Does this warrant deeper reasoning? → High stakes / ambiguous / architectural: invest. Routine / clear / low-risk: be concise.
 6. Is my planned output longer than needed? → cut everything that doesn't add information.
-7. **Am I about to read a foreign file / clone a repo / grep across repos / web-search an external thing?** → **Run the two-token decision in `$skill{external-research}`. Search first.** If the answer is in a native engine (Sourcegraph, DeepWiki, Glean, Rovo, Perplexity, GitHub, registry), use it. If it isn't, then fall through to local work.
+7. **Am I about to read a foreign file / clone a repo / grep across repos / web-search an external thing?** → **Run the two-token decision in `external-research`. Search first.** If the answer is in a native engine (Sourcegraph, DeepWiki, Glean, Rovo, Perplexity, GitHub, registry), use it. If it isn't, then fall through to local work.
 
 ---
 
@@ -170,3 +170,7 @@ See [`references/examples.md`](./references/examples.md) for worked examples of:
 - Targeted edits vs full rewrites
 - Documentation rejection cases
 - Format selection in practice
+
+## Related skills
+
+See [related-skills.md](references/related-skills.md) for cross-references that are loaded on demand.
