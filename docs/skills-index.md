@@ -9,7 +9,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-skills-inde
 - **Skills metadata budget (2%):** 2,560 tokens
 - **Total description tokens:** 6,491 tokens
 - **Overflow vs. 2% budget:** 2.54x
-- **Total skill file tokens:** 173,035 tokens
+- **Total skill file tokens:** 172,967 tokens
 
 Token counts use the same approximation Codex uses for its skills context budget: `ceil(byte_length / 4)`.
 
@@ -26,7 +26,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | foundation | 4 | 320 | 8,427 |
 | integrations | 6 | 271 | 8,563 |
 | methodology | 24 | 1,716 | 49,015 |
-| orchestration | 5 | 366 | 9,501 |
+| orchestration | 5 | 366 | 9,433 |
 | research | 2 | 170 | 3,096 |
 | safety | 3 | 224 | 4,146 |
 | self-learning | 2 | 167 | 3,575 |
@@ -97,7 +97,7 @@ Token counts use the same approximation Codex uses for its skills context budget
 | [`save-session`](skills/orchestration/save-session/SKILL.md) | orchestration | 2 | yes | 51 | 2,421 | user, model | yes | yes |
 | [`subagent-capsule`](skills/orchestration/subagent-capsule/SKILL.md) | orchestration | 2 | yes | 79 | 518 | user, model | yes | yes |
 | [`unwind`](skills/orchestration/unwind/SKILL.md) | orchestration | 2 | yes | 90 | 969 | user, model | yes | yes |
-| [`using-agent-skills`](skills/orchestration/using-agent-skills/SKILL.md) | orchestration | 2 | yes | 55 | 2,584 | user, model | yes | yes |
+| [`using-agent-skills`](skills/orchestration/using-agent-skills/SKILL.md) | orchestration | 2 | yes | 55 | 2,516 | user, model | yes | yes |
 | [`deepwiki`](skills/research/deepwiki/SKILL.md) | research | 2 | yes | 57 | 1,759 | user, model | yes | yes |
 | [`external-research`](skills/research/external-research/SKILL.md) | research | 2 | yes | 113 | 1,337 | user, model | yes | yes |
 | [`drill`](skills/safety/drill/SKILL.md) | safety | 2 | yes | 52 | 2,052 | user, model | yes | yes |
