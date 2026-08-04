@@ -37,7 +37,7 @@ task tracking when available.
 ### Harness loop (fallback)
 
 When the runtime cannot execute tools natively, drive the loop through
-`scripts/run_loop.py`:
+[`references/run_loop.py`](references/run_loop.py):
 
 - `--dry-run` validates and prints the loop contract without touching
   the repository.
@@ -55,7 +55,7 @@ When the runtime cannot execute tools natively, drive the loop through
   capabilities to runtime-specific tools.
 - `references/safety-policy.md` — read before executing shell
   commands or modifying a repository.
-- `scripts/run_loop.py` — canonical harness entrypoint when executable
+- [`references/run_loop.py`](references/run_loop.py) — canonical harness entrypoint when executable
   scripts are supported.
 
 ## Initialize the loop
