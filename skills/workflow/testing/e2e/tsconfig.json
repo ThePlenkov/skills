@@ -15,6 +15,6 @@
     "sourceMap": true,
     "types": ["node"]
   },
-  "include": ["cli.ts", "scripts/framework/**/*.ts"],
-  "exclude": ["scripts/framework/*.test.ts", "**/*.test.ts"]
+  "include": ["cli.ts", "references/scripts/framework/**/*.ts"],
+  "exclude": ["references/scripts/framework/*.test.ts", "**/*.test.ts"]
 }

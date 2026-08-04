@@ -4,7 +4,7 @@
 
 ## Public surface
 
-Agents and operators use **only** the `e2e-agent` CLI (or `bun run e2e` alias in a consuming repo). Internal modules under `scripts/framework/` are not part of the agent contract.
+Agents and operators use **only** the `e2e-agent` CLI (or `bun run e2e` alias in a consuming repo). Internal modules under `references/scripts/framework/` are not part of the agent contract.
 
 ```bash
 e2e-agent list [--config <path>] [suite]
@@ -136,4 +136,4 @@ On `/e2e <code> [params]`:
 2. Read exit code and `E2E_EVIDENCE_FILE`
 3. Report PASS/FAIL, Given/When/Then, assertion highlights
 
-Do **not** import `scripts/framework/*`. Do **not** generate per-scenario runner scripts.
+Do **not** import `references/scripts/framework/*`. Do **not** generate per-scenario runner scripts.
