@@ -24,13 +24,16 @@ or every `/act` invocation. Triggers are: PR merge, post-PR-CI, manual dispatch.
 | Path | Purpose |
 | ---- | ------- |
 | `SKILL.md` | This file |
-| `scripts/` | `harvest-threads.ts`, `harvest-debt-batch.ts`, `resolve-harvest-prs.ts`, `resolve-harvest-target.ts`, `land-harvest-files.sh`, `archive-harvest.ts`, `harvest-cli.ts`, `review-debt-{lib,gh,text}.ts` |
-| `references/` | (reserved) |
+| `scripts/` | Lazy pointer to `references/scripts/` (backward-compatible symlink) |
+| `references/scripts/` | `harvest-threads.ts`, `harvest-debt-batch.ts`, `resolve-harvest-prs.ts`, `resolve-harvest-target.ts`, `land-harvest-files.sh`, `archive-harvest.ts`, `harvest-cli.ts`, `review-debt-{lib,gh,text}.ts` |
+| `references/related-skills.md` | Related skills (`act`, `backlog`) |
 
 The shared ledger types/helpers (`review-debt-lib.ts`, `review-debt-gh.ts`,
-`review-debt-text.ts`) live here because they describe the harvest format.
-`/act` (`query-debt.ts`, `plan-debt-batch.ts`, `update-debt-status.ts`) imports
-them through a relative path; `/backlog` does the same.
+`review-debt-text.ts`) live in `references/scripts/` because they describe the
+harvest format. `/act` (`query-debt.ts`, `plan-debt-batch.ts`, `update-debt-status.ts`)
+imports them through a relative path; `/backlog` does the same. The `scripts/`
+entry is a symlink kept for existing consumers (`bun .agents/skills/harvest/scripts/...`,
+`.github/workflows/review-debt-harvest.yml`, root `package.json` `harvest:*` targets).
 
 ## Files produced
 
@@ -90,7 +93,7 @@ bun run harvest:test
 
 ## Row schema
 
-`DebtRecord` is the source of truth — see `scripts/review-debt-lib.ts:53-77`.
+`DebtRecord` is the source of truth — see `references/scripts/review-debt-lib.ts:53-77`.
 Highlights: `thread_id`, `thread_url`, `status: open|claimed|done|wontfix|duplicate`,
 `priority: blocking|human|nit|scan|noise`, `needs: code_change|reply_only|skip`,
 `source_pr`, `fingerprint` (sha256 of `body|path` — same nit across PRs collapses
@@ -166,8 +169,8 @@ that's a contract violation. The reverse (other skills importing `/harvest`'s
 ## Move to another repo
 
 Copy the harvest skill directory and `.agents/review-debt/`. The other skills
-(`$act`, `$backlog`) only depend on `scripts/review-debt-{lib,gh,text}.ts` via
-relative import — relocating `/harvest` relocates those transitively.
+(`$act`, `$backlog`) only depend on `references/scripts/review-debt-{lib,gh,text}.ts`
+via relative import — relocating `/harvest` relocates those transitively.
 
 ## Validation
 
