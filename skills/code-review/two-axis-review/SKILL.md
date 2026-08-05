@@ -108,4 +108,4 @@ Reporting them separately stops one axis from masking the other.
 - $skill{shared-plan} — when a review reveals a multi-step follow-up (refactor, ADR, or split-PR plan), feed it into the active shared plan rather than the PR thread.
 - $skill{github-pr-review} — single-axis, GitHub-aware review writer; use when you only need one axis or are posting back to a PR.
 - $skill{act} — when the review findings are ready to be turned into per-thread fixes and resolved on GitHub or GitLab.
-- $skill{architecture-review} / $skill{minimalist} / $skill{codehome} — concrete standards to feed the Standards sub-agent.
+- $skill{architecture-review} / $skill{minimalist} / $skill{codehome} — concrete standards to feed the Standards sub-agent p

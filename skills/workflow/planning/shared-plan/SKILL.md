@@ -83,3 +83,7 @@ Completed work should be moved to changelogs.
 - If you used sources, list them in `Decisions`.
 - Keep entries short and easy to scan.
 - Answer direct user questions explicitly before applying structural doc changes.
+
+## See Also
+
+- `references/definition-of-done.md` — the project-wide bar every change must clear before it counts as done.

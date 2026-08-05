@@ -1,6 +1,6 @@
 # Observability Checklist
 
-Quick reference for instrumenting production code. Use alongside the $skill{observability-and-instrumentation} skill.
+Quick reference for instrumenting production code. Use alongside the $skill{debugging} skill when building or diagnosing production services.
 
 ## Table of Contents
 

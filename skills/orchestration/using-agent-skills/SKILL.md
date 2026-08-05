@@ -103,7 +103,7 @@ Your job is surgical precision, not unsolicited renovation.
 
 Every skill includes a verification step. A task is not complete until verification passes. "Seems right" is never sufficient — there must be evidence (passing tests, build output, runtime data).
 
-Per-skill verification is the local check. The project-wide bar that applies to *every* change, regardless of which skill is active, is the Definition of Done: tests pass, no regressions, behavior verified at runtime, docs updated. See `references/definition-of-done.md`. It complements each task's acceptance criteria rather than replacing them.
+Per-skill verification is the local check. The project-wide bar that applies to *every* change, regardless of which skill is active, is the Definition of Done: tests pass, no regressions, behavior verified at runtime, docs updated. See `skills/workflow/planning/shared-plan/references/definition-of-done.md`. It complements each task's acceptance criteria rather than replacing them.
 
 ## Failure Modes to Avoid
 
@@ -138,13 +138,12 @@ For a complete feature, the typical skill sequence is:
 1.  interview-me                → Extract what the user actually wants
 2.  idea-refine                 → Refine vague ideas
 3.  spec-driven-development     → Define what we're building
-4.  shared-plan                 → Break into verifiable tasks
-5.  external-research   → Verify against official docs
-6.  test-driven-development     → Prove each slice works
-7.  critical-thinking    → Cross-examine non-trivial decisions in-flight
-8.  review-methodology     → Review before merge
-9.  minimalist         → Reduce unnecessary complexity while preserving behavior
-10. git-workflow-and-versioning → Clean commit history
+4.  external-research   → Verify against official docs
+5.  test-driven-development     → Prove each slice works
+6.  critical-thinking    → Cross-examine non-trivial decisions in-flight
+7.  review-methodology     → Review before merge
+8.  minimalist         → Reduce unnecessary complexity while preserving behavior
+9.  git-workflow-and-versioning → Clean commit history
 ```
 
 Not every task needs every skill. A bug fix might only need: debugging → test-driven-development → review-methodology.
@@ -156,7 +155,6 @@ Not every task needs every skill. A bug fix might only need: debugging → test-
 | Define | interview-me | Surface what the user actually wants before any plan, spec, or code exists |
 | Define | idea-refine | Refine ideas through structured divergent and convergent thinking |
 | Define | spec-driven-development | Requirements and acceptance criteria before code |
-| Plan | shared-plan | Break into verifiable tasks |
 | Build | external-research | Verify against official docs before implementing |
 | Build | critical-thinking | Adversarial fresh-context review of every non-trivial decision |
 | Build | architecture-review | Stable interfaces with clear contracts |
