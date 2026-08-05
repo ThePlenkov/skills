@@ -13,7 +13,7 @@ metadata:
   tier: 2
   triggers:
     - user
-    - model
+  disable-model-invocation: true
   source: ThePlenkov/skills
 source: ThePlenkov/skills
 ---
@@ -148,7 +148,7 @@ During post-drill:
 
 1. **Merge** `prevention_plan` entries from the root drill and all nested drills.
 2. **Dedupe** by `sink` + `action` and keep the most specific `evidence`.
-3. Invoke `$skill{retrospect}` once with the merged plan; it routes each remaining action to the correct resource.
+3. Invoke `retrospect` once with the merged plan; it routes each remaining action to the correct resource.
 
 If the merged prevention plan is empty and the drill encountered a non-trivial issue, the parent agent must still retrospect to discover why the plan was missed.
 
@@ -156,10 +156,6 @@ Nested drills do not run post-drill; they only produce and propagate their plans
 
 ## Cross-references
 
-- `$skill{investigate-first}` — narrow scope before editing.
-- `$skill{unwind}` — expand scope by collapsing solved branches.
-- `$skill{retrospect}` — capture learnings from mistakes.
-- `$skill{backlog}` — track actionable follow-up work.
-- `$skill{persistent-memory}` — persistent knowledge across sessions.
+See [related-skills.md](references/related-skills.md) for the full cross-reference list.
 
 For templates, frontmatter fields, full example workflows, validation rules, scope rules, error handling, state machine, merge/trace policies, and recommended defaults — see [references/templates.md](references/templates.md) and [references/troubleshooting.md](references/troubleshooting.md).
