@@ -269,7 +269,8 @@ export const skillMetadata: Record<string, SkillMetadata> = {
     frontmatter: {
       metadata: {
         "tier": 2,
-        "triggers": ["user", "model"],
+        "disable-model-invocation": true,
+        "triggers": ["user"],
       },
     },
   },
@@ -277,7 +278,8 @@ export const skillMetadata: Record<string, SkillMetadata> = {
     frontmatter: {
       metadata: {
         "tier": 2,
-        "triggers": ["user", "model"],
+        "disable-model-invocation": true,
+        "triggers": ["user"],
         "conflicts_with": ["review-methodology"],
       },
     },
@@ -676,7 +678,8 @@ export const skillMetadata: Record<string, SkillMetadata> = {
     frontmatter: {
       metadata: {
         "tier": 2,
-        "triggers": ["user", "model"],
+        "disable-model-invocation": true,
+        "triggers": ["user"],
       },
     },
   },
@@ -698,8 +701,9 @@ export const skillMetadata: Record<string, SkillMetadata> = {
         "allowed-tools": "read, grep, glob, exec, run_subagent",
         "argument-hint": "<fixed-point ref, e.g. \"main\", \"HEAD~5\", \"abc1234\">",
         "tier": 2,
-        "triggers": ["user", "model"],
-        "conflicts_with": ["github-pr-review", "review-methodology"],
+        "disable-model-invocation": true,
+        "triggers": ["user"],
+        "conflicts_with": ["github-pr-review", "act", "review-methodology"],
       },
     },
   },

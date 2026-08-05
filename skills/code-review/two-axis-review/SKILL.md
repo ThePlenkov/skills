@@ -1,6 +1,6 @@
 ---
 name: two-axis-review
-description: Review the changes since a fixed point (commit, branch, tag, or merge-base) along two independent axes — Standards (does the code follow the repo's documented coding standards plus a Fowler smell baseline?) and Spec (does the code faithfully implement the originating issue / PRD / spec?). Runs both reviews in parallel sub-agents. Distinct from $skill{github-pr-review} (single-axis) and $skill{act} (thread remediation); this skill holds the two-axis discipline.
+description: Review the changes since a fixed point (commit, branch, tag, or merge-base) along two independent axes — Standards (does the code follow the repo's documented coding standards plus a Fowler smell baseline?) and Spec (does the code faithfully implement the originating issue / PRD / spec?). Runs both reviews in parallel sub-agents. Distinct from github-pr-review (single-axis) and act (thread remediation); this skill holds the two-axis discipline.
 ---
 
 <!--
@@ -34,7 +34,7 @@ Before going further, confirm the fixed point resolves (`git rev-parse <fixed-po
 
 Look for the originating spec, in this order:
 
-1. Issue references in the commit messages (`#123`, `Closes #45`, GitLab `!67`, etc.) — fetch via the appropriate integration skill (`$skill{external-tools}`, etc.).
+1. Issue references in the commit messages (`#123`, `Closes #45`, GitLab `!67`, etc.) — fetch via the appropriate integration skill (`external-tools`, etc.).
 2. A path the user passed as an argument.
 3. A PRD/spec file under `docs/`, `specs/`, or `.scratch/` matching the branch name or feature.
 4. If nothing is found, ask the user where the spec is. If they say there isn't one, the **Spec** sub-agent will skip and report "no spec available".
@@ -44,7 +44,7 @@ Look for the originating spec, in this order:
 Anything in the repo that documents how code should be written, such as `CODING_STANDARDS.md` or `CONTRIBUTING.md`, or the existing skills themselves. **The default standards-source set the Standards sub-agent should always receive, in addition to whatever the repo documents:**
 
 - `methodology/review-methodology` — the multi-axis review rubric covering correctness, readability, architecture, security, and performance. **Include this by default** so the Standards axis doesn't miss any of those dimensions when the repo's own standards doc is silent on one of them.
-- `engineering/architecture-review`, `troubleshooting/performance-investigation`, `engineering/security-and-hardening` — module-shape and cross-cutting concerns.
+- `engineering/architecture-review`, `engineering/frontend-ui-engineering`, `troubleshooting/performance-investigation`, `engineering/security-and-hardening` — module-shape and cross-cutting concerns.
 - `behavior/minimalist`, `methodology/codehome`, `methodology/refactoring` — simplification and placement rules.
 
 On top of whatever the repo documents, the Standards axis always carries the **smell baseline** below — a fixed set of Fowler code smells (_Refactoring_, ch.3) that applies even when a repo documents nothing. Two rules bind it:
@@ -69,9 +69,9 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 
 ### 4. Spawn both sub-agents in parallel
 
-**Permission gate.** This step is a model-invoked behaviour. Per the orchestration rules in this repository (see `$skill{subagent-capsule}` and the role-prompt reference `$subagents-setup` documented in `AGENTS.md § Role prompts`), `Manager → ...` is a downward delegation, and launching parallel sub-agents costs context + money; the user's `$skill{adhd}` goal focus and `$skill{token-rationalism}` apply. Require **explicit user permission** before launching both axes in parallel. If the user has not explicitly said "run both", "parallel", or equivalent, default to running the axes **sequentially** (Standards first, then Spec) in a single sub-agent invocation, and report both axes in the aggregate step. The sequential path is the safe default; the parallel path is the optimisation.
+**Permission gate.** This step is a model-invoked behaviour. Per the orchestration rules in this repository (see `subagent-capsule` and the role-prompt reference `$subagents-setup` documented in `AGENTS.md § Role prompts`), `Manager → ...` is a downward delegation, and launching parallel sub-agents costs context + money; the user's `adhd` goal focus and `token-rationalism` apply. Require **explicit user permission** before launching both axes in parallel. If the user has not explicitly said "run both", "parallel", or equivalent, default to running the axes **sequentially** (Standards first, then Spec) in a single sub-agent invocation, and report both axes in the aggregate step. The sequential path is the safe default; the parallel path is the optimisation.
 
-If the user has given explicit permission for parallel execution, use this repository's `run_subagent` tool to launch both sub-agents in parallel (a single message with two `run_subagent` calls). Both calls use the **investigator** profile from `$skill{subagent-capsule}` — the sub-agents are read-only evidence gatherers, not patchers, and do not delegate. Each call's prompt must wrap its content in the `SUBAGENT_CONTEXT_CAPSULE ... END_SUBAGENT_CONTEXT_CAPSULE` structure defined in `$skill{subagent-capsule}` (root objective, current stack, profile, assigned subtask, success condition, known evidence, allowed/forbidden scope, edit permission = none, verification expectation, output contract). Without that capsule the sub-agent will invent context the parent never gave it.
+If the user has given explicit permission for parallel execution, use this repository's `run_subagent` tool to launch both sub-agents in parallel (a single message with two `run_subagent` calls). Both calls use the **investigator** profile from `subagent-capsule` — the sub-agents are read-only evidence gatherers, not patchers, and do not delegate. Each call's prompt must wrap its content in the `SUBAGENT_CONTEXT_CAPSULE ... END_SUBAGENT_CONTEXT_CAPSULE` structure defined in `subagent-capsule` (root objective, current stack, profile, assigned subtask, success condition, known evidence, allowed/forbidden scope, edit permission = none, verification expectation, output contract). Without that capsule the sub-agent will invent context the parent never gave it.
 
 **Standards sub-agent capsule (assigned subtask) — include:**
 
@@ -104,8 +104,4 @@ Reporting them separately stops one axis from masking the other.
 
 ## Related skills
 
-- $skill{subagent-capsule} — orchestration rules this skill honours (downward-only delegation, explicit user permission for parallel runs, read-only investigator profile, the `SUBAGENT_CONTEXT_CAPSULE` envelope this step's sub-agents are required to wrap their prompts in).
-- $skill{shared-plan} — when a review reveals a multi-step follow-up (refactor, ADR, or split-PR plan), feed it into the active shared plan rather than the PR thread.
-- $skill{github-pr-review} — single-axis, GitHub-aware review writer; use when you only need one axis or are posting back to a PR.
-- $skill{act} — when the review findings are ready to be turned into per-thread fixes and resolved on GitHub or GitLab.
-- $skill{architecture-review} / $skill{minimalist} / $skill{codehome} — concrete standards to feed the Standards sub-agent p
+See [references/related-skills.md](references/related-skills.md) for related skills.

@@ -36,10 +36,10 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `idea-refine` | `coaching` | 2 | user, model | — | — |
 | `interview-me` | `coaching` | 2 | user, model | — | — |
 | `act` | `code-review` | 2 | user, model | `$skill{github-pr-review}`, `$skill{review-methodology}` | — |
-| `github-fix-main` | `code-review` | 2 | user, model | — | — |
-| `github-pr-review` | `code-review` | 2 | user, model | `$skill{review-methodology}` | — |
-| `triage-issue` | `code-review` | 2 | user, model | — | — |
-| `two-axis-review` | `code-review` | 2 | user, model | `$skill{github-pr-review}`, `$skill{review-methodology}` | — |
+| `github-fix-main` | `code-review` | 2 | user | — | — |
+| `github-pr-review` | `code-review` | 2 | user | `$skill{review-methodology}` | — |
+| `triage-issue` | `code-review` | 2 | user | — | — |
+| `two-axis-review` | `code-review` | 2 | user | `$skill{github-pr-review}`, `$skill{act}`, `$skill{review-methodology}` | — |
 | `architecture-review` | `engineering` | 2 | user, model | — | — |
 | `bootstrap-ts-repo` | `engineering` | 2 | user, model | — | — |
 | `nodejs` | `engineering` | 2 | user, model | — | — |
@@ -107,7 +107,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 
 - **`$skill{act}`** — Use when the user invokes /act on a PR/MR, /act with no arguments (uses the PR in the current conversation context), or /act <context> with context ∈ {pr, plan, backlog, harvest}. Resolves threads in product code (or posts a substantive in-thread reply), commits, then closes threads. Never resolve-only. Harvest (collecting threads) lives in /harvest; triage (priority / grouping / wontfix) lives in /backlog. /act is the fix loop, not the collect or triage. Use this, not `$skill{github-pr-review}`, `$skill{review-methodology}`.
 - **`$skill{github-pr-review}`** — Use when the user asks for a GitHub pull request review or wants review comments prepared for a PR on github.com. Use this, not `$skill{review-methodology}`.
-- **`$skill{two-axis-review}`** — Review the changes since a fixed point (commit, branch, tag, or merge-base) along two independent axes — Standards (does the code follow the repo's documented coding standards plus a Fowler smell baseline?) and Spec (does the code faithfully implement the originating issue / PRD / spec?). Runs both reviews in parallel sub-agents. Distinct from $skill{github-pr-review} (single-axis) and $skill{act} (thread remediation); this skill holds the two-axis discipline. Use this, not `$skill{github-pr-review}`, `$skill{review-methodology}`.
+- **`$skill{two-axis-review}`** — Review the changes since a fixed point (commit, branch, tag, or merge-base) along two independent axes — Standards (does the code follow the repo's documented coding standards plus a Fowler smell baseline?) and Spec (does the code faithfully implement the originating issue / PRD / spec?). Runs both reviews in parallel sub-agents. Distinct from github-pr-review (single-axis) and act (thread remediation); this skill holds the two-axis discipline. Use this, not `$skill{github-pr-review}`, `$skill{act}`, `$skill{review-methodology}`.
 - **`$skill{investigate-first}`** — Use before editing when a bug, task, failing test, or code area is not yet understood. Guides agents to inspect files, search symbols and errors, reproduce a failure when practical, and produce evidence before any patching. Useful for weak-model stability, unknown codebases, root-cause analysis, and preventing chaotic edits. Use this, not `$skill{debugging}`, `$skill{one-shot-patch}`.
 - **`$skill{minimal-root-cause}`** — Use before patching code when the task may cause overengineering, duplicate logic, unnecessary dependencies, or symptom-only bug fixes. Enforces laziness about solution, rigor about understanding and verification. Climb the laziness ladder before editing. Use this, not `$skill{investigate-first}`, `$skill{debugging}`, `$skill{one-shot-patch}`.
 - **`$skill{one-shot-patch}`** — Use when the relevant file and fix hypothesis are known and the agent needs to make exactly one narrow change, then verify it. Prevents stacked fixes, broad refactors, and chaotic iteration. Best for isolated bug fixes after investigation has identified the likely cause. Use this, not `$skill{investigate-first}`, `$skill{debugging}`.
