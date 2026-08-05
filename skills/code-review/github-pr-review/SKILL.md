@@ -11,7 +11,7 @@ Review a GitHub PR the way a senior reviewer does: understand intent, inspect th
 
 - `$skill{two-axis-review}` — two-axis review methodology; use when you want parallel Standards + Spec reviews rather than a single reviewer pass.
 - `$skill{act}` — handling comments left on a PR/MR you own (react → evaluate → reply → resolve). Different direction.
-- `$skill{code-review-and-quality}` — rubric for evaluating feedback you got (agree / partial / disagree). Not about writing a review.
+- `$skill{review-methodology}` — rubric for evaluating feedback you got (agree / partial / disagree). Not about writing a review.
 
 This skill is: **you are the reviewer, the PR lives on GitHub, you produce a review.**
 

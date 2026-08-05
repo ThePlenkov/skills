@@ -313,4 +313,10 @@ minimalist: minimalist senior-dev persona + the seven rungs.
   pair with terse-prose discipline for fewer words too.
 ```
 
+## References
+
+- [Common rationalizations](references/common-rationalizations.md) — excuses for leaving complexity in place.
+- [Red flags](references/red-flags.md) — signals a simplification pass has gone wrong.
+- [Refactor patterns](references/refactor-patterns.md) — named simplifications for common complexity smells.
+
 If the level is not full, prepend it: `(minimalist: lite)`.

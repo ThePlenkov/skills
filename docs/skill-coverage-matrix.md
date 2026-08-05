@@ -14,7 +14,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `experimentation` | Sandboxed experimentation | `sandboxed` |
 | `foundation` | Always-on behavioral primitives and activation tiers | `persistent-memory`, `skill-tiers`, `token-rationalism` |
 | `integrations` | External platform connectors | `bootstrap-gh-self-hosted-runner`, `codacy`, `codescene`, `gitlab-ci-local`, `glean`, `sourcegraph` |
-| `methodology` | Development methodology | `code-review-and-quality`, `code-simplification`, `codehome`, `context-engineering`, `dep-cost`, `doubt-driven-development`, `external-tools`, `incremental-implementation`, `investigate-first`, `loop-programming`, `minimal-root-cause`, `modern-stack`, `observability-and-instrumentation`, `one-shot-patch`, `refactoring`, `repository-onboarding`, `reuse-first`, `review-methodology`, `spec-driven-development`, `test-driven-development` |
+| `methodology` | Development methodology | `codehome`, `context-engineering`, `dep-cost`, `external-tools`, `incremental-implementation`, `investigate-first`, `loop-programming`, `minimal-root-cause`, `modern-stack`, `observability-and-instrumentation`, `one-shot-patch`, `refactoring`, `repository-onboarding`, `reuse-first`, `review-methodology`, `spec-driven-development`, `test-driven-development` |
 | `orchestration` | Agent coordination, isolation, context management, and skill discovery | `handoff`, `subagent-capsule`, `unwind`, `using-agent-skills` |
 | `research` | Codebase analysis and documentation tools | `deepwiki`, `external-research` |
 | `safety` | Destructive operation protection and recovery | `drill`, `safeguard`, `salvage` |
@@ -35,11 +35,11 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `adhd` | `coaching` | 2 | user, model | — | — |
 | `idea-refine` | `coaching` | 2 | user, model | — | — |
 | `interview-me` | `coaching` | 2 | user, model | — | — |
-| `act` | `code-review` | 2 | user, model | `$skill{github-pr-review}`, `$skill{code-review-and-quality}` | — |
+| `act` | `code-review` | 2 | user, model | `$skill{github-pr-review}`, `$skill{review-methodology}` | — |
 | `github-fix-main` | `code-review` | 2 | user, model | — | — |
-| `github-pr-review` | `code-review` | 2 | user, model | `$skill{code-review-and-quality}` | — |
+| `github-pr-review` | `code-review` | 2 | user, model | `$skill{review-methodology}` | — |
 | `triage-issue` | `code-review` | 2 | user, model | — | — |
-| `two-axis-review` | `code-review` | 2 | user, model | `$skill{github-pr-review}`, `$skill{code-review-and-quality}` | — |
+| `two-axis-review` | `code-review` | 2 | user, model | `$skill{github-pr-review}`, `$skill{review-methodology}` | — |
 | `architecture-review` | `engineering` | 2 | user, model | — | — |
 | `bootstrap-ts-repo` | `engineering` | 2 | user, model | — | — |
 | `frontend-ui-engineering` | `engineering` | 2 | user, model | — | — |
@@ -57,12 +57,9 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `gitlab-ci-local` | `integrations` | 2 | user, model | — | — |
 | `glean` | `integrations` | 2 | user, model | — | — |
 | `sourcegraph` | `integrations` | 2 | user, model | — | `$skill{external-research}` |
-| `code-review-and-quality` | `methodology` | 2 | user, model | `$skill{github-pr-review}` | — |
-| `code-simplification` | `methodology` | 2 | user, model | — | — |
 | `codehome` | `methodology` | 2 | user | — | — |
 | `context-engineering` | `methodology` | 2 | user, model | — | — |
 | `dep-cost` | `methodology` | 2 | user, model | — | — |
-| `doubt-driven-development` | `methodology` | 2 | user, model | `$skill{investigate-first}`, `$skill{critical-thinking}` | — |
 | `external-tools` | `methodology` | 2 | user, model | — | — |
 | `incremental-implementation` | `methodology` | 2 | user, model | `$skill{loop-programming}` | — |
 | `investigate-first` | `methodology` | 2 | user, model | `$skill{debugging}`, `$skill{one-shot-patch}` | `$skill{minimal-root-cause}` |
@@ -114,11 +111,9 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 
 ## Disambiguation (use this, not that)
 
-- **`$skill{act}`** — Use when the user invokes /act on a PR/MR, /act with no arguments (uses the PR in the current conversation context), or /act <context> with context ∈ {pr, plan, backlog, harvest}. Resolves threads in product code (or posts a substantive in-thread reply), commits, then closes threads. Never resolve-only. Harvest (collecting threads) lives in /harvest; triage (priority / grouping / wontfix) lives in /backlog. /act is the fix loop, not the collect or triage. Use this, not `$skill{github-pr-review}`, `$skill{code-review-and-quality}`.
-- **`$skill{github-pr-review}`** — Use when the user asks for a GitHub pull request review or wants review comments prepared for a PR on github.com. Use this, not `$skill{code-review-and-quality}`.
-- **`$skill{two-axis-review}`** — Review the changes since a fixed point (commit, branch, tag, or merge-base) along two independent axes — Standards (does the code follow the repo's documented coding standards plus a Fowler smell baseline?) and Spec (does the code faithfully implement the originating issue / PRD / spec?). Runs both reviews in parallel sub-agents. Distinct from $skill{github-pr-review} (single-axis) and $skill{act} (thread remediation); this skill holds the two-axis discipline. Use this, not `$skill{github-pr-review}`, `$skill{code-review-and-quality}`.
-- **`$skill{code-review-and-quality}`** — Conducts multi-axis code review. Use before merging any change. Use when reviewing code written by yourself, another agent, or a human. Use when you need to assess code quality across multiple dimensions before it enters the main branch. Use this, not `$skill{github-pr-review}`.
-- **`$skill{doubt-driven-development}`** — Subjects every non-trivial decision to a fresh-context adversarial review before it stands. Use when correctness matters more than speed, when working in unfamiliar code, when stakes are high (production, security-sensitive logic, irreversible operations), or any time a confident output would be cheaper to verify now than to debug later. Use this, not `$skill{investigate-first}`, `$skill{critical-thinking}`.
+- **`$skill{act}`** — Use when the user invokes /act on a PR/MR, /act with no arguments (uses the PR in the current conversation context), or /act <context> with context ∈ {pr, plan, backlog, harvest}. Resolves threads in product code (or posts a substantive in-thread reply), commits, then closes threads. Never resolve-only. Harvest (collecting threads) lives in /harvest; triage (priority / grouping / wontfix) lives in /backlog. /act is the fix loop, not the collect or triage. Use this, not `$skill{github-pr-review}`, `$skill{review-methodology}`.
+- **`$skill{github-pr-review}`** — Use when the user asks for a GitHub pull request review or wants review comments prepared for a PR on github.com. Use this, not `$skill{review-methodology}`.
+- **`$skill{two-axis-review}`** — Review the changes since a fixed point (commit, branch, tag, or merge-base) along two independent axes — Standards (does the code follow the repo's documented coding standards plus a Fowler smell baseline?) and Spec (does the code faithfully implement the originating issue / PRD / spec?). Runs both reviews in parallel sub-agents. Distinct from $skill{github-pr-review} (single-axis) and $skill{act} (thread remediation); this skill holds the two-axis discipline. Use this, not `$skill{github-pr-review}`, `$skill{review-methodology}`.
 - **`$skill{incremental-implementation}`** — Delivers changes incrementally. Use when implementing any feature or change that touches more than one file. Use when you're about to write a large amount of code at once, or when a task feels too big to land in one step. Use this, not `$skill{loop-programming}`.
 - **`$skill{investigate-first}`** — Use before editing when a bug, task, failing test, or code area is not yet understood. Guides agents to inspect files, search symbols and errors, reproduce a failure when practical, and produce evidence before any patching. Useful for weak-model stability, unknown codebases, root-cause analysis, and preventing chaotic edits. Use this, not `$skill{debugging}`, `$skill{one-shot-patch}`.
 - **`$skill{loop-programming}`** — Run bounded, validator-driven loops for tasks needing repeated inspect, modify, execute, and verify cycles. Use when the agent must iterate on a repository until measurable criteria pass: failing tests, debugging, refactoring, multi-file changes, performance thresholds. Trigger for "keep iterating until tests pass", "fix the repository autonomously", or "refactor and prove nothing broke". Not for one-shot explanations, tiny edits, or unbounded exploration. Use this, not `$skill{incremental-implementation}`.
@@ -132,9 +127,9 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 - **Have a runtime failure or regression?** → `$skill{debugging}`
 - **Know the exact fix and want one narrow change?** → `$skill{one-shot-patch}`
 - **Before patching, want to avoid overengineering or symptom-only fixes?** → `$skill{minimal-root-cause}`
-- **Need adversarial review of a non-trivial decision?** → `$skill{doubt-driven-development}`
+- **Need adversarial review of a non-trivial decision?** → `$skill{critical-thinking}`
 - **Implementing a multi-file or large change?** → `$skill{incremental-implementation}`
 - **Need repeated inspect-edit-validate cycles with explicit stop conditions?** → `$skill{loop-programming}`
 - **Reviewing a PR on GitHub?** → `$skill{github-pr-review}`
 - **End-to-end fixing of PR/MR threads on a repo?** → `$skill{act}`
-- **Multi-axis quality review before merge?** → `$skill{code-review-and-quality}`
+- **Multi-axis quality review before merge?** → `$skill{review-methodology}`

@@ -203,6 +203,12 @@ Include all sections that have substantive content. Omit sections where there is
 
 ---
 
+## Adversarial-review discipline
+
+For non-trivial decisions, subject the output to a fresh-context review biased to disprove, not approve, before it stands. This is not `/review` (a post-hoc verdict); it is an in-flight check while course-correction is still cheap.
+
+See [references/adversarial-review.md](references/adversarial-review.md) for the full process (CLAIM, EXTRACT, DOUBT, RECONCILE, STOP), cross-model escalation rules, common rationalizations, and red flags. For the verification checklist that closes the loop, see `$skill{evidence}` (`references/adversarial-review-checklist.md`).
+
 ## When to Challenge the Goal Itself
 
 If the user is pursuing something, it's legitimate to question whether the goal itself is correct — not just the implementation.

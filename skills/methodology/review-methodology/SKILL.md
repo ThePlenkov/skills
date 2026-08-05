@@ -57,7 +57,7 @@ For detailed execution of a specific axis, delegate to the relevant skill:
 `security-and-hardening` for threat modelling,
 `evidence` for verification discipline,
 `codehome` and `architecture-review` for fit,
-`code-simplification` and `critical-thinking` for legibility.
+`minimalist` and `critical-thinking` for legibility.
 
 ### Severity (from `REVIEW.md`)
 
@@ -107,6 +107,19 @@ lint rule, CI gate, AGENTS.md rule, skill change, or explicitly "none, one-off".
 If the finding violates something already written in `AGENTS.md`, `REVIEW.md`,
 or a skill, the document is at fault: it must be rewritten or automated. "Be more careful"
 is not a prevention.
+
+## Generic guidance
+
+The contract above is the yardstick; the references below are the practical details:
+
+- [Structural remedies](references/structural-remedies.md) — propose the move, not just the problem.
+- [Change sizing](references/change-sizing.md) — when and how to split a change.
+- [Change descriptions](references/change-descriptions.md) — commit/PR message hygiene.
+- [Dependency discipline](references/dependency-discipline.md) — adding and upgrading dependencies.
+- [Common rationalizations](references/common-rationalizations.md) — pushback that sounds reasonable but isn't.
+- [Red flags](references/red-flags.md) — signals that a review or change is off.
+- [Verification checklist](references/verification-checklist.md) — close the loop before merging.
+- [Security checklist](references/security-checklist.md) and [performance checklist](references/performance-checklist.md) — per-domain concerns.
 
 ## Output
 
