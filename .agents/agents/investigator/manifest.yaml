@@ -18,8 +18,7 @@ optional:
   - shared-plan
   - deepwiki
 forbidden:
-  - git-commit
-  - git-push
+  - git-workflow-and-versioning
   - git-reset
   - ci-local
   - e2e

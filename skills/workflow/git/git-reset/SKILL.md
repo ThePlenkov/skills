@@ -205,7 +205,7 @@ This skill enforces:
 
 - Destructive-operation safety — see $skill{safeguard}
 - Branch workflow — see `.agents/rules/branch-workflow.md`
-- $skill{git-push} - Force push safety
+- $skill{git-workflow-and-versioning} — force push safety and recovery
 
 ## Notes
 

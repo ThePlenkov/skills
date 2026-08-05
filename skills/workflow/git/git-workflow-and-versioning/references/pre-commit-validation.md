@@ -1,6 +1,8 @@
 # Pre-Commit Validation Rules
 
-Detailed checklists referenced by the git-commit workflow. Read `.agents/rules/documentation.md` and `.agents/rules/project-structure.md` for full project rules.
+<!-- os-independence-exempt: reference bash detection recipes; run in Git Bash / WSL on Windows -->
+
+Detailed checklists referenced by the operational commit workflow. Read `.agents/rules/documentation.md` and `.agents/rules/project-structure.md` for full project rules.
 
 ## Documentation updates
 

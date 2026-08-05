@@ -5,7 +5,7 @@ argument-hint: --check --fix <subject>
 
 Commit changes after analyzing git tree, validating documentation updates and project structure compliance, and optionally running local CI checks.
 
-**This command wraps the `git-commit` skill workflow.**
+**This command wraps the `git-workflow-and-versioning` skill workflow.**
 
 ## Usage
 
@@ -114,7 +114,7 @@ This triggers correct semver bumps per component (Nx, Lerna, Changesets).
 
 ## Full Workflow
 
-See `.agents/skills/git-commit/SKILL.md` for the complete workflow including:
+See `.agents/skills/git-workflow-and-versioning/SKILL.md` for the complete workflow including:
 
 - Git tree analysis and change categorization
 - Local CI checks (--check flag)
@@ -136,7 +136,7 @@ This command enforces:
 
 ## Related
 
-- `.agents/skills/git-commit/SKILL.md` - Full workflow implementation
+- `.agents/skills/git-workflow-and-versioning/SKILL.md` - Full workflow implementation
 - `.agents/skills/ci-local/SKILL.md` - Local CI checks and auto-fix
 - `.agents/rules/documentation.md` - Documentation validation rules
 - `.agents/rules/project-structure.md` - Structure validation rules

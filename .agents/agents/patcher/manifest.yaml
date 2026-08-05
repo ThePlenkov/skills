@@ -14,7 +14,7 @@ required:
   - investigate-first
 optional:
   - sandboxed
-  - git-commit
+  - git-workflow-and-versioning
   - ci-local
   - persistent-memory
 forbidden:
@@ -22,7 +22,6 @@ forbidden:
   - harvest
   - github-pr-review
   - triage-issue
-  - git-push
   - git-reset
   - e2e
   - npm-publish

@@ -136,7 +136,7 @@ git push origin --delete <branch-name>
 This rule works with:
 - `documentation.md` - Documentation updates in feature branches
 - `project-structure.md` - Structure changes in feature branches
-- `git-commit` skill - Commits go to feature branches
+- `git-workflow-and-versioning` skill - Commits go to feature branches
 
 ## Anti-Patterns
 
@@ -161,7 +161,7 @@ If production is broken and immediate fix is needed:
 
 - `documentation.md` - Documentation must be updated in feature branches
 - `project-structure.md` - Structure changes in feature branches
-- `git-commit` skill - Commit workflow applies to feature branches
+- `git-workflow-and-versioning` skill - Commit workflow applies to feature branches
 
 ## User Preference
 

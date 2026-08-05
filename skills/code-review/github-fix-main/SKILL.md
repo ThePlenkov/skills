@@ -17,7 +17,7 @@ One-shot cleanup of the default branch: green CI + no open security/quality find
 
 - Reviewing someone else's PR → `$skill{github-pr-review}`.
 - Triaging a reported issue → `$skill{triage-issue}`.
-- Writing a commit message only → `$skill{git-commit}`.
+- Writing a commit message only → `$skill{git-workflow-and-versioning}`.
 - Fixing a red PR branch (not main) → work the PR directly.
 
 ## Invocation
@@ -65,10 +65,12 @@ git switch -c fix/main-health origin/"$MAIN"
 ### 2. Gather signal in parallel
 
 ```bash
-gh run list --branch "$MAIN" --limit 1 --json databaseId,status,conclusion,workflowName,headSha,url
+gh run list --branch "$MAIN" --limit=1 --json databaseId,status,conclusion,workflowName,headSha,url
 gh api "repos/$REPO/code-scanning/alerts?state=open&per_page=100" --paginate > tmp/fix-main/code-scanning.json
-ls sonar-project.properties .sonarcloud.properties
-git grep -Il -e "SONAR_TOKEN" -e "sonarcloud" -e "sonarqube" -- .github/
+for f in sonar-project.properties .sonarcloud.properties; do
+  if test -f "$f"; then echo "$f"; fi
+done
+git grep -I -l "SONAR_TOKEN\|sonarcloud\|sonarqube" -- .github/
 ```
 
 Dump all raw responses under `tmp/fix-main/`. Verify Sonar credentials before assuming SonarCloud fix is in-scope.
@@ -137,7 +139,7 @@ Write `tmp/fix-main/pr-body.md` per the template in [references/pr-body.md](refe
 
 ```bash
 git push -u origin fix/main-health
-gh pr create --base "$MAIN" \
+gh pr create --base="$MAIN" --head=fix/main-health \
   --title "fix(main): restore health of main (CI + security + quality)" \
   --body-file tmp/fix-main/pr-body.md
 ```
@@ -182,4 +184,4 @@ Per thread:
 - [references/terminal-states.md](references/terminal-states.md) — stop conditions and follow-up message template.
 - `$skill{external-tools}` — raw `gh` patterns.
 - `$skill{github-pr-review}` — reviewer side once the PR is open.
-- `$skill{git-commit}` — atomic commit conventions.
+- `$skill{git-workflow-and-versioning}` — atomic commit and push conventions.

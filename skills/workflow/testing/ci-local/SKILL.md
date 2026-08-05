@@ -105,8 +105,7 @@ For per-check-type auto-fix strategies: [references/auto-fix-strategies.md](refe
 
 ## Integration
 
-- `$skill{git-commit}` — runs this before commit when `--check`/`--fix`.
-- `$skill{git-push}` — runs this before push when `--check`/`--fix`.
+- `$skill{git-workflow-and-versioning}` — runs this before commit or push when `--check`/`--fix`.
 - See `.agents/rules/branch-workflow.md`, `.agents/rules/documentation.md`.
 
 ## Notes
