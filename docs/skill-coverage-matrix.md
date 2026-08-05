@@ -34,7 +34,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `minimalist` | `behavior` | 2 | user, model | — | — |
 | `adhd` | `coaching` | 2 | user, model | — | — |
 | `idea-refine` | `coaching` | 2 | user, model | — | — |
-| `interview-me` | `coaching` | 2 | user, model | — | — |
+| `interview-me` | `coaching` | 2 | user | — | — |
 | `act` | `code-review` | 2 | user, model | `$skill{github-pr-review}`, `$skill{review-methodology}` | — |
 | `github-fix-main` | `code-review` | 2 | user | — | — |
 | `github-pr-review` | `code-review` | 2 | user | `$skill{review-methodology}` | — |
