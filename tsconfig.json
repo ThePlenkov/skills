@@ -13,6 +13,6 @@
     "noEmit": true,
     "outDir": "./tmp/dist"
   },
-  "include": ["scripts/**/*.ts", "bin/**/*.ts"],
+  "include": ["scripts/**/*.ts", "bin/**/*.ts", "tools/doctor/src/**/*.ts"],
   "exclude": ["node_modules", "tmp", "**/*.test.ts"]
 }

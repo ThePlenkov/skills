@@ -752,5 +752,14 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
+  "security-doctor": {
+    frontmatter: {
+      metadata: {
+        "tier": 2,
+        "triggers": ["user", "model"],
+        "allowed-tools": ["read", "exec", "write", "edit", "web_search", "web_get_contents", "grep", "message_user"],
+        "compatibility": "Requires gh (with act extension), docker, or the scanner CLI.",
+      },
+    },
+  },
 };
-
