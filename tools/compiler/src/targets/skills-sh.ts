@@ -11,6 +11,7 @@ function copySkillDirectory(src: string, dest: string): void {
     fs.mkdirSync(dest, { recursive: true });
   }
   for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    // dependencies/ is a build-time artifact from earlier formats; do not publish it.
     if (entry.name === 'dependencies') continue;
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
@@ -96,6 +97,94 @@ export function normalizeFrontmatter(input: Record<string, unknown>, publicSourc
   return stringifyYaml(output, { lineWidth: 0 });
 }
 
+function relativeSkillPath(
+  fromDir: string,
+  targetName: string,
+  projectName: string,
+  outDir: string,
+  byName: Map<string, Skill>
+): string | null {
+  if (!byName.has(targetName)) return null;
+  const targetPath =
+    targetName === projectName
+      ? path.join(outDir, 'SKILL.md')
+      : path.join(outDir, 'references', targetName, 'SKILL.md');
+  return path.relative(fromDir, targetPath).replace(/\\/g, '/');
+}
+
+function walkMdFiles(dir: string, callback: (filePath: string) => void): void {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      walkMdFiles(fullPath, callback);
+    } else if (entry.name.toLowerCase().endsWith('.md')) {
+      callback(fullPath);
+    }
+  }
+}
+
+function rewriteFileMacros(
+  filePath: string,
+  projectName: string,
+  outDir: string,
+  byName: Map<string, Skill>
+): void {
+  const content = fs.readFileSync(filePath, 'utf8');
+  const fileDir = path.dirname(filePath);
+  const names = [...byName.keys()].sort((a, b) => b.length - a.length);
+  if (names.length === 0) return;
+
+  const escaped = names.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  const regex = new RegExp(`\\$skill\\{(${escaped.join('|')})\\}`, 'g');
+
+  let changed = false;
+  const result = content.replace(regex, (match, name: string) => {
+    const rel = relativeSkillPath(fileDir, name, projectName, outDir, byName);
+    if (!rel) return match;
+    changed = true;
+    return `[${name}](${rel})`;
+  });
+
+  if (changed) {
+    fs.writeFileSync(filePath, result, 'utf8');
+  }
+}
+
+function emitSkill(
+  skill: Skill,
+  destDir: string,
+  isPrimary: boolean,
+  options: CompilerOptions,
+  projectName: string,
+  byName: Map<string, Skill>
+): void {
+  copySkillDirectory(skill.dir, destDir);
+
+  const linkFormatter = (link: SkillLink, _source: Skill) => {
+    const target = byName.get(link.targetName);
+    if (!target) return link.raw;
+    if (isPrimary) {
+      return `[${link.text}](references/${target.name}/SKILL.md)`;
+    }
+    if (target.name === projectName) {
+      return `[${link.text}](../../SKILL.md)`;
+    }
+    return `[${link.text}](../${target.name}/SKILL.md)`;
+  };
+
+  const header = `---\n${normalizeFrontmatter(skill.frontmatter, options.publicSource)}---\n`;
+  const body = rewriteBody(skill.body, skill.links, linkFormatter, skill);
+  const skillMdPath = path.join(destDir, 'SKILL.md');
+  fs.writeFileSync(skillMdPath, header + body, 'utf8');
+
+  // Rewrite $skill{} macros in bundled reference files so they remain resolvable
+  // when the skill is installed on its own.
+  walkMdFiles(destDir, (filePath) => {
+    if (filePath === skillMdPath) return;
+    rewriteFileMacros(filePath, projectName, options.outDir, byName);
+  });
+}
+
 export function buildSkillsSh(options: CompilerOptions, skills: Skill[], projectName: string): void {
   const byName = new Map(skills.map((s) => [s.name, s]));
   const primary = byName.get(projectName);
@@ -104,31 +193,11 @@ export function buildSkillsSh(options: CompilerOptions, skills: Skill[], project
   }
 
   fs.mkdirSync(options.outDir, { recursive: true });
-  const depsDir = path.join(options.outDir, 'dependencies');
-
-  function emitSkill(skill: Skill, destDir: string, isPrimary: boolean): void {
-    copySkillDirectory(skill.dir, destDir);
-    const linkFormatter = (link: SkillLink, source: Skill) => {
-      if (link.type === 'macro') return link.raw;
-      const target = byName.get(link.targetName);
-      if (!target) return link.raw;
-      if (isPrimary) {
-        return `[${link.text}](dependencies/${target.name}/SKILL.md)`;
-      }
-      if (target.name === projectName) {
-        return `[${link.text}](../SKILL.md)`;
-      }
-      return `[${link.text}](../${target.name}/SKILL.md)`;
-    };
-
-    const header = `---\n${normalizeFrontmatter(skill.frontmatter, options.publicSource)}---\n`;
-    const body = rewriteBody(skill.body, skill.links, linkFormatter, skill);
-    fs.writeFileSync(path.join(destDir, 'SKILL.md'), header + body, 'utf8');
-  }
+  const refsDir = path.join(options.outDir, 'references');
 
   for (const skill of skills) {
     if (skill.name === projectName) continue;
-    emitSkill(skill, path.join(depsDir, skill.name), false);
+    emitSkill(skill, path.join(refsDir, skill.name), false, options, projectName, byName);
   }
-  emitSkill(primary, options.outDir, true);
+  emitSkill(primary, options.outDir, true, options, projectName, byName);
 }
