@@ -29,7 +29,7 @@ import {
   statSync,
   writeFileSync,
 } from "node:fs";
-import { basename, dirname, extname, isAbsolute, join, normalize, relative, resolve, sep } from "node:path";
+import { dirname, extname, isAbsolute, join, relative, resolve } from "node:path";
 import process from "node:process";
 
 interface Options {
@@ -158,15 +158,6 @@ function readSkillName(skillMd: string, fallback: string): string {
   if (!nameLine) return fallback;
   const name = nameLine.replace(/^name:\s*/, "").trim().replace(/^["']|["']$/g, "");
   return name || fallback;
-}
-
-function toPosix(p: string): string {
-  return p.replaceAll("\\", "/");
-}
-
-function relPath(fromFile: string, toFile: string): string {
-  const rel = relative(dirname(fromFile), toFile);
-  return toPosix(rel);
 }
 
 function isUrlExternal(url: string): boolean {
