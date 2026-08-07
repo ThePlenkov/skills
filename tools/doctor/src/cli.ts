@@ -2,6 +2,7 @@ import * as path from "node:path";
 import { loadConfig } from "./config.ts";
 import { runScanner } from "./runner.ts";
 import { scanners } from "./scanners/index.ts";
+import { summarizeOutput } from "./utils.ts";
 import type { DoctorConfig, RunContext, ScannerConfig } from "./types.ts";
 
 function usage() {
@@ -149,6 +150,8 @@ async function main() {
       exitCode = code;
     }
   }
+
+  summarizeOutput(ctx.outputDir);
 
   process.exit(exitCode);
 }

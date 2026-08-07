@@ -4,6 +4,7 @@ node_modules/
 .env
 .env.*
 tmp/
+.doctor/
 skillspector.sarif
 # Nx cache (populated by actions/skillspector; do not commit)
 .nx/

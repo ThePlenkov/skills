@@ -28,5 +28,6 @@ export interface ScannerDefinition {
   name: string;
   workflow: string;
   actInputs(config: ScannerConfig, ctx: RunContext): Record<string, string>;
+  actEnv?(config: ScannerConfig, ctx: RunContext): Record<string, string>;
   runLocal(config: ScannerConfig, ctx: RunContext): Promise<number>;
 }

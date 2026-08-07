@@ -3,8 +3,6 @@ import { fileURLToPath } from "node:url";
 import { exec, isCommandAvailable } from "../utils.ts";
 import type { RunContext, ScannerConfig, ScannerDefinition } from "../types.ts";
 
-const CODEQL_IMAGE = "mcr.microsoft.com/cstsectools/codeql-container";
-
 const KNOWN_SUITES = new Set(["default", "code-scanning", "security-extended", "security-and-quality"]);
 
 function normalizeLanguage(language: string): string {
@@ -47,6 +45,9 @@ function resolveQueryPart(language: string, part: string): string[] {
 export const codeql: ScannerDefinition = {
   name: "codeql",
   workflow: fileURLToPath(new URL("../../templates/codeql.yml", import.meta.url)),
+  actEnv() {
+    return { CODEQL_ACTION_ANALYSIS_KEY: "security-doctor:analyze" };
+  },
   actInputs(config, ctx) {
     const outputDir = path.relative(ctx.repoDir, path.resolve(ctx.repoDir, (config.outputDir as string) ?? ctx.outputDir));
     return {
@@ -85,44 +86,9 @@ export const codeql: ScannerDefinition = {
       return 0;
     }
 
-    if (isCommandAvailable("docker")) {
-      for (const language of languages) {
-        const queryArgs = resolveQuery(language, queries);
-        const dbDir = `/opt/results/codeql-db-${language}`;
-        const createArgs = `codeql database create ${dbDir} --source-root=/opt/src --language=${language} --overwrite`;
-        let code = await exec("docker", [
-          "run",
-          "--rm",
-          "-v",
-          `${sourceRoot}:/opt/src`,
-          "-v",
-          `${outputDir}:/opt/results`,
-          "-e",
-          `CODEQL_CLI_ARGS=${createArgs}`,
-          CODEQL_IMAGE,
-        ], { cwd: ctx.repoDir, verbose: ctx.verbose, dryRun: ctx.dryRun });
-        if (code !== 0) return code;
-
-        const analyzeArgs = `codeql database analyze ${dbDir} ${queryArgs.join(" ")} --format=sarif-latest --output=${dbDir}.sarif`;
-        code = await exec("docker", [
-          "run",
-          "--rm",
-          "-v",
-          `${sourceRoot}:/opt/src`,
-          "-v",
-          `${outputDir}:/opt/results`,
-          "-e",
-          `CODEQL_CLI_ARGS=${analyzeArgs}`,
-          CODEQL_IMAGE,
-        ], { cwd: ctx.repoDir, verbose: ctx.verbose, dryRun: ctx.dryRun });
-        if (code !== 0) return code;
-      }
-      return 0;
-    }
-
     throw new Error(
-      "CodeQL local runner requires either the `codeql` CLI or `docker`. " +
-      "Install CodeQL CLI from https://github.com/github/codeql-cli-binaries or install Docker.",
+      "CodeQL local runner requires the `codeql` CLI. " +
+      "Install it from https://github.com/github/codeql-cli-binaries or run with `act` (auto mode) instead.",
     );
   },
 };
