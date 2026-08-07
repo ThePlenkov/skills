@@ -25,7 +25,6 @@ import {
   writeFileSync,
 } from "node:fs";
 import {
-  basename,
   dirname,
   isAbsolute,
   join,
