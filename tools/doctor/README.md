@@ -42,9 +42,9 @@ scanners:
 
 ## Scanners
 
-- `codeql` — uses `github/codeql-action` as the workflow template and falls back
-to the `codeql` CLI or the `mcr.microsoft.com/cstsectools/codeql-container`
-Docker image.
+- `codeql` — uses `github/codeql-action` as a reusable workflow template. `auto`
+mode first runs the template locally via `gh act --bind`; if `act` is unavailable,
+it falls back to the `codeql` CLI.
 
 ## Adding a scanner
 

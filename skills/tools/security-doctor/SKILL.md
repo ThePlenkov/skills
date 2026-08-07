@@ -38,10 +38,13 @@ scanners:
     upload: never
 ```
 
-## CodeQL fallback
+## CodeQL runner
 
-- If `gh act` is unavailable, `doctor` looks for the `codeql` CLI in `PATH`.
-- If `codeql` is missing, it tries `docker` with `mcr.microsoft.com/cstsectools/codeql-container`.
+- `auto` mode first tries `gh act -W tools/doctor/templates/codeql.yml`.
+  - The repo is bind-mounted (`--bind`) so SARIF files are written back to the host.
+  - `CODEQL_ACTION_ANALYSIS_KEY` is set so `codeql-action` does not call the GitHub REST API for a workflow run ID.
+  - `GITHUB_TOKEN` is passed as a secret when available.
+- If `gh act` fails or is unavailable, `doctor` falls back to the local `codeql` CLI.
 - If neither is available, it reports the exact install command needed.
 
 ## Extending
