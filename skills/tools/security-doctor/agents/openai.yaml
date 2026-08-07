@@ -1,5 +1,5 @@
 interface:
   display_name: "Security Doctor"
-  short_description: "Run security scanners from reusable GitHub Actions templates with act or local CLI fallback"
+  short_description: "Run security scanners from reusable GitHub Actions templates"
   brand_color: "#10B981"
   default_prompt: "Use $security-doctor to run a security scan. Start with the CodeQL template and auto-detect the runner backend."

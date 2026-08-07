@@ -19,7 +19,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `research` | Codebase analysis and documentation tools | `deepwiki`, `external-research` |
 | `safety` | Destructive operation protection and recovery | `drill`, `safeguard`, `salvage` |
 | `self-learning` | Retrospective learning and skill-improvement feedback | `retrospect`, `skill-feedback` |
-| `tools` | Agent development utilities | `docker-agent-config`, `npm-publish`, `sarif-to-annotations`, `skillmaker`, `skills-cli`, `tsdown`, `writing-great-skills` |
+| `tools` | Agent development utilities | `docker-agent-config`, `npm-publish`, `sarif-to-annotations`, `security-doctor`, `skillmaker`, `skills-cli`, `tsdown`, `writing-great-skills` |
 | `troubleshooting` | Scoped descent, debugging, and performance investigation | `debugging`, `performance-investigation` |
 | `verification` | Runtime proof and evidence-backed claims | `evidence`, `evidence-lite` |
 | `workflow` | Development workflow | `backlog`, `ci-cd-and-automation`, `ci-local`, `e2e`, `git-reset`, `git-workflow-and-versioning`, `harvest`, `resolving-merge-conflicts`, `shadow-fork`, `shared-plan` |
@@ -84,6 +84,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `docker-agent-config` | `tools` | 2 | user, model | — | — |
 | `npm-publish` | `tools` | 2 | user, model | — | — |
 | `sarif-to-annotations` | `tools` | 2 | user, model | — | — |
+| `security-doctor` | `tools` | 2 | user, model | — | — |
 | `skillmaker` | `tools` | 2 | user, model | — | — |
 | `skills-cli` | `tools` | 2 | user, model | — | — |
 | `tsdown` | `tools` | 2 | user, model | — | — |
