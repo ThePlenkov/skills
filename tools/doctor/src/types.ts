@@ -18,6 +18,7 @@ export interface DoctorConfig {
 
 export interface RunContext {
   repoDir: string;
+  repoUrl?: string;
   outputDir: string;
   mode: "auto" | "act" | "local";
   dryRun: boolean;
@@ -26,12 +27,14 @@ export interface RunContext {
 
 export interface ScannerRunResult {
   name: string;
-  backend: "act" | "local" | "unknown";
+  backend: "act" | "local" | "github" | "unknown";
   exitCode: number;
   durationMs: number;
   outputs: string[];
   commandSummary: string;
   errorMessage?: string;
+  skipped?: boolean;
+  skipReason?: string;
 }
 
 export interface FindingSummary {
@@ -40,6 +43,7 @@ export interface FindingSummary {
   totalResults: number;
   byRule: Record<string, number>;
   byLevel: Record<string, number>;
+  details?: string[];
 }
 
 export interface DoctorReport {
@@ -53,8 +57,8 @@ export interface DoctorReport {
 
 export interface ScannerDefinition {
   name: string;
-  workflow: string;
-  actInputs(config: ScannerConfig, ctx: RunContext): Record<string, string>;
+  workflow?: string;
+  actInputs?(config: ScannerConfig, ctx: RunContext): Record<string, string>;
   actEnv?(config: ScannerConfig, ctx: RunContext): Record<string, string>;
   runLocal(config: ScannerConfig, ctx: RunContext): Promise<ScannerRunResult>;
 }

@@ -1,7 +1,10 @@
+import * as fs from "node:fs";
 import * as path from "node:path";
 import { loadConfig } from "./config.ts";
 import { runScanner } from "./runner.ts";
 import { scanners } from "./scanners/index.ts";
+import { detectGitHubRepo, expandGroup, isGitHubUrl, parseGitHubUrl } from "./scanners/github.ts";
+import { exec } from "./utils.ts";
 import { buildReport, printReportSummary, writeReport } from "./report.ts";
 import type { DoctorConfig, RunContext, ScannerConfig, ScannerRunResult } from "./types.ts";
 
@@ -27,6 +30,8 @@ Options:
 
 Config files (searched in repo order):
   doctor.config.ts, doctor.config.js, doctor.config.yaml, doctor.config.yml, doctor.config.json
+
+The repo argument may be a local path or a GitHub URL (https://github.com/owner/repo).
 `.trim());
 }
 
@@ -63,20 +68,80 @@ function isValidMode(mode: string): mode is "auto" | "act" | "local" {
   return ["auto", "act", "local"].includes(mode);
 }
 
-function resolveScanners(config: DoctorConfig, command: string, scannerName?: string): ScannerConfig[] {
+async function resolveRepoDir(input: string | undefined, options: { verbose: boolean; dryRun: boolean }): Promise<string> {
+  if (!input) return process.cwd();
+  if (isGitHubUrl(input)) {
+    const parsed = parseGitHubUrl(input);
+    if (!parsed) {
+      throw new Error(`Unable to parse GitHub URL: ${input}`);
+    }
+    const cloneDir = path.resolve(process.cwd(), ".doctor", "repos", `${parsed.owner}-${parsed.repo}`);
+    if (options.dryRun) {
+      console.log(`[dry-run] git clone --depth 1 ${input} ${cloneDir}`);
+      fs.mkdirSync(cloneDir, { recursive: true });
+      return cloneDir;
+    }
+    if (fs.existsSync(cloneDir)) {
+      if (fs.existsSync(path.join(cloneDir, ".git"))) {
+        fs.rmSync(cloneDir, { recursive: true, force: true });
+      } else {
+        throw new Error(`Directory ${cloneDir} exists and is not a git repository`);
+      }
+    }
+    fs.mkdirSync(path.dirname(cloneDir), { recursive: true });
+    const cloneCode = await exec("git", ["clone", "--depth", "1", input, cloneDir], { verbose: options.verbose, dryRun: options.dryRun });
+    if (cloneCode !== 0) {
+      throw new Error(`Failed to clone ${input} into ${cloneDir}`);
+    }
+    return cloneDir;
+  }
+  return path.resolve(input);
+}
+
+function expandGroups(configs: ScannerConfig[]): ScannerConfig[] {
+  const result: ScannerConfig[] = [];
+  for (const config of configs) {
+    const group = expandGroup(config.name);
+    if (group) {
+      for (const name of group) {
+        result.push({ ...config, name });
+      }
+    } else {
+      result.push(config);
+    }
+  }
+  return result;
+}
+
+async function resolveScanners(
+  config: DoctorConfig,
+  ctx: RunContext,
+  command: string,
+  scannerName?: string,
+): Promise<ScannerConfig[]> {
   if (command === "run") {
     if (!scannerName) {
       console.error("Usage: doctor run <scanner>");
       process.exit(1);
     }
+    const group = expandGroup(scannerName);
+    if (group) {
+      return group.map((name) => ({ name }));
+    }
     const fromConfig = config.scanners?.find((s) => s.name === scannerName);
     return [fromConfig ?? { name: scannerName }];
   }
-  const configured = config.scanners?.filter((s) => s.enabled !== false);
+
+  let configured = config.scanners?.filter((s) => s.enabled !== false);
   if (!configured || configured.length === 0) {
-    return [{ name: "codeql" }];
+    configured = [{ name: "codeql" }];
+    const repo = await detectGitHubRepo(ctx.repoDir, ctx.repoUrl);
+    if (repo) {
+      configured.push({ name: "github" });
+    }
   }
-  return configured;
+
+  return expandGroups(configured);
 }
 
 async function main() {
@@ -115,7 +180,10 @@ async function main() {
     process.exit(0);
   }
 
-  const repoDir = path.resolve(positionals[repoArgIndex] ?? process.cwd());
+  const dryRun = options.dryRun === true;
+  const verbose = options.verbose === true;
+
+  const repoDir = await resolveRepoDir(positionals[repoArgIndex], { verbose, dryRun });
 
   const rawMode = (options.mode as string) ?? "auto";
   if (!isValidMode(rawMode)) {
@@ -133,13 +201,14 @@ async function main() {
 
   const ctx: RunContext = {
     repoDir,
+    repoUrl: positionals[repoArgIndex] && isGitHubUrl(positionals[repoArgIndex]) ? positionals[repoArgIndex] : undefined,
     outputDir,
     mode,
-    dryRun: options.dryRun === true,
-    verbose: options.verbose === true,
+    dryRun,
+    verbose,
   };
 
-  const scannerConfigs = resolveScanners(config, command, scannerName);
+  const scannerConfigs = await resolveScanners(config, ctx, command, scannerName);
 
   const scannerResults: ScannerRunResult[] = [];
   let exitCode = 0;
@@ -147,7 +216,7 @@ async function main() {
     console.log(`\n▶ Running scanner: ${scannerConfig.name} (mode: ${ctx.mode})`);
     const result = await runScanner(scannerConfig, ctx);
     scannerResults.push(result);
-    if (result.exitCode !== 0) {
+    if (result.exitCode !== 0 && !result.skipped) {
       console.error(`Scanner ${scannerConfig.name} exited with code ${result.exitCode}`);
       if (result.errorMessage) console.error(result.errorMessage);
       exitCode = result.exitCode;

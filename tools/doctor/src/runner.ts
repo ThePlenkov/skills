@@ -2,7 +2,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { exec, fixOwnership, isCommandAvailable } from "./utils.ts";
 import { scanners } from "./scanners/index.ts";
-import type { RunContext, ScannerConfig, ScannerRunResult } from "./types.ts";
+import type { RunContext, ScannerConfig, ScannerDefinition, ScannerRunResult } from "./types.ts";
 
 function redactCommand(parts: string[]): string {
   return parts
@@ -18,6 +18,9 @@ function redactCommand(parts: string[]): string {
 async function runAct(scannerConfig: ScannerConfig, ctx: RunContext): Promise<ScannerRunResult> {
   const def = scanners.find((s) => s.name === scannerConfig.name);
   if (!def) throw new Error(`Unknown scanner: ${scannerConfig.name}`);
+  if (!def.workflow || !def.actInputs) {
+    throw new Error(`Scanner ${scannerConfig.name} cannot run via act`);
+  }
   const inputs = def.actInputs(scannerConfig, ctx);
   const args = ["act", "workflow_dispatch", "-W", def.workflow, "-C", ctx.repoDir, "--bind"];
   for (const [key, value] of Object.entries(inputs)) {
@@ -43,7 +46,7 @@ async function runAct(scannerConfig: ScannerConfig, ctx: RunContext): Promise<Sc
   const durationMs = Date.now() - start;
   if (!ctx.dryRun) await fixOwnership(ctx.outputDir);
 
-  const outputs = collectOutputs(ctx.outputDir);
+  const outputs = ctx.dryRun ? [] : collectOutputs(ctx.outputDir);
   return {
     name: scannerConfig.name,
     backend: "act",
@@ -59,7 +62,7 @@ function collectOutputs(outputDir: string): string[] {
   try {
     return fs
       .readdirSync(outputDir)
-      .filter((f) => f.endsWith(".sarif"))
+      .filter((f) => f.endsWith(".sarif") || f.endsWith(".json"))
       .map((f) => path.relative(process.cwd(), path.join(outputDir, f)))
       .sort();
   } catch {
@@ -67,32 +70,38 @@ function collectOutputs(outputDir: string): string[] {
   }
 }
 
+async function runLocal(scannerConfig: ScannerConfig, def: ScannerDefinition, ctx: RunContext): Promise<ScannerRunResult> {
+  const start = Date.now();
+  const result = await def.runLocal(scannerConfig, ctx);
+  result.durationMs = Date.now() - start;
+  if (result.outputs.length === 0 && !ctx.dryRun) {
+    result.outputs = collectOutputs(ctx.outputDir);
+  }
+  return result;
+}
+
 export async function runScanner(scannerConfig: ScannerConfig, ctx: RunContext): Promise<ScannerRunResult> {
   const def = scanners.find((s) => s.name === scannerConfig.name);
   if (!def) throw new Error(`Unknown scanner: ${scannerConfig.name}`);
 
-  const mode = ctx.mode === "auto" ? (scannerConfig.mode ?? "auto") : ctx.mode;
-
-  if (mode === "act") {
+  if (ctx.mode === "act") {
+    if (!def.workflow) {
+      console.log(`Scanner ${scannerConfig.name} does not support act; running locally.`);
+      return runLocal(scannerConfig, def, ctx);
+    }
     return runAct(scannerConfig, ctx);
   }
-  if (mode === "local") {
-    const start = Date.now();
-    const result = await def.runLocal(scannerConfig, ctx);
-    result.durationMs = Date.now() - start;
-    result.outputs = collectOutputs(ctx.outputDir);
-    return result;
+
+  if (ctx.mode === "local") {
+    return runLocal(scannerConfig, def, ctx);
   }
 
   // auto
-  if (isCommandAvailable("gh")) {
+  if (isCommandAvailable("gh") && def.workflow) {
     const result = await runAct(scannerConfig, ctx);
     if (result.exitCode === 0) return result;
     console.error(`act runner exited with code ${result.exitCode}; falling back to local scanner CLI.`);
   }
-  const start = Date.now();
-  const result = await def.runLocal(scannerConfig, ctx);
-  result.durationMs = Date.now() - start;
-  result.outputs = collectOutputs(ctx.outputDir);
-  return result;
+
+  return runLocal(scannerConfig, def, ctx);
 }

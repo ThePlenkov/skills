@@ -27,7 +27,7 @@ export async function loadConfig(configPath?: string, cwd = process.cwd()): Prom
     }
   }
   if (!file) {
-    return { scanners: [{ name: "codeql" }] };
+    return {};
   }
 
   const ext = path.extname(file).toLowerCase();

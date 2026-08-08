@@ -50,6 +50,30 @@ export function exec(command: string, args: string[], options: ExecOptions = {})
   });
 }
 
+export function execCapture(
+  command: string,
+  args: string[],
+  options: ExecOptions = {},
+): Promise<{ code: number; stdout: string; stderr: string }> {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      cwd: options.cwd,
+      env: { ...process.env, ...options.env },
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout?.on("data", (chunk: Buffer) => {
+      stdout += chunk.toString("utf8");
+    });
+    child.stderr?.on("data", (chunk: Buffer) => {
+      stderr += chunk.toString("utf8");
+    });
+    child.on("error", reject);
+    child.on("exit", (code) => resolve({ code: code ?? 0, stdout, stderr }));
+  });
+}
+
 export function isCommandAvailable(name: string): boolean {
   const result = spawnSync(name, ["--version"], { stdio: "ignore" });
   return result.error === undefined && result.status === 0;

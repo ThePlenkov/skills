@@ -16,14 +16,14 @@ Run SAST/SCA/security scanners against any repository without modifying the targ
 ## Workflow
 
 1. Locate or create `doctor.config.{ts,js,yaml,yml,json}` in the target repository.
-2. Default to the `codeql` scanner with `languages: [javascript, typescript]` and `queries: security-extended`.
-3. Run `doctor` from `tools/doctor/bin/doctor.js` (or `npx @theplenkov/doctor` when published).
+2. Default to the `codeql` scanner and, when the repository is hosted on GitHub, the `github` scanner group.
+3. Run `doctor` from `tools/doctor/bin/doctor.js` (or `npx @theplenkov/doctor` when published). The repo argument may be a local path or a GitHub URL (`https://github.com/owner/repo`).
 4. `doctor` chooses the backend:
    - `auto` (default): try `gh act -W <template>`; if it fails or is unavailable, fall back to the scanner's local CLI.
    - `act`: force the `gh act` workflow run.
    - `local`: force the local scanner CLI.
 5. After the scan, read `.doctor/doctor-report.md` for the execution checklist and findings summary.
-6. Present the report to the user: scanner(s) used, backend, status, duration, generated SARIF files, and counts by rule/severity. Do not dump raw SARIF contents unless asked.
+6. Present the report to the user: scanner(s) used, backend, status, duration, generated output files, and counts by rule/severity. Do not dump raw SARIF/JSON contents unless asked.
 
 ## Configuration example
 
@@ -52,9 +52,9 @@ scanners:
 
 `doctor` writes `.doctor/doctor-report.md` after every scan. The report contains:
 
-- **Scan checklist**: each configured scanner, backend (`act` or `local`), pass/fail status, duration, exact command summary, and generated `.sarif` files.
+- **Scan checklist**: each configured scanner, backend (`act`, `local`, or `github`), pass/fail status with ✅ / ❌, skipped status with ⏭️, and duration.
 - **Findings summary**: total count, counts per rule, and counts per severity level.
-- **Raw SARIF files list**: file names and sizes.
+- **Raw output files list**: generated `.sarif` and `.json` report files.
 
 Use the report as the primary user-facing artifact. Keep the raw SARIF files for downstream tooling (`sarif-to-annotations`, GitHub Security tab, etc.).
 
@@ -62,6 +62,7 @@ Use the report as the primary user-facing artifact. Keep the raw SARIF files for
 
 - Add new scanner templates to `tools/doctor/templates/<name>.yml`.
 - Add a matching `ScannerDefinition` in `tools/doctor/src/scanners/<name>.ts` and export it from `tools/doctor/src/scanners/index.ts`.
+- GitHub-only scanners live in the `github` group (`tools/doctor/src/scanners/github.ts`) and are auto-expanded when the target repo is on GitHub.
 
 ## References
 

@@ -58,17 +58,43 @@ function summarizeSarif(filePath: string): FindingSummary | undefined {
   };
 }
 
+function summarizeReportJson(filePath: string): FindingSummary | undefined {
+  let content: string;
+  try {
+    content = fs.readFileSync(filePath, "utf8");
+  } catch {
+    return undefined;
+  }
+  try {
+    const parsed = JSON.parse(content) as Partial<FindingSummary>;
+    if (typeof parsed.totalResults !== "number") return undefined;
+    return {
+      scanner: parsed.scanner ?? path.basename(filePath, ".json"),
+      file: parsed.file ?? filePath,
+      totalResults: parsed.totalResults,
+      byRule: parsed.byRule ?? {},
+      byLevel: parsed.byLevel ?? {},
+      details: parsed.details,
+    };
+  } catch {
+    return undefined;
+  }
+}
+
+function summarizeFile(filePath: string): FindingSummary | undefined {
+  if (filePath.endsWith(".sarif")) return summarizeSarif(filePath);
+  if (filePath.endsWith(".json")) return summarizeReportJson(filePath);
+  return undefined;
+}
+
 export function buildReport(ctx: RunContext, scannerResults: ScannerRunResult[]): DoctorReport {
   const timestamp = new Date().toISOString();
   const findings: FindingSummary[] = [];
-  try {
-    const files = fs.readdirSync(ctx.outputDir).filter((f) => f.endsWith(".sarif"));
-    for (const file of files.sort()) {
-      const summary = summarizeSarif(path.join(ctx.outputDir, file));
-      if (summary) findings.push(summary);
-    }
-  } catch {
-    // output dir may not exist yet
+  const files = new Set(scannerResults.flatMap((r) => r.outputs));
+  for (const file of [...files].sort()) {
+    if (!fs.existsSync(file)) continue;
+    const summary = summarizeFile(file);
+    if (summary) findings.push(summary);
   }
 
   return {
@@ -98,10 +124,27 @@ export function reportToMarkdown(report: DoctorReport): string {
   lines.push("| Scanner | Backend | Status | Duration |");
   lines.push("| --- | --- | --- | --- |");
   for (const scanner of report.scanners) {
-    const status = scanner.exitCode === 0 ? "✅ passed" : `❌ failed (${scanner.exitCode})`;
+    let status: string;
+    if (scanner.skipped) {
+      status = scanner.skipReason ? `⏭️ skipped (${scanner.skipReason})` : "⏭️ skipped";
+    } else if (scanner.exitCode === 0) {
+      status = "✅ passed";
+    } else {
+      status = `❌ failed (${scanner.exitCode})`;
+    }
     lines.push(`| ${scanner.name} | ${scanner.backend} | ${status} | ${formatDuration(scanner.durationMs)} |`);
   }
   lines.push("");
+
+  const failedScanners = report.scanners.filter((s) => !s.skipped && s.exitCode !== 0 && s.errorMessage);
+  if (failedScanners.length > 0) {
+    lines.push("## Execution notes");
+    lines.push("");
+    for (const scanner of failedScanners) {
+      lines.push(`- **${scanner.name}**: ${scanner.errorMessage}`);
+    }
+    lines.push("");
+  }
 
   const totalFindings = report.findings.reduce((sum, f) => sum + f.totalResults, 0);
   if (totalFindings === 0) {
@@ -126,19 +169,30 @@ export function reportToMarkdown(report: DoctorReport): string {
           .join(", ");
         lines.push(`- **By level**: ${levelText}`);
       }
-      lines.push("- **By rule**:");
-      const ruleEntries = Object.entries(finding.byRule).sort(([, a], [, b]) => b - a);
-      for (const [rule, count] of ruleEntries) {
-        lines.push(`  - \`${rule}\`: ${count}`);
+      if (Object.keys(finding.byRule).length > 0) {
+        lines.push("- **By rule**:");
+        const ruleEntries = Object.entries(finding.byRule).sort(([, a], [, b]) => b - a);
+        for (const [rule, count] of ruleEntries) {
+          lines.push(`  - \`${rule}\`: ${count}`);
+        }
+      }
+      if (finding.details && finding.details.length > 0) {
+        lines.push("- **Details**:");
+        for (const detail of finding.details.slice(0, 20)) {
+          lines.push(`  - ${detail}`);
+        }
+        if (finding.details.length > 20) {
+          lines.push(`  - ... and ${finding.details.length - 20} more`);
+        }
       }
       lines.push("");
     }
   }
 
-  lines.push("## Raw SARIF files");
+  lines.push("## Raw output files");
   lines.push("");
   if (report.findings.length === 0) {
-    lines.push("No SARIF files were generated.");
+    lines.push("No output files were generated.");
   } else {
     for (const finding of report.findings) {
       const rel = finding.file.startsWith(report.repoDir) ? finding.file.slice(report.repoDir.length + 1) : finding.file;
@@ -170,8 +224,15 @@ export function printReportSummary(report: DoctorReport): void {
   const totalFindings = report.findings.reduce((sum, f) => sum + f.totalResults, 0);
   console.log(`  Total findings: ${totalFindings}`);
   for (const scanner of report.scanners) {
+    if (scanner.skipped) {
+      console.log(`  ⏭️ ${scanner.name} (${scanner.backend}) — skipped: ${scanner.skipReason ?? ""}`);
+      continue;
+    }
     const status = scanner.exitCode === 0 ? "✅" : "❌";
     console.log(`  ${status} ${scanner.name} (${scanner.backend}) — ${formatDuration(scanner.durationMs)}`);
+    if (!scanner.skipped && scanner.exitCode !== 0 && scanner.errorMessage) {
+      console.log(`    error: ${scanner.errorMessage}`);
+    }
     for (const finding of report.findings.filter((f) => f.scanner.toLowerCase() === scanner.name || f.file.toLowerCase().includes(scanner.name))) {
       console.log(`    - ${path.basename(finding.file)}: ${finding.totalResults} finding${finding.totalResults === 1 ? "" : "s"}`);
     }
