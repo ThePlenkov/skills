@@ -95,12 +95,11 @@ export function reportToMarkdown(report: DoctorReport): string {
 
   lines.push("## Scan checklist");
   lines.push("");
-  lines.push("| Scanner | Backend | Status | Duration | Command |");
-  lines.push("| --- | --- | --- | --- | --- |");
+  lines.push("| Scanner | Backend | Status | Duration |");
+  lines.push("| --- | --- | --- | --- |");
   for (const scanner of report.scanners) {
     const status = scanner.exitCode === 0 ? "✅ passed" : `❌ failed (${scanner.exitCode})`;
-    const command = scanner.commandSummary ? `<small><code>${escapeHtml(scanner.commandSummary)}</code></small>` : "—";
-    lines.push(`| ${scanner.name} | ${scanner.backend} | ${status} | ${formatDuration(scanner.durationMs)} | ${command} |`);
+    lines.push(`| ${scanner.name} | ${scanner.backend} | ${status} | ${formatDuration(scanner.durationMs)} |`);
   }
   lines.push("");
 
@@ -157,10 +156,6 @@ export function writeReport(report: DoctorReport): string {
   fs.mkdirSync(report.outputDir, { recursive: true });
   fs.writeFileSync(reportPath, reportToMarkdown(report), "utf8");
   return reportPath;
-}
-
-function escapeHtml(text: string): string {
-  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 function formatBytes(bytes: number): string {
