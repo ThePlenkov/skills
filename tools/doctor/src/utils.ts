@@ -1,4 +1,3 @@
-import * as fs from "node:fs";
 import * as path from "node:path";
 import { spawn, spawnSync } from "node:child_process";
 
@@ -69,41 +68,4 @@ export async function fixOwnership(target: string): Promise<void> {
   });
 }
 
-interface SarifResult {
-  ruleId?: string;
-  message?: { text?: string; markdown?: string };
-}
 
-interface SarifRun {
-  results?: SarifResult[];
-  tool?: { driver?: { rules?: Array<{ id?: string; name?: string; shortDescription?: { text?: string } }> } };
-}
-
-interface SarifDocument {
-  runs?: SarifRun[];
-}
-
-export function summarizeOutput(outputDir: string): void {
-  const files = fs.readdirSync(outputDir).filter((f) => f.endsWith(".sarif"));
-  if (files.length === 0) return;
-  console.log(`\n▶ Scan results in ${path.relative(process.cwd(), outputDir) || outputDir}:`);
-  for (const file of files.sort()) {
-    const content = fs.readFileSync(path.join(outputDir, file), "utf8");
-    let sarif: SarifDocument;
-    try {
-      sarif = JSON.parse(content) as SarifDocument;
-    } catch {
-      continue;
-    }
-    const results = sarif.runs?.[0]?.results ?? [];
-    const ruleIndex = new Map<string, number>();
-    for (const result of results) {
-      const id = result.ruleId ?? "unknown";
-      ruleIndex.set(id, (ruleIndex.get(id) ?? 0) + 1);
-    }
-    console.log(`  ${file}: ${results.length} finding${results.length === 1 ? "" : "s"}`);
-    for (const [id, count] of ruleIndex) {
-      console.log(`    - ${id}: ${count}`);
-    }
-  }
-}

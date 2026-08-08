@@ -46,6 +46,10 @@ scanners:
 mode first runs the template locally via `gh act --bind`; if `act` is unavailable,
 it falls back to the `codeql` CLI.
 
+After the scan, `doctor` writes a Markdown report to `<outputDir>/doctor-report.md`
+with a checklist of what ran and a findings summary. Raw SARIF files are kept in
+`<outputDir>` for downstream tools.
+
 ## Adding a scanner
 
 1. Add a workflow template under `templates/<name>.yml`.

@@ -1,8 +1,21 @@
+import * as fs from "node:fs";
+import * as path from "node:path";
 import { exec, fixOwnership, isCommandAvailable } from "./utils.ts";
 import { scanners } from "./scanners/index.ts";
-import type { RunContext, ScannerConfig } from "./types.ts";
+import type { RunContext, ScannerConfig, ScannerRunResult } from "./types.ts";
 
-async function runAct(scannerConfig: ScannerConfig, ctx: RunContext): Promise<number> {
+function redactCommand(parts: string[]): string {
+  return parts
+    .map((arg) => {
+      if (arg.startsWith("GITHUB_TOKEN=") || /gh[pousr]_[A-Za-z0-9_]+/.test(arg)) {
+        return "GITHUB_TOKEN=***";
+      }
+      return arg;
+    })
+    .join(" ");
+}
+
+async function runAct(scannerConfig: ScannerConfig, ctx: RunContext): Promise<ScannerRunResult> {
   const def = scanners.find((s) => s.name === scannerConfig.name);
   if (!def) throw new Error(`Unknown scanner: ${scannerConfig.name}`);
   const inputs = def.actInputs(scannerConfig, ctx);
@@ -25,12 +38,36 @@ async function runAct(scannerConfig: ScannerConfig, ctx: RunContext): Promise<nu
     env.GITHUB_TOKEN = process.env.GITHUB_TOKEN;
   }
 
+  const start = Date.now();
   const code = await exec("gh", args, { cwd: ctx.repoDir, env, verbose: ctx.verbose, dryRun: ctx.dryRun });
+  const durationMs = Date.now() - start;
   if (!ctx.dryRun) await fixOwnership(ctx.outputDir);
-  return code;
+
+  const outputs = collectOutputs(ctx.outputDir);
+  return {
+    name: scannerConfig.name,
+    backend: "act",
+    exitCode: code,
+    durationMs,
+    outputs,
+    commandSummary: `gh ${redactCommand(args)}`,
+    errorMessage: code !== 0 ? `act runner exited with code ${code}` : undefined,
+  };
 }
 
-export async function runScanner(scannerConfig: ScannerConfig, ctx: RunContext): Promise<number> {
+function collectOutputs(outputDir: string): string[] {
+  try {
+    return fs
+      .readdirSync(outputDir)
+      .filter((f) => f.endsWith(".sarif"))
+      .map((f) => path.relative(process.cwd(), path.join(outputDir, f)))
+      .sort();
+  } catch {
+    return [];
+  }
+}
+
+export async function runScanner(scannerConfig: ScannerConfig, ctx: RunContext): Promise<ScannerRunResult> {
   const def = scanners.find((s) => s.name === scannerConfig.name);
   if (!def) throw new Error(`Unknown scanner: ${scannerConfig.name}`);
 
@@ -40,14 +77,22 @@ export async function runScanner(scannerConfig: ScannerConfig, ctx: RunContext):
     return runAct(scannerConfig, ctx);
   }
   if (mode === "local") {
-    return def.runLocal(scannerConfig, ctx);
+    const start = Date.now();
+    const result = await def.runLocal(scannerConfig, ctx);
+    result.durationMs = Date.now() - start;
+    result.outputs = collectOutputs(ctx.outputDir);
+    return result;
   }
 
   // auto
   if (isCommandAvailable("gh")) {
-    const code = await runAct(scannerConfig, ctx);
-    if (code === 0) return 0;
-    console.error(`act runner exited with code ${code}; falling back to local scanner CLI.`);
+    const result = await runAct(scannerConfig, ctx);
+    if (result.exitCode === 0) return result;
+    console.error(`act runner exited with code ${result.exitCode}; falling back to local scanner CLI.`);
   }
-  return def.runLocal(scannerConfig, ctx);
+  const start = Date.now();
+  const result = await def.runLocal(scannerConfig, ctx);
+  result.durationMs = Date.now() - start;
+  result.outputs = collectOutputs(ctx.outputDir);
+  return result;
 }

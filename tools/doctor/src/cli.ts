@@ -2,8 +2,8 @@ import * as path from "node:path";
 import { loadConfig } from "./config.ts";
 import { runScanner } from "./runner.ts";
 import { scanners } from "./scanners/index.ts";
-import { summarizeOutput } from "./utils.ts";
-import type { DoctorConfig, RunContext, ScannerConfig } from "./types.ts";
+import { buildReport, printReportSummary, writeReport } from "./report.ts";
+import type { DoctorConfig, RunContext, ScannerConfig, ScannerRunResult } from "./types.ts";
 
 function usage() {
   console.log(`
@@ -141,17 +141,23 @@ async function main() {
 
   const scannerConfigs = resolveScanners(config, command, scannerName);
 
+  const scannerResults: ScannerRunResult[] = [];
   let exitCode = 0;
   for (const scannerConfig of scannerConfigs) {
     console.log(`\n▶ Running scanner: ${scannerConfig.name} (mode: ${ctx.mode})`);
-    const code = await runScanner(scannerConfig, ctx);
-    if (code !== 0) {
-      console.error(`Scanner ${scannerConfig.name} exited with code ${code}`);
-      exitCode = code;
+    const result = await runScanner(scannerConfig, ctx);
+    scannerResults.push(result);
+    if (result.exitCode !== 0) {
+      console.error(`Scanner ${scannerConfig.name} exited with code ${result.exitCode}`);
+      if (result.errorMessage) console.error(result.errorMessage);
+      exitCode = result.exitCode;
     }
   }
 
-  summarizeOutput(ctx.outputDir);
+  const report = buildReport(ctx, scannerResults);
+  const reportPath = writeReport(report);
+  printReportSummary(report);
+  console.log(`\nFull report: ${reportPath}`);
 
   process.exit(exitCode);
 }

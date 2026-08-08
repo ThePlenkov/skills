@@ -19,10 +19,11 @@ Run SAST/SCA/security scanners against any repository without modifying the targ
 2. Default to the `codeql` scanner with `languages: [javascript, typescript]` and `queries: security-extended`.
 3. Run `doctor` from `tools/doctor/bin/doctor.js` (or `npx @theplenkov/doctor` when published).
 4. `doctor` chooses the backend:
-   - `auto` (default): try `gh act -W <template>`; if it fails or is unavailable, fall back to the scanner's local CLI or container.
+   - `auto` (default): try `gh act -W <template>`; if it fails or is unavailable, fall back to the scanner's local CLI.
    - `act`: force the `gh act` workflow run.
-   - `local`: force the local scanner CLI/container run.
-5. Collect SARIF results from `outputDir` (default `.doctor`).
+   - `local`: force the local scanner CLI.
+5. After the scan, read `.doctor/doctor-report.md` for the execution checklist and findings summary.
+6. Present the report to the user: scanner(s) used, backend, status, duration, generated SARIF files, and counts by rule/severity. Do not dump raw SARIF contents unless asked.
 
 ## Configuration example
 
@@ -46,6 +47,16 @@ scanners:
   - `GITHUB_TOKEN` is passed as a secret when available.
 - If `gh act` fails or is unavailable, `doctor` falls back to the local `codeql` CLI.
 - If neither is available, it reports the exact install command needed.
+
+## Report output
+
+`doctor` writes `.doctor/doctor-report.md` after every scan. The report contains:
+
+- **Scan checklist**: each configured scanner, backend (`act` or `local`), pass/fail status, duration, exact command summary, and generated `.sarif` files.
+- **Findings summary**: total count, counts per rule, and counts per severity level.
+- **Raw SARIF files list**: file names and sizes.
+
+Use the report as the primary user-facing artifact. Keep the raw SARIF files for downstream tooling (`sarif-to-annotations`, GitHub Security tab, etc.).
 
 ## Extending
 

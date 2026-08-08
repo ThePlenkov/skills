@@ -24,10 +24,37 @@ export interface RunContext {
   verbose: boolean;
 }
 
+export interface ScannerRunResult {
+  name: string;
+  backend: "act" | "local" | "unknown";
+  exitCode: number;
+  durationMs: number;
+  outputs: string[];
+  commandSummary: string;
+  errorMessage?: string;
+}
+
+export interface FindingSummary {
+  scanner: string;
+  file: string;
+  totalResults: number;
+  byRule: Record<string, number>;
+  byLevel: Record<string, number>;
+}
+
+export interface DoctorReport {
+  repoDir: string;
+  timestamp: string;
+  mode: "auto" | "act" | "local";
+  outputDir: string;
+  scanners: ScannerRunResult[];
+  findings: FindingSummary[];
+}
+
 export interface ScannerDefinition {
   name: string;
   workflow: string;
   actInputs(config: ScannerConfig, ctx: RunContext): Record<string, string>;
   actEnv?(config: ScannerConfig, ctx: RunContext): Record<string, string>;
-  runLocal(config: ScannerConfig, ctx: RunContext): Promise<number>;
+  runLocal(config: ScannerConfig, ctx: RunContext): Promise<ScannerRunResult>;
 }
