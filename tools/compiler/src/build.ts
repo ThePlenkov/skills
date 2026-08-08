@@ -76,7 +76,7 @@ export function build(options: CompilerOptions): void {
     description = sourceSkill.description;
   }
 
-  const closure = resolveClosure(include, skillsByName, options.target !== 'skills-sh');
+  const closure = resolveClosure(include, skillsByName, true);
   if (closure.length === 0) {
     throw new Error(`No skills resolved for project ${options.projectRoot}`);
   }
