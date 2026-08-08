@@ -63,7 +63,7 @@
       "name": "tools",
       "source": "./",
       "skills": ["./skills/tools"],
-      "description": "Agent development utilities and build tools (skills authoring and craft, publishing, tsdown, SARIF, docker-agent config)"
+      "description": "Agent development utilities and build tools (skills authoring and craft, publishing, tsdown, SARIF, security scanner orchestration with security-doctor, docker-agent config)"
     },
     {
       "name": "safety",

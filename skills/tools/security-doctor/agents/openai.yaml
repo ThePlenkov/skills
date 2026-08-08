@@ -1,0 +1,13 @@
+interface:
+  display_name: "Security Doctor"
+  short_description: "Run security scanners from reusable GitHub Actions templates"
+  brand_color: "#10B981"
+  default_prompt: |
+    Run a security scan with $security-doctor using the CodeQL template in auto mode.
+    If the target repository is on GitHub, include the `github` scanner group by passing `run github` or by running `doctor` on a GitHub URL.
+    After the scan completes, read `.doctor/doctor-report.md` and present the result to the user as a professional checklist:
+    - what scanner or group ran and which backend was used (act / local / github),
+    - the execution status and duration with ✅ / ❌ for pass/fail and ⏭️ for skipped,
+    - a concise findings summary (counts by rule and severity level),
+    - the full raw report path.
+    Do not dump the full SARIF/JSON contents or every finding message into the chat. Offer to investigate specific findings if the user asks.

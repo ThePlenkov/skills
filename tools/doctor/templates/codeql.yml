@@ -1,0 +1,55 @@
+name: doctor-codeql
+
+on:
+  workflow_dispatch:
+    inputs:
+      languages:
+        description: Comma-separated CodeQL languages
+        required: true
+        default: "javascript,typescript"
+      queries:
+        description: CodeQL query suite or query spec
+        required: false
+        default: "security-extended"
+      config_file:
+        description: Optional path to a CodeQL config file
+        required: false
+        default: ""
+      output_dir:
+        description: Directory for SARIF results
+        required: false
+        default: ".doctor"
+      upload:
+        description: SARIF upload mode (always | failure-only | never)
+        required: false
+        default: "never"
+      ram:
+        description: RAM in MB for CodeQL
+        required: false
+        default: "4096"
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ inputs.languages }}
+          queries: ${{ inputs.queries }}
+          config-file: ${{ inputs.config_file }}
+          ram: ${{ inputs.ram }}
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+      - name: Analyze
+        uses: github/codeql-action/analyze@v3
+        with:
+          output: ${{ inputs.output_dir }}
+          upload: ${{ inputs.upload }}
