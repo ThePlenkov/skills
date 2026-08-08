@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/nx-executors",
+  "executors": {
+    "build": {
+      "implementation": "./dist/executors/build/executor.js",
+      "schema": "./src/executors/build/schema.json",
+      "description": "Compile an agent skill to a chosen distribution target."
+    }
+  }
+}

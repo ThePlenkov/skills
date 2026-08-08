@@ -15,7 +15,14 @@ function copySkillDirectory(src: string, dest: string): void {
     if (entry.name === 'dependencies') continue;
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
-    if (entry.isDirectory()) {
+    if (entry.isSymbolicLink()) {
+      const linkTarget = fs.readlinkSync(srcPath);
+      const type = fs.statSync(srcPath).isDirectory() ? 'dir' : 'file';
+      if (fs.existsSync(destPath)) {
+        fs.rmSync(destPath, { recursive: true, force: true });
+      }
+      fs.symlinkSync(linkTarget, destPath, type);
+    } else if (entry.isDirectory()) {
       copySkillDirectory(srcPath, destPath);
     } else {
       fs.copyFileSync(srcPath, destPath);

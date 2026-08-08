@@ -31,6 +31,9 @@ scripts/reserved-names.sh
 skills-obsidian/
 .obsidian/
 
+# Drill artifacts (transient, do not commit)
+.drills/
+
 # Generated flat skill view and Mermaid graphs; source of truth is skills/.
 .agents/skills/
 docs/graphs/generated/
@@ -40,3 +43,4 @@ docs/skills-index.md
 
 # Built compiler output; rebuilt on demand (npx tsc -p tools/compiler/tsconfig.json)
 tools/compiler/dist/
+tools/nx-skill/dist/

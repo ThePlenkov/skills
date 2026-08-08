@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "type": "object",
+  "description": "Compile an agent skill to a target distribution format.",
+  "properties": {
+    "target": {
+      "type": "string",
+      "enum": ["skills-sh", "claude", "codex", "agents", "obsidian"],
+      "description": "Distribution target format.",
+      "default": "skills-sh"
+    },
+    "outDir": {
+      "type": "string",
+      "description": "Output directory for the compiled skill."
+    },
+    "publicSource": {
+      "type": "string",
+      "description": "Override canonical source in the skills-sh bundle (owner/repo)."
+    },
+    "dependencies": {
+      "type": "string",
+      "enum": ["inline", "external"],
+      "description": "Whether to bundle transitive skill dependencies.",
+      "default": "inline"
+    }
+  },
+  "required": ["outDir"]
+}
