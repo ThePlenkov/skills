@@ -36,7 +36,7 @@ function formatBytes(bytes: number): string {
 }
 
 function countLines(text: string): number {
-  return text.split(/\r?\n/).length;
+  return text.length === 0 ? 0 : text.replace(/\r?\n$/, '').split(/\r?\n/).length;
 }
 
 async function main(): Promise<number> {
@@ -54,7 +54,13 @@ async function main(): Promise<number> {
     return 0;
   }
 
-  const skillsByName = discoverSkills(SKILLS_DIR);
+  let skillsByName;
+  try {
+    skillsByName = discoverSkills(SKILLS_DIR);
+  } catch (error) {
+    console.error(`Failed to discover skills in ${SKILLS_DIR}: ${error instanceof Error ? error.message : String(error)}`);
+    return 1;
+  }
   const outPath = path.resolve(String(values.out));
 
   const stats: SkillStats[] = [];
@@ -64,7 +70,13 @@ async function main(): Promise<number> {
       console.error(`warning: public skill '${pub.skill}' not found in skills tree`);
       continue;
     }
-    const text = fs.readFileSync(path.join(skill.dir, 'SKILL.md'), 'utf8');
+    let text;
+    try {
+      text = fs.readFileSync(path.join(skill.dir, 'SKILL.md'), 'utf8');
+    } catch (error) {
+      console.error(`error: failed to read SKILL.md for '${pub.skill}': ${error instanceof Error ? error.message : String(error)}`);
+      continue;
+    }
     const bytes = Buffer.byteLength(text, 'utf8');
     const lines = countLines(text);
     const fileLinks = skill.links.filter((l) => l.type === 'file').map((l) => l.targetName);
