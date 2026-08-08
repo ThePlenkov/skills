@@ -18,7 +18,8 @@ async function loadSkillMetadata(workspaceRoot: string) {
       skillMetadata?: Record<string, { frontmatter?: Record<string, unknown> }>;
     };
     return mod.skillMetadata;
-  } catch {
+  } catch (error) {
+    console.warn(`Failed to load skills.config.ts: ${error instanceof Error ? error.message : String(error)}`);
     return undefined;
   }
 }
@@ -41,17 +42,21 @@ export default async function buildExecutor(
 
   fs.mkdirSync(outDir, { recursive: true });
 
-  build({
-    workspaceRoot,
-    skillsRoot,
-    pluginsRoot,
-    projectRoot: path.resolve(workspaceRoot, projectRoot),
-    target: options.target ?? 'skills-sh',
-    outDir,
-    publicSource: options.publicSource,
-    dependencies: options.dependencies ?? 'inline',
-    skillMetadata: await loadSkillMetadata(workspaceRoot),
-  });
-
-  return { success: true };
+  try {
+    await build({
+      workspaceRoot,
+      skillsRoot,
+      pluginsRoot,
+      projectRoot: path.resolve(workspaceRoot, projectRoot),
+      target: options.target ?? 'skills-sh',
+      outDir,
+      publicSource: options.publicSource,
+      dependencies: options.dependencies ?? 'inline',
+      skillMetadata: await loadSkillMetadata(workspaceRoot),
+    });
+    return { success: true };
+  } catch (error) {
+    console.error(`Skill build failed: ${error instanceof Error ? error.message : String(error)}`);
+    return { success: false };
+  }
 }
