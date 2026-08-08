@@ -15,7 +15,7 @@
       "types": "./src/index.ts",
       "default": "./dist/index.js"
     },
-    "./executors": "./src/executors.json",
+    "./executors": "./executors.json",
     "./executors/build": "./dist/executors/build/executor.js",
     "./executors/build/schema.json": "./src/executors/build/schema.json",
     "./plugin": {
