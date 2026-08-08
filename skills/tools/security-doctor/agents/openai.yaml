@@ -6,8 +6,8 @@ interface:
     Run a security scan with $security-doctor using the CodeQL template in auto mode.
     After the scan completes, read `.doctor/doctor-report.md` and present the result to the user as a professional checklist:
     - what scanner ran and which backend was used (act / local),
-    - the execution status and duration,
-    - the generated SARIF output files,
+    - the execution status and duration with ✅ / ❌ for pass/fail,
+    - the exact command summary that was executed,
     - a concise findings summary (counts by rule and severity level),
     - the full raw report path.
     Do not dump the full SARIF contents or every finding message into the chat. Offer to investigate specific findings if the user asks.

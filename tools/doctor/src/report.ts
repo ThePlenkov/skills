@@ -95,13 +95,12 @@ export function reportToMarkdown(report: DoctorReport): string {
 
   lines.push("## Scan checklist");
   lines.push("");
-  lines.push("| Scanner | Backend | Status | Duration | Outputs |");
+  lines.push("| Scanner | Backend | Status | Duration | Command |");
   lines.push("| --- | --- | --- | --- | --- |");
   for (const scanner of report.scanners) {
-    const status = scanner.exitCode === 0 ? "passed" : `failed (${scanner.exitCode})`;
-    const outputs = scanner.outputs.length > 0 ? scanner.outputs.map((o) => `\`${o}\``).join(", ") : "—";
-    const command = scanner.commandSummary ? `<br><small><code>${escapeHtml(scanner.commandSummary)}</code></small>` : "";
-    lines.push(`| ${scanner.name} | ${scanner.backend} | ${status} | ${formatDuration(scanner.durationMs)} | ${outputs}${command} |`);
+    const status = scanner.exitCode === 0 ? "✅ passed" : `❌ failed (${scanner.exitCode})`;
+    const command = scanner.commandSummary ? `<small><code>${escapeHtml(scanner.commandSummary)}</code></small>` : "—";
+    lines.push(`| ${scanner.name} | ${scanner.backend} | ${status} | ${formatDuration(scanner.durationMs)} | ${command} |`);
   }
   lines.push("");
 
@@ -176,8 +175,8 @@ export function printReportSummary(report: DoctorReport): void {
   const totalFindings = report.findings.reduce((sum, f) => sum + f.totalResults, 0);
   console.log(`  Total findings: ${totalFindings}`);
   for (const scanner of report.scanners) {
-    const status = scanner.exitCode === 0 ? "passed" : "failed";
-    console.log(`  - ${scanner.name} (${scanner.backend}): ${status} in ${formatDuration(scanner.durationMs)}`);
+    const status = scanner.exitCode === 0 ? "✅" : "❌";
+    console.log(`  ${status} ${scanner.name} (${scanner.backend}) — ${formatDuration(scanner.durationMs)}`);
     for (const finding of report.findings.filter((f) => f.scanner.toLowerCase() === scanner.name || f.file.toLowerCase().includes(scanner.name))) {
       console.log(`    - ${path.basename(finding.file)}: ${finding.totalResults} finding${finding.totalResults === 1 ? "" : "s"}`);
     }
