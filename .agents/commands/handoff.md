@@ -54,4 +54,4 @@ Generate a durable handoff between subagent-driven PRs for external agents with 
 
 **Output must be self-contained** - new agent in new sandbox can start from handoff doc alone.
 
-Apply the full PR-handoff protocol from `.agents/skills/save-session/SKILL.md`.
+Apply the full PR-handoff protocol from `.agents/skills/handoff/SKILL.md`.

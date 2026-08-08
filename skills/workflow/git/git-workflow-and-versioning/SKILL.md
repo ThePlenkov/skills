@@ -108,7 +108,7 @@ git commit -m "refactor validation and add phone number field"
 
 ## 5. Size Your Changes
 
-Target ~100 lines per commit/PR. Changes over ~1000 lines should be split. See the splitting strategies in $skill{code-review-and-quality} for how to break down large changes.
+Target ~100 lines per commit/PR. Changes over ~1000 lines should be split. See the splitting strategies in $skill{review-methodology} for how to break down large changes.
 
 ```
 ~100 lines  → Easy to review, easy to revert
@@ -227,6 +227,8 @@ npm run lint
 npx tsc --noEmit
 ```
 
+Full validation checklists: [references/pre-commit-validation.md](references/pre-commit-validation.md).
+
 Automate this with git hooks:
 
 ```json
@@ -238,6 +240,22 @@ Automate this with git hooks:
   }
 }
 ```
+
+## Operational Commit Workflow
+
+Once pre-commit hygiene is clean, commit the slice.
+
+1. **Analyze the tree** — `git status -sb`, `git diff --stat`, `git diff --name-only`. Group changes by component or package in monorepos.
+2. **Run local checks (`--check` / `--fix`)** — invoke `$skill{ci-local}`; abort on failure unless `--fix` succeeds after auto-fix.
+3. **Validate docs and structure** — moved/renamed/deleted files have references updated; new files justified; no secrets or build artifacts staged. See [references/pre-commit-validation.md](references/pre-commit-validation.md).
+4. **Write the message** — follow Conventional Commits and project conventions. See [references/commit-message.md](references/commit-message.md).
+5. **Stage safely** — `git add -A` for tracked changes; ask before staging untracked files; never stage secrets or generated artifacts.
+6. **Commit** — one logical change per commit; for monorepos split by component to drive semver automation.
+
+### Flags
+
+- `--check` — run `$skill{ci-local}` before committing; abort on failure (unless `--fix`).
+- `--fix` — implies `--check`; auto-fix linting/formatting, re-run checks, include fixes in the commit, and mention them in the body.
 
 ## Handling Generated Files
 
@@ -279,7 +297,7 @@ For anything with consumers, version `MAJOR.MINOR.PATCH` and let the number carr
   PATCH  bug fix, backward-compatible — safe to upgrade
 ```
 
-The number is a promise, so make the code match it. A "patch" that changes behavior consumers relied on is a major change wearing a disguise (Hyrum's Law — see the $skill{api-and-interface-design} skill). When unsure whether a change is breaking, assume it is; a surprise major is far cheaper than a broken consumer.
+The number is a promise, so make the code match it. A "patch" that changes behavior consumers relied on is a major change wearing a disguise (Hyrum's Law — see the $skill{architecture-review} skill). When unsure whether a change is breaking, assume it is; a surprise major is far cheaper than a broken consumer.
 
 ### Tag the release, and let the tag be the source of truth
 
@@ -306,7 +324,31 @@ A changelog is not `git log`. It's the curated, consumer-facing answer to "what 
 - `GET /v1/tasks/all` — use the paginated `GET /v1/tasks` (removal in 2.0)
 ```
 
-Write the entry in the same change that makes the change, while the impact is fresh — not reconstructed from commit archaeology at release time. Breaking changes get a migration note and a deprecation window (follow the $skill{deprecation-and-migration} skill); shipping the actual release is the $skill{shipping-and-launch} skill's job — this section is the versioning contract that feeds it.
+Write the entry in the same change that makes the change, while the impact is fresh — not reconstructed from commit archaeology at release time. Breaking changes get a migration note and a deprecation window; the changelog is the versioning contract that feeds downstream release and deployment workflows.
+
+## Push Workflow
+
+After one or more clean commits, push to the remote.
+
+1. **Resolve the target** — branch, PR number, remote, fork, or submodule. See [references/target-resolution.md](references/target-resolution.md).
+2. **Run checks (`--check` / `--fix`)** — invoke `$skill{ci-local}` if requested.
+3. **Validate the branch** — never push from `main`, `master`, `develop`, `production`, or `release/*`.
+4. **Validate scope** — review `git log <remote>/<branch>..HEAD --oneline` and `git diff <remote>/<branch>..HEAD --stat`; scan for secrets; confirm conventional commits; confirm docs and structure are updated.
+5. **Choose strategy**:
+   - First push: `git push -u <remote> <branch>`
+   - Regular: `git push <remote> <branch>`
+   - Rebased/amended: tag a backup, then `git push --force-with-lease`
+6. **Verify** — `git ls-remote --heads <remote> <branch>` and `git log <remote>/<branch> --oneline -5`.
+7. **Next steps** — create or update PR; for forks use `gh pr create --repo <upstream>`.
+
+Recovery scenarios (wrong branch, leaked secrets, etc.): [references/recovery.md](references/recovery.md).
+
+### Flags
+
+- `--check` — run `$skill{ci-local}` before pushing; abort on failure (unless `--fix`).
+- `--fix` — implies `--check`; auto-fix linting, commit fixes separately, then push.
+
+Never use plain `--force`. Always `--force-with-lease` when history was rewritten, and only on branches no one else is using.
 
 ## Common Rationalizations
 

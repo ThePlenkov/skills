@@ -1,5 +1,0 @@
-interface:
-  display_name: "Deprecation And Migration"
-  short_description: "Manages deprecation and migration"
-  brand_color: "#3B82F6"
-  default_prompt: "Use $deprecation-and-migration to get started."

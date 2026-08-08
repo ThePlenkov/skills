@@ -1,5 +1,0 @@
-interface:
-  display_name: "Context Engineering"
-  short_description: "Optimizes agent context setup"
-  brand_color: "#3B82F6"
-  default_prompt: "Use $context-engineering to get started."

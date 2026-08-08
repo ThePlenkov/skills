@@ -1,13 +1,13 @@
 #!/usr/bin/env bun
 /**
  * e2e-agent — domain-agnostic AI-native scenario CLI.
- * Project-specific wiring lives in a config + adapter (see SPEC.md).
+ * Project-specific wiring lives in a config + adapter (see references/SPEC.md).
  */
-import { parseCli } from './scripts/framework/context'
-import { buildE2eDispatch, runE2eDispatch } from './scripts/framework/dispatch'
-import { resolveRepoRoot } from './scripts/framework/evidence'
-import { listScenarios, runE2e, showScenarioByCode } from './scripts/framework/execute'
-import { loadProjectConfig, resolveConfigPath } from './scripts/framework/project-config'
+import { parseCli } from './references/scripts/framework/context'
+import { buildE2eDispatch, runE2eDispatch } from './references/scripts/framework/dispatch'
+import { resolveRepoRoot } from './references/scripts/framework/evidence'
+import { listScenarios, runE2e, showScenarioByCode } from './references/scripts/framework/execute'
+import { loadProjectConfig, resolveConfigPath } from './references/scripts/framework/project-config'
 
 const USAGE = `e2e-agent — domain-agnostic scenario runner
 

@@ -55,7 +55,7 @@ permissions:
 
 jobs:
   scan:
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
 
     steps:
       - uses: actions/checkout@v7
@@ -72,6 +72,11 @@ jobs:
 
       - name: Install Node dependencies
         run: npm ci --no-audit --no-fund --prefer-offline
+
+      - name: Set up Python
+        # scripts/install.sh validates and compares symlinked skill trees
+        # with Python 3 helpers; ensure it is available on self-hosted runners.
+        uses: ./.github/actions/setup-python-with-fallback
 
       - name: Materialise .agents/skills for scanning
         run: npm run install:skills

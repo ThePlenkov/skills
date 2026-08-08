@@ -62,8 +62,7 @@ decision tree is in
 - **The user wants a tutorial on a technology** → that's
   coaching territory, not research.
 - **The user wants to change the external code** (open a PR
-  upstream) → `$skill{github}` / `$skill{gitlab}` territory,
-  not research.
+  upstream) → `$skill{external-tools}` territory, not research.
 - **The data is in the agent's own memory / scratchpad** → use
   that, no engine needed.
 
@@ -94,6 +93,7 @@ above before any local work.
 | [`references/catalog.md`](references/catalog.md) | The full catalog — Tier A through E with "first try / fallback" per engine |
 | [`references/decision-tree.md`](references/decision-tree.md) | Full decision tree + use-case table |
 | [`references/deepwiki-mcp.md`](references/deepwiki-mcp.md) | "How to use DeepWiki MCP" — three ways in, common pitfalls, scope discipline |
+| [`references/source-verification.md`](references/source-verification.md) | Verifying framework-specific implementation decisions against official documentation |
 
 ## Related skills
 
@@ -106,9 +106,8 @@ above before any local work.
   (Deep Search + `src search`).
 - `$skill{glean}` — Tier A for corporate-wide search (Slack,
   Drive, Jira, Confluence, etc.). The internal "Google."
-- `$skill{atlassian}` — Tier C for Jira/Confluence/Bitbucket.
+- `$skill{external-tools}` — Tier C for Jira/Confluence/Bitbucket.
   Includes Rovo (Tier A chat).
-- `$skill{github}` / `$skill{gitlab}` — Tier C for VCS
-  operations on a known host.
+- `$skill{external-tools}` — Tier C for VCS operations on a known host.
 - `$skill{investigate-first}` — for the current project's own
   code. **Do not blur with this skill.**

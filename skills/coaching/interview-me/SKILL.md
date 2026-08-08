@@ -11,7 +11,7 @@ What people ask for and what they actually want are different things. They ask f
 
 The cheapest moment to find this gap is before any plan, spec, or code exists. Once you've started building, switching costs are real, and the user will rationalize the wrong thing into a "good enough" thing. The misfit gets locked in.
 
-This skill closes the gap before it costs anything. The other Define-phase skills assume you already know roughly what you want: $skill{idea-refine} generates variations from an idea, $skill{spec-driven-development} writes the requirements down, $skill{doubt-driven-development} stress-tests a plan after you've drafted one. Interview-me is the part before all of those, where you ask one question at a time, with your best guess attached, until you can predict what the user is going to say before they say it.
+This skill closes the gap before it costs anything. The other Define-phase skills assume you already know roughly what you want: idea-refine generates variations from an idea, spec-driven-development writes the requirements down, critical-thinking stress-tests a plan after you've drafted one. Interview-me is the part before all of those, where you ask one question at a time, with your best guess attached, until you can predict what the user is going to say before they say it.
 
 ## When to Use
 
@@ -134,14 +134,14 @@ If the user wants the intent to persist (a multi-session project, a handoff to a
 ## Example
 
 A short before-and-after.
-### Without $skill{interview-me}:
+### Without interview-me:
 ```
 User:  build me a dashboard for our metrics
 Agent: <starts proposing chart libraries and layouts>
 ```
 
 The agent has assumed: who it's for, what metrics, what "for our team" means, what success looks like. None of these are stated. Every assumption is a place the user can later say "that's not what I meant."
-#### With $skill{interview-me}:
+#### With interview-me:
 ```
 User: build me a dashboard for our metrics
 
@@ -167,13 +167,11 @@ Agent: <continues>
 
 Two questions in, the agent has discovered the actual ask isn't "a dashboard." It's "a list." Different artifact, different scope, different work. The dashboard would have been wrong.
 
-## Interaction with Other Skills
+## Interaction with other skills
 
-- **$skill{idea-refine}**: downstream. If the confirmed intent is "I want X but I don't know how to scope it," hand off to $skill{idea-refine} to generate variations against the now-explicit intent.
-- **$skill{spec-driven-development}**: downstream. If the confirmed intent is concrete ("I want X for Y users with Z success criteria"), hand off to $skill{spec-driven-development} to write it down.
-- **$skill{planning-and-task-breakdown}**: two hops downstream of this skill (after the spec).
-- **$skill{doubt-driven-development}**: opposite end of the timeline. Interview-me is pre-decision intent extraction; doubt-driven is post-decision artifact review. Both catch divergence, but at different moments.
-- **$skill{source-driven-development}**: orthogonal. Interview-me clarifies what the user wants; SDD verifies framework facts. They don't compete.
+## Interaction with other skills
+
+See [related-skills.md](references/related-skills.md) for downstream and orthogonal skills.
 
 ## Common Rationalizations
 
@@ -212,4 +210,4 @@ After applying interview-me:
 - [ ] A concrete restate (Outcome / User / Why now / Success / Constraint / Out of scope) was written back to the user
 - [ ] The user confirmed the restate with an explicit yes (not "whatever you think," not "sounds good," not silence)
 - [ ] At the stop point, the agent could predict reactions to the next three questions it would ask
-- [ ] Any handoff to a downstream skill ($skill{idea-refine}, $skill{spec-driven-development}) was framed in terms of the confirmed intent, not the original underspecified ask
+- [ ] Any handoff to a downstream skill (idea-refine, spec-driven-development) was framed in terms of the confirmed intent, not the original underspecified ask

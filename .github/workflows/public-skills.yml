@@ -5,12 +5,16 @@ on:
     branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: public-skills
+  cancel-in-progress: false
+
 permissions:
   contents: read
 
 jobs:
   matrix:
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
     outputs:
       include: ${{ steps.matrix.outputs.include }}
     steps:
@@ -28,7 +32,7 @@ jobs:
 
   publish:
     needs: matrix
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
     if: needs.matrix.outputs.include != '{"include":[]}'
     strategy:
       matrix: ${{ fromJSON(needs.matrix.outputs.include) }}

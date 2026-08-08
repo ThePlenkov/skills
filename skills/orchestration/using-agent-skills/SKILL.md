@@ -19,25 +19,19 @@ Task arrives
     ├── Don't know what you want yet? ──────→ interview-me
     ├── Have a rough concept, need variants? → idea-refine
     ├── New project/feature/change? ──→ spec-driven-development
-    ├── Have a spec, need tasks? ──────→ planning-and-task-breakdown
-    ├── Implementing code? ────────────→ incremental-implementation
-    │   ├── UI work? ─────────────────→ frontend-ui-engineering
-    │   ├── API work? ────────────────→ api-and-interface-design
-    │   ├── Need better context? ─────→ context-engineering
-    │   ├── Need doc-verified code? ───→ source-driven-development
-    │   └── Stakes high / unfamiliar code? ──→ doubt-driven-development
+    ├── Have a spec, need tasks? ──────→ shared-plan
+    ├── Implementing code? ────────────→ test-driven-development
+    │   ├── API work? ────────────────→ architecture-review
+    │   ├── Need doc-verified code? ───→ external-research
+    │   └── Stakes high / unfamiliar code? ──→ critical-thinking
     ├── Writing/running tests? ────────→ test-driven-development
     ├── Something broke? ──────────────→ debugging
-    ├── Reviewing code? ───────────────→ code-review-and-quality
-    │   ├── Too complex? ─────────────→ code-simplification
+    ├── Reviewing code? ───────────────→ review-methodology
+    │   ├── Too complex? ─────────────→ minimalist
     │   ├── Security concerns? ───────→ security-and-hardening
-    │   └── Performance concerns? ────→ performance-optimization
+    │   └── Performance concerns? ────→ performance-investigation
     ├── Committing/branching? ─────────→ git-workflow-and-versioning
-    ├── CI/CD pipeline work? ──────────→ ci-cd-and-automation
-    ├── Deprecating/migrating? ────────→ deprecation-and-migration
-    ├── Writing docs/ADRs? ───────────→ documentation-and-adrs
-    ├── Adding logs/metrics/alerts? ───→ observability-and-instrumentation
-    └── Deploying/launching? ─────────→ shipping-and-launch
+    └── CI/CD pipeline work? ──────────→ ci-cd-and-automation
 ```
 
 ## Core Operating Behaviors
@@ -109,7 +103,7 @@ Your job is surgical precision, not unsolicited renovation.
 
 Every skill includes a verification step. A task is not complete until verification passes. "Seems right" is never sufficient — there must be evidence (passing tests, build output, runtime data).
 
-Per-skill verification is the local check. The project-wide bar that applies to *every* change, regardless of which skill is active, is the Definition of Done: tests pass, no regressions, behavior verified at runtime, docs updated. See `references/definition-of-done.md`. It complements each task's acceptance criteria rather than replacing them.
+Per-skill verification is the local check. The project-wide bar that applies to *every* change, regardless of which skill is active, is the Definition of Done: tests pass, no regressions, behavior verified at runtime, docs updated. See `skills/workflow/planning/shared-plan/references/definition-of-done.md`. It complements each task's acceptance criteria rather than replacing them.
 
 ## Failure Modes to Avoid
 
@@ -132,9 +126,9 @@ These are the subtle errors that look like productivity but create problems:
 
 2. **Skills are workflows, not suggestions.** Follow the steps in order. Don't skip verification steps.
 
-3. **Multiple skills can apply.** A feature implementation might involve $skill{idea-refine} → $skill{spec-driven-development} → $skill{planning-and-task-breakdown} → $skill{incremental-implementation} → $skill{test-driven-development} → $skill{code-review-and-quality} → $skill{code-simplification} → $skill{shipping-and-launch} in sequence.
+3. **Multiple skills can apply.** A feature implementation might involve idea-refine → spec-driven-development → test-driven-development → review-methodology → minimalist in sequence.
 
-4. **When in doubt, start with a spec.** If the task is non-trivial and there's no spec, begin with $skill{spec-driven-development}.
+4. **When in doubt, start with a spec.** If the task is non-trivial and there's no spec, begin with spec-driven-development.
 
 ## Lifecycle Sequence
 
@@ -144,46 +138,31 @@ For a complete feature, the typical skill sequence is:
 1.  interview-me                → Extract what the user actually wants
 2.  idea-refine                 → Refine vague ideas
 3.  spec-driven-development     → Define what we're building
-4.  planning-and-task-breakdown → Break into verifiable chunks
-5.  context-engineering         → Load the right context
-6.  source-driven-development   → Verify against official docs
-7.  incremental-implementation  → Build slice by slice
-8.  observability-and-instrumentation → Instrument as you build (runs parallel with 7-9, not after)
-9.  doubt-driven-development    → Cross-examine non-trivial decisions in-flight
-10. test-driven-development     → Prove each slice works
-11. code-review-and-quality     → Review before merge
-12. code-simplification         → Reduce unnecessary complexity while preserving behavior
-13. git-workflow-and-versioning → Clean commit history
-14. documentation-and-adrs      → Document decisions
-15. deprecation-and-migration   → Retire old systems and move users safely when needed
-16. shipping-and-launch         → Deploy safely
+4.  external-research   → Verify against official docs
+5.  test-driven-development     → Prove each slice works
+6.  critical-thinking    → Cross-examine non-trivial decisions in-flight
+7.  review-methodology     → Review before merge
+8.  minimalist         → Reduce unnecessary complexity while preserving behavior
+9.  git-workflow-and-versioning → Clean commit history
 ```
 
-Not every task needs every skill. A bug fix might only need: $skill{debugging} → $skill{test-driven-development} → $skill{code-review-and-quality}.
+Not every task needs every skill. A bug fix might only need: debugging → test-driven-development → review-methodology.
 
 ## Quick Reference
 
 | Phase | Skill | One-Line Summary |
 |-------|-------|-----------------|
-| Define | $skill{interview-me} | Surface what the user actually wants before any plan, spec, or code exists |
-| Define | $skill{idea-refine} | Refine ideas through structured divergent and convergent thinking |
-| Define | $skill{spec-driven-development} | Requirements and acceptance criteria before code |
-| Plan | $skill{planning-and-task-breakdown} | Decompose into small, verifiable tasks |
-| Build | $skill{incremental-implementation} | Thin vertical slices, test each before expanding |
-| Build | $skill{source-driven-development} | Verify against official docs before implementing |
-| Build | $skill{doubt-driven-development} | Adversarial fresh-context review of every non-trivial decision |
-| Build | $skill{context-engineering} | Right context at the right time |
-| Build | $skill{frontend-ui-engineering} | Production-quality UI with accessibility |
-| Build | $skill{api-and-interface-design} | Stable interfaces with clear contracts |
-| Verify | $skill{test-driven-development} | Failing test first, then make it pass |
-| Verify | $skill{debugging} | Reproduce → localize → fix → guard |
-| Review | $skill{code-review-and-quality} | Five-axis review with quality gates |
-| Review | $skill{code-simplification} | Preserve behavior while reducing unnecessary complexity |
-| Review | $skill{security-and-hardening} | OWASP prevention, input validation, least privilege |
-| Review | $skill{performance-optimization} | Measure first, optimize only what matters |
-| Ship | $skill{git-workflow-and-versioning} | Atomic commits, clean history |
-| Ship | $skill{ci-cd-and-automation} | Automated quality gates on every change |
-| Ship | $skill{deprecation-and-migration} | Remove old systems and migrate users safely |
-| Ship | $skill{documentation-and-adrs} | Document the why, not just the what |
-| Ship | $skill{observability-and-instrumentation} | Structured logs, RED metrics, traces, symptom-based alerts |
-| Ship | $skill{shipping-and-launch} | Pre-launch checklist, monitoring, rollback plan |
+| Define | interview-me | Surface what the user actually wants before any plan, spec, or code exists |
+| Define | idea-refine | Refine ideas through structured divergent and convergent thinking |
+| Define | spec-driven-development | Requirements and acceptance criteria before code |
+| Build | external-research | Verify against official docs before implementing |
+| Build | critical-thinking | Adversarial fresh-context review of every non-trivial decision |
+| Build | architecture-review | Stable interfaces with clear contracts |
+| Verify | test-driven-development | Failing test first, then make it pass |
+| Verify | debugging | Reproduce → localize → fix → guard |
+| Review | review-methodology | Five-axis review with quality gates |
+| Review | minimalist | Preserve behavior while reducing unnecessary complexity |
+| Review | security-and-hardening | OWASP prevention, input validation, least privilege |
+| Review | performance-investigation | Measure first, optimize only what matters |
+| Ship | git-workflow-and-versioning | Atomic commits, clean history |
+| Ship | ci-cd-and-automation | Automated quality gates on every change |

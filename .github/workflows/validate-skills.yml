@@ -59,7 +59,7 @@ permissions:
 jobs:
   validate:
     name: Validate skills structure
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -74,6 +74,11 @@ jobs:
 
       - name: Install Node dependencies
         run: npm ci --no-audit --no-fund --prefer-offline
+
+      - name: Set up Python
+        # scripts/install.sh validates and compares symlinked skill trees
+        # with Python 3 helpers; ensure it is available on self-hosted runners.
+        uses: ./.github/actions/setup-python-with-fallback
 
       - name: Validate all SKILL.md frontmatter
         # For each SKILL.md: extract YAML frontmatter, convert to JSON,
@@ -159,7 +164,7 @@ jobs:
 
   check-os-independence:
     name: Check OS independence
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -202,7 +207,7 @@ jobs:
 
   check-skill-size:
     name: Warn on oversized skill files
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v7
 
@@ -221,7 +226,7 @@ jobs:
 
   coverage-matrix:
     name: Check skill coverage matrix
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v7
 
@@ -240,7 +245,7 @@ jobs:
 
   readme-categories:
     name: Check README skill categories
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v7
 

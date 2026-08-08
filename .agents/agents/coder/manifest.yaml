@@ -12,8 +12,7 @@ required:
   - codehome
   - one-shot-patch
   - safeguard
-  - git-commit
-  - git-push
+  - git-workflow-and-versioning
   - git-reset
   - ci-local
 optional:
@@ -29,5 +28,4 @@ forbidden:
   - act
   - harvest
   - github-pr-review
-  - mr-address-review
   - triage-issue

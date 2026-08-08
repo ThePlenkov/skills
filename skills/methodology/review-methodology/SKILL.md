@@ -31,9 +31,9 @@ these files are the contract.
 
 ## When not to use
 
-- Fixing findings → `$skill{act}`.
-- Platform-specific PR review workflow on GitHub → `$skill{github-pr-review}`.
-- Two-axis Standards + Spec review → `$skill{two-axis-review}`.
+- Fixing findings → `act`.
+- Platform-specific PR review workflow on GitHub → `github-pr-review`.
+- Two-axis Standards + Spec review → `two-axis-review`.
 
 ## The contract
 
@@ -53,11 +53,11 @@ not an Intent finding.
 | **Legibility** | Will the next agent understand the repository more cheaply? |
 
 For detailed execution of a specific axis, delegate to the relevant skill:
-`$skill{two-axis-review}` for Standards/Spec decomposition,
-`$skill{security-and-hardening}` for threat modelling,
-`$skill{evidence}` for verification discipline,
-`$skill{codehome}` and `$skill{architecture-review}` for fit,
-`$skill{code-simplification}` and `$skill{critical-thinking}` for legibility.
+`two-axis-review` for Standards/Spec decomposition,
+`security-and-hardening` for threat modelling,
+`evidence` for verification discipline,
+`codehome` and `architecture-review` for fit,
+`minimalist` and `critical-thinking` for legibility.
 
 ### Severity (from `REVIEW.md`)
 
@@ -107,6 +107,19 @@ lint rule, CI gate, AGENTS.md rule, skill change, or explicitly "none, one-off".
 If the finding violates something already written in `AGENTS.md`, `REVIEW.md`,
 or a skill, the document is at fault: it must be rewritten or automated. "Be more careful"
 is not a prevention.
+
+## Generic guidance
+
+The contract above is the yardstick; the references below are the practical details:
+
+- [Structural remedies](references/structural-remedies.md) — propose the move, not just the problem.
+- [Change sizing](references/change-sizing.md) — when and how to split a change.
+- [Change descriptions](references/change-descriptions.md) — commit/PR message hygiene.
+- [Dependency discipline](references/dependency-discipline.md) — adding and upgrading dependencies.
+- [Common rationalizations](references/common-rationalizations.md) — pushback that sounds reasonable but isn't.
+- [Red flags](references/red-flags.md) — signals that a review or change is off.
+- [Verification checklist](references/verification-checklist.md) — close the loop before merging.
+- [Security checklist](references/security-checklist.md) and [performance checklist](references/performance-checklist.md) — per-domain concerns.
 
 ## Output
 

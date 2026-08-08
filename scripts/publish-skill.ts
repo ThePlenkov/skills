@@ -45,6 +45,43 @@ build({
 const targetRepoDir = fs.mkdtempSync(path.join(process.cwd(), 'target-repo-'));
 const targetSkillPath = path.join('skills', skillName);
 
+function generateReadme(repoShorthand: string, repoDir: string): void {
+  const publicSkillsRoot = path.join(repoDir, 'skills');
+  let rows: { name: string; description: string }[] = [];
+  if (fs.existsSync(publicSkillsRoot)) {
+    const published = discoverSkills(publicSkillsRoot);
+    rows = [...published.values()]
+      .map((s) => ({ name: s.name, description: s.description }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  const table = rows.length
+    ? `| Skill | Description |\n|---|---|\n${rows.map((r) => `| ${r.name} | ${r.description} |`).join('\n')}\n`
+    : '_No skills published yet._\n';
+
+  const content = `# ${repoShorthand}
+
+Public distribution of agent skills from [theplenkov-ai/skills](https://github.com/theplenkov-ai/skills).
+
+## Install
+
+\`\`\`bash
+# Install all skills
+npx skills add ${repoShorthand} --all
+
+# Install a specific skill
+npx skills add ${repoShorthand} --skill <skill-name>
+\`\`\`
+
+## Skills
+
+${table}
+_Auto-published from [theplenkov-ai/skills](https://github.com/theplenkov-ai/skills)._
+`;
+
+  fs.writeFileSync(path.join(repoDir, 'README.md'), content, 'utf8');
+}
+
 try {
   execSync('gh auth setup-git');
   execFileSync('gh', ['repo', 'clone', resolvedRepo, targetRepoDir]);
@@ -53,6 +90,8 @@ try {
   fs.rmSync(destPath, { recursive: true, force: true });
   fs.mkdirSync(path.dirname(destPath), { recursive: true });
   fs.cpSync(buildDir, destPath, { recursive: true });
+
+  generateReadme(resolvedRepo, targetRepoDir);
 
   const status = execSync('git status --porcelain', { cwd: targetRepoDir, encoding: 'utf8' });
   if (status.trim()) {

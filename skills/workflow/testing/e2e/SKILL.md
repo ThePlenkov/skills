@@ -5,7 +5,7 @@ description: Domain-agnostic AI-native scenario runner (e2e-agent CLI). Scenario
 
 # /e2e — e2e-agent (domain-agnostic)
 
-**This skill is fully generic.** It does not know SAP, MCP, or any particular service. Your project supplies a config + adapter; see [SPEC.md](./SPEC.md).
+**This skill is fully generic.** It does not know SAP, MCP, or any particular service. Your project supplies a config + adapter; see [references/SPEC.md](references/SPEC.md).
 
 **Agents use only the CLI below.** Do not import `scripts/framework/*`. Do not generate per-scenario TypeScript.
 
@@ -52,4 +52,4 @@ Project profile: `e2e.config.yaml`. Product spec: `specs/mcp-ai-testing.md`.
 
 ## Configuration
 
-Project config lives in `e2e.config.yaml` at the repo root (adapter, suites, optional `autoclean`). See [SPEC.md](./SPEC.md) for framework flags, scenario format, adapter contract, and evidence shape.
+Project config lives in `e2e.config.yaml` at the repo root (adapter, suites, optional `autoclean`). See [references/SPEC.md](references/SPEC.md) for framework flags, scenario format, adapter contract, and evidence shape.

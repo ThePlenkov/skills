@@ -14,16 +14,14 @@ required:
   - investigate-first
 optional:
   - sandboxed
-  - git-commit
+  - git-workflow-and-versioning
   - ci-local
   - persistent-memory
 forbidden:
   - act
   - harvest
   - github-pr-review
-  - mr-address-review
   - triage-issue
-  - git-push
   - git-reset
   - e2e
   - npm-publish

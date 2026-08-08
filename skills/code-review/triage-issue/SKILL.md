@@ -15,9 +15,9 @@ Act as the first responder on an incoming issue. Do not just summarize — *work
 
 ## When NOT to Use
 
-- The user only wants a summary of the issue (use $github / $gitlab directly).
+- The user only wants a summary of the issue (use external-tools directly).
 - The issue is a feature request or discussion with no concrete failure — just comment and hand back.
-- The user explicitly wants a code review, not triage (use $skill{act} / $skill{github-pr-review}).
+- The user explicitly wants a code review, not triage (use act / github-pr-review).
 
 ## Principles
 
@@ -33,8 +33,8 @@ Act as the first responder on an incoming issue. Do not just summarize — *work
 
 Identify the platform from the URL. Use the appropriate skill:
 
-- GitLab → `$glab` / `$gitlab` (`glab api`, `glab issue view`, `glab ci trace`).
-- GitHub → `$github` (`gh issue view`, `gh run view`, `gh pr view`).
+- GitLab → `external-tools` (`glab api`, `glab issue view`, `glab ci trace`).
+- GitHub → `external-tools` (`gh issue view`, `gh run view`, `gh pr view`).
 
 Pull: issue title/body, labels, assignees, linked MR/PR, latest pipeline / workflow run, failing job traces.
 
@@ -55,7 +55,7 @@ For CI failures:
 For behavioral bugs:
 
 - Identify the component / file from the report.
-- Use `$blame-trace` to find the commit that introduced the suspected code.
+- Use `blame-trace` to find the commit that introduced the suspected code.
 - Read related tests or recent PRs in the area.
 
 ### 4. Check for upstream fix
@@ -80,7 +80,7 @@ Before writing new code:
 1. Create a branch, implement the minimal fix.
 2. Add or update a test that reproduces the failure.
 3. Verify locally (run tests / lint / relevant `test-local.sh`).
-4. Push and open a **draft** PR/MR (`$split-draft-mrs` or `gh pr create --draft` / `glab mr create --draft`).
+4. Push and open a **draft** PR/MR (`split-draft-mrs` or `gh pr create --draft` / `glab mr create --draft`).
 5. Link the PR/MR from the issue with a comment explaining cause and fix.
 6. Leave the issue open until the PR/MR merges and a re-run passes.
 
@@ -155,11 +155,7 @@ Reassigning back to you for now.
 
 ## Tools & references
 
-- `$glab` / `$gitlab` — GitLab CLI (`glab api`, `glab issue note`, `glab ci trace`, `glab mr create --draft`).
-- `$github` — GitHub CLI (`gh issue view`, `gh issue comment`, `gh run view`, `gh pr create --draft`).
-- `$blame-trace` — find the commit that introduced the suspected code.
-- `$split-draft-mrs` — when the fix is large enough that stacked draft MRs make sense.
-- `$mr-description-writer` / `$mr-review-buddy` — for the PR/MR body after the fix is pushed.
+See [references/related-skills.md](references/related-skills.md) for related skills and tools.
 
 ## Anti-patterns
 

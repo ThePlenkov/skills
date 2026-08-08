@@ -6,7 +6,6 @@ notes: |
 required:
   - token-rationalism
   - review-methodology
-  - code-review-and-quality
   - two-axis-review
   - evidence
   - critical-thinking
@@ -18,17 +17,13 @@ required:
 optional:
   - harvest
   - retrospect
-  - context-engineering
   - investigate-first
   - drill
 forbidden:
   - one-shot-patch
   - refactoring
-  - git-commit
-  - git-push
+  - git-workflow-and-versioning
   - git-reset
   - act
   - github-fix-main
-  - mr-address-review
   - triage-issue
-  - incremental-implementation

@@ -9,6 +9,8 @@ description: Creates specs before coding. Use when starting a new project, featu
 
 Write a structured specification before writing any code. The spec is the shared source of truth between you and the human engineer — it defines what we're building, why, and how we'll know it's done. Code without a spec is guessing.
 
+For GitHub's `specify` CLI workflow, see the upstream [Spec Kit](https://github.github.io/spec-kit/) documentation. Use the generic SDD phases below for the methodology, and refer to Spec Kit's docs for tool-specific install and commands.
+
 ## When to Use
 
 - Starting a new project or feature
@@ -134,7 +136,7 @@ With the validated spec, generate a technical implementation plan:
 4. Identify what can be built in parallel vs. what must be sequential
 5. Define verification checkpoints between phases
 
-> Follow $skill{planning-and-task-breakdown} for the dependency-graph mapping and vertical-slicing mechanics behind these steps; it is the canonical source. The bullets above are a lightweight summary; if they ever diverge, $skill{planning-and-task-breakdown} takes precedence.
+> Use task breakdown to map the dependency graph and identify vertical slices. The bullets above are a lightweight summary.
 >
 > **Output convention:** Save the plan to `tasks/plan.md` and the task list to `tasks/todo.md`, per the `/plan` command convention. Create `tasks/` if it does not exist. Downstream commands (`/build`, etc.) expect these paths.
 
@@ -150,7 +152,7 @@ Break the plan into discrete, implementable tasks:
 - Tasks are ordered by dependency, not by perceived importance
 - No task should require changing more than ~5 files
 
-> Follow $skill{planning-and-task-breakdown} for the full task-sizing and dependency-ordering mechanics; it is the canonical source. The template below is a lightweight inline form; if they ever diverge, $skill{planning-and-task-breakdown} takes precedence.
+> Size tasks so none touches more than a handful of files and each has clear acceptance criteria. The template below is a lightweight inline form.
 #### Task template:
 ```markdown
 - [ ] Task: [Description]
@@ -161,7 +163,7 @@ Break the plan into discrete, implementable tasks:
 
 ### Phase 4: Implement
 
-Execute tasks one at a time following `skills/methodology/incremental-implementation/SKILL.md` ($skill{incremental-implementation}) and `skills/methodology/test-driven-development/SKILL.md` ($skill{test-driven-development}). Use `skills/methodology/context-engineering/SKILL.md` ($skill{context-engineering}) to load the right spec sections and source files at each step rather than flooding the agent with the entire spec.
+Execute tasks one at a time following `skills/methodology/test-driven-development/SKILL.md` ($skill{test-driven-development}). Load only the spec sections and source files relevant to the current step rather than flooding the agent with the entire spec.
 
 ## Keeping the Spec Alive
 

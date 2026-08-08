@@ -1,5 +1,0 @@
-interface:
-  display_name: "Git Push"
-  short_description: "Push commits to remote with validation of target and scope"
-  brand_color: "#3B82F6"
-  default_prompt: "Use $git-push to get started."

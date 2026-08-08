@@ -15,9 +15,9 @@ One-shot cleanup of the default branch: green CI + no open security/quality find
 
 ## When NOT to use
 
-- Reviewing someone else's PR → `$skill{github-pr-review}`.
-- Triaging a reported issue → `$skill{triage-issue}`.
-- Writing a commit message only → `$skill{git-commit}`.
+- Reviewing someone else's PR → `github-pr-review`.
+- Triaging a reported issue → `triage-issue`.
+- Writing a commit message only → `git-workflow-and-versioning`.
 - Fixing a red PR branch (not main) → work the PR directly.
 
 ## Invocation
@@ -65,10 +65,12 @@ git switch -c fix/main-health origin/"$MAIN"
 ### 2. Gather signal in parallel
 
 ```bash
-gh run list --branch "$MAIN" --limit 1 --json databaseId,status,conclusion,workflowName,headSha,url
+gh run list --branch "$MAIN" --limit=1 --json databaseId,status,conclusion,workflowName,headSha,url
 gh api "repos/$REPO/code-scanning/alerts?state=open&per_page=100" --paginate > tmp/fix-main/code-scanning.json
-ls sonar-project.properties .sonarcloud.properties 2>/dev/null
-grep -RIl "SONAR_TOKEN\|sonarcloud\|sonarqube" .github/ 2>/dev/null
+for f in sonar-project.properties .sonarcloud.properties; do
+  if test -f "$f"; then echo "$f"; fi
+done
+git grep -I -l "SONAR_TOKEN\|sonarcloud\|sonarqube" -- .github/
 ```
 
 Dump all raw responses under `tmp/fix-main/`. Verify Sonar credentials before assuming SonarCloud fix is in-scope.
@@ -137,7 +139,7 @@ Write `tmp/fix-main/pr-body.md` per the template in [references/pr-body.md](refe
 
 ```bash
 git push -u origin fix/main-health
-gh pr create --base "$MAIN" --head fix/main-health \
+gh pr create --base="$MAIN" --head=fix/main-health \
   --title "fix(main): restore health of main (CI + security + quality)" \
   --body-file tmp/fix-main/pr-body.md
 ```
@@ -156,7 +158,7 @@ CI should already be green because §6 mirrored it. Confirm with `gh pr checks "
 
 ### 7c. Review-response loop
 
-Resolve review feedback inline or delegate to `$skill{github-pr-review}`.
+Resolve review feedback inline or delegate to `github-pr-review`.
 
 ```bash
 gh pr view "$PR" --json reviewDecision,reviews,comments,latestReviews
@@ -180,6 +182,4 @@ Per thread:
 - [references/ci-parity.md](references/ci-parity.md) — §6 reproducible CI command set.
 - [references/pr-body.md](references/pr-body.md) — PR body template + `gh pr create` invocation.
 - [references/terminal-states.md](references/terminal-states.md) — stop conditions and follow-up message template.
-- `$skill{github}` — raw `gh` patterns.
-- `$skill{github-pr-review}` — reviewer side once the PR is open.
-- `$skill{git-commit}` — atomic commit conventions.
+- [references/related-skills.md](references/related-skills.md) — related skills this skill may delegate to.

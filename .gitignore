@@ -4,6 +4,7 @@ node_modules/
 .env
 .env.*
 tmp/
+.doctor/
 skillspector.sarif
 # Nx cache (populated by actions/skillspector; do not commit)
 .nx/
@@ -36,6 +37,9 @@ skills-obsidian/
 # Generated flat skill view and Mermaid graphs; source of truth is skills/.
 .agents/skills/
 docs/graphs/generated/
+
+# Generated human-readable skills index; published to theplenkov-ai/skills-sync
+docs/skills-index.md
 
 # Built compiler output; rebuilt on demand (npx tsc -p tools/compiler/tsconfig.json)
 tools/compiler/dist/

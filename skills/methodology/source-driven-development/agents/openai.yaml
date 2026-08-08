@@ -1,5 +1,0 @@
-interface:
-  display_name: "Source Driven Development"
-  short_description: "Grounds every implementation decision in official documentation"
-  brand_color: "#3B82F6"
-  default_prompt: "Use $source-driven-development to get started."

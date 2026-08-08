@@ -7,7 +7,7 @@ This repository is maintained by an agent that creates and updates skills and ro
 ```
 skills/
 ├── foundation/         # Behavioral primitives (token economy, memory, minimalist senior-dev persona) — tier 0 always-on + tier 1/2 opt-in primitives
-├── methodology/        # Development methodology (patching, critical thinking, code home, SDD)
+├── methodology/        # Development methodology (patching, critical thinking, code home)
 ├── verification/       # Runtime proof (evidence)
 ├── safety/             # Destructive operation protection (safeguard, salvage)
 ├── orchestration/      # Agent coordination, isolation, session state, and context-window hand-off
@@ -23,7 +23,7 @@ skills/
 ├── coaching/           # User guidance (adhd)
 ├── self-learning/      # Retrospective learning (retrospect, skill-feedback)
 ├── experimentation/    # Sandboxed experimentation (sandboxed)
-├── engineering/        # Cross-cutting engineering practices (API/UI design, prototype-driven design, performance, security)
+├── engineering/        # Cross-cutting engineering practices (frontend, nodejs/typescript, bootstrap-ts-repo, prototype, security)
 └── agents/             # Framework management (dotagents, claude-skills)
 ```
 
@@ -152,12 +152,12 @@ export const skillMetadata: Record<string, SkillMetadata> = {
 
 ## Skill references
 
-When one skill references another, use `$name` or `$skill{name}` notation. Integration and tool skills are typically referenced by bare `$name` (e.g. `$github`, `$gitlab`, `$glab`); other skills may use `$skill{name}`:
+When one skill references another, use `$name` or `$skill{name}` notation. Hyphenated or integration/tool skills should use `$skill{name}` (e.g. `$skill{external-tools}`); other skills may use bare `$name`:
 
 ```markdown
 See $skill{evidence} for proof requirements.
 Use $skill{safeguard} before destructive operations.
-See $github for authentication.
+See $skill{external-tools} for authentication.
 ```
 
 ## Required UI metadata

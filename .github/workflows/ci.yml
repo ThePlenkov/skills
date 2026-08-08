@@ -44,7 +44,7 @@ permissions:
 jobs:
   shellcheck:
     name: ShellCheck
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
     env:
       SC_VERSION: v0.10.0
     steps:
@@ -106,7 +106,7 @@ jobs:
 
   markdownlint:
     name: Markdown Lint
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -136,7 +136,7 @@ jobs:
 
   reserved-names:
     name: Check reserved skill names
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -164,7 +164,7 @@ jobs:
     # `npx github:theplenkov/skills`) is exercised here so the idempotent
     # re-install path can't regress unnoticed.
     name: Wrapper smoke test
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -181,6 +181,11 @@ jobs:
         # Pure devDeps; production npm install is unnecessary because the
         # wrapper is shipped as a source file and resolved at runtime.
         run: npm ci --no-audit --no-fund --prefer-offline
+
+      - name: Set up Python
+        # scripts/install.sh validates and compares symlinked skill trees
+        # with Python 3 helpers; ensure it is available on self-hosted runners.
+        uses: ./.github/actions/setup-python-with-fallback
 
       - name: Build local compiler package
         run: npx tsc -p tools/compiler/tsconfig.json
@@ -213,7 +218,7 @@ jobs:
     # PRs only need fast Linux feedback; the full matrix runs on main.
     if: github.event_name == 'pull_request'
     name: Unit tests (self-hosted)
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v7
         with:

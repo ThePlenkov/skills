@@ -142,7 +142,7 @@ During post-drill:
 
 1. **Merge** `prevention_plan` entries from the root drill and all nested drills.
 2. **Dedupe** by `sink` + `action` and keep the most specific `evidence`.
-3. Invoke `$skill{retrospect}` once with the merged plan; it routes each remaining action to the correct resource.
+3. Invoke `retrospect` once with the merged plan; it routes each remaining action to the correct resource.
 
 If the merged prevention plan is empty and the drill encountered a non-trivial issue, the parent agent must still retrospect to discover why the plan was missed.
 

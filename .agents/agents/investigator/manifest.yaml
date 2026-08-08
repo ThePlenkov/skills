@@ -18,8 +18,7 @@ optional:
   - shared-plan
   - deepwiki
 forbidden:
-  - git-commit
-  - git-push
+  - git-workflow-and-versioning
   - git-reset
   - ci-local
   - e2e
@@ -27,6 +26,5 @@ forbidden:
   - act
   - harvest
   - github-pr-review
-  - mr-address-review
   - triage-issue
   - npm-publish

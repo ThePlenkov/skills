@@ -18,7 +18,7 @@ based on the question you have:
   schema for the evidence file — required fields, `artifacts[].kind`
   values, `claim.json` / `target_environment`):
   [`evidence-schema.md`](evidence-schema.md) (and the JSON
-  Schema in `templates/claim.json`).
+  Schema in `claim.json`).
 
 ## Choose Target Environment
 

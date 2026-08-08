@@ -22,19 +22,11 @@ export const skillMetadata: Record<string, SkillMetadata> = {
         "tier": 2,
         "triggers": ["user", "model"],
         "allowed-tools": ["read", "exec", "write", "edit", "web_search", "web_get_contents", "grep", "message_user"],
-        "conflicts_with": ["github-pr-review", "code-review-and-quality"],
+        "conflicts_with": ["github-pr-review", "review-methodology"],
       },
     },
   },
   "adhd": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
-  "api-and-interface-design": {
     frontmatter: {
       metadata: {
         "tier": 2,
@@ -47,14 +39,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       metadata: {
         "allowed-tools": "read, grep, glob, exec",
         "argument-hint": "<repository path or focus area, optional review scope>",
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
-  "atlassian": {
-    frontmatter: {
-      metadata: {
         "tier": 2,
         "triggers": ["user", "model"],
       },
@@ -118,23 +102,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "code-review-and-quality": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-        "conflicts_with": ["github-pr-review"],
-      },
-    },
-  },
-  "code-simplification": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
   "codehome": {
     frontmatter: {
       metadata: {
@@ -150,14 +117,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
     },
   },
   "codescene": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
-  "context-engineering": {
     frontmatter: {
       metadata: {
         "tier": 2,
@@ -200,23 +159,7 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "deprecation-and-migration": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
   "docker-agent-config": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
-  "documentation-and-adrs": {
     frontmatter: {
       metadata: {
         "tier": 2,
@@ -237,15 +180,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "doubt-driven-development": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-        "conflicts_with": ["investigate-first", "critical-thinking"],
-      },
-    },
-  },
   "drill": {
     frontmatter: {
       metadata: {
@@ -253,7 +187,8 @@ export const skillMetadata: Record<string, SkillMetadata> = {
         "author": "petr-plenkov",
         "version": "1.1.0",
         "tier": 2,
-        "triggers": ["user", "model"],
+        "triggers": ["user"],
+        "disable-model-invocation": true,
       },
     },
   },
@@ -261,8 +196,8 @@ export const skillMetadata: Record<string, SkillMetadata> = {
     frontmatter: {
       metadata: {
         "tier": 2,
-        "triggers": ["user", "model"],
-        "disable-model-invocation": false,
+        "triggers": ["user"],
+        "disable-model-invocation": true,
       },
     },
   },
@@ -276,6 +211,7 @@ export const skillMetadata: Record<string, SkillMetadata> = {
           "write": "ask"
         },
         "argument-hint": "<task or claim to evidence> [lite|full]",
+        "disable-model-invocation": true,
         "triggers": ["user", "model"],
         "tier": 2,
       },
@@ -296,31 +232,15 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
+  "external-tools": {
+    frontmatter: {
+      metadata: {
+        "tier": 2,
+        "triggers": ["user", "model"],
+      },
+    },
+  },
   "external-research": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
-  "frontend-ui-engineering": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
-  "git-commit": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
-  "git-push": {
     frontmatter: {
       metadata: {
         "tier": 2,
@@ -345,19 +265,12 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "github": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
   "github-fix-main": {
     frontmatter: {
       metadata: {
         "tier": 2,
-        "triggers": ["user", "model"],
+        "disable-model-invocation": true,
+        "triggers": ["user"],
       },
     },
   },
@@ -365,28 +278,13 @@ export const skillMetadata: Record<string, SkillMetadata> = {
     frontmatter: {
       metadata: {
         "tier": 2,
-        "triggers": ["user", "model"],
-        "conflicts_with": ["code-review-and-quality"],
-      },
-    },
-  },
-  "gitlab": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
+        "disable-model-invocation": true,
+        "triggers": ["user"],
+        "conflicts_with": ["review-methodology"],
       },
     },
   },
   "gitlab-ci-local": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
-  "glab": {
     frontmatter: {
       metadata: {
         "tier": 2,
@@ -408,9 +306,9 @@ export const skillMetadata: Record<string, SkillMetadata> = {
         "upstream": "mattpocock/skills",
         "upstream_path": "skills/productivity/handoff/",
         "note": "Adapted from mattpocock/skills. Path resolution swapped from a single OS temp directory to \"OS temp handoff body + per-worktree `.agents/handoffs/latest.md` pointer\" so `/clear` sessions on the same machine can find handoffs across git worktrees.",
-        "disable-model-invocation": false,
+        "disable-model-invocation": true,
         "tier": 2,
-        "triggers": ["user", "model"],
+        "triggers": ["user"],
         "argument-hint": "what the next session will focus on | resume",
       },
     },
@@ -433,20 +331,12 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "incremental-implementation": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-        "conflicts_with": ["loop-programming"],
-      },
-    },
-  },
   "interview-me": {
     frontmatter: {
       metadata: {
         "tier": 2,
-        "triggers": ["user", "model"],
+        "triggers": ["user"],
+        "disable-model-invocation": true,
       },
     },
   },
@@ -468,8 +358,7 @@ export const skillMetadata: Record<string, SkillMetadata> = {
         "allowed-tools": "read, grep, glob, edit, write, exec",
         "argument-hint": "<goal plus validators, e.g. \"fix auth tests; npm test -- auth\">",
         "tier": 2,
-        "triggers": ["user", "model"],
-        "conflicts_with": ["incremental-implementation"]
+        "triggers": ["user", "model"]
       },
     },
   },
@@ -502,14 +391,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "mr-address-review": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
   "nodejs": {
     frontmatter: {
       metadata: {
@@ -526,14 +407,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
           "network": "registry.npmjs.org",
           "scope": "packages explicitly opted in via `npm publish` from a clean checkout"
         },
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
-  "observability-and-instrumentation": {
-    frontmatter: {
-      metadata: {
         "tier": 2,
         "triggers": ["user", "model"],
       },
@@ -560,27 +433,11 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "performance-optimization": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
   "persistent-memory": {
     frontmatter: {
       metadata: {
         "tier": 1,
         "triggers": ["user"],
-      },
-    },
-  },
-  "planning-and-task-breakdown": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
       },
     },
   },
@@ -591,6 +448,7 @@ export const skillMetadata: Record<string, SkillMetadata> = {
         "upstream_path": "skills/engineering/prototype/",
         "note": "Adapted from mattpocock/skills. Sub-files in references/ are the two branch guides.",
         "allowed-tools": "read, grep, glob, edit, write, exec",
+        "disable-model-invocation": true,
         "tier": 2,
         "triggers": ["user", "model"],
       },
@@ -703,18 +561,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "save-session": {
-    frontmatter: {
-      metadata: {
-        "tags": ["productivity", "workflow", "persistence", "handoff"],
-        "author": "codex",
-        "version": "1.0.0",
-        "tier": 2,
-        "triggers": ["user", "model"],
-        "disable-model-invocation": false,
-      },
-    },
-  },
   "security-and-hardening": {
     frontmatter: {
       metadata: {
@@ -732,14 +578,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
     },
   },
   "shared-plan": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
-  "shipping-and-launch": {
     frontmatter: {
       metadata: {
         "tier": 2,
@@ -811,14 +649,6 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "spec-kit": {
-    frontmatter: {
-      metadata: {
-        "tier": 2,
-        "triggers": ["user", "model"],
-      },
-    },
-  },
   "subagent-capsule": {
     frontmatter: {
       metadata: {
@@ -849,7 +679,8 @@ export const skillMetadata: Record<string, SkillMetadata> = {
     frontmatter: {
       metadata: {
         "tier": 2,
-        "triggers": ["user", "model"],
+        "disable-model-invocation": true,
+        "triggers": ["user"],
       },
     },
   },
@@ -871,8 +702,9 @@ export const skillMetadata: Record<string, SkillMetadata> = {
         "allowed-tools": "read, grep, glob, exec, run_subagent",
         "argument-hint": "<fixed-point ref, e.g. \"main\", \"HEAD~5\", \"abc1234\">",
         "tier": 2,
-        "triggers": ["user", "model"],
-        "conflicts_with": ["github-pr-review", "mr-address-review", "code-review-and-quality"],
+        "disable-model-invocation": true,
+        "triggers": ["user"],
+        "conflicts_with": ["github-pr-review", "act", "review-methodology"],
       },
     },
   },
@@ -920,5 +752,14 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
+  "security-doctor": {
+    frontmatter: {
+      metadata: {
+        "tier": 2,
+        "triggers": ["user", "model"],
+        "allowed-tools": ["read", "exec", "write", "edit", "web_search", "web_get_contents", "grep", "message_user"],
+        "compatibility": "Requires gh (with act extension), docker, or the scanner CLI.",
+      },
+    },
+  },
 };
-

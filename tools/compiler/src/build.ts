@@ -1,4 +1,3 @@
-import fs from 'node:fs';
 import path from 'node:path';
 import { discoverSkills, readPluginManifest, resolveClosure } from './resolver.js';
 import type { CompilerOptions, PluginDependency, Skill } from './types.js';
@@ -77,7 +76,7 @@ export function build(options: CompilerOptions): void {
     description = sourceSkill.description;
   }
 
-  const closure = resolveClosure(include, skillsByName, options.target !== 'skills-sh');
+  const closure = resolveClosure(include, skillsByName, true);
   if (closure.length === 0) {
     throw new Error(`No skills resolved for project ${options.projectRoot}`);
   }

@@ -6,7 +6,7 @@ source: .memory/experience/2026-07-24-act-p5-p6-skip-cycle-misread.md
 
 ## Problem
 
-The `scripts/resolve-open-threads.sh` script (used by `/act` P4) resolves
+The `scripts/resolve-open-threads.ts` script (used by `/act` P4) resolves
 **every** open thread on a PR in one batch. When the agent needs to
 keep one thread open for a human/owner decision (e.g. a convention
 question that needs explicit sign-off) and resolve the rest, there is
@@ -20,29 +20,29 @@ the user. The script had to be bypassed.
 
 ## Proposed action
 
-Add a `scripts/resolve-threads.sh` sibling that takes a list of
+Add a `scripts/review-resolve.ts` sibling that takes a list of
 thread IDs (newline-delimited, one ID per line) and resolves only
 those. The agent generates the list by selecting threads to close
-from the `pr-state.sh` / `extract-findings.ts` output. Use `.sh`
+from the `pr-state.ts` / `extract-findings.ts` output. Use `.ts`
 (executable script) not `.tsv` (data file) for the script name; the
-established convention in `scripts/` is for scripts to use `.sh` and
-consume `.tsv` data files via `--file PATH` (see `reply-threads.sh`
-and `resolve-open-threads.sh`). The data file itself is the input
+updated convention in `scripts/` is for OS-independent helpers to use `.ts` and
+consume `.tsv` data files via `--file PATH` (see `review-reply.ts`
+and `resolve-open-threads.ts`). The data file itself is the input
 list — it is plain text with one thread ID per line, NOT a
 TAB-separated multi-column file (the input is a set of IDs, not rows
-of fields). Keep `resolve-open-threads.sh` for the "resolve all"
+of fields). Keep `resolve-open-threads.ts` for the "resolve all"
 case (the common path). Both can share the same underlying GraphQL
 mutation helper.
 
 ## Acceptance criteria
 
-- [ ] `scripts/resolve-threads.sh [--file PATH] [--dry-run]` resolves
+- [ ] `scripts/review-resolve.ts [--file PATH]` resolves
       only the threads listed in the file (one thread ID per line,
       plain text — not a two-column TSV).
 - [ ] `--dry-run` reports the planned batch count and thread IDs
       without POSTing.
 - [ ] On rate-limit / auth failure, the script exits non-zero with
-      a clear error (matches the pattern of `resolve-open-threads.sh`).
+      a clear error (matches the pattern of `resolve-open-threads.ts`).
 - [ ] Round-trip test: a self-contained `bash` test that pipes a
       known list of N fake thread IDs to the script with
       `GITHUB_GRAPHQL_URL` pointed at a local mock server (e.g.
@@ -53,5 +53,5 @@ mutation helper.
       that isn't part of this repo — the harness setup and the
       assertion both live in the test file itself.
 - [ ] Documented in `AGENTS.md` § `scripts/` next to the
-      `resolve-open-threads.sh` reference, with the "use this when
+      `resolve-open-threads.ts` reference, with the "use this when
       you need to leave a decision thread open" trigger.

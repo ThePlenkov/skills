@@ -100,7 +100,7 @@ function categoryDescription(category: string): string {
     behavior: "Evidence, code quality, and critical thinking",
     coaching: "User guidance and focus support",
     "code-review": "PR/MR review and remediation",
-    engineering: "Cross-cutting engineering practices (API/UI design, performance, security)",
+    engineering: "Cross-cutting engineering practices (frontend, nodejs/typescript, bootstrap-ts-repo, prototype, security)",
     experimentation: "Sandboxed experimentation",
     foundation: "Always-on behavioral primitives and activation tiers",
     integrations: "External platform connectors",
@@ -197,12 +197,12 @@ function generateMatrix(skills: Skill[]): string {
   output += `- **Have a runtime failure or regression?** → \`$skill{debugging}\`\n`;
   output += `- **Know the exact fix and want one narrow change?** → \`$skill{one-shot-patch}\`\n`;
   output += `- **Before patching, want to avoid overengineering or symptom-only fixes?** → \`$skill{minimal-root-cause}\`\n`;
-  output += `- **Need adversarial review of a non-trivial decision?** → \`$skill{doubt-driven-development}\`\n`;
-  output += `- **Implementing a multi-file or large change?** → \`$skill{incremental-implementation}\`\n`;
+  output += `- **Need adversarial review of a non-trivial decision?** → \`$skill{critical-thinking}\`\n`;
+  output += `- **Implementing a multi-file or large change?** → \`$skill{test-driven-development}\`\n`;
   output += `- **Need repeated inspect-edit-validate cycles with explicit stop conditions?** → \`$skill{loop-programming}\`\n`;
   output += `- **Reviewing a PR on GitHub?** → \`$skill{github-pr-review}\`\n`;
   output += `- **End-to-end fixing of PR/MR threads on a repo?** → \`$skill{act}\`\n`;
-  output += `- **Multi-axis quality review before merge?** → \`$skill{code-review-and-quality}\`\n`;
+  output += `- **Multi-axis quality review before merge?** → \`$skill{review-methodology}\`\n`;
 
   return output;
 }

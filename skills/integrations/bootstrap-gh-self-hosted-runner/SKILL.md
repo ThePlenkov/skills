@@ -14,7 +14,7 @@ description: Spin up an ephemeral or persistent self-hosted GitHub Actions runne
 
 Use this skill when a repo or org has hit its GitHub-hosted runner spending
 limit and you need a self-hosted runner to unblock CI. The runner can be
-ephemeral (one job, then removed) or persistent. See `$skill{github}` for
+ephemeral (one job, then removed) or persistent. See `$skill{external-tools}` for
 `gh` authentication and token handling.
 
 ## When to use

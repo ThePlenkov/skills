@@ -1,6 +1,6 @@
 ---
 name: dep-cost
-description: "Measure whether a dependency is worth its cost (bundle, install, surface, maintenance) for the part you actually use, and reimplement locally when it is not. Use before adding a new dependency, or when reviewing an existing one that pulls disproportionate weight for a small use. Sibling of $skill{reuse-first} — that one finds candidates, this one judges whether to keep them."
+description: "Measure whether a dependency is worth its cost (bundle, install, surface, maintenance) for the part you actually use, and reimplement locally when it is not. Use before adding a new dependency, or when reviewing an existing one that pulls disproportionate weight for a small use. Sibling of reuse-first — that one finds candidates, this one judges whether to keep them."
 metadata:
   tier: 2
   triggers: [user, model]
@@ -9,13 +9,13 @@ metadata:
 
 # dep-cost
 
-**When to use:** you are about to add a new dependency, or you are reviewing an existing one and suspect it is heavier than the use case justifies. Not a security audit (`$skill{security-and-hardening}`), not a perf review of the whole app (`$skill{performance-optimization}`), not a "is this the right version" check (`$skill{modern-stack}`) — those are siblings, see Cross-references.
+**When to use:** you are about to add a new dependency, or you are reviewing an existing one and suspect it is heavier than the use case justifies. Not a security audit (`security-and-hardening`), not a perf review of the whole app (`performance-investigation`), not a "is this the right version" check (`modern-stack`) — those are siblings, see Cross-references.
 
 ## The principle
 
 Dependencies are not free. Every dep is permanent tax: install time, bundle size, supply-chain surface, upgrade burden, breaking-change risk, and the day it goes unmaintained. The default reflex — "just add it, it's on npm" — has made average JS bundles worse than they need to be by 10x in the last decade. Be suspicious of every new dep, and audit old ones periodically.
 
-This skill operationalizes the dependency-awareness part of `$skill{minimal-root-cause}`. The philosophy says "don't overengineer"; this skill says "here is how to measure when a dep is overengineering at the import level". Because this is an orchestrator, also load `$subagents-setup` for delegation boundaries and `$shared-plan` for shared planning.
+This skill operationalizes the dependency-awareness part of `minimal-root-cause`. The philosophy says "don't overengineer"; this skill says "here is how to measure when a dep is overengineering at the import level". Because this is an orchestrator, also load `subagents-setup` for delegation boundaries and `shared-plan` for shared planning.
 
 ## Procedure
 
@@ -73,7 +73,7 @@ Before deciding, look at the dep's own health:
 - **Last release** — if > 18 months, flag as maintenance risk regardless of size
 - **Weekly downloads** — a signal of trust, not a hard requirement
 - **License** — must be compatible with the project
-- **Open issues / PRs** — pending CVE? Abandoned maintainer? Hand off to `$skill{security-and-hardening}`
+- **Open issues / PRs** — pending CVE? Abandoned maintainer? Hand off to `security-and-hardening`
 - **Transitive deps** — the dep pulls N other deps. Add their costs to the total. `npm ls <pkg>`, `cargo tree -i <pkg>`
 
 ### 5. Decision
@@ -85,29 +85,20 @@ Before deciding, look at the dep's own health:
 | Large | Low (<10% of API) | Trivial | **Reimplement** |
 | Large | Low | Tricky | **Reimplement only if you have time to test it** |
 | Any | Any | Critical | **Keep** — the dep is the value |
-| Unmaintained | Any | Any | **Reimplement or replace** — hand to `$skill{deprecation-and-migration}` |
+| Unmaintained | Any | Any | **Reimplement or replace** — document the exit strategy and timeline if a migration is needed |
 
 **Always produce an evidence trail.** Output the install size, bundle size, used-surface / unused signal, transitive count, last release date, and your call. The point is not the decision; it is that the next reviewer can verify it in 30 seconds.
 
 ## What this skill is NOT
 
-- Not a security audit. For CVE / supply-chain risk, hand to `$skill{security-and-hardening}`.
-- Not a version-bump check. For "is this the latest line", hand to `$skill{modern-stack}`.
-- Not a "is the bundle small" optimization. For overall app perf, hand to `$skill{performance-optimization}`.
+- Not a security audit. For CVE / supply-chain risk, hand to `security-and-hardening`.
+- Not a version-bump check. For "is this the latest line", hand to `modern-stack`.
+- Not a "is the bundle small" optimization. For overall app perf, hand to `performance-investigation`.
 - Not a license review. For license compatibility, see SPDX / ScanCode / `license-checker`.
 
 ## Cross-references
 
-This skill is an orchestrator. Load the cited skills too, plus `$subagents-setup` for delegation and `$shared-plan` for planning.
-
-- **`$skill{token-rationalism}`** (Tier 0) — Rule 8 (reuse before write) covers "use the dep"; this covers "is the dep worth it"
-- **`$skill{reuse-first}`** (Tier 2, sibling) — finds candidates; this one judges whether to keep them
-- **`$skill{modern-stack}`** (Tier 2) — checks current supported version line for the dep
-- **`$skill{security-and-hardening}`** (Tier 2) — CVE and supply-chain surface of the dep
-- **`$skill{performance-optimization}`** (Tier 2) — overall app perf, of which deps are one input
-- **`$skill{evidence}`** (Tier 2) — every claim in this skill must be backed by a measurement, not a hunch
-- **`$skill{deprecation-and-migration}`** (Tier 2) — when the dep is unmaintained and you need to plan the exit
-- **`$skill{minimal-root-cause}`** (Tier 2) — the philosophy this operationalizes
+This skill is an orchestrator. Load the cited skills too, plus `subagents-setup` for delegation and `shared-plan` for planning. See [related-skills.md](references/related-skills.md) for the full list.
 
 ## Top 5 mistakes
 

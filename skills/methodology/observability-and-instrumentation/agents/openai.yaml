@@ -1,5 +1,0 @@
-interface:
-  display_name: "Observability And Instrumentation"
-  short_description: "Help with Observability And Instrumentation"
-  brand_color: "#3B82F6"
-  default_prompt: "Use $observability-and-instrumentation to get started."
