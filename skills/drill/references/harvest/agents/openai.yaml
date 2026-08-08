@@ -1,0 +1,7 @@
+interface:
+  display_name: "Harvest"
+  short_description: "Help with Harvest tasks and workflows"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $harvest to get started."
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,12 @@
+interface:
+  display_name: "Shadow Fork"
+  short_description: "Create paired shadow/upstream reviews while syncing your fork."
+  icon_small: "assets/icon.svg"
+  icon_large: "assets/icon.svg"
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

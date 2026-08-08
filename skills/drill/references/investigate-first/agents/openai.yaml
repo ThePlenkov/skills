@@ -1,0 +1,5 @@
+interface:
+  display_name: "Investigate First"
+  short_description: "Help with Investigate First"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $investigate-first to get started."
