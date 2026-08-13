@@ -88,9 +88,16 @@ jobs:
 
       - name: Override NX_HEAD to current PR HEAD
         # nx-set-shas uses the last successful run's HEAD, which may be
-        # stale on PRs. Force NX_HEAD to the actual PR HEAD so nx affected
-        # computes the correct diff.
-        run: echo "NX_HEAD=$GITHUB_SHA" >> "$GITHUB_ENV"
+        # stale on PRs. $GITHUB_SHA on pull_request events is the merge
+        # commit, not the PR branch HEAD. Use the PR head SHA directly.
+        env:
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ -n "$PR_HEAD" ]; then
+            echo "NX_HEAD=$PR_HEAD" >> "$GITHUB_ENV"
+          else
+            echo "NX_HEAD=$GITHUB_SHA" >> "$GITHUB_ENV"
+          fi
 
       - name: Run affected skill checks (lint, validate, os-check, size-check)
         run: |
