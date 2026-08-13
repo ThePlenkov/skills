@@ -15,5 +15,6 @@ Common mistakes when running `/act` and what to do instead.
 | "Codacy is not my responsibility — it's a third-party tool" | Codacy findings on this PR are your problem. Read annotations, install linter, reproduce, fix. |
 | One pass through threads, then resolve | Loop: fetch → analyse → fix → verify → push → re-fetch. CI may surface new findings after each push. |
 | Stop when context gets large | Plan a handoff: summarize state, write remaining items to backlog/harvest, report to user. |
+| `gh stack rebase && gh stack push` after every single-PR fix | Push only the changed branch. Full-stack push triggers CI on all PRs — see [stack-mode.md](stack-mode.md). |
 
 Long-tail footguns (git stash / `git add -A` / `scripts/run.ts` bypass / "what's the PR?" mid-flow) are catalogued in [`footguns.md`](footguns.md). Read it when about to take a shortcut.

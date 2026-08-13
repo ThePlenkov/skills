@@ -575,6 +575,72 @@ If feedback is already fixed on HEAD and threads are closed → short
 
 Use the helpers under [`scripts/`](scripts/) instead of issuing ad-hoc `gh`/`glab` calls. See [references/script-index.md](references/script-index.md) for the per-step command index and [`references/script-gotchas.md`](references/script-gotchas.md) for scratch-artifact rules.
 
+## PR stacks (`/act stack`)
+
+When the user invokes `/act stack`, `/act pr stack`, or the PR is part
+of a stacked branch series (managed by `gh stack` or equivalent), the
+loop runs **bottom-to-top, round-robin**, but with **stack-aware push
+optimization** to avoid wasting CI minutes.
+
+See [`references/stack-mode.md`](references/stack-mode.md) for the full
+procedure. Short version:
+
+1. **Discover the stack** — `gh stack view` (or `gh stack list`) to get
+   the ordered list of branches and PR numbers, bottom to top.
+2. **Process bottom-to-top** — start from the lowest PR in the stack.
+   Run the normal `/act` loop (P0a–P6) on each PR before moving up.
+3. **Push only what changed** — after fixing a PR, push **only that
+   branch** (`git push origin <branch>`) and any **downstream branches
+   that need rebasing**. Do **not** blindly run `gh stack push` (which
+   pushes all branches) unless the bottom of the stack changed.
+4. **Rebase only when needed** — if a lower-stack commit changed the
+   diff that downstream branches build on, rebase downstream branches
+   with `gh stack rebase` (or manual `git rebase`). If only the top
+   branch changed, push just that branch — no rebase needed.
+5. **Wait for CI per-PR** — after each push, wait for CI on the
+   **pushed branches only**. Do not wait for CI on branches whose HEAD
+   SHA did not change.
+6. **Round-robin** — after reaching the top, re-scan from the bottom
+   for any new bot comments or CI findings that appeared from the
+   latest pushes. Repeat until all PRs are merge-ready.
+
+### Stack push optimization — the key rule
+
+**Never push a branch whose HEAD SHA has not changed.** Before running
+`gh stack push` (or any bulk push), check which branches have new
+commits:
+
+```bash
+# Show local vs remote for each stack branch
+for branch in $(gh stack list --format 'json' | jq -r '.[].branch'); do
+  local_sha=$(git rev-parse "$branch" 2>/dev/null)
+  remote_sha=$(git rev-parse "origin/$branch" 2>/dev/null)
+  if [ "$local_sha" != "$remote_sha" ]; then
+    echo "CHANGED: $branch"
+  fi
+done
+```
+
+Push only the `CHANGED` branches. If a branch was rebased (its history
+changed even without new commits), it will appear as `CHANGED` — that
+is correct, it needs a force-push.
+
+**Anti-pattern:** running `gh stack rebase && gh stack push` after
+every fix, even when only the top branch was edited. This triggers CI
+on all 10+ PRs in the stack, wasting runner minutes and creating noise
+from bot re-evaluations on unchanged diffs.
+
+### When to rebase the whole stack
+
+Rebase the full stack (`gh stack rebase && gh stack push`) **only when**:
+
+- The bottom branch (`main` or the stack base) received new commits.
+- A lower-stack PR's changes conflict with or alter the diff that
+  downstream branches depend on.
+- The user explicitly asks for a full stack refresh.
+
+In all other cases, push only the changed branch(es).
+
 ## Runtime extras
 
 - **Copilot SWE:** .github/copilot-instructions.md
