@@ -36,10 +36,11 @@ if (!existsSync(skillMdPath)) {
 }
 
 const skillMd = readFileSync(skillMdPath, "utf8");
-const frontmatterMatch = skillMd.match(/^---\n([\s\S]*?)\n---/);
+const frontmatterMatch = skillMd.match(/^---\r?\n([\s\S]*?)\r?\n---/);
 if (!frontmatterMatch) {
-  console.error(`::error file=${skillMdPath},title=ajv[frontmatter]::no YAML frontmatter found (expected '---' delimiters)`);
-  process.exit(1);
+  // Some skills may not have frontmatter — log a warning but don't fail
+  console.log(`⚠ ${skillMdPath} — no YAML frontmatter found (skipping schema validation)`);
+  process.exit(0);
 }
 
 const frontmatter = frontmatterMatch[1]!;

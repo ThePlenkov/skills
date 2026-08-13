@@ -86,6 +86,12 @@ jobs:
           main-branch-name: ${{ github.event.pull_request.base.ref || 'main' }}
           workflow-id: validate-skills.yml
 
+      - name: Override NX_HEAD to current PR HEAD
+        # nx-set-shas uses the last successful run's HEAD, which may be
+        # stale on PRs. Force NX_HEAD to the actual PR HEAD so nx affected
+        # computes the correct diff.
+        run: echo "NX_HEAD=$GITHUB_SHA" >> "$GITHUB_ENV"
+
       - name: Run affected skill checks (lint, validate, os-check, size-check)
         run: |
           npx nx affected -t lint validate os-check size-check --parallel=4
