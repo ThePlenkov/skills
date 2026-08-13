@@ -19,7 +19,8 @@ PR.
 
 ## Merge-ready for batch PR
 
-CI green on HEAD (`CI_REQUIRED_PENDING=0` AND `SAST_FINDINGS_PENDING=0`)
+CI green on HEAD (`CI_REQUIRED_PENDING=0` AND `SAST_FINDINGS_PENDING=0`
+AND `SAST_FINDINGS_UNKNOWN=0`)
 + summary of themes fixed. Do **not** require `open_threads=0` on
 source PRs before the batch PR merges.
 

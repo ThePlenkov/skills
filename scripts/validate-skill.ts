@@ -8,13 +8,9 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 
-const ROOT = fileURLToURL(new URL("..", import.meta.url));
+const ROOT = fileURLToPath(new URL("..", import.meta.url));
 
-function fileURLToURL(url: URL): string {
-  return fileURLToPath(url);
-}
-
-const { values, positionals } = parseArgs({
+const { positionals } = parseArgs({
   options: {},
   allowPositionals: true,
 });
@@ -63,13 +59,17 @@ const schema = JSON.parse(readFileSync(schemaPath, "utf8"));
 
 // Use ajv if available, otherwise do basic checks
 try {
-  const { default: Ajv } = await import("ajv");
+  const AjvModule = await import("ajv");
+  const Ajv = AjvModule.default as unknown as new (opts?: { allErrors?: boolean }) => {
+    compile: (schema: unknown) => (data: unknown) => boolean;
+    errors?: unknown[];
+  };
   const ajv = new Ajv({ allErrors: true });
   const validate = ajv.compile(schema);
   const data = JSON.parse(frontmatterJson);
   if (!validate(data)) {
     console.error(`::error file=${skillMdPath}::frontmatter validation failed`);
-    for (const err of validate.errors ?? []) {
+    for (const err of (ajv.errors ?? []) as Array<{ instancePath: string; message?: string }>) {
       console.error(`  ${err.instancePath}: ${err.message}`);
     }
     failed = true;
@@ -102,12 +102,16 @@ if (!existsSync(openaiYamlPath)) {
     const openaiData = YAML.parse(openaiYaml);
     const openaiSchema = JSON.parse(readFileSync(openaiSchemaPath, "utf8"));
     try {
-      const { default: Ajv } = await import("ajv");
+      const AjvModule = await import("ajv");
+      const Ajv = AjvModule.default as unknown as new (opts?: { allErrors?: boolean }) => {
+        compile: (schema: unknown) => (data: unknown) => boolean;
+        errors?: unknown[];
+      };
       const ajv = new Ajv({ allErrors: true });
       const validateOpenai = ajv.compile(openaiSchema);
       if (!validateOpenai(openaiData)) {
         console.error(`::error file=${openaiYamlPath}::openai.yaml validation failed`);
-        for (const err of validateOpenai.errors ?? []) {
+        for (const err of (ajv.errors ?? []) as Array<{ instancePath: string; message?: string }>) {
           console.error(`  ${err.instancePath}: ${err.message}`);
         }
         failed = true;

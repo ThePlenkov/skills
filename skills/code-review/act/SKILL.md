@@ -234,8 +234,9 @@ wait-for-CI into parallel analysis.
 ### Stack convergence
 
 All PRs are merge-ready when every PR has: `open_threads=0`,
-`CI_REQUIRED_PENDING=0`, `SAST_FINDINGS_PENDING=0`, and
-`mergeable_state` is `clean` or `unstable` (not `conflict` or `dirty`).
+`CI_REQUIRED_PENDING=0`, `SAST_FINDINGS_PENDING=0`,
+`SAST_FINDINGS_UNKNOWN=0`, no new bot comments since the last push,
+and `mergeable_state` is `clean` or `unstable` (not `conflict` or `dirty`).
 
 Push optimization details, conflict resolution, and CI waiting
 strategy: [`references/stack-mode.md`](references/stack-mode.md).
