@@ -90,6 +90,10 @@ jobs:
         run: |
           npx nx affected -t lint validate os-check size-check --parallel=4
 
+      - name: Install skill symlinks
+        if: success() || failure()
+        run: ./node_modules/.bin/tsx scripts/run.ts scripts/install.sh
+
       - name: Validate agent manifests
         if: success() || failure()
         run: ./node_modules/.bin/tsx scripts/run.ts scripts/validate-agent-manifests.sh
@@ -97,10 +101,6 @@ jobs:
       - name: Check Tier 0 always-on budget
         if: success() || failure()
         run: ./node_modules/.bin/tsx scripts/run.ts scripts/check-tier-0-budget.cjs
-
-      - name: Install skill symlinks
-        if: success() || failure()
-        run: ./node_modules/.bin/tsx scripts/run.ts scripts/install.sh
 
       - name: Check skill coverage matrix
         if: success() || failure()
