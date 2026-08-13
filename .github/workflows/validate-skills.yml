@@ -104,7 +104,7 @@ jobs:
 
       - name: Run affected skill checks
         run: |
-          npx nx affected -t lint validate os-check size-check --parallel=8
+          npx nx affected -t lint validate os-check size-check --parallel=4
 
   # ──────────────────────────────────────────────────────────────
   # Job 2: Repository-level checks (agent manifests, tier-0, coverage, README)
