@@ -10,6 +10,7 @@ const WARNING_THRESHOLD = 250;
 const { values } = parseArgs({
   options: {
     'skill': { type: 'string' },
+    'warn-only': { type: 'boolean' },
   },
   allowPositionals: false,
 });

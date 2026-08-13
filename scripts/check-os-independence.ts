@@ -14,6 +14,7 @@ const { values } = parseArgs({
   options: {
     'since-ref': { type: 'string' },
     'skill': { type: 'string' },
+    'warn-only': { type: 'boolean' },
   },
   allowPositionals: false,
 });
@@ -259,4 +260,4 @@ for (const [file, fileIssues] of byFile) {
 }
 
 console.log(`\nTotal POSIX-only patterns found: ${deduped.length}`);
-process.exit(deduped.length > 0 ? 1 : 0);
+process.exit(deduped.length > 0 && !values['warn-only'] ? 1 : 0);
