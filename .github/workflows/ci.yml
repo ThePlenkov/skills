@@ -15,6 +15,7 @@ on:
       - '.markdownlint.json'
       - '**/*.sh'
       - '**/*.md'
+      - 'tools/**'
   pull_request:
     branches: [main]
     paths:
@@ -29,6 +30,7 @@ on:
       - '.markdownlint.json'
       - '**/*.sh'
       - '**/*.md'
+      - 'tools/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

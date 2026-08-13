@@ -24,6 +24,7 @@ on:
       - 'skills/**'
       - 'skills.config.ts'
       - 'docs/skill-coverage-matrix.md'
+      - 'tools/nx-skill/**'
   pull_request:
     paths:
       - 'README.md'
@@ -46,6 +47,7 @@ on:
       - 'skills/**'
       - 'skills.config.ts'
       - 'docs/skill-coverage-matrix.md'
+      - 'tools/nx-skill/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -55,8 +57,12 @@ permissions:
   contents: read
 
 jobs:
-  validate-affected:
-    name: Validate affected skills (Nx)
+  # ──────────────────────────────────────────────────────────────
+  # Job 1: Nx affected per-skill checks (lint, validate, os-check, size-check)
+  # Runs in parallel with repo-checks.
+  # ──────────────────────────────────────────────────────────────
+  nx-checks:
+    name: Nx affected checks
     runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v7
@@ -73,9 +79,6 @@ jobs:
 
       - name: Install Node dependencies
         run: npm ci --no-audit --no-fund --prefer-offline
-
-      - name: Set up Python
-        uses: ./.github/actions/setup-python-with-fallback
 
       - name: Build Nx plugin
         run: npm run build --prefix tools/nx-skill
@@ -99,26 +102,47 @@ jobs:
             echo "NX_HEAD=$GITHUB_SHA" >> "$GITHUB_ENV"
           fi
 
-      - name: Run affected skill checks (lint, validate, os-check, size-check)
+      - name: Run affected skill checks
         run: |
-          npx nx affected -t lint validate os-check size-check --parallel=4
+          npx nx affected -t lint validate os-check size-check --parallel=8
+
+  # ──────────────────────────────────────────────────────────────
+  # Job 2: Repository-level checks (agent manifests, tier-0, coverage, README)
+  # Runs in parallel with nx-checks. Does not need Nx.
+  # ──────────────────────────────────────────────────────────────
+  repo-checks:
+    name: Repo checks
+    runs-on: [self-hosted]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+          check-latest: true
+          cache: npm
+
+      - name: Install Node dependencies
+        run: npm ci --no-audit --no-fund --prefer-offline
+
+      - name: Set up Python
+        uses: ./.github/actions/setup-python-with-fallback
 
       - name: Install skill symlinks
-        if: success() || failure()
         run: ./node_modules/.bin/tsx scripts/run.ts scripts/install.sh
 
       - name: Validate agent manifests
-        if: success() || failure()
         run: ./node_modules/.bin/tsx scripts/run.ts scripts/validate-agent-manifests.sh
 
       - name: Check Tier 0 always-on budget
-        if: success() || failure()
         run: ./node_modules/.bin/tsx scripts/run.ts scripts/check-tier-0-budget.cjs
 
       - name: Check skill coverage matrix
-        if: success() || failure()
         run: ./node_modules/.bin/tsx scripts/generate-coverage-matrix.ts --check
 
       - name: Check README categories
-        if: success() || failure()
         run: ./node_modules/.bin/tsx scripts/run.ts scripts/check-readme-categories.ts
