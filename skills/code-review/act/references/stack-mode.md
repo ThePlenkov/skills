@@ -2,6 +2,25 @@
 
 Full procedure for running `/act` on a stacked branch series.
 
+## Why stack mode is efficient
+
+Processing a stack of N PRs is **not** N × single-PR time. Two
+optimizations make it much faster:
+
+1. **Don't wait for CI between PRs.** After pushing PR #1, immediately
+   move to PR #2 to analyze and fix while CI runs on #1. CI is async —
+   your analysis isn't. By the time you've fixed PR #5, CI on PR #1 is
+   done and you can check it on the round-robin pass.
+
+2. **Analyze all PRs at once.** Fetch all thread states upfront (before
+   fixing anything). This lets you see patterns across PRs and batch
+   similar fixes (e.g. "all 5 PRs have the same localeCompare comment"
+   → fix them all in one pass). Processing each PR in isolation misses
+   these patterns.
+
+The result: a 19-PR stack converges in 2-3 round-robin passes, not 19
+serial iterations.
+
 ## Discovery
 
 ```bash
@@ -30,8 +49,20 @@ main → PR #1 (bottom) → PR #2 → PR #3 → ... → PR #N (top)
 For each PR, run the normal `/act` loop:
 P0a (CI) → P0b (SAST) → P1–P3 (threads) → P4 (resolve) → P5 (rate) → P6 (evaluate).
 
-Do not move to the next PR until the current one is merge-ready or
-blocked on something outside `/act`'s scope.
+**But don't block on CI.** The efficient pattern is:
+
+1. Fetch all thread states for all PRs **upfront** (one batch of GraphQL
+   queries). This gives you the full picture before fixing anything.
+2. Start fixing PR #1 (bottom). Fix threads, commit, push.
+3. **Don't wait for CI on PR #1.** Immediately move to PR #2. Fix
+   threads, commit, push.
+4. Continue up the stack. By the time you reach PR #5, CI on PR #1 is
+   likely done.
+5. On the round-robin re-scan, check CI results and new bot comments
+   from bottom to top.
+
+This turns N serial wait-for-CI cycles into one parallel analysis pass
++ one CI verification pass.
 
 ## Push optimization — the critical efficiency rule
 
