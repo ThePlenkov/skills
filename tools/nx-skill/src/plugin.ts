@@ -22,6 +22,38 @@ export const createNodes: CreateNodes = [
                   outDir: `.build/skills/${projectName}`,
                 },
               },
+              lint: {
+                cache: true,
+                inputs: [
+                  '{projectRoot}/**/*.md',
+                  '{workspaceRoot}/.markdownlint.json',
+                ],
+                command: `npx markdownlint-cli2 '{projectRoot}/**/*.md' --config .markdownlint.json`,
+              },
+              validate: {
+                cache: true,
+                inputs: [
+                  '{projectRoot}/SKILL.md',
+                  '{projectRoot}/agents/openai.yaml',
+                  '{workspaceRoot}/.github/skill-schema.json',
+                  '{workspaceRoot}/.github/openai-metadata-schema.json',
+                ],
+                command: `tsx scripts/validate-skill.ts {projectRoot}`,
+              },
+              'os-check': {
+                cache: true,
+                inputs: [
+                  '{projectRoot}/**/*.md',
+                  '{projectRoot}/**/*.sh',
+                  '{workspaceRoot}/scripts/check-os-independence.ts',
+                ],
+                command: `tsx scripts/check-os-independence.ts --skill {projectRoot}`,
+              },
+              'size-check': {
+                cache: true,
+                inputs: ['{projectRoot}/SKILL.md'],
+                command: `tsx scripts/check-skill-size.ts --skill {projectRoot}`,
+              },
             },
           },
         },

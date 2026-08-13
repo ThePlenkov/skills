@@ -13,6 +13,7 @@ const ROOT = realpathSync(resolve(fileURLToPath(import.meta.url), '..', '..'));
 const { values } = parseArgs({
   options: {
     'since-ref': { type: 'string' },
+    'skill': { type: 'string' },
   },
   allowPositionals: false,
 });
@@ -67,6 +68,12 @@ const issues: Issue[] = [];
 
 async function* getFilesToCheck(): AsyncGenerator<string> {
   const sinceRef = values['since-ref'];
+  const skillDir = values['skill'];
+  if (skillDir) {
+    // Single-skill mode: check all .md files in the skill directory
+    yield* walk(resolve(ROOT, skillDir));
+    return;
+  }
   if (sinceRef) {
     // Reject refs that git would parse as an option (e.g. `--upload-pack=...`),
     // since the ref is passed positionally before `--` at both diff call sites.

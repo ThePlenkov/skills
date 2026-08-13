@@ -1,5 +1,7 @@
 # Stack mode — `/act stack`
 
+<!-- os-independence-exempt: contains bash recipes for stack tooling (Git Bash / WSL on Windows) -->
+
 Full procedure for running `/act` on a stacked branch series.
 
 ## Why stack mode is efficient
@@ -159,11 +161,11 @@ After reaching the top of the stack, re-scan from the bottom:
 
 All PRs in the stack are merge-ready when:
 
-- Every PR has `open_threads=0`.
-- Every PR has `CI_REQUIRED_PENDING=0` and `SAST_FINDINGS_PENDING=0`.
-- No new bot comments appeared in the last CI cycle (compare bot
++ Every PR has `open_threads=0`.
++ Every PR has `CI_REQUIRED_PENDING=0` and `SAST_FINDINGS_PENDING=0`.
++ No new bot comments appeared in the last CI cycle (compare bot
   comment count before and after the last push).
-- Every PR's `mergeable_state` is `clean` (not `conflict` or `dirty`).
++ Every PR's `mergeable_state` is `clean` (not `conflict` or `dirty`).
 
 `mergeable_state: unstable` is acceptable — it means pending review
 approval or non-required checks running, not a conflict.
@@ -186,13 +188,13 @@ conflicts), escalate to the user with the conflict details.
 
 When resolving threads on a stacked PR:
 
-- Threads on **lower** PRs may be resolved by commits on **higher** PRs
++ Threads on **lower** PRs may be resolved by commits on **higher** PRs
   if the fix is in a file that the higher PR also touches. In that case,
   reply on the lower PR pointing to the commit on the higher branch.
-- Threads on **higher** PRs that reference code from **lower** PRs should
++ Threads on **higher** PRs that reference code from **lower** PRs should
   be fixed on the higher PR (the lower PR's code is already merged into
   the higher branch via the stack).
-- Do not resolve a thread on a lower PR by saying "fixed in the upper
++ Do not resolve a thread on a lower PR by saying "fixed in the upper
   PR" unless the upper PR's commit actually changes the line the thread
   points at.
 
