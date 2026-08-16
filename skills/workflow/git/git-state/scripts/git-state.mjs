@@ -43,7 +43,7 @@ function branchName(base) {
   return match[1];
 }
 
-function parseWorktrees(text) {
+function parseWorktrees(text, current) {
   return text.split('\n\n').filter(Boolean).map((block) => {
     const fields = Object.fromEntries(block.split('\n').map((line) => {
       const [key, ...rest] = line.split(' ');
@@ -53,7 +53,7 @@ function parseWorktrees(text) {
       path: fields.worktree,
       head: fields.HEAD,
       branch: fields.branch?.replace('refs/heads/', ''),
-      current: fields.worktree === cwd,
+      current: fields.worktree === current,
       prunable: Boolean(fields.prunable),
     };
   });
@@ -112,7 +112,7 @@ const report = {
   branches: parseBranches(git(['for-each-ref', '--format=%(refname:short)%00%(upstream:short)%00', 'refs/heads']), base),
   changedPaths,
   dirty: changedPaths.length > 0,
-  worktrees: parseWorktrees(git(['worktree', 'list', '--porcelain'])),
+  worktrees: parseWorktrees(git(['worktree', 'list', '--porcelain']), git(['rev-parse', '--show-toplevel'])),
 };
 
 console.log(values.format === 'json' ? JSON.stringify(report, null, 2) : markdown(report));
