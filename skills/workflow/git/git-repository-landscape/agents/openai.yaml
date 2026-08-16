@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Repository Landscape"
+  short_description: "Inspect branches, worktrees, and merge state"
+  default_prompt: "Use $git-repository-landscape to map this repository safely."
