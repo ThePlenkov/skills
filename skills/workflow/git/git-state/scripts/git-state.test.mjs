@@ -5,8 +5,8 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = mkdtempSync(join(tmpdir(), 'git-repository-landscape-'));
-const script = resolve(fileURLToPath(new URL('.', import.meta.url)), 'git-repository-landscape.mjs');
+const root = mkdtempSync(join(tmpdir(), 'git-state-'));
+const script = resolve(fileURLToPath(new URL('.', import.meta.url)), 'git-state.mjs');
 
 function git(args) {
   execFileSync('git', args, { cwd: root, stdio: 'ignore' });

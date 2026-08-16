@@ -1,9 +1,9 @@
 ---
-name: git-repository-landscape
+name: git-state
 description: Inspect and explain a repository's local branches, worktrees, dirty state, merge requests or pull requests, and relationship to the current remote default branch. Use when asked where work stands, which branches or worktrees are safe cleanup candidates, why a merged PR/MR still appears ahead, or for a readable Git repository landscape.
 ---
 
-# Git Repository Landscape
+# Git State
 
 Produce an evidence-backed snapshot before proposing cleanup. Treat `ahead` and
 `behind` as commit-ancestry facts, not as proof that code is unmerged.
@@ -14,7 +14,7 @@ Produce an evidence-backed snapshot before proposing cleanup. Treat `ahead` and
    and point `--repository` at the repository to inspect:
 
    ```sh
-   node scripts/git-repository-landscape.mjs --repository <repository-path> --refresh
+   node scripts/git-state.mjs --repository <repository-path> --refresh
    ```
 
    The script resolves `origin/HEAD`, refreshes only that branch when
@@ -25,7 +25,7 @@ Produce an evidence-backed snapshot before proposing cleanup. Treat `ahead` and
    provider. Pass the explicit comparison ref to the script:
 
    ```sh
-   node scripts/git-repository-landscape.mjs --repository <repository-path> --base origin/main
+   node scripts/git-state.mjs --repository <repository-path> --base origin/main
    ```
 
 3. Read the hosting-provider MR/PR list with its available authenticated CLI

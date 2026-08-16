@@ -257,7 +257,7 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
-  "git-repository-landscape": {
+  "git-state": {
     frontmatter: {
       metadata: {
         "tier": 2,
