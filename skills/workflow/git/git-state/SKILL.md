@@ -7,6 +7,8 @@ description: Inspect and explain a repository's local branches, worktrees, dirty
 
 Produce an evidence-backed snapshot before proposing cleanup. Treat `ahead` and
 `behind` as commit-ancestry facts, not as proof that code is unmerged.
+In JSON output, `containedInBase` means the branch tip is an ancestor of the
+comparison base; it does not report provider merge status.
 
 ## Workflow
 

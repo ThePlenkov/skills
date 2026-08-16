@@ -252,6 +252,9 @@ jobs:
       - name: Run unit tests
         run: bun test scripts/lib/
 
+      - name: Run skill tests
+        run: bun test skills/
+
   cross-platform-unit-tests:
     # Regression-tests scripts/lib/{find-bash,posix-path}.ts on Windows so the
     # MSYS drive-letter normalisation actually runs in CI (the wrapper

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process';
+import { resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 
 const { values } = parseArgs({
@@ -16,7 +17,7 @@ if (!['json', 'markdown'].includes(values.format)) {
   throw new Error('--format must be markdown or json');
 }
 
-const cwd = values.repository;
+const cwd = resolve(values.repository);
 
 function git(args, allowFailure = false) {
   try {
@@ -52,6 +53,7 @@ function parseWorktrees(text) {
       path: fields.worktree,
       head: fields.HEAD,
       branch: fields.branch?.replace('refs/heads/', ''),
+      current: fields.worktree === cwd,
       prunable: Boolean(fields.prunable),
     };
   });
@@ -70,13 +72,13 @@ function parseBranches(text, base) {
       .trim()
       .split(/\s+/)
       .map(Number);
-    branches.push({ name, upstream, ahead, behind, merged: ahead === 0 });
+    branches.push({ name, upstream, ahead, behind, containedInBase: ahead === 0 });
   }
   return branches;
 }
 
 function markdown(report) {
-  const escape = (value) => String(value ?? '—').replaceAll('|', '\\|');
+  const escape = (value) => String(value ?? '—').replaceAll('|', '\\|').replaceAll('`', '\\`');
   const lines = [
     `Comparison base: \`${report.base}\``,
     '',
@@ -88,7 +90,14 @@ function markdown(report) {
     lines.push(`| \`${escape(branch.name)}\` | \`${escape(branch.upstream)}\` | ${marker} ↑${branch.ahead} ↓${branch.behind} |`);
   }
   lines.push('', `Working tree: ${report.dirty ? `🟡 ${report.changedPaths.length} changed path(s)` : '🟢 clean'}`);
-  lines.push(`Worktrees: ${report.worktrees.length}; prunable metadata: ${report.worktrees.filter((worktree) => worktree.prunable).length}`);
+  if (report.changedPaths.length > 0) {
+    lines.push('', 'Changed paths:');
+    for (const path of report.changedPaths) lines.push(`- \`${escape(path)}\``);
+  }
+  lines.push('', `Worktrees: ${report.worktrees.length}`, '', '| Path | Branch | Current | Prunable |', '|---|---|---:|---:|');
+  for (const worktree of report.worktrees) {
+    lines.push(`| \`${escape(worktree.path)}\` | \`${escape(worktree.branch)}\` | ${worktree.current ? 'yes' : 'no'} | ${worktree.prunable ? 'yes' : 'no'} |`);
+  }
   return lines.join('\n');
 }
 
