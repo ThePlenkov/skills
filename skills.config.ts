@@ -257,6 +257,14 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
+  "git-state": {
+    frontmatter: {
+      metadata: {
+        "tier": 2,
+        "triggers": ["user", "model"],
+      },
+    },
+  },
   "git-workflow-and-versioning": {
     frontmatter: {
       metadata: {

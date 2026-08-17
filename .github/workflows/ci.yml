@@ -252,6 +252,14 @@ jobs:
       - name: Run unit tests
         run: bun test scripts/lib/
 
+      - name: Run skill tests
+        # The unit-test job does not install npm dependencies; run the
+        # dependency-free skill test added by this change rather than the
+        # broader suite, whose e2e tests require js-yaml. This is a standalone
+        # Node test script, so invoke Node directly instead of Bun's test
+        # discovery (which does not execute .mjs files).
+        run: node skills/workflow/git/git-state/scripts/git-state.test.mjs
+
   cross-platform-unit-tests:
     # Regression-tests scripts/lib/{find-bash,posix-path}.ts on Windows so the
     # MSYS drive-letter normalisation actually runs in CI (the wrapper
