@@ -49,3 +49,18 @@ documents the symlink trust boundary in the source.
 
 **Right.** Prefer the imperative reading when context is forward
 motion. Continue the action; do not pause to describe it.
+
+## Stack operations
+
+### `gh stack rebase && gh stack push` after every single-PR fix
+
+**Wrong.** This pushes all branches in the stack (e.g. 19 PRs),
+triggering CI on every one of them — even branches whose HEAD SHA
+did not change. Bot re-evaluations fire on unchanged diffs, creating
+noise and wasting runner minutes.
+
+**Right.** Check which branches have new commits (`git rev-parse
+<branch>` vs `git rev-parse origin/<branch>`). Push only changed
+branches. Use `gh stack push` only when the stack base changed or a
+lower-stack commit altered downstream diffs. See
+[stack-mode.md](stack-mode.md) for the full procedure.

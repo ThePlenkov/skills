@@ -15,6 +15,7 @@ on:
       - '.agents/agents/**/manifest.yaml'
       - 'scripts/validate-agent-manifests.sh'
       - 'scripts/validate-openai-metadata.sh'
+      - 'scripts/validate-skill.ts'
       - 'scripts/check-tier-0-budget.cjs'
       - 'scripts/check-readme-categories.ts'
       - 'scripts/generate-coverage-matrix.ts'
@@ -23,6 +24,7 @@ on:
       - 'skills/**'
       - 'skills.config.ts'
       - 'docs/skill-coverage-matrix.md'
+      - 'tools/nx-skill/**'
   pull_request:
     paths:
       - 'README.md'
@@ -36,6 +38,7 @@ on:
       - '.agents/agents/**/manifest.yaml'
       - 'scripts/validate-agent-manifests.sh'
       - 'scripts/validate-openai-metadata.sh'
+      - 'scripts/validate-skill.ts'
       - 'scripts/check-tier-0-budget.cjs'
       - 'scripts/check-readme-categories.ts'
       - 'scripts/generate-coverage-matrix.ts'
@@ -44,11 +47,8 @@ on:
       - 'skills/**'
       - 'skills.config.ts'
       - 'docs/skill-coverage-matrix.md'
+      - 'tools/nx-skill/**'
 
-# Cancel duplicate runs on the same ref. Without this, a single push
-# to a PR branch can fire the workflow twice (once for the push event
-# from the underlying git push, once for the pull_request event from
-# GitHub's PR machinery).
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -57,113 +57,12 @@ permissions:
   contents: read
 
 jobs:
-  validate:
-    name: Validate skills structure
-    runs-on: [self-hosted]
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: lts/*
-          check-latest: true
-          cache: npm
-
-      - name: Install Node dependencies
-        run: npm ci --no-audit --no-fund --prefer-offline
-
-      - name: Set up Python
-        # scripts/install.sh validates and compares symlinked skill trees
-        # with Python 3 helpers; ensure it is available on self-hosted runners.
-        uses: ./.github/actions/setup-python-with-fallback
-
-      - name: Validate all SKILL.md frontmatter
-        # For each SKILL.md: extract YAML frontmatter, convert to JSON,
-        # validate against the JSON schema with ajv. On failure, emit a
-        # GitHub annotation that points at the offending file. Step exits
-        # non-zero if any skill failed validation.
-        run: |
-          set -euo pipefail
-          SCHEMA=".github/skill-schema.json"
-          FAILED=0
-
-          while IFS= read -r -d '' skill_file; do
-            # Extract YAML frontmatter between --- delimiters
-            frontmatter=$(awk '/^---/{if(p)exit;p=1;next} p' "$skill_file")
-            if [ -z "$frontmatter" ]; then
-              echo "::error file=${skill_file},title=ajv[frontmatter]::no YAML frontmatter found (expected '---' delimiters)"
-              FAILED=1
-              continue
-            fi
-
-            # Convert YAML -> JSON for ajv validation using the pinned yaml package.
-            # If parsing fails, annotate the file and continue with the rest.
-            tmpjson=$(mktemp /tmp/skill-XXXXXX.json)
-            yaml_err=$(mktemp /tmp/skill-XXXXXX.err)
-            if ! printf '%s\n' "$frontmatter" | node -e '
-              const YAML = require("yaml");
-              let d = "";
-              process.stdin.on("data", c => d += c);
-              process.stdin.on("end", () => {
-                try {
-                  process.stdout.write(JSON.stringify(YAML.parse(d)));
-                } catch (e) {
-                  console.error("YAML parse error:", e.message);
-                  process.exit(1);
-                }
-              });
-            ' > "$tmpjson" 2>"$yaml_err"; then
-              echo "::error file=${skill_file}::Failed to parse YAML frontmatter"
-              cat "$yaml_err" >&2
-              FAILED=1
-              rm -f "$tmpjson" "$yaml_err" /tmp/ajv.out
-              continue
-            fi
-            rm -f "$yaml_err"
-
-            # Run ajv and capture combined output. On failure, emit annotations.
-            if ./node_modules/.bin/ajv validate -s "$SCHEMA" -d "$tmpjson" --spec=draft7 \
-                 > /tmp/ajv.out 2>&1; then
-              echo "✅ ${skill_file}"
-            else
-              # Feed ajv output through the annotation converter; CURRENT_FILE
-              # gives the converter context for which SKILL.md failed.
-              echo "❌ ${skill_file} — frontmatter validation failed"
-              CURRENT_FILE="$skill_file" \
-                .github/scripts/to-annotations.sh ajv < /tmp/ajv.out
-              FAILED=1
-            fi
-            rm -f "$tmpjson" /tmp/ajv.out
-          done < <(find skills -name 'SKILL.md' -print0)
-
-          exit $FAILED
-
-      - name: Validate OpenAI skill metadata
-        # Every skill must have an agents/openai.yaml file that conforms to
-        # .github/openai-metadata-schema.json. The script emits GitHub
-        # annotations for missing files or schema violations.
-        run: ./node_modules/.bin/tsx scripts/run.ts scripts/validate-openai-metadata.sh
-
-      - name: Check reserved skill names
-        run: ./node_modules/.bin/tsx scripts/run.ts scripts/validate-reserved-names.sh
-
-      - name: Install skill symlinks
-        if: success() || failure()
-        run: ./node_modules/.bin/tsx scripts/run.ts scripts/install.sh
-
-      - name: Validate agent manifests
-        if: success() || failure()
-        run: ./node_modules/.bin/tsx scripts/run.ts scripts/validate-agent-manifests.sh
-
-      - name: Check Tier 0 always-on budget
-        if: success() || failure()
-        run: ./node_modules/.bin/tsx scripts/run.ts scripts/check-tier-0-budget.cjs
-
-  check-os-independence:
-    name: Check OS independence
+  # ──────────────────────────────────────────────────────────────
+  # Job 1: Nx affected per-skill checks (lint, validate, os-check, size-check)
+  # Runs in parallel with repo-checks.
+  # ──────────────────────────────────────────────────────────────
+  nx-checks:
+    name: Nx affected checks
     runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v7
@@ -178,38 +77,47 @@ jobs:
           check-latest: true
           cache: npm
 
-      - name: Install dependencies
+      - name: Install Node dependencies
         run: npm ci --no-audit --no-fund --prefer-offline
 
-      - name: Determine OS-independence baseline
-        id: os-baseline
-        run: |
-          if [ "${{ github.event_name }}" = "push" ]; then
-            BEFORE="${{ github.event.before }}"
-            if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
-              echo "ref=" >> "$GITHUB_OUTPUT"
-            else
-              echo "ref=$BEFORE" >> "$GITHUB_OUTPUT"
-            fi
-          else
-            echo "ref=origin/$BASE_REF" >> "$GITHUB_OUTPUT"
-          fi
+      - name: Build Nx plugin
+        run: npm run build --prefix tools/nx-skill
+
+      - name: Set Nx SHAs
+        uses: nrwl/nx-set-shas@v5
+        with:
+          main-branch-name: ${{ github.event.pull_request.base.ref || 'main' }}
+          workflow-id: validate-skills.yml
+
+      - name: Override NX_HEAD to current PR HEAD
+        # nx-set-shas uses the last successful run's HEAD, which may be
+        # stale on PRs. $GITHUB_SHA on pull_request events is the merge
+        # commit, not the PR branch HEAD. Use the PR head SHA directly.
         env:
-          BASE_REF: ${{ github.base_ref }}
-
-      - name: Run OS-independence check
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
         run: |
-          if [ -z "${{ steps.os-baseline.outputs.ref }}" ]; then
-            npm run check:os
+          if [ -n "$PR_HEAD" ]; then
+            echo "NX_HEAD=$PR_HEAD" >> "$GITHUB_ENV"
           else
-            npm run check:os -- --since-ref "${{ steps.os-baseline.outputs.ref }}"
+            echo "NX_HEAD=$GITHUB_SHA" >> "$GITHUB_ENV"
           fi
 
-  check-skill-size:
-    name: Warn on oversized skill files
+      - name: Run affected skill checks
+        run: |
+          npx nx affected -t lint validate os-check size-check --parallel=4
+
+  # ──────────────────────────────────────────────────────────────
+  # Job 2: Repository-level checks (agent manifests, tier-0, coverage, README)
+  # Runs in parallel with nx-checks. Does not need Nx.
+  # ──────────────────────────────────────────────────────────────
+  repo-checks:
+    name: Repo checks
     runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up Node.js
         uses: actions/setup-node@v7
@@ -218,47 +126,23 @@ jobs:
           check-latest: true
           cache: npm
 
-      - name: Install dependencies
+      - name: Install Node dependencies
         run: npm ci --no-audit --no-fund --prefer-offline
 
-      - name: Check SKILL.md size
-        run: ./node_modules/.bin/tsx scripts/check-skill-size.ts
+      - name: Set up Python
+        uses: ./.github/actions/setup-python-with-fallback
 
-  coverage-matrix:
-    name: Check skill coverage matrix
-    runs-on: [self-hosted]
-    steps:
-      - uses: actions/checkout@v7
+      - name: Install skill symlinks
+        run: ./node_modules/.bin/tsx scripts/run.ts scripts/install.sh
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: lts/*
-          check-latest: true
-          cache: npm
+      - name: Validate agent manifests
+        run: ./node_modules/.bin/tsx scripts/run.ts scripts/validate-agent-manifests.sh
 
-      - name: Install dependencies
-        run: npm ci --no-audit --no-fund --prefer-offline
+      - name: Check Tier 0 always-on budget
+        run: ./node_modules/.bin/tsx scripts/run.ts scripts/check-tier-0-budget.cjs
 
-      - name: Check coverage matrix is up to date
+      - name: Check skill coverage matrix
         run: ./node_modules/.bin/tsx scripts/generate-coverage-matrix.ts --check
 
-  readme-categories:
-    name: Check README skill categories
-    runs-on: [self-hosted]
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: lts/*
-          check-latest: true
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci --no-audit --no-fund --prefer-offline
-
       - name: Check README categories
-        if: success() || failure()
         run: ./node_modules/.bin/tsx scripts/run.ts scripts/check-readme-categories.ts

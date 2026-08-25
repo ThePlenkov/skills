@@ -1,10 +1,19 @@
-import { readdirSync, readFileSync } from "node:fs";
-import { join, relative } from "node:path";
+import { readdirSync, readFileSync, existsSync } from "node:fs";
+import { join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseArgs } from "node:util";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const SKILLS_DIR = join(ROOT, "skills");
 const WARNING_THRESHOLD = 250;
+
+const { values } = parseArgs({
+  options: {
+    'skill': { type: 'string' },
+    'warn-only': { type: 'boolean' },
+  },
+  allowPositionals: false,
+});
 
 interface OversizedSkill {
   path: string;
@@ -34,7 +43,24 @@ function extractName(frontmatter: string): string | null {
 
 const oversized: OversizedSkill[] = [];
 
-for (const skillFile of walkSkillFiles(SKILLS_DIR)) {
+// Collect skill files to check
+const skillFiles: string[] = [];
+if (values.skill) {
+  const skillPath = resolve(ROOT, values.skill);
+  const skillMd = join(skillPath, "SKILL.md");
+  if (existsSync(skillMd)) {
+    skillFiles.push(skillMd);
+  } else {
+    console.error(`::error file=${values.skill}::SKILL.md not found at ${values.skill}`);
+    process.exit(1);
+  }
+} else {
+  for (const f of walkSkillFiles(SKILLS_DIR)) {
+    skillFiles.push(f);
+  }
+}
+
+for (const skillFile of skillFiles) {
   const text = readFileSync(skillFile, "utf-8");
   const lines = countLines(text);
   const relPath = relative(ROOT, skillFile).replace(/\\/g, "/");

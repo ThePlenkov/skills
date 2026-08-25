@@ -15,6 +15,7 @@ on:
       - '.markdownlint.json'
       - '**/*.sh'
       - '**/*.md'
+      - 'tools/**'
   pull_request:
     branches: [main]
     paths:
@@ -29,11 +30,8 @@ on:
       - '.markdownlint.json'
       - '**/*.sh'
       - '**/*.md'
+      - 'tools/**'
 
-# Cancel duplicate runs on the same ref. Without this, a single push
-# to a PR branch can fire the workflow twice (once for the push event
-# from the underlying git push, once for the pull_request event from
-# GitHub's PR machinery).
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -60,9 +58,6 @@ jobs:
           key: shellcheck-${{ env.SC_VERSION }}
 
       - name: Install ShellCheck
-        # Always verify the binary is present and matches the expected version;
-        # a cache hit can be stale or restored on a self-hosted runner whose
-        # ~/.local/bin does not yet contain a valid executable.
         run: |
           set -euo pipefail
           if [ -x ~/.local/bin/shellcheck ] && \
@@ -88,15 +83,6 @@ jobs:
         run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run ShellCheck
-        # shellcheck doesn't recurse on its own, so we use `find` to expand
-        # the directory into explicit files. Pipe through the annotation
-        # converter so each warning becomes a GitHub PR annotation.
-        #
-        # Pipeline: find -> xargs shellcheck -> tee log -> converter.
-        # We rely on `set -o pipefail` so the pipeline's exit code is
-        # the rightmost non-zero status (i.e. shellcheck's, via xargs).
-        # We do NOT use ${PIPESTATUS[0]} -- that captures `find`'s exit,
-        # which is almost always 0, masking shellcheck failures.
         run: |
           set -o pipefail
           find scripts -type f -name '*.sh' -print0 \
@@ -104,65 +90,7 @@ jobs:
             | tee shellcheck.log \
             | .github/scripts/to-annotations.sh shellcheck
 
-  markdownlint:
-    name: Markdown Lint
-    runs-on: [self-hosted]
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: lts/*
-          check-latest: true
-          cache: npm
-
-      - name: Install Node dependencies
-        run: npm ci --no-audit --no-fund --prefer-offline
-
-      - name: Run markdownlint
-        # Pipeline: markdownlint -> tee log -> converter.
-        # `set -o pipefail` makes the pipeline's exit code the rightmost
-        # non-zero status (markdownlint's). The converter always succeeds
-        # (it never errors on bad input), so the gate is purely on
-        # markdownlint.
-        run: |
-          set -o pipefail
-          ./node_modules/.bin/markdownlint-cli2 '**/*.md' '!node_modules/**' --config .markdownlint.json \
-            | tee markdownlint.log \
-            | .github/scripts/to-annotations.sh markdownlint
-
-  reserved-names:
-    name: Check reserved skill names
-    runs-on: [self-hosted]
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: lts/*
-          check-latest: true
-          cache: npm
-
-      - name: Install Node dependencies
-        run: npm ci --no-audit --no-fund --prefer-offline
-
-      - name: Generate and validate reserved names
-        run: |
-          ./node_modules/.bin/tsx scripts/run.ts skills/tools/skillmaker/scripts/collect-reserved.sh
-          ./node_modules/.bin/tsx scripts/run.ts scripts/validate-reserved-names.sh
-
   wrapper-regression:
-    # Smoke-tests the bin/skills.{js,ts} wrapper end-to-end. The wrapper is a
-    # TypeScript file run through Node's --experimental-strip-types, so this
-    # job requires Node >=22.6. The wrapper's default --copy flow (used by
-    # `npx github:theplenkov/skills`) is exercised here so the idempotent
-    # re-install path can't regress unnoticed.
     name: Wrapper smoke test
     runs-on: [self-hosted]
     steps:
@@ -178,13 +106,9 @@ jobs:
           cache: npm
 
       - name: Install npm dependencies
-        # Pure devDeps; production npm install is unnecessary because the
-        # wrapper is shipped as a source file and resolved at runtime.
         run: npm ci --no-audit --no-fund --prefer-offline
 
       - name: Set up Python
-        # scripts/install.sh validates and compares symlinked skill trees
-        # with Python 3 helpers; ensure it is available on self-hosted runners.
         uses: ./.github/actions/setup-python-with-fallback
 
       - name: Build local compiler package
@@ -197,15 +121,6 @@ jobs:
         run: ./bin/skills.js --help
 
       - name: Wrapper --project is idempotent on re-run
-        # Exercise the default copy flow twice in a clean caller dir and
-        # confirm --check reports 'is in sync' afterward. Mirrors the
-        # documented `npx github:theplenkov/skills --project` re-install
-        # behaviour. set -e surfaces any non-zero exit from the wrapper
-        # itself; the final --check assertion fails the step on drift.
-        # Invocation goes through the shebang (`./bin/skills.js`) rather
-        # than a bare `node` so the type-stripping flag from bin/skills.js
-        # applies uniformly across all wrapper steps (Node >=22.18 strips
-        # types by default; older 22.x runners still need the flag).
         run: |
           set -euo pipefail
           TESTDIR=$(mktemp -d)
@@ -215,7 +130,6 @@ jobs:
           "$GITHUB_WORKSPACE/bin/skills.js" --project --check
 
   unit-tests:
-    # PRs only need fast Linux feedback; the full matrix runs on main.
     if: github.event_name == 'pull_request'
     name: Unit tests (self-hosted)
     runs-on: [self-hosted]
@@ -225,8 +139,6 @@ jobs:
           persist-credentials: false
 
       - name: Set up Bun
-        # Self-hosted runner images may not provide unzip, so we extract the
-        # pinned Bun release with python3's zipfile module as a fallback.
         env:
           BUN_VERSION: "1.3.12"
         run: |
@@ -261,12 +173,6 @@ jobs:
         run: node skills/workflow/git/git-state/scripts/git-state.test.mjs
 
   cross-platform-unit-tests:
-    # Regression-tests scripts/lib/{find-bash,posix-path}.ts on Windows so the
-    # MSYS drive-letter normalisation actually runs in CI (the wrapper
-    # smoke-test job is Ubuntu-only and never exercises C:\foo -> /c/foo).
-    # The same tests run on Linux and macOS too, giving a single source of
-    # truth for bash-discovery and path-normalisation behaviour across all
-    # three target platforms. Runs only on main to save macOS/Windows minutes.
     if: github.event_name == 'push'
     name: Cross-platform unit tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -280,9 +186,6 @@ jobs:
           persist-credentials: false
 
       - name: Set up Bun
-        # Pinned to the v2.1.3 release commit SHA. SonarCloud S7637 requires
-        # a fully-pinned action reference for third-party Actions so a
-        # tag rewrite cannot silently run new code on every CI invocation.
         uses: oven-sh/setup-bun@ecf28ddc73e819eb6fa29df6b34ef8921c743461
         with:
           bun-version: 1.3.12

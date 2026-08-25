@@ -1,0 +1,121 @@
+name: CodeQL
+
+# Replaces GitHub's default-setup dynamic CodeQL workflow.
+# Path filters skip CodeQL entirely when only markdown/docs change —
+# the biggest win for a skills repo where most PRs touch only .md files.
+#
+# NOTE: This repo is private without Advanced Security, so the SARIF
+# upload to the code-scanning API is skipped. Results are uploaded as
+# a workflow artifact instead. To get inline PR annotations, enable
+# Advanced Security in repo settings (Settings → Code security and
+# analysis → GitHub Advanced Security).
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.ts'
+      - '**/*.tsx'
+      - '**/*.js'
+      - '**/*.jsx'
+      - '**/*.py'
+      - '.github/workflows/codeql.yml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig.json'
+      - 'tools/**'
+      - 'scripts/**'
+      - 'bin/**'
+  pull_request:
+    paths:
+      - '**/*.ts'
+      - '**/*.tsx'
+      - '**/*.js'
+      - '**/*.jsx'
+      - '**/*.py'
+      - '.github/workflows/codeql.yml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig.json'
+      - 'tools/**'
+      - 'scripts/**'
+      - 'bin/**'
+  schedule:
+    - cron: '0 4 * * 1'  # weekly full scan on Monday 4am UTC
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: [self-hosted]
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: javascript-typescript
+            build-mode: none
+          - language: python
+            build-mode: none
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          # Use security-and-quality (lighter) on PRs, security-extended on push/schedule.
+          queries: ${{ github.event_name == 'pull_request' && 'security-and-quality' || 'security-extended' }}
+          # Limit paths to code directories only — skip skills/, docs/, harbor/
+          # to dramatically reduce database creation and query time.
+          config: |
+            paths:
+              - tools
+              - scripts
+              - bin
+            paths-ignore:
+              - skills
+              - docs
+              - harbor
+              - node_modules
+
+      - name: Perform CodeQL Analysis
+        id: codeql-analyze
+        uses: github/codeql-action/analyze@v4
+        continue-on-error: true
+        with:
+          category: '/language:${{ matrix.language }}'
+          # Write SARIF to a known path so we can upload it as an artifact.
+          # The action also tries to upload to the code-scanning API, which
+          # fails without Advanced Security — hence continue-on-error.
+          output: ${{ github.workspace }}/codeql-results-${{ matrix.language }}.sarif
+
+      - name: Upload SARIF artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: codeql-${{ matrix.language }}-sarif
+          path: ${{ github.workspace }}/codeql-results-${{ matrix.language }}.sarif
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Convert SARIF to PR annotations
+        if: always() && github.event_name == 'pull_request'
+        continue-on-error: true
+        run: |
+          SARIF="${{ github.workspace }}/codeql-results-${{ matrix.language }}.sarif"
+          if [ -f "$SARIF" ]; then
+            python3 skills/tools/sarif-to-annotations/scripts/to-annotations.py "$SARIF" || true
+          fi
