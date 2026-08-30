@@ -1,28 +1,43 @@
 #!/usr/bin/env bun
 /**
- * Extract scorable findings from a GitHub PR into a JSONL sidecar.
+ * Extract scorable findings from a GitHub PR or GitLab MR into a JSONL sidecar.
  *
  * Two finding kinds:
- *   - code_scan   — one per check-run annotation (Codacy, Opengrep, CodeQL, …)
- *   - code_review — one per top-level inline review comment (human or AI reviewer)
+ *   - code_scan   — one per check-run annotation (GitHub: Codacy, Opengrep,
+ *     CodeQL, …) or one per MR vulnerability finding (GitLab Ultimate SAST).
+ *   - code_review — one per top-level inline review comment (human or AI
+ *     reviewer). GitHub: PR review comments; GitLab: MR diff-note discussions.
  *
  * Output: one JSON object per line on stdout (the agent reads this once; the
  * submit step joins ratings back against it by `finding_id`). Diagnostics go to
  * stderr. The script does all fetch/parse/latency work so the agent spends no
  * tool calls on mechanics — see AGENTS.md "Script over steps".
  *
- * Usage: extract-findings.ts OWNER REPO PR_NUMBER > /tmp/agent_xyz/findings.jsonl
+ * Usage:
+ *   GitHub: extract-findings.ts OWNER REPO PR_NUMBER > tmp/agent_xyz/findings.jsonl
+ *   GitLab: extract-findings.ts GROUP PROJECT MR_IID  > tmp/agent_xyz/findings.jsonl
+ *           (subgroups: GROUP/SUBGROUP as OWNER, PROJECT as REPO)
  *
  * detection_latency_ms is (detected − committed). For code_scan that is tool
  * latency; for code_review it includes reviewer availability — split by
  * `type` when analysing.
  */
+import {
+  detectProvider,
+  gitlabMrWebUrl,
+  gitlabRestProject,
+  type Provider,
+} from "./lib/platform.ts";
+
 const SUMMARY_MAX = 100
 
 interface PrArgs {
   owner: string
   repo: string
   pr: string
+  provider: Provider
+  /** `owner/repo` for GitHub or full `group/project` path for GitLab. */
+  project: string
 }
 
 interface CommitInfo {
@@ -96,10 +111,11 @@ function parseArgs(argv: string[]): PrArgs {
   const [owner, repo, pr] = argv
   const missing = [owner, repo, pr].some((v) => !v)
   if (missing) {
-    console.error('Usage: extract-findings.ts OWNER REPO PR_NUMBER')
+    console.error('Usage: extract-findings.ts OWNER REPO PR_NUMBER|MR_IID')
     process.exit(2)
   }
-  return { owner, repo, pr }
+  const provider = detectProvider()
+  return { owner, repo, pr, provider, project: `${owner}/${repo}` }
 }
 
 function truncate(text: string): string {
@@ -243,8 +259,151 @@ function safe<T>(label: string, fn: () => T[]): T[] {
   }
 }
 
+// ---------------------------------------------------------------------------
+// GitLab extraction (REST). Mirrors the GitHub flow: commit info → scan
+// findings (MR vulnerability_findings, Ultimate-tier, degrades gracefully) →
+// review findings (MR diff-note discussions). See issue #284.
+// ---------------------------------------------------------------------------
+
+interface GitLabMr {
+  sha?: string
+  web_url?: string
+  head_pipeline?: { id?: number; status?: string; detailed_status?: { state?: string } } | null
+}
+
+interface GitLabCommit {
+  committed_date?: string
+}
+
+interface GitLabNote {
+  id: number
+  body?: string
+  system?: boolean
+  author?: { username?: string }
+  created_at?: string
+  position?: {
+    new_path?: string | null
+    old_path?: string | null
+    new_line?: number | null
+    old_line?: number | null
+  } | null
+}
+
+interface GitLabDiscussion {
+  id: string
+  notes: GitLabNote[]
+}
+
+interface GitLabVulnerabilityFinding {
+  uuid?: string
+  name?: string
+  description?: string
+  scanner?: { name?: string }
+  location?: { file?: string; start_line?: number } | null
+  scan?: { start_time?: string; end_time?: string } | null
+}
+
+function gitlabCommitInfo(a: PrArgs): CommitInfo {
+  const mr = gitlabRestProject<GitLabMr>(a.project, `merge_requests/${a.pr}`)
+  const sha = mr.sha || ''
+  if (!sha) throw new Error(`GitLab MR !${a.pr} has no head sha in ${a.project}`)
+  const commit = gitlabRestProject<GitLabCommit>(a.project, `repository/commits/${sha}`)
+  return { sha, committedAt: commit.committed_date || '' }
+}
+
+function gitlabReviewFindings(opts: { a: PrArgs; commit: CommitInfo }): Finding[] {
+  const mr = gitlabRestProject<GitLabMr>(opts.a.project, `merge_requests/${opts.a.pr}`)
+  const mrUrl = mr.web_url || gitlabMrWebUrl(opts.a.project, opts.a.pr)
+  const out: Finding[] = []
+  let page = 1
+  while (true) {
+    const batch = gitlabRestProject<GitLabDiscussion[]>(
+      opts.a.project,
+      `merge_requests/${opts.a.pr}/discussions`,
+      { query: { per_page: 100, page } },
+    )
+    if (!Array.isArray(batch) || batch.length === 0) break
+    for (const d of batch) {
+      const note = d.notes?.[0]
+      if (!note || note.system) continue
+      if (!note.position) continue // only diff-note discussions are review findings
+      const pos = note.position
+      const file = pos.new_path || pos.old_path || undefined
+      const line = pos.new_line ?? pos.old_line ?? undefined
+      const detected = note.created_at ?? opts.commit.committedAt
+      out.push({
+        finding_id: `review:${note.id}`,
+        type: 'code_review',
+        tool_name: note.author?.username ?? 'unknown',
+        finding_url: `${mrUrl}#note_${note.id}`,
+        summary: truncate(note.body ?? ''),
+        file,
+        line,
+        commit_timestamp: opts.commit.committedAt,
+        detected_timestamp: detected,
+        detection_latency_ms: latencyMs({ from: opts.commit.committedAt, to: detected }),
+      })
+    }
+    if (batch.length < 100) break
+    page += 1
+  }
+  return out
+}
+
+function gitlabScanFindings(opts: { a: PrArgs; commit: CommitInfo }): Finding[] {
+  // `/merge_requests/:iid/vulnerability_findings` is Ultimate-tier. On
+  // non-Ultimate tiers (or when no security report ran) this 404s and the
+  // outer safe() swallows it — yielding zero scan findings, which is honest.
+  const mr = gitlabRestProject<GitLabMr>(opts.a.project, `merge_requests/${opts.a.pr}`)
+  const mrUrl = mr.web_url || gitlabMrWebUrl(opts.a.project, opts.a.pr)
+  const out: Finding[] = []
+  let page = 1
+  while (true) {
+    const batch = gitlabRestProject<GitLabVulnerabilityFinding[]>(
+      opts.a.project,
+      `merge_requests/${opts.a.pr}/vulnerability_findings`,
+      { query: { per_page: 100, page } },
+    )
+    if (!Array.isArray(batch) || batch.length === 0) break
+    batch.forEach((vf, index) => {
+      const detected = vf.scan?.end_time || vf.scan?.start_time || opts.commit.committedAt
+      out.push({
+        finding_id: `scan:${vf.uuid || `${page}:${index}`}`,
+        type: 'code_scan',
+        tool_name: vf.scanner?.name ?? 'unknown',
+        finding_url: mrUrl,
+        summary: truncate(vf.name || vf.description || ''),
+        file: vf.location?.file,
+        line: vf.location?.start_line,
+        commit_timestamp: opts.commit.committedAt,
+        detected_timestamp: detected,
+        detection_latency_ms: latencyMs({ from: opts.commit.committedAt, to: detected }),
+      })
+    })
+    if (batch.length < 100) break
+    page += 1
+  }
+  return out
+}
+
 function main(): void {
   const a = parseArgs(process.argv.slice(2))
+
+  if (a.provider === 'gitlab') {
+    const commit = gitlabCommitInfo(a)
+    const findings = [
+      ...safe('vulnerability-findings', () => gitlabScanFindings({ a, commit })),
+      ...safe('review-discussions', () => gitlabReviewFindings({ a, commit })),
+    ]
+    for (const finding of findings) {
+      console.log(JSON.stringify(finding))
+    }
+    console.error(
+      `extracted ${findings.length} findings (commit ${commit.sha.slice(0, 7)} @ ${commit.committedAt})`
+    )
+    return
+  }
+
   ensureGhAuth()
   const commit = getCommitInfo(a)
   const runs = safe('list-runs', () => fetchCheckRuns({ a, sha: commit.sha }))

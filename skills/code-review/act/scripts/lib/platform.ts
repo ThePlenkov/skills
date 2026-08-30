@@ -215,15 +215,97 @@ export function graphqlGitLab(query: string, variables: Record<string, unknown>)
   if (!token) throw new Error("GitLab token not found (set GITLAB_TOKEN or GLAB_TOKEN)");
   const host = gitlabHost();
   const payload = JSON.stringify({ query, variables });
+  // Token goes via curl --config - (stdin), not -H argv, to avoid exposure
+  // in process listings (ps/top) and shell history. See CWE-214, issue #289.
+  const config = `header = "PRIVATE-TOKEN: ${token}"\nheader = "Content-Type: application/json"\n`;
   const result = execText("curl", [
     "-fsSL",
-    "-H", "Content-Type: application/json",
-    "-H", `PRIVATE-TOKEN: ${token}`,
+    "--config", "-",
     "-X", "POST",
     "-d", payload,
     `https://${host}/api/graphql`,
-  ]);
+  ], { input: config });
   return JSON.parse(result);
+}
+
+export interface GitLabRestOptions {
+  method?: "GET" | "POST" | "PUT";
+  query?: Record<string, string | number | boolean>;
+  body?: Record<string, unknown>;
+  ignoreExitCode?: boolean;
+}
+
+/**
+ * Call a GitLab REST v4 endpoint under `/projects/:id/...`.
+ *
+ * `projectPath` is URL-encoded as the project `:id`. `path` is the suffix after
+ * the project segment (e.g. `merge_requests/11/discussions`). The GitLab REST
+ * API is stable for MR metadata, discussions, draft/ready transitions, replies,
+ * and resolve — unlike the GraphQL schema, which churned (`DiffNote` position
+ * shape, `mergeRequestSetDraft` access, REST-vs-GraphQL discussion ID mismatch).
+ * See issue #284.
+ */
+export function gitlabRestProject<T = unknown>(projectPath: string, path: string, opts: GitLabRestOptions = {}): T {
+  const token = gitlabToken();
+  if (!token) throw new Error("GitLab token not found (set GITLAB_TOKEN or GLAB_TOKEN)");
+  const host = gitlabHost();
+  const method = opts.method ?? "GET";
+  const encodedProject = encodeURIComponent(projectPath);
+  let url = `https://${host}/api/v4/projects/${encodedProject}/${path}`;
+  if (opts.query && Object.keys(opts.query).length > 0) {
+    const qs = Object.entries(opts.query)
+      .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`)
+      .join("&");
+    url += `?${qs}`;
+  }
+  // Token goes via curl --config - (stdin), not -H argv, to avoid exposure
+  // in process listings (ps/top) and shell history. See CWE-214, issue #289.
+  const configLines = [`header = "PRIVATE-TOKEN: ${token}"`];
+  if (opts.body) {
+    configLines.push(`header = "Content-Type: application/json"`);
+  }
+  const config = `${configLines.join("\n")}\n`;
+  const args = ["-fsSL", "--config", "-", "-X", method];
+  if (opts.body) {
+    args.push("-d", JSON.stringify(opts.body));
+  }
+  args.push(url);
+  const text = execText("curl", args, { input: config, ignoreExitCode: opts.ignoreExitCode });
+  if (!text) return {} as T;
+  try {
+    return JSON.parse(text) as T;
+  } catch (e) {
+    throw new Error(`Failed to parse GitLab REST JSON: ${(e as Error).message}\n${text.slice(0, 500)}`);
+  }
+}
+
+/** Construct the human-facing web URL for a GitLab merge request. */
+export function gitlabMrWebUrl(projectPath: string, number: string): string {
+  const host = gitlabHost();
+  return `https://${host}/${projectPath}/-/merge_requests/${number}`;
+}
+
+/** Construct the human-facing web URL for a GitHub pull request. */
+export function githubPrWebUrl(owner: string, repo: string, number: string): string {
+  return `https://github.com/${owner}/${repo}/pull/${number}`;
+}
+
+/**
+ * Toggle the draft title marker on a GitLab MR title.
+ *
+ * The GitLab REST `PUT /merge_requests/:iid` endpoint has no `draft` boolean
+ * param — draft state is encoded in the title prefix. GitLab recognises three
+ * marker forms: `Draft:`, `WIP:` (legacy), and `[Draft]` / `(Draft)`. This
+ * pure function computes the new title for a desired draft state.
+ */
+export function toggleDraftTitle(title: string, draft: boolean): string {
+  // Strip any existing draft marker: Draft:/WIP: (with colon) or [Draft]/(Draft).
+  // Do not trim unrelated leading whitespace — only the marker itself.
+  const stripped = title.replace(
+    /^(?:(?:Draft|WIP)\s*:\s*|(?:\[Draft\]|\(Draft\))\s*)/i,
+    "",
+  );
+  return draft ? `Draft: ${stripped}` : stripped;
 }
 
 export function paginatedGithubCheckRuns(owner: string, repo: string, headSha: string): Array<{ id: number; name: string }> {

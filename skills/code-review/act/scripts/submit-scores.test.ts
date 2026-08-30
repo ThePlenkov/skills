@@ -312,4 +312,39 @@ describe("submit-scores CSV opt-in", () => {
 		expect(merged).toMatch(/warn: failed to parse/);
 		rmSync(dir, { recursive: true, force: true });
 	});
+
+	test("ACT_PROVIDER=gitlab builds GitLab MR URL in the dataset (issue #284)", () => {
+		const { dir, csvPath } = setupTmpdir();
+		const findings = makeFindings(dir);
+		const scores = makeScores(dir);
+		// Override the default GitHub owner/repo/pr with a GitLab group/project/iid.
+		const args = [
+			"bun",
+			SCRIPT,
+			"booking-com",
+			"finsys-devops",
+			"131",
+			"--evaluator",
+			"test-model",
+			"--findings",
+			findings,
+			"--scores",
+			scores,
+			"--csv",
+			csvPath,
+			"--record",
+		];
+		const proc = Bun.spawnSync(args, {
+			cwd: dir,
+			env: safeChildEnvironment({ ACT_PROVIDER: "gitlab" }),
+		});
+		expect(proc.exitCode).toBe(0);
+		expect(proc.stdout.toString()).toContain("RECORDING=on");
+		const csv = readFileSync(csvPath, "utf8");
+		expect(csv).toContain(
+			"https://gitlab.com/booking-com/finsys-devops/-/merge_requests/131",
+		);
+		expect(csv).not.toContain("github.com");
+		rmSync(dir, { recursive: true, force: true });
+	});
 });

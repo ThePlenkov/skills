@@ -10,8 +10,8 @@
 import { readFileSync } from "node:fs";
 import {
   detectProvider,
+  gitlabRestProject,
   graphqlGh,
-  graphqlGitLab,
   parseArgs,
   resolveTarget,
 } from "./lib/platform.ts";
@@ -56,7 +56,7 @@ function main(): void {
 
   const provider = detectProvider();
   // Number is not used, but resolving validates environment and provider setup.
-  resolveTarget(provider, parseArgs(positional));
+  const target = resolveTarget(provider, parseArgs(positional));
 
   let resolved = 0;
   for (const id of ids) {
@@ -67,11 +67,15 @@ function main(): void {
         throw new Error(JSON.stringify(res.errors));
       }
     } else {
-      const query = `mutation($id:DiscussionID!){discussionToggleResolve(input:{id:$id,resolve:true}){discussion{resolved}}}`;
-      const res = graphqlGitLab(query, { id }) as { errors?: unknown };
-      if (res.errors) {
-        throw new Error(JSON.stringify(res.errors));
-      }
+      if (!target.projectPath || !target.number) throw new Error("GitLab MR context not resolved");
+      // REST: PUT /projects/:id/merge_requests/:iid/discussions/:discussion_id?resolved=true
+      // `id` is the REST discussion ID emitted by review-state.ts (e.g. "6a9c1750..."),
+      // which is exactly what this endpoint expects — no GraphQL global-ID conversion.
+      gitlabRestProject(
+        target.projectPath,
+        `merge_requests/${target.number}/discussions/${id}`,
+        { method: "PUT", query: { resolved: "true" } },
+      );
     }
     resolved += 1;
     console.log(`resolved ${id}`);

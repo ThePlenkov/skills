@@ -41,6 +41,12 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
+import {
+  detectProvider,
+  gitlabMrWebUrl,
+  githubPrWebUrl,
+  type Provider,
+} from "./lib/platform.ts";
 
 const DEFAULT_CSV = ".agents/act/review_scores.csv";
 const DEFAULT_CONFIG = ".agents/act/config.json";
@@ -66,6 +72,7 @@ interface Cli {
 	owner: string;
 	repo: string;
 	pr: string;
+	provider: Provider;
 	evaluator: string;
 	findingsPath: string;
 	scoresPath: string;
@@ -135,6 +142,7 @@ function parseCli(argv: string[]): Cli {
 		owner,
 		repo,
 		pr,
+		provider: detectProvider(),
 		evaluator: flagValue(argv, "--evaluator") ?? "unknown",
 		findingsPath: requireFlag(flagValue(argv, "--findings"), "--findings"),
 		scoresPath: flagValue(argv, "--scores") ?? "./scores.tsv",
@@ -221,7 +229,14 @@ function buildRows(opts: {
 	cli: Cli;
 	timestamp: string;
 }): Record<string, string>[] {
-	const prUrl = `https://github.com/${opts.cli.owner}/${opts.cli.repo}/pull/${opts.cli.pr}`;
+	// `owner/repo` is the GitHub `owner/repo` or the GitLab `group/project`
+	// (subgroups: caller passes `group/subgroup` as owner and `project` as repo,
+	// which joins to the full project path). The URL is built per provider so
+	// the research dataset records the correct source review URL. See issue #284.
+	const project = `${opts.cli.owner}/${opts.cli.repo}`;
+	const prUrl = opts.cli.provider === "gitlab"
+		? gitlabMrWebUrl(project, opts.cli.pr)
+		: githubPrWebUrl(opts.cli.owner, opts.cli.repo, opts.cli.pr);
 	const rows: Record<string, string>[] = [];
 	for (const score of opts.scores) {
 		const finding = opts.findings.get(score.finding_id);

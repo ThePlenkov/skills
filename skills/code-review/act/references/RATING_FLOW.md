@@ -27,11 +27,15 @@ scripts. The agent never re-echoes data a script already holds. See
 ### 1. Extract — 1 tool call (max context, zero reasoning)
 
 ```bash
+# GitHub
 bun scripts/extract-findings.ts OWNER REPO PR > tmp/agent_xyz/findings.jsonl
+# GitLab (subgroups: GROUP/SUBGROUP PROJECT MR_IID)
+bun scripts/extract-findings.ts GROUP PROJECT MR_IID > tmp/agent_xyz/findings.jsonl
 ```
 
-Emits one finding per line — check-run annotations (`code_scan`) and top-level
-inline review comments (`code_review`) — each already carrying everything:
+Emits one finding per line — check-run annotations / MR vulnerability findings
+(`code_scan`) and top-level inline review comments / diff-note discussions
+(`code_review`) — each already carrying everything:
 
 ```json
 {

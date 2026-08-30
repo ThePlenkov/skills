@@ -11,8 +11,8 @@
 import { readFileSync } from "node:fs";
 import {
   detectProvider,
+  gitlabRestProject,
   graphqlGh,
-  graphqlGitLab,
   parseArgs,
   resolveTarget,
 } from "./lib/platform.ts";
@@ -85,16 +85,11 @@ function main(): void {
   }
 
   const provider = detectProvider();
-  // Validate context; for GitLab we also need the MR node ID as noteableId.
+  // Validate context; GitLab REST replies go through the discussions endpoint
+  // and need the project path + MR iid (resolved here), not a GraphQL noteable ID.
   const target = resolveTarget(provider, parseArgs(positional));
-  let gitlabNoteableId: string | undefined;
   if (provider === "gitlab") {
     if (!target.projectPath || !target.number) throw new Error("could not resolve GitLab MR");
-    const mrQuery = `query($p:ID!,$i:String!){project(fullPath:$p){mergeRequest(iid:$i){id}}}`;
-    const mrRes = graphqlGitLab(mrQuery, { p: target.projectPath, i: target.number }) as { errors?: unknown; data?: { project?: { mergeRequest?: { id?: string } } } };
-    if (mrRes.errors) throw new Error(JSON.stringify(mrRes.errors));
-    gitlabNoteableId = mrRes.data?.project?.mergeRequest?.id;
-    if (!gitlabNoteableId) throw new Error("could not resolve GitLab MR node id");
   }
 
   let posted = 0;
@@ -116,15 +111,20 @@ function main(): void {
           }
         }
       } else {
-        if (!gitlabNoteableId) throw new Error("GitLab MR node id not resolved");
-        const replyQuery = `mutation($noteableId:NoteableID!,$discussionId:DiscussionID!,$body:String!){createNote(input:{noteableId:$noteableId,discussionId:$discussionId,body:$body}){note{id}}}`;
-        const replyRes = graphqlGitLab(replyQuery, { noteableId: gitlabNoteableId, discussionId: id, body }) as { errors?: unknown; data?: { createNote?: { note?: { id?: string } } } };
-        if (replyRes.errors) throw new Error(JSON.stringify(replyRes.errors));
-        const replyId = replyRes.data?.createNote?.note?.id;
-        if (reaction && replyId) {
+        if (!target.projectPath || !target.number) throw new Error("GitLab MR context not resolved");
+        // REST: POST /projects/:id/merge_requests/:iid/discussions/:discussion_id/notes
+        const note = gitlabRestProject<{ id: number }>(
+          target.projectPath,
+          `merge_requests/${target.number}/discussions/${id}/notes`,
+          { method: "POST", body: { body } },
+        );
+        if (reaction && note.id != null) {
           try {
-            const reactQuery = `mutation($awardableId:AwardableID!,$name:String!){awardEmojiAdd(input:{awardableId:$awardableId,name:$name}){awardEmoji{name}}}`;
-            graphqlGitLab(reactQuery, { awardableId: replyId, name: reaction });
+            gitlabRestProject(
+              target.projectPath,
+              `merge_requests/${target.number}/notes/${note.id}/award_emoji`,
+              { method: "POST", body: { name: reaction } },
+            );
           } catch {
             // Reaction failures are best-effort.
           }

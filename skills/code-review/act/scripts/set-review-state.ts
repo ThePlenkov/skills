@@ -10,14 +10,15 @@
 import {
   detectProvider,
   ghAuthOk,
+  gitlabRestProject,
   graphqlGh,
-  graphqlGitLab,
   parseArgs,
   requireBin,
   resolveGitHubNumber,
   resolveGitHubOwnerRepo,
   resolveGitLabNumber,
   resolveGitLabProjectPath,
+  toggleDraftTitle,
 } from "./lib/platform.ts";
 
 function parseArgv(argv: string[]): { mode: "draft" | "ready"; positional: string[] } {
@@ -79,10 +80,19 @@ function main(): void {
   const number = resolveGitLabNumber(projectPath, parsed.number);
 
   const draftValue = mode === "draft";
-  const query = `mutation($p:ID!,$i:String!,$d:Boolean!){mergeRequestSetDraft(input:{projectPath:$p,iid:$i,draft:$d}){mergeRequest{draft iid}}}`;
-  const res = graphqlGitLab(query, { p: projectPath, i: number, d: draftValue }) as { errors?: unknown; data?: { mergeRequestSetDraft?: { mergeRequest?: { draft?: boolean; iid?: string } } } };
-  if (res.errors) throw new Error(JSON.stringify(res.errors));
-  const isDraft = res.data?.mergeRequestSetDraft?.mergeRequest?.draft;
+  // GitLab REST has no `draft` boolean on PUT /merge_requests/:iid — draft state
+  // is encoded in the title prefix. Fetch the title, toggle the prefix, PUT it back.
+  const mr = gitlabRestProject<{ title: string; draft: boolean }>(
+    projectPath,
+    `merge_requests/${number}`,
+  );
+  const newTitle = toggleDraftTitle(mr.title, draftValue);
+  const updated = gitlabRestProject<{ draft: boolean }>(
+    projectPath,
+    `merge_requests/${number}`,
+    { method: "PUT", body: { title: newTitle } },
+  );
+  const isDraft = updated.draft ?? draftValue;
   console.log(`provider=gitlab project=${projectPath} mr=${number} draft=${isDraft}`);
 }
 
