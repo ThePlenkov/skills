@@ -1,1 +1,1 @@
-../../../workflow/planning/shared-plan/references/definition-of-done.md
+../../../workflow/shared-plan/references/definition-of-done.md

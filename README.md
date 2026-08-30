@@ -73,6 +73,7 @@ skills/
 ├── engineering/        # Cross-cutting engineering practices (frontend, nodejs/typescript, bootstrap-ts-repo, prototype, security)
 ├── experimentation/    # Sandboxed experimentation (sandboxed)
 ├── foundation/         # Always-on behavioral primitives (token economy, memory)
+├── git/                # Git branch inspection, status, pruning, reset, workflow, merge conflicts
 ├── integrations/       # Platform connectors (GitHub, GitLab, Atlassian, Codacy, ...)
 ├── methodology/        # Development methodology (patching, critical thinking, code home)
 ├── orchestration/      # Agent coordination, isolation, and session state
@@ -82,7 +83,7 @@ skills/
 ├── tools/              # Dev tools (skillmaker, skills-cli, docker-agent-config, ...)
 ├── troubleshooting/    # Scoped descent, safety, recovery
 ├── verification/       # Runtime proof (evidence)
-└── workflow/           # Development workflow (git, testing, planning, debt)
+└── workflow/           # Development workflow (CI/CD, testing, planning, debt)
 ```
 
 Each category contains skill directories with `SKILL.md` files.
@@ -177,7 +178,7 @@ This repo is also a [Claude Code plugin marketplace](https://code.claude.com/doc
 /plugin install methodology@theplenkov-claude
 ```
 
-**Available plugins:** `skills` (all), `coaching`, `behavior`, `foundation`, `methodology`, `verification`, `orchestration`, `workflow`, `integrations`, `tools`, `safety`, `experimentation`, `engineering`, `troubleshooting`, `code-review`, `self-learning`, `research`, `agents`
+**Available plugins:** `skills` (all), `coaching`, `behavior`, `foundation`, `git`, `methodology`, `verification`, `orchestration`, `workflow`, `integrations`, `tools`, `safety`, `experimentation`, `engineering`, `troubleshooting`, `code-review`, `self-learning`, `research`, `agents`
 
 **Auto-populate for your team** — add to `.claude/settings.json`:
 

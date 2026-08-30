@@ -13,6 +13,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `engineering` | Cross-cutting engineering practices (frontend, nodejs/typescript, bootstrap-ts-repo, prototype, security) | `architecture-review`, `bootstrap-ts-repo`, `nodejs`, `prototype`, `security-and-hardening`, `typescript` |
 | `experimentation` | Sandboxed experimentation | `sandboxed` |
 | `foundation` | Always-on behavioral primitives and activation tiers | `persistent-memory`, `skill-tiers`, `token-rationalism` |
+| `git` | Git branch inspection, status, pruning, reset, workflow, and merge conflict resolution | `git-prune`, `git-reset`, `git-state`, `git-status`, `git-workflow-and-versioning`, `resolving-merge-conflicts`, `shadow-fork` |
 | `integrations` | External platform connectors | `bootstrap-gh-self-hosted-runner`, `codacy`, `codescene`, `gitlab-ci-local`, `glean`, `sourcegraph` |
 | `methodology` | Development methodology | `codehome`, `dep-cost`, `external-tools`, `investigate-first`, `loop-programming`, `minimal-root-cause`, `modern-stack`, `one-shot-patch`, `refactoring`, `repository-onboarding`, `reuse-first`, `review-methodology`, `spec-driven-development`, `test-driven-development` |
 | `orchestration` | Agent coordination, isolation, context management, and skill discovery | `handoff`, `subagent-capsule`, `unwind`, `using-agent-skills` |
@@ -22,7 +23,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `tools` | Agent development utilities | `docker-agent-config`, `npm-publish`, `sarif-to-annotations`, `security-doctor`, `skillmaker`, `skills-cli`, `tsdown`, `writing-great-skills` |
 | `troubleshooting` | Scoped descent, debugging, and performance investigation | `debugging`, `performance-investigation` |
 | `verification` | Runtime proof and evidence-backed claims | `evidence`, `evidence-lite` |
-| `workflow` | Development workflow | `backlog`, `ci-cd-and-automation`, `ci-local`, `e2e`, `git-reset`, `git-state`, `git-workflow-and-versioning`, `harvest`, `resolving-merge-conflicts`, `shadow-fork`, `shared-plan` |
+| `workflow` | Development workflow | `backlog`, `ci-cd-and-automation`, `ci-local`, `e2e`, `harvest`, `shared-plan` |
 
 ## Skill catalog
 
@@ -50,6 +51,13 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `persistent-memory` | `foundation` | 1 | user | — | — |
 | `skill-tiers` | `foundation` | 2 | user, model | — | — |
 | `token-rationalism` | `foundation` | 0 | always | — | — |
+| `git-prune` | `git` | 2 | user, model | `$skill{git-reset}` | — |
+| `git-reset` | `git` | 2 | user, model | — | — |
+| `git-state` | `git` | 2 | user, model | — | — |
+| `git-status` | `git` | 2 | user, model | — | — |
+| `git-workflow-and-versioning` | `git` | 2 | user, model | — | — |
+| `resolving-merge-conflicts` | `git` | 2 | user, model | — | — |
+| `shadow-fork` | `git` | 2 | user, model | — | — |
 | `bootstrap-gh-self-hosted-runner` | `integrations` | 2 | user | — | — |
 | `codacy` | `integrations` | 2 | user, model | — | — |
 | `codescene` | `integrations` | 2 | user, model | — | — |
@@ -97,12 +105,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 | `ci-cd-and-automation` | `workflow` | 2 | user, model | — | — |
 | `ci-local` | `workflow` | 2 | user, model | — | — |
 | `e2e` | `workflow` | 2 | user | — | — |
-| `git-reset` | `workflow` | 2 | user, model | — | — |
-| `git-state` | `workflow` | 2 | user, model | — | — |
-| `git-workflow-and-versioning` | `workflow` | 2 | user, model | — | — |
 | `harvest` | `workflow` | 2 | user | — | — |
-| `resolving-merge-conflicts` | `workflow` | 2 | user, model | — | — |
-| `shadow-fork` | `workflow` | 2 | user, model | — | — |
 | `shared-plan` | `workflow` | 2 | user, model | — | — |
 
 ## Disambiguation (use this, not that)
@@ -110,6 +113,7 @@ Auto-generated from skill frontmatter. Run `npx tsx scripts/generate-coverage-ma
 - **`$skill{act}`** — Use when the user invokes /act on a PR/MR, /act with no arguments (uses the PR in the current conversation context), or /act <context> with context ∈ {pr, plan, backlog, harvest, stack}. Resolves threads in product code (or posts a substantive in-thread reply), commits, then closes threads. Never resolve-only. Harvest (collecting threads) lives in /harvest; triage (priority / grouping / wontfix) lives in /backlog. /act is the fix loop, not the collect or triage. Use this, not `$skill{github-pr-review}`, `$skill{review-methodology}`.
 - **`$skill{github-pr-review}`** — Use when the user asks for a GitHub pull request review or wants review comments prepared for a PR on github.com. Use this, not `$skill{review-methodology}`.
 - **`$skill{two-axis-review}`** — Review the changes since a fixed point (commit, branch, tag, or merge-base) along two independent axes — Standards (does the code follow the repo's documented coding standards plus a Fowler smell baseline?) and Spec (does the code faithfully implement the originating issue / PRD / spec?). Runs both reviews in parallel sub-agents. Distinct from github-pr-review (single-axis) and act (thread remediation); this skill holds the two-axis discipline. Use this, not `$skill{github-pr-review}`, `$skill{act}`, `$skill{review-methodology}`.
+- **`$skill{git-prune}`** — Delete stale local branches that are behind the comparison base and not ahead, with no uncommitted changes. Reuses $skill{git-status} for branch facts. Dry-run by default; --apply deletes after mandatory $skill{safeguard} approval. Use to clean up merged/stale branch clutter safely. Use this, not `$skill{git-reset}`.
 - **`$skill{investigate-first}`** — Use before editing when a bug, task, failing test, or code area is not yet understood. Guides agents to inspect files, search symbols and errors, reproduce a failure when practical, and produce evidence before any patching. Useful for weak-model stability, unknown codebases, root-cause analysis, and preventing chaotic edits. Use this, not `$skill{debugging}`, `$skill{one-shot-patch}`.
 - **`$skill{minimal-root-cause}`** — Use before patching code when the task may cause overengineering, duplicate logic, unnecessary dependencies, or symptom-only bug fixes. Enforces laziness about solution, rigor about understanding and verification. Climb the laziness ladder before editing. Use this, not `$skill{investigate-first}`, `$skill{debugging}`, `$skill{one-shot-patch}`.
 - **`$skill{one-shot-patch}`** — Use when the relevant file and fix hypothesis are known and the agent needs to make exactly one narrow change, then verify it. Prevents stacked fixes, broad refactors, and chaotic iteration. Best for isolated bug fixes after investigation has identified the likely cause. Use this, not `$skill{investigate-first}`, `$skill{debugging}`.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Prune"
+  short_description: "Delete stale behind-base local branches safely"
+  default_prompt: "Use $git-prune to clean up stale local branches."

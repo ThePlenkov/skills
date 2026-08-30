@@ -11,11 +11,11 @@ skills/
 ├── verification/       # Runtime proof (evidence)
 ├── safety/             # Destructive operation protection (safeguard, salvage)
 ├── orchestration/      # Agent coordination, isolation, session state, and context-window hand-off
-├── workflow/           # Development workflow (git, testing, planning, debt)
-│   ├── git/                # commit, push, reset, merge conflict resolution
-│   ├── testing/            # ci-local, e2e
-│   ├── planning/           # shared-plan, backlog
-│   └── debt/               # harvest
+├── git/                # Git branch inspection, status, pruning, reset, workflow, merge conflict resolution
+├── workflow/           # Development workflow (CI/CD, testing, planning, debt)
+│   ├── ci-local, e2e       # local CI testing
+│   ├── shared-plan, backlog # planning
+│   └── harvest             # review debt harvest
 ├── code-review/        # PR/MR review, remediation, and the two-axis (Standards + Spec) review discipline
 ├── integrations/       # Platform connectors (GitHub, GitLab, Atlassian, Codacy, ...)
 ├── tools/              # Dev tools (skillmaker, skills-cli, docker-agent-config, writing-great-skills, ...)

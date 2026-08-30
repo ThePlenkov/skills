@@ -9,7 +9,7 @@
  */
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
-import { readDebtRecords, type DebtRecord } from '../../../workflow/debt/harvest/scripts/review-debt-lib.ts'
+import { readDebtRecords, type DebtRecord } from '../../../workflow/harvest/scripts/review-debt-lib.ts'
 
 interface PlanArgs {
   limit: number

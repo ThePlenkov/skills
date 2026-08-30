@@ -17,7 +17,7 @@ The goal of this import is to take **only the value-add** — not to mirror the 
 |---|---|---|
 | `prototype` | `skills/engineering/prototype/` | No existing skill answers "throwaway code for a design question" with explicit LOGIC vs. UI branches. |
 | `handoff` | `skills/orchestration/handoff/` | Pairs with `save-session` and `unwind`; we had durable cross-work preservation and parent-collapse but no **context-window hand-off** to a fresh session. |
-| `resolving-merge-conflicts` | `skills/workflow/git/resolving-merge-conflicts/` | `act` covers PR-thread conflicts; nothing covers `git merge` / `git rebase` markers. The by-intent, no-`--abort` discipline is unique. |
+| `resolving-merge-conflicts` | `skills/git/resolving-merge-conflicts/` | `act` covers PR-thread conflicts; nothing covers `git merge` / `git rebase` markers. The by-intent, no-`--abort` discipline is unique. |
 | `writing-great-skills` | `skills/tools/writing-great-skills/` | Companion to `skillmaker`: `skillmaker` is the **procedure** (how to scaffold a new skill), `writing-great-skills` is the **craft** (how to make it fire predictably). The two layers were missing. |
 | `two-axis-review` | `skills/code-review/two-axis-review/` | Existing `github-pr-review` / `mr-address-review` / `act` are **tool runners** (single-axis, platform-specific). The **discipline** of separating Standards from Spec into parallel sub-agents is the contribution. The name avoids collision with the `code-review/` category. |
 
@@ -52,11 +52,11 @@ PR (out of scope here) to call out the mirror and the routing rule.
 |---|---|
 | `grilling` + `grill-me` | Duplicates `coaching/interview-me` (which has a confidence number and richer when-to-use rules). |
 | `grill-with-docs` | Output differs from `methodology/idea-refine` (one-pager) but the discipline is similar; we prefer to keep `idea-refine` and add the glossary/ADR flavour to `documentation-and-adrs` instead. |
-| `wayfinder` | `workflow/planning/planning-and-task-breakdown` + `shared-plan` cover the same surface at our scale. Re-evaluate when we land a multi-session build that exceeds one window. |
+| `wayfinder` | `workflow/shared-plan` covers the same surface at our scale. Re-evaluate when we land a multi-session build that exceeds one window. |
 | `tdd` | `methodology/test-driven-development` already covers the same ground; the anti-pattern section (tautological / implementation-coupled / horizontal slicing) is the borrow candidate (see below). |
 | `diagnosing-bugs` | `troubleshooting/debugging` already covers the 4-phase methodology; the "tight feedback loop / red-capable" framing is the borrow candidate (see below). |
 | `code-review` | Renamed to `two-axis-review` (above) to avoid name collision. |
-| `to-spec` / `to-tickets` / `implement` | Duplicates the SDD chain we already have (`methodology/sdd/spec-driven-development` + `workflow/planning/planning-and-task-breakdown` + `methodology/test-driven-development`). |
+| `to-spec` / `to-tickets` / `implement` | Duplicates the SDD chain we already have (`methodology/spec-driven-development` + `workflow/shared-plan` + `methodology/test-driven-development`). |
 | `codebase-design` | Vocab (module, depth, seam, leverage, locality) is excellent but the existing `engineering/architecture-review` covers the surface. Borrow vocab into a shared reference doc, not a new skill. |
 | `domain-modeling` | `workflow/documentation-and-adrs` already covers ADR discipline. The glossary-side "active sharpening" concept is a borrow candidate. |
 | `improve-codebase-architecture` | `behavior/architecture-review` is broader. |
@@ -100,4 +100,4 @@ The following three upstream concepts are sharper than what we currently have an
 - `npm run check:readme-categories` — 17 categories, 18 plugins in sync.
 - `npm run typecheck` — clean.
 - `npm run validate` — `generated skills-index.json is valid`.
-- `npm test` — pre-existing `js-yaml` resolution failures in `skills/workflow/testing/e2e/scripts/framework/*` are unrelated to this import (those tests were failing on `main` before this branch was created).
+- `npm test` — pre-existing `js-yaml` resolution failures in `skills/workflow/e2e/scripts/framework/*` are unrelated to this import (those tests were failing on `main` before this branch was created).

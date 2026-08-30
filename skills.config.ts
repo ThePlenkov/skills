@@ -265,6 +265,25 @@ export const skillMetadata: Record<string, SkillMetadata> = {
       },
     },
   },
+  "git-status": {
+    frontmatter: {
+      metadata: {
+        "tier": 2,
+        "triggers": ["user", "model"],
+        "allowed-tools": ["read", "exec", "grep"],
+      },
+    },
+  },
+  "git-prune": {
+    frontmatter: {
+      metadata: {
+        "tier": 2,
+        "triggers": ["user", "model"],
+        "allowed-tools": ["read", "exec", "grep"],
+        "conflicts_with": ["git-reset"],
+      },
+    },
+  },
   "git-workflow-and-versioning": {
     frontmatter: {
       metadata: {

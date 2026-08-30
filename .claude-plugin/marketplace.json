@@ -51,7 +51,13 @@
       "name": "workflow",
       "source": "./",
       "skills": ["./skills/workflow"],
-      "description": "Development workflow (git, CI/CD, planning, testing, and merge conflict resolution)"
+      "description": "Development workflow (CI/CD, planning, testing, debt harvest, and merge conflict resolution)"
+    },
+    {
+      "name": "git",
+      "source": "./",
+      "skills": ["./skills/git"],
+      "description": "Git branch inspection, status dashboards, pruning, reset, workflow, and merge conflict resolution"
     },
     {
       "name": "integrations",

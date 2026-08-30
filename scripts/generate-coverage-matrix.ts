@@ -103,6 +103,7 @@ function categoryDescription(category: string): string {
     engineering: "Cross-cutting engineering practices (frontend, nodejs/typescript, bootstrap-ts-repo, prototype, security)",
     experimentation: "Sandboxed experimentation",
     foundation: "Always-on behavioral primitives and activation tiers",
+    git: "Git branch inspection, status, pruning, reset, workflow, and merge conflict resolution",
     integrations: "External platform connectors",
     methodology: "Development methodology",
     orchestration: "Agent coordination, isolation, context management, and skill discovery",
