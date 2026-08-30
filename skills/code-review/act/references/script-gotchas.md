@@ -27,6 +27,20 @@ script decodes them before POST):
 **not** `--input FILE` (which discards `-F`). Use `-f` for the query
 and `-F` or `-f` for variables.
 
+## `reviewThreads(first:)` vs `reviewThreads(last:)` — pagination direction
+
+GitHub's `reviewThreads` connection returns threads in **chronological order**
+(oldest first). When you query `reviewThreads(first: 100)`, you get the
+**oldest 100** threads — which on a PR with 150+ threads are typically all
+already resolved. New bot findings opened after a rebase or push are appended
+at the **end** and only appear with `reviewThreads(last: 100)` or by paginating
+`first:` to the end via `after:` cursors.
+
+**Always use `last: 100`** for ad-hoc thread checks, or use the `pr-state.ts`
+helper which paginates `first:` with cursors to exhaust all threads. Never
+query `first: 100` alone on a PR with a long review history — you will
+silently miss new unresolved findings and falsely report convergence.
+
 ## `MERGEABLE=UNKNOWN` cache note
 
 If `MERGEABLE=UNKNOWN` in `pr-state.ts` output, the GraphQL

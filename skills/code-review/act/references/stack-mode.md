@@ -151,7 +151,11 @@ CI status is unchanged from the previous run.
 After reaching the top of the stack, re-scan from the bottom:
 
 1. Query all PRs for new unresolved threads (bots may have posted
-   new comments after the latest CI run).
+   new comments after the latest CI run). **Use `reviewThreads(last: 100)`**
+   (not `first: 100`) — after a rebase, new bot threads are appended at the
+   end, and `first: 100` returns the oldest (already resolved) threads,
+   causing you to miss new findings. Prefer the `pr-state.ts` helper which
+   paginates correctly.
 2. Query all PRs for CI status (a lower-stack push may have triggered
    CI on downstream PRs).
 3. If any PR has new findings, process it again (bottom-to-top).

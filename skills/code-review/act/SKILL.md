@@ -93,6 +93,12 @@ Footguns: [`references/footguns.md`](references/footguns.md).
 6. **HEAD SHA** — `review-state.ts` or `gh pr view NUMBER --json headRefOid`.
 7. **Inventory threads** — for each unresolved thread: file/line,
    reviewer ask, planned action (fix code | reply only).
+   **Use the helper script** (`pr-state.ts` or `review-state.ts`) instead of
+   ad-hoc GraphQL — it paginates correctly. If you must query manually, use
+   `reviewThreads(last: 100)` (not `first: 100`) to get the **newest** threads,
+   and paginate when `totalCount > 100`. `first: 100` returns the oldest
+   threads, which are typically already resolved — you will miss new bot
+   findings opened after a rebase or push.
 
 Build a **thread plan** before editing. Do not start the resolve script
 until every open thread has a planned action and P0a/P0b/P1–P3 are done.
