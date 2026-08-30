@@ -63,7 +63,7 @@ jobs:
   # ──────────────────────────────────────────────────────────────
   nx-checks:
     name: Nx affected checks
-    runs-on: [self-hosted]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
         with:
@@ -112,7 +112,7 @@ jobs:
   # ──────────────────────────────────────────────────────────────
   repo-checks:
     name: Repo checks
-    runs-on: [self-hosted]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
         with:

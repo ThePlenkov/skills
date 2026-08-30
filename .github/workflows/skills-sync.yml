@@ -23,7 +23,7 @@ permissions:
 jobs:
   sync:
     if: "github.ref == 'refs/heads/main'"
-    runs-on: [self-hosted]
+    runs-on: ubuntu-latest
     steps:
       - name: Generate GitHub App token
         id: app-token
