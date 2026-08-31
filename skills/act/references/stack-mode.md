@@ -163,13 +163,12 @@ After reaching the top of the stack, re-scan from the bottom:
 
 ### Convergence check
 
-All PRs in the stack are merge-ready when:
-
-+ Every PR has `open_threads=0`.
-+ Every PR has `CI_REQUIRED_PENDING=0` and `SAST_FINDINGS_PENDING=0`.
-+ No new bot comments appeared in the last CI cycle (compare bot
-  comment count before and after the last push).
-+ Every PR's `mergeable_state` is `clean` (not `conflict` or `dirty`).
+Each PR in the stack is merge-ready when it satisfies the four exit
+conditions in [SKILL.md § Exit conditions](../SKILL.md)
+(`open_threads=0`, `CI_REQUIRED_PENDING=0`, `SAST_FINDINGS_PENDING=0`,
+`SAST_FINDINGS_UNKNOWN=0`, no new bot comments, no cycle-guard signal).
+Additionally, every PR's `mergeable_state` must be `clean` (not
+`conflict` or `dirty`).
 
 `mergeable_state: unstable` is acceptable — it means pending review
 approval or non-required checks running, not a conflict.

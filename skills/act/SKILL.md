@@ -1,6 +1,6 @@
 ---
 name: act
-description: Use when the user invokes /act on a PR/MR, /act with no arguments (uses the PR in the current conversation context), or /act <context> with context ∈ {pr, plan, backlog, harvest, stack}. Resolves threads in product code (or posts a substantive in-thread reply), commits, then closes threads. Never resolve-only. Harvest (collecting threads) lives in /harvest; triage (priority / grouping / wontfix) lives in /backlog. /act is the fix loop, not the collect or triage.
+description: Use when the user invokes /act on a PR/MR, /act with no arguments (uses the PR in the current conversation context), or /act <context> with context ∈ {pr, plan, backlog, harvest, stack}. Resolves threads in product code (or posts a substantive in-thread reply), commits, then closes threads. Never resolve-only. /act is the fix loop — collection lives in /harvest and triage in /backlog.
 metadata:
   disable-model-invocation: false
   compatibility: Requires gh, jq, git, bun, node.
@@ -127,7 +127,8 @@ Footguns: [`references/footguns.md`](references/footguns.md).
 Build a **thread plan** before editing. Do not start the resolve script
 until every open thread has a planned action and P0a/P0b/P1–P3 are done.
 
-**Never change PR title or description** unless the user explicitly asks.
+**Leave the author's PR title and body as-is** unless the user explicitly
+asks for a change; track agent progress in thread replies and commits.
 
 ## Work order — mandatory sequence
 
@@ -154,8 +155,9 @@ Runs **inside** each pass of the main loop:
 4. **Commit** product changes (group sensibly; no empty commits).
 5. **Reply in thread** pointing to the commit or decision (short, factual).
    Add 👍 when feedback is accepted/fixed.
-6. **Then** resolve that thread. **Never resolve a thread that does not
-   yet contain an agent reply with the fix commit and evidence.**
+6. **Then** resolve that thread. **Resolve only after the thread holds
+   an agent reply with the fix commit and evidence** — resolve-before-reply
+   is the cardinal `/act` violation.
 
 Skipping steps 2–5 and only running the batch resolve script
 **violates `/act`**.
@@ -170,14 +172,15 @@ the script literally cannot run.
 
 ## Review-only PRs for already-merged work
 
-`/act` operates on an **existing** PR/MR — it is not a tool for
-manufacturing review PRs around commits already on `main`. **Never**
-invent a custom base branch (e.g. `review/<name>`) in the same repo to
-diff against `main`: it goes stale and GitHub auto-creates a reverse
-PR on merge. Use a fork (`[shadow-fork](references/shadow-fork/SKILL.md)`), run review tools
-directly on `main`, or use an ephemeral empty branch you delete
-immediately. Full rationale and the three options:
-[`references/footguns.md`](references/footguns.md#review-only-prs).
+`/act` operates on an **existing** PR/MR — it reviews an open PR, not
+commits already on `main`. To get automated review on already-merged
+work, use one of: a fork (`[shadow-fork](references/shadow-fork/SKILL.md)`) with a fork→upstream
+PR, review tools run directly on `main` (Codacy, CodeQL, Semgrep, and
+Trivy can scan commits without a PR), or an ephemeral empty branch you
+delete immediately after review. Inventing a custom base branch
+(`review/<name>`) in the same repo is the anti-pattern to avoid: it
+goes stale and GitHub auto-creates a reverse PR on merge. Full
+rationale: [`references/footguns.md`](references/footguns.md#review-only-prs).
 
 ## Resolve pass (P4)
 
@@ -220,61 +223,13 @@ converged.** Keep iterating. If context is low, hand off.
 ## Stack mode
 
 When the user invokes `/act stack` or the PR is part of a stacked branch
-series (`gh stack` or equivalent). Full procedure:
+series (`gh stack` or equivalent). The stack is processed bottom-to-top
+with two efficiency levers — **don't wait for CI between PRs** (push,
+then move on; check CI on the round-robin re-scan) and **analyze all PRs
+upfront** to batch similar fixes. Convergence is 2-3 round-robin passes,
+not N serial iterations. Full procedure, push optimization, conflict
+resolution, and the per-PR convergence check:
 [`references/stack-mode.md`](references/stack-mode.md).
-
-### Core logic: bottom-to-top, round-robin, don't wait for CI
-
-```
-PR #1 (bottom) → PR #2 → PR #3 → ... → PR #N (top)
-  fix & push      fix & push  fix & push    fix & push
-       │              │            │              │
-       ▼              ▼            ▼              ▼
-     CI runs        CI runs      CI runs        CI runs
-     (async)        (async)      (async)        (async)
-       │              │            │              │
-       └──────────────┴────────────┴──────────────┘
-                      │
-              round-robin: re-scan
-              for new bot comments
-              from bottom to top
-```
-
-**Key insight: don't block on CI.** After pushing PR #1, immediately
-move to PR #2 to analyze and fix while CI runs on #1. CI is async —
-your analysis isn't. By the time you've fixed PR #5, CI on PR #1 is
-done and you can check it on the round-robin pass. This turns serial
-wait-for-CI into parallel analysis.
-
-### Rules
-
-1. **Process bottom-to-top** — fix the lowest PR first. Everything
-   above inherits its changes.
-2. **Push only what changed** — never push a branch whose HEAD SHA
-   hasn't changed. Check `git rev-parse <branch>` vs
-   `git rev-parse origin/<branch>`. Full-stack push (`gh stack push`)
-   only when the stack base changed or a lower commit altered
-   downstream diffs.
-3. **Don't wait for CI between PRs** — push, then move to the next PR.
-   Check CI results on the round-robin re-scan.
-4. **Round-robin** — after reaching the top, re-scan from the bottom
-   for new bot comments or CI findings. The first pass fixes 80-90%
-   of threads; subsequent passes catch bot re-evaluations on the new
-   diffs. Usually 2-3 round-robin passes converge the whole stack.
-5. **Analyze all PRs at once** — fetching all thread states upfront
-   (before fixing anything) lets you see patterns across PRs and batch
-   similar fixes. This is more efficient than processing each PR in
-   isolation.
-
-### Stack convergence
-
-All PRs are merge-ready when every PR has: `open_threads=0`,
-`CI_REQUIRED_PENDING=0`, `SAST_FINDINGS_PENDING=0`,
-`SAST_FINDINGS_UNKNOWN=0`, no new bot comments since the last push,
-and `mergeable_state` is `clean` or `unstable` (not `conflict` or `dirty`).
-
-Push optimization details, conflict resolution, and CI waiting
-strategy: [`references/stack-mode.md`](references/stack-mode.md).
 
 ## Idempotency
 

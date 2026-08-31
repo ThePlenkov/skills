@@ -1,16 +1,9 @@
-# Loop convergence — `/act --loop` stability heuristic
+# Loop convergence — `/act` stability heuristic
 
-The four exit conditions in SKILL.md are the **only** exit rule. This
-document explains how to verify conditions 3 and 4 are stable.
-
-## The four conditions (canonical exit rule)
-
-1. `open_threads == 0` from `review-state.ts` showing `OPEN_THREADS=0`.
-2. `CI_REQUIRED_PENDING == 0`, `SAST_FINDINGS_PENDING == 0`, and
-   `SAST_FINDINGS_UNKNOWN == 0`.
-3. No new comments / annotations appeared in the last CI run
-   (compare bot-comment count before and after the most recent push).
-4. No cycle-guard signal fires on this iteration (reopened thread, same rule 2+, or empty /act loop — see SKILL.md exit conditions).
+The four exit conditions in [SKILL.md § Exit conditions](../SKILL.md)
+are the **only** exit rule — all four must hold on the same HEAD. This
+document explains how to verify conditions 3 (no new bot comments) and
+4 (no cycle-guard signal) are stable.
 
 There is no second, parallel exit rule. The stability heuristic below
 is a way to verify conditions 3 and 4, not an independent way to leave
