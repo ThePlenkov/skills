@@ -64,3 +64,37 @@ noise and wasting runner minutes.
 branches. Use `gh stack push` only when the stack base changed or a
 lower-stack commit altered downstream diffs. See
 [stack-mode.md](stack-mode.md) for the full procedure.
+
+## Review-only PRs
+
+### Create a `review/<name>` base branch in the same repo to review already-merged `main` commits
+
+**Wrong.** Inventing a custom base branch (`review/post-merge-fixes`,
+`review/backup-fix`, etc.) inside the user's repository and opening
+`main` → `review/<name>` to trigger automated review on commits that
+are already on `main`. Two failure modes:
+
+1. **Stale branch** — the `review/*` branch persists after the PR is
+   merged/closed, cluttering the repo.
+2. **Auto-created reverse PR** — when the review PR merges, GitHub
+   opens a new PR from `review/<name>` back to `main` (observed: PR
+   #11 auto-created from `review/post-merge-devsy-fixes` after PR #10
+   merged). The user then has to clean up an unexpected PR they never
+   asked for.
+
+This happened twice in one session and frustrated the user both times.
+
+**Right.** `/act` operates on an *existing* PR — it is not a tool for
+manufacturing review PRs around already-merged work. Pick one:
+
+1. **Fork** — use `$skill{shadow-fork}` and open the review PR from
+   the fork to upstream. No branches live in the user's repo.
+2. **No PR** — run review tools directly on `main` (Codacy, CodeQL,
+   Semgrep, Trivy, etc. can scan commits without a PR). Prefer this
+   when no human review is needed.
+3. **Ephemeral empty branch** — if a PR object is truly required,
+   open `main` → an empty branch, then **close the PR and delete the
+   branch immediately** once review completes.
+
+Never leave `review/*` (or any review-only) branches behind in the
+user's repository.

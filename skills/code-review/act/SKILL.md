@@ -147,6 +147,17 @@ Skipping steps 2–5 and only running the batch resolve script
 **Out of scope:** `.agents/skills/`, `resolve-open-threads.ts` — unless
 the script literally cannot run.
 
+## Review-only PRs for already-merged work
+
+`/act` operates on an **existing** PR/MR — it is not a tool for
+manufacturing review PRs around commits already on `main`. **Never**
+invent a custom base branch (e.g. `review/<name>`) in the same repo to
+diff against `main`: it goes stale and GitHub auto-creates a reverse
+PR on merge. Use a fork (`$skill{shadow-fork}`), run review tools
+directly on `main`, or use an ephemeral empty branch you delete
+immediately. Full rationale and the three options:
+[`references/footguns.md`](references/footguns.md#review-only-prs).
+
 ## Resolve pass (P4)
 
 **Prerequisites:** every open thread has an **in-thread reply** with the
