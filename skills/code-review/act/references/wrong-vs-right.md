@@ -1,6 +1,10 @@
 # Wrong vs right
 
-Common mistakes when running `/act` and what to do instead.
+One-line table of common `/act` mistakes for fast scanning — glance at
+this every run. Rules that need a story (git stash hazards, script
+runner bypass, review-only PR branches) live in
+[`footguns.md`](footguns.md); read it on-demand when about to take a
+shortcut.
 
 | Wrong (do not do this) | Right |
 |------------------------|--------|
@@ -16,6 +20,4 @@ Common mistakes when running `/act` and what to do instead.
 | One pass through threads, then resolve | Loop: fetch → analyse → fix → verify → push → re-fetch. CI may surface new findings after each push. |
 | Stop when context gets large | Plan a handoff: summarize state, write remaining items to backlog/harvest, report to user. |
 | `gh stack rebase && gh stack push` after every single-PR fix | Push only the changed branch. Full-stack push triggers CI on all PRs — see [stack-mode.md](stack-mode.md). |
-| Create a `review/<name>` base branch in the same repo to review already-merged `main` commits | Don't. Use a fork (`$skill{shadow-fork}`), run review tools directly on `main`, or use an ephemeral empty branch you delete immediately. Custom base branches go stale and GitHub auto-creates reverse PRs on merge. See [footguns.md](footguns.md). |
-
-Long-tail footguns (git stash / `git add -A` / `scripts/run.ts` bypass / "what's the PR?" mid-flow) are catalogued in [`footguns.md`](footguns.md). Read it when about to take a shortcut.
+| Create a `review/<name>` base branch in the same repo to review already-merged `main` commits | Don't. Use a fork (`$skill{shadow-fork}`), run review tools directly on `main`, or use an ephemeral empty branch you delete immediately. Custom base branches go stale and GitHub auto-creates reverse PRs on merge. See [footguns.md](footguns.md#review-only-prs). |

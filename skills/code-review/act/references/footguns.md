@@ -1,9 +1,9 @@
 # `/act` Footguns
 
-Long-tail Wrong-vs-right entries that have come up on past PRs. The
-SKILL body carries the core procedure; the entries below are the
-ones that are easy to forget and costly when violated. Read this when
-you're about to do something that feels like a shortcut.
+Long-form Wrong/Right narratives for rules that need a story — the
+ones easy to forget and costly when violated. The one-line table in
+[`wrong-vs-right.md`](wrong-vs-right.md) is for fast scanning every
+run; this file is read on-demand when about to take a shortcut.
 
 ## Git operations
 

@@ -1,6 +1,6 @@
 interface:
   display_name: "Act"
-  short_description: "Help with Act tasks and workflows"
+  short_description: "Fix PR review feedback and close threads with verified commits"
   brand_color: "#3B82F6"
   default_prompt: "Use $act to get started."
 policy:
