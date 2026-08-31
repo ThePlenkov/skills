@@ -153,7 +153,7 @@ confidence over time.
 
 ## Wiring
 
-This is **P5** in [SKILL.md](SKILL.md) — after P4 resolve, before P6 evaluation.
+This is **P5** in [SKILL.md](SKILL.md) — after P4 resolve.
 Scratch (`findings.jsonl`, `scores.tsv`, `scores-report.jsonl`) lives under repo
 **`./tmp/`** (never system `/tmp`, never `scripts/` or repo root). The
 persistent `review_scores.csv` is committed only when the `/act` run was

@@ -49,7 +49,7 @@ main → PR #1 (bottom) → PR #2 → PR #3 → ... → PR #N (top)
 ```
 
 For each PR, run the normal `/act` loop:
-P0a (CI) → P0b (SAST) → P1–P3 (threads) → P4 (resolve) → P5 (rate) → P6 (evaluate).
+P0a (CI) → P0b (SAST) → P1–P3 (threads) → P4 (resolve) → P5 (rate).
 
 **But don't block on CI.** The efficient pattern is:
 

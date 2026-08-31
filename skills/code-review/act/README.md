@@ -12,7 +12,7 @@ wontfix) lives in $backlog.
 | ---- | ------- |
 | `SKILL.md` | Agent instructions (load on `/act`) |
 | `scripts/` | gh/bun helpers (`pr-state.ts`, `review-state.ts`, `review-reply.ts`, `review-resolve.ts`, `query-debt`, `plan-debt-batch`, `update-debt-status`, P5 extract/submit, …) |
-| `references/` | `EVALUATE.md` (P6), `RATING_FLOW.md` (P5) |
+| `references/` | `RATING_FLOW.md` (P5), `sast-source-priority.md`, `loop-convergence.md`, `stack-mode.md`, `debt-context.md`, `wrong-vs-right.md`, `footguns.md`, `script-index.md`, `script-gotchas.md`, `runner-fallback.md` |
 
 The shared ledger types/helpers (`scripts/review-debt-{lib,gh,text}.ts`) live in
 [`.agents/skills/harvest/scripts/`](../harvest/scripts/) — the act skill imports
@@ -46,7 +46,7 @@ exact switch priority.
 
 Both must be 0 for merge-ready. Reading annotations is **non-negotiable** for
 failed SAST runs — see [SKILL.md § P0b](SKILL.md) and
-[EVALUATE.md § 2b](references/EVALUATE.md).
+[`sast-source-priority.md`](references/sast-source-priority.md).
 
 ## Move to another repo
 

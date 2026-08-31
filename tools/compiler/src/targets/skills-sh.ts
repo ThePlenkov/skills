@@ -157,6 +157,54 @@ function rewriteFileMacros(
   }
 }
 
+function rewriteFileLinks(
+  filePath: string,
+  sourceDir: string,
+  skillsRoot: string,
+  projectName: string,
+  outDir: string,
+  byName: Map<string, Skill>
+): void {
+  const content = fs.readFileSync(filePath, 'utf8');
+  const fileDir = path.dirname(filePath);
+
+  // Match markdown links to .md files (excluding images).
+  const mdLinkRegex = /(?<!\!)\[([^\]]*)\]\(([^)]+)\)/g;
+  let changed = false;
+  const result = content.replace(mdLinkRegex, (raw, text, url) => {
+    if (url.startsWith('http') || url.startsWith('#')) return raw;
+    const cleanUrl = url.split('?')[0].split('#')[0];
+    if (!cleanUrl.toLowerCase().endsWith('.md')) return raw;
+
+    // Resolve the link relative to the SOURCE file's directory (not the
+    // published copy) to find which skill it points at.
+    const resolved = path.resolve(sourceDir, cleanUrl);
+    if (!resolved.toLowerCase().endsWith('skill.md')) return raw;
+    const skillDir = path.dirname(resolved);
+    const relToSkills = path.relative(path.resolve(skillsRoot), skillDir).replace(/\\/g, '/');
+
+    // Find the target skill by directory.
+    let targetName: string | null = null;
+    for (const skill of byName.values()) {
+      if (skill.root === relToSkills) {
+        targetName = skill.name;
+        break;
+      }
+    }
+    if (!targetName) return raw;
+
+    // Compute the correct relative path in the published bundle.
+    const rel = relativeSkillPath(fileDir, targetName, projectName, outDir, byName);
+    if (!rel) return raw;
+    changed = true;
+    return `[${text}](${rel})`;
+  });
+
+  if (changed) {
+    fs.writeFileSync(filePath, result, 'utf8');
+  }
+}
+
 function emitSkill(
   skill: Skill,
   destDir: string,
@@ -184,11 +232,15 @@ function emitSkill(
   const skillMdPath = path.join(destDir, 'SKILL.md');
   fs.writeFileSync(skillMdPath, header + body, 'utf8');
 
-  // Rewrite $skill{} macros in bundled reference files so they remain resolvable
-  // when the skill is installed on its own.
+  // Rewrite $skill{} macros and file links to SKILL.md in bundled reference
+  // files so they remain resolvable when the skill is installed on its own.
   walkMdFiles(destDir, (filePath) => {
     if (filePath === skillMdPath) return;
+    const relPath = path.relative(destDir, filePath);
+    const sourceFilePath = path.join(skill.dir, relPath);
+    const sourceFileDir = path.dirname(sourceFilePath);
     rewriteFileMacros(filePath, projectName, options.outDir, byName);
+    rewriteFileLinks(filePath, sourceFileDir, options.skillsRoot, projectName, options.outDir, byName);
   });
 }
 

@@ -50,7 +50,10 @@ agent's problem to fix. SAST priority ladder and per-tool reproduction:
 1. `open_threads == 0`
 2. `CI_REQUIRED_PENDING == 0`, `SAST_FINDINGS_PENDING == 0`, `SAST_FINDINGS_UNKNOWN == 0`
 3. No new bot comments/annotations since last push (compare before/after)
-4. No cycle-guard signal (P6)
+4. No cycle-guard signal:
+   - **Reopened thread** — any thread was resolved earlier then commented on again → stop, do not merge; user must confirm.
+   - **Same rule 2+ times** — same rule ID flagged again after a fix commit → verify fix is on current HEAD; do not re-merge blindly.
+   - **Empty /act loop** — 2+ `/act` invocations on the same PR with no new product commits → stop and report cycle.
 
 Do not stop at "all threads resolved" if condition 3 fails — bot
 re-evaluations after each push commonly open new threads. A clean exit
@@ -116,10 +119,8 @@ until every open thread has a planned action and P0a/P0b/P1–P3 are done.
 | **P3** | Inline suggestions | **Applied in code** or declined with reason **in thread** |
 | **P4** | Resolve pass | Only after P0a/P0b/P1–P3 for **all** open threads |
 | **P5** | Rate findings (**opt-in**) | Score every finding 0–5. Only if `--record` / `ACT_RECORD_SCORES=1` / config. Details: [`references/RATING_FLOW.md`](references/RATING_FLOW.md) |
-| **P6** | Evaluation | Retrospect, cycle check, durable knowledge — **before** merge-ready. Details: [`references/EVALUATE.md`](references/EVALUATE.md) |
 
-**Resolve is step P4, not step 1.** P6 is mandatory before merge-ready;
-the retrospective portion is required only when something went wrong.
+**Resolve is step P4, not step 1.**
 
 ## Per-thread loop
 
@@ -173,11 +174,7 @@ Say **merge-ready** only when **all** are true:
 4. `open_threads=0`.
 5. Summary lists **what you changed per theme/file**, not just "resolved N threads".
 6. **P5 done** (if opted in) — scratch report written; CSV only when recording enabled.
-7. **P6 passed** — no cycle signals; retrospective done if something went wrong.
-8. **Move out of draft** (`set-review-state.ts --ready`) — final step.
-
-Cycle-guard details (reopened threads, same-SHA detection, causes):
-[`references/EVALUATE.md`](references/EVALUATE.md).
+7. **Move out of draft** (`set-review-state.ts --ready`) — final step.
 
 **If the loop is still producing new findings on each push, it has not
 converged.** Keep iterating. If context is low, hand off.
@@ -186,7 +183,7 @@ converged.** Keep iterating. If context is low, hand off.
 
 1. Status · 2. **HEAD** SHA · 3. **Review fixes** (per theme/file) ·
 4. Threads resolved · 5. CI on HEAD · 6. SAST clean · 7. P5 (if opted in) ·
-8. P6 cycle signals · 9. Left
+8. Left
 
 ## Stack mode
 

@@ -10,7 +10,7 @@ document explains how to verify conditions 3 and 4 are stable.
    `SAST_FINDINGS_UNKNOWN == 0`.
 3. No new comments / annotations appeared in the last CI run
    (compare bot-comment count before and after the most recent push).
-4. No cycle-guard signal (P6) fires on this iteration.
+4. No cycle-guard signal fires on this iteration (reopened thread, same rule 2+, or empty /act loop — see SKILL.md exit conditions).
 
 There is no second, parallel exit rule. The stability heuristic below
 is a way to verify conditions 3 and 4, not an independent way to leave

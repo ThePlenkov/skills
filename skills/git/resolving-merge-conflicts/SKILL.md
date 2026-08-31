@@ -37,5 +37,5 @@ A discipline for working through conflict markers that have appeared in your tre
 
 ## Related skills
 
-- $skill{act} — for resolving review-thread conflicts on a PR/MR; the discipline is similar but the artefacts are review comments, not git markers.
-- $skill{debugging} — when the merge appears clean but behaviour has changed; treat it as a regression and run the 4-phase Reproduce → Hypothesise → Fix loop when tests fail after the merge is "done".
+- **act** — for resolving review-thread conflicts on a PR/MR; the discipline is similar but the artefacts are review comments, not git markers.
+- **debugging** — when the merge appears clean but behaviour has changed; treat it as a regression and run the 4-phase Reproduce → Hypothesise → Fix loop when tests fail after the merge is "done".

@@ -95,11 +95,59 @@ export function discoverSkills(skillsRoot: string): Map<string, Skill> {
   walk(skillsRoot, '');
 
   // Second pass: resolve links now that all skills are known.
+  // Scan ALL .md files in the skill directory (SKILL.md + references/*.md,
+  // etc.) so that cross-skill links in reference files are included in the
+  // closure. Without this, only links in SKILL.md count, and skills that
+  // declare dependencies via reference files get empty closures.
   for (const skill of byName.values()) {
-    skill.links = resolveLinksInBody(skill.body, skill.dir, skillsRoot, byName);
+    const allLinks: SkillLink[] = [];
+    // Deduplicate by (source file, resolved target) so the same link text
+    // in different files is preserved (each file needs its own rewrite),
+    // while true duplicates within the same file are collapsed.
+    const seen = new Set<string>();
+    for (const mdFile of collectMdFiles(skill.dir)) {
+      const content = fs.readFileSync(mdFile, 'utf8');
+      const fileDir = path.dirname(mdFile);
+      const fileLinks = resolveLinksInBody(content, fileDir, skillsRoot, byName);
+      for (const link of fileLinks) {
+        const key = `${mdFile}\0${link.targetName}\0${link.raw}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          allLinks.push(link);
+        }
+      }
+    }
+    skill.links = allLinks;
   }
 
   return byName;
+}
+
+function collectMdFiles(dir: string): string[] {
+  const results: string[] = [];
+  function walk(d: string) {
+    let entries: fs.Dirent[];
+    try {
+      entries = fs.readdirSync(d, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      // Skip dependencies/ — it is a build-time artifact subtree, not part
+      // of the skill's own source. Nested skills there are discovered
+      // independently by discoverSkills and should not contribute links to
+      // the parent's closure.
+      if (entry.isDirectory() && entry.name === 'dependencies') continue;
+      const fullPath = path.join(d, entry.name);
+      if (entry.isDirectory()) {
+        walk(fullPath);
+      } else if (entry.name.toLowerCase().endsWith('.md')) {
+        results.push(fullPath);
+      }
+    }
+  }
+  walk(dir);
+  return results;
 }
 
 function resolveLinksInBody(

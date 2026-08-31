@@ -15,6 +15,7 @@ export interface PublicSkillPublication {
 
 const publications: PublicSkillPublication[] = [
   { skill: 'drill', repo: 'public-skills', format: 'skills-sh' },
+  { skill: 'act', repo: 'public-skills', format: 'skills-sh' },
 ];
 
 export default publications;
