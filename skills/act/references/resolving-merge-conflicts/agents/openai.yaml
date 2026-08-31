@@ -1,0 +1,15 @@
+interface:
+  display_name: "Resolving Merge Conflicts"
+  short_description: "Resolve merge and rebase conflicts"
+  default_prompt: >-
+    When a git merge or rebase has produced conflict markers, resolve hunks by
+    tracing each side's intent to its primary source (commit message, PR, MR,
+    issue, ticket). Preserve both intents where possible; where incompatible,
+    pick the one matching the merge's stated goal and note the trade-off. Do
+    not invent new behaviour. Aborting (--abort) is allowed only after
+    explicit user confirmation, because --abort restores the tree to its
+    pre-merge state and can silently discard unrelated uncommitted work the
+    user wanted to keep. Finish by running the project's automated checks
+    (typecheck, tests, format) and confirming no merge or rebase remains in
+    flight, no unmerged paths remain, and HEAD is on the expected branch —
+    without discarding unrelated user changes.
