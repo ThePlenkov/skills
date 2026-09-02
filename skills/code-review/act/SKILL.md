@@ -31,7 +31,7 @@ agent's problem to fix. SAST priority ladder and per-tool reproduction:
    │                                                │
    │   FIX ───► REPLY & RESOLVE ───► VERIFY CLEAN ─┘
    │                                                   │
-   └─── PUSH ───► loop back to FETCH                    │
+   └─── PUSH ───► WAIT FOR CI ───► loop back to FETCH   │
 ```
 
 | Step | What |
@@ -43,13 +43,43 @@ agent's problem to fix. SAST priority ladder and per-tool reproduction:
 | **REPLY & RESOLVE** | Reply pointing to commit, then resolve that thread |
 | **VERIFY CLEAN** | `pr-state.ts` → `SAST_FINDINGS_PENDING=0`, `CI_REQUIRED_PENDING=0` |
 | **PUSH** | Atomic push with clear commit messages |
+| **WAIT FOR CI** | Block on CI completion via `gh run watch` before re-fetching — see [Wait for CI](#wait-for-ci-after-push-before-fetch) |
 | **LOOP** | Re-fetch. New CI may surface new findings. Repeat until clean. |
+
+### Wait for CI (after PUSH, before FETCH)
+
+After pushing a fix commit, **block on CI completion** before
+re-fetching threads. Bot reviewers (Codacy, SonarCloud, CodeQL,
+amazon-q, codeant-ai) post findings 30–60s after CI finishes — if you
+re-fetch before that, you miss them and resolve threads prematurely.
+
+```bash
+# Latest workflow run for the PR branch
+RUN_ID=$(gh run list --repo <owner>/<repo> --branch <branch> \
+  --limit 1 --json databaseId --jq '.[0].databaseId')
+
+# Block until CI completes — run as a background task, then get_output
+gh run watch "$RUN_ID" --repo <owner>/<repo> --exit-status --compact
+```
+
+- `--exit-status` → non-zero if any required check fails
+- `--compact` → only show relevant/failed steps
+- Run as a **background task** (`timeout: 0`), then `get_output` to
+  check the result
+- **NEVER** poll with `sleep` loops — it wastes tokens and tempts
+  premature resolve
+- If `gh run watch` is unavailable (GitLab, no `runs:read` scope), fall
+  back to `pr-state.ts` polling at a 30s cadence with a hard cap of 10
+  minutes, then bail to the user rather than resolving blind
+
+Only after `gh run watch` returns (or the fallback reaches
+`CI_REQUIRED_PENDING=0`): fetch review threads, reply, resolve.
 
 ### Exit conditions — all four must hold on the same HEAD
 
 1. `open_threads == 0`
-2. `CI_REQUIRED_PENDING == 0`, `SAST_FINDINGS_PENDING == 0`, `SAST_FINDINGS_UNKNOWN == 0`
-3. No new bot comments/annotations since last push (compare before/after)
+2. `CI_REQUIRED_PENDING == 0`, `SAST_FINDINGS_PENDING == 0`, `SAST_FINDINGS_UNKNOWN == 0` — and CI has actually **completed** on this HEAD (verified via `gh run watch` return, not a polling snapshot that may flip back to pending)
+3. No new bot comments/annotations since last push (compare before/after) — checked **after** the WAIT FOR CI step, not before
 4. No cycle-guard signal:
    - **Reopened thread** — any thread was resolved earlier then commented on again → stop, do not merge; user must confirm.
    - **Same rule 2+ times** — same rule ID flagged again after a fix commit → verify fix is on current HEAD; do not re-merge blindly.
@@ -183,7 +213,7 @@ underlying comment was handled on the branch.
 Say **merge-ready** only when **all** are true:
 
 1. Review feedback **done in code** (or explicitly declined with reason).
-2. CI required checks **success on current HEAD** (`CI_REQUIRED_PENDING=0`).
+2. CI required checks **success on current HEAD** (`CI_REQUIRED_PENDING=0`), verified via `gh run watch` return — not a polling snapshot.
 3. **SAST clean** — `SAST_FINDINGS_PENDING=0` **and** `SAST_FINDINGS_UNKNOWN=0`.
 4. `open_threads=0`.
 5. Summary lists **what you changed per theme/file**, not just "resolved N threads".

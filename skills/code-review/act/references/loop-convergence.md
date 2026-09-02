@@ -11,6 +11,13 @@ the loop.
 
 ## Stability check
 
+Stability can only be assessed **after** the WAIT FOR CI step in
+[SKILL.md § Wait for CI](../SKILL.md#wait-for-ci-after-push-before-fetch)
+has returned. Comparing findings before CI completes measures an
+incomplete state — bot reviewers (Codacy, SonarCloud, CodeQL,
+amazon-q, codeant-ai) post 30–60s after CI finishes, so a "stable"
+snapshot taken mid-run is meaningless.
+
 If the current iteration's push produced zero new bot comments AND zero
 new bot findings/annotations and no new required-check failures compared
 to the previous HEAD, the loop is stable for this iteration. (Compare
