@@ -64,7 +64,7 @@ agent's problem to fix. SAST priority ladder and per-tool reproduction:
 | **REPLY & RESOLVE** | Reply pointing to commit, then resolve that thread |
 | **VERIFY CLEAN** | `pr-state.ts` → `SAST_FINDINGS_PENDING=0`, `CI_REQUIRED_PENDING=0` |
 | **PUSH** | Atomic push with clear commit messages |
-| **WAIT FOR CI** | Block on CI completion via `gh run watch` before re-fetching — see [Wait for CI](#wait-for-ci-after-push-before-fetch) |
+| **WAIT FOR CI** | Block on CI completion via `gh pr checks --watch` before re-fetching — see [Wait for CI](#wait-for-ci-after-push-before-fetch) |
 | **LOOP** | Re-fetch. New CI may surface new findings. Repeat until clean. |
 
 ### Wait for CI (after PUSH, before FETCH)
@@ -75,31 +75,39 @@ amazon-q, codeant-ai) post findings 30–60s after CI finishes — if you
 re-fetch before that, you miss them and resolve threads prematurely.
 
 ```bash
-# Latest workflow run for the PR branch
-RUN_ID=$(gh run list --repo <owner>/<repo> --branch <branch> \
-  --limit 1 --json databaseId --jq '.[0].databaseId')
-
-# Block until CI completes — run as a background task, then get_output
-gh run watch "$RUN_ID" --repo <owner>/<repo> --exit-status --compact
+# Block until ALL checks on the PR complete — run as a background task, then get_output
+gh pr checks <PR_NUMBER> --repo <owner>/<repo> --watch
 ```
 
-- `--exit-status` → non-zero if any required check fails
-- `--compact` → only show relevant/failed steps
+- `--watch` → blocks until every check on the PR's head SHA finishes
+  (required AND optional — including SAST bots like Codacy, SonarCloud,
+  CodeQL that are often non-required but still post late findings)
+- Do **not** pass `--required` — it would return while optional SAST
+  checks are still running, reintroducing the premature-resolve failure
+  this step exists to prevent
+- Do **not** pass `--fail-fast` — it exits on the first check failure,
+  skipping still-running checks whose findings you would then miss
+- Covers **all workflow runs** triggered by the push (CI, SAST, lint, ...),
+  not just one — `gh run watch <run-id>` only watches a single workflow run
+  and misses late-posting bots from other runs
 - Run as a **background task** (`timeout: 0`), then `get_output` to
   check the result
+- After `--watch` returns, verify the merge gate via `pr-state.ts`:
+  `CI_REQUIRED_PENDING=0` and `SAST_FINDINGS_PENDING=0`
 - **NEVER** poll with `sleep` loops — it wastes tokens and tempts
   premature resolve
-- If `gh run watch` is unavailable (GitLab, no `runs:read` scope), fall
-  back to `pr-state.ts` polling at a 30s cadence with a hard cap of 10
-  minutes, then bail to the user rather than resolving blind
+- Fallbacks (GitLab, no `checks:read` scope, or `--watch` unavailable):
+  `gh pr checks <PR>` (single poll without `--required`, repeat at 30s
+  cadence with a hard cap of 10 minutes), or `pr-state.ts` polling,
+  then bail to the user rather than resolving blind
 
-Only after `gh run watch` returns (or the fallback reaches
+Only after `gh pr checks --watch` returns (or the fallback reaches
 `CI_REQUIRED_PENDING=0`): fetch review threads, reply, resolve.
 
 ### Exit conditions — all four must hold on the same HEAD
 
 1. `open_threads == 0`
-2. `CI_REQUIRED_PENDING == 0`, `SAST_FINDINGS_PENDING == 0`, `SAST_FINDINGS_UNKNOWN == 0` — and CI has actually **completed** on this HEAD (verified via `gh run watch` return, not a polling snapshot that may flip back to pending)
+2. `CI_REQUIRED_PENDING == 0`, `SAST_FINDINGS_PENDING == 0`, `SAST_FINDINGS_UNKNOWN == 0` — and CI has actually **completed** on this HEAD (verified via `gh pr checks --watch` return, not a polling snapshot that may flip back to pending)
 3. No new bot comments/annotations since last push (compare before/after) — checked **after** the WAIT FOR CI step, not before
 4. No cycle-guard signal:
    - **Reopened thread** — any thread was resolved earlier then commented on again → stop, do not merge; user must confirm.
@@ -234,7 +242,7 @@ underlying comment was handled on the branch.
 Say **merge-ready** only when **all** are true:
 
 1. Review feedback **done in code** (or explicitly declined with reason).
-2. CI required checks **success on current HEAD** (`CI_REQUIRED_PENDING=0`), verified via `gh run watch` return — not a polling snapshot.
+2. CI required checks **success on current HEAD** (`CI_REQUIRED_PENDING=0`), verified via `gh pr checks --watch` return — not a polling snapshot.
 3. **SAST clean** — `SAST_FINDINGS_PENDING=0` **and** `SAST_FINDINGS_UNKNOWN=0`.
 4. `open_threads=0`.
 5. Summary lists **what you changed per theme/file**, not just "resolved N threads".
