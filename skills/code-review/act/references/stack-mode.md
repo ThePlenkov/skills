@@ -138,9 +138,8 @@ Did the fix change a lower-stack branch's diff?
 After pushing, wait for CI **only on the pushed branches**:
 
 ```bash
-# Wait for CI on a specific PR — filter by commit SHA, not just branch
-sha=$(gh api repos/<owner>/<repo>/pulls/<PR> --jq '.head.sha')
-gh run watch --repo <owner>/<repo> $(gh run list --repo <owner>/<repo> --branch <branch> --commit "$sha" --json databaseId --jq '.[0].databaseId')
+# Wait for CI on a specific PR — watches ALL checks on the head SHA, not one run
+gh pr checks <PR> --repo <owner>/<repo> --watch --required --fail-fast
 ```
 
 Do not wait for CI on branches whose HEAD SHA did not change — their
