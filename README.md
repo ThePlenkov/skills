@@ -1,33 +1,22 @@
 # ThePlenkov/skills
 
-Public [skills.sh](https://skills.sh) distribution mirror for selected agent skills.
+Public distribution of agent skills from [theplenkov-ai/skills](https://github.com/theplenkov-ai/skills).
 
 ## Install
 
 ```bash
-npx skills add ThePlenkov/skills --skill <name>
+# Install all skills
+npx skills add ThePlenkov/skills --all
+
+# Install a specific skill
+npx skills add ThePlenkov/skills --skill <skill-name>
 ```
-
-## Badges
-
-![skills.sh](https://img.shields.io/badge/distributed%20via-skills.sh-3178c6)
-![public skills](https://img.shields.io/badge/public%20skills-2-brightgreen)
-![total size](https://img.shields.io/badge/total%20size-20.7%20KB-blue)
-
-## Stats
-
-- **Public skills:** 2
-- **Total SKILL.md size:** 20.7 KB
-- **Total SKILL.md lines:** 420
-- **Total skill edges:** 8
 
 ## Skills
 
-| Skill | Category | Description | Size | Lines | Stack | Deps |
-| --- | --- | --- | --- | --- | --- | --- |
-| [act](skills/act/SKILL.md) | code-review/act | Use when the user invokes /act on a PR/MR, /act with no argu… | 12.5 KB | 261 | skills-sh | 3 |
-| [drill](skills/drill/SKILL.md) | safety/drill | Scoped descent primitive for agent systems. Creates isolated… | 8.2 KB | 159 | skills-sh | 5 |
+| Skill | Description |
+|---|---|
+| act | Use when the user invokes /act on a PR/MR, /act with no arguments (uses the PR in the current conversation context), or /act <context> with context ∈ {pr, plan, backlog, harvest, stack}. Resolves threads in product code (or posts a substantive in-thread reply), commits, then closes threads. Never resolve-only. /act is the fix loop — collection lives in /harvest and triage in /backlog. |
+| drill | Scoped descent primitive for agent systems. Creates isolated execution frames, materializes them as directory trees, and returns a result plus a parallel prevention plan so the same problem does not recur. |
 
----
-
-This README is auto-generated. Do not edit it by hand.
+_Auto-published from [theplenkov-ai/skills](https://github.com/theplenkov-ai/skills)._
