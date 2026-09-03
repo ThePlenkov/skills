@@ -61,4 +61,4 @@ this nit?" question).
 If you only want to triage a row without archiving, that's fine — the archive
 pass is **idempotent** and safe to re-run after every batch.
 
-See [harvest](../harvest/SKILL.md) for the full pipeline diagram.
+See [harvest](../harvest/README.md) for the full pipeline diagram.

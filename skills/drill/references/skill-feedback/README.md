@@ -103,7 +103,7 @@ gh issue create \
 # Or, when --pr is passed, open a draft PR against the skill's own `source:`
 # repo (`$REPO`, resolved above) instead.
 # Requires the agent to be on a branch with the fix already applied locally
-# and the remote to allow pushes (fork-first — see [shadow-fork](../shadow-fork/SKILL.md)).
+# and the remote to allow pushes (fork-first — see [shadow-fork](../shadow-fork/README.md)).
 ```
 
 Pre-create the scratch dir under the repo (`tmp/agent_<pid>/`, gitignored) — not system `/tmp` in cloud agents. `body-file` resolves paths relative to the current working directory, so repo-relative is the portable choice across local and cloud runtimes.

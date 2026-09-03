@@ -156,10 +156,10 @@ Nested drills do not run post-drill; they only produce and propagate their plans
 
 ## Cross-references
 
-- [investigate-first](references/investigate-first/SKILL.md) — narrow scope before editing.
-- [unwind](references/unwind/SKILL.md) — expand scope by collapsing solved branches.
-- [retrospect](references/retrospect/SKILL.md) — capture learnings from mistakes.
-- [backlog](references/backlog/SKILL.md) — track actionable follow-up work.
-- [persistent-memory](references/persistent-memory/SKILL.md) — persistent knowledge across sessions.
+- [investigate-first](references/investigate-first/README.md) — narrow scope before editing.
+- [unwind](references/unwind/README.md) — expand scope by collapsing solved branches.
+- [retrospect](references/retrospect/README.md) — capture learnings from mistakes.
+- [backlog](references/backlog/README.md) — track actionable follow-up work.
+- [persistent-memory](references/persistent-memory/README.md) — persistent knowledge across sessions.
 
 For templates, frontmatter fields, full example workflows, validation rules, scope rules, error handling, state machine, merge/trace policies, and recommended defaults — see [references/templates.md](references/templates.md) and [references/troubleshooting.md](references/troubleshooting.md).

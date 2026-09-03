@@ -88,10 +88,10 @@ Run this protocol once after the root `/undrill` returns and the topmost parent 
 
 For every action in the merged plan, route it to the correct resource based on its `sink`:
 
-- `backlog` → `[backlog](../backlog/SKILL.md)` with the action, scope, and a link to the root drill as the source.
-- `memory` → classify as user or project memory per step 3b, then persist the learning through `[persistent-memory](../persistent-memory/SKILL.md)` with the selected scope.
+- `backlog` → `[backlog](../backlog/README.md)` with the action, scope, and a link to the root drill as the source.
+- `memory` → classify as user or project memory per step 3b, then persist the learning through `[persistent-memory](../persistent-memory/README.md)` with the selected scope.
 - `knowledgebase` → create or update a knowledge note when the finding is reusable across projects or agents.
-- `agentic-documents` → update `AGENTS.md`, `.agents/rules/`, `.agents/commands/`, or project docs based on the scope decision in step 3. If the target is a specific skill's `SKILL.md`, use `[skill-feedback](../skill-feedback/SKILL.md)` to route the change to its canonical `source:` repository instead of editing a generated copy.
+- `agentic-documents` → update `AGENTS.md`, `.agents/rules/`, `.agents/commands/`, or project docs based on the scope decision in step 3. If the target is a specific skill's `SKILL.md`, use `[skill-feedback](../skill-feedback/README.md)` to route the change to its canonical `source:` repository instead of editing a generated copy.
 - `upstream-issue` → open an issue in the relevant OSS/external repo. Do **not** submit a PR unless the drill explicitly included it.
 - `workaround` / `code` → implement the workaround, link it to the root drill, and add a guardrail or test if possible.
 
@@ -111,7 +111,7 @@ When conflicts are detected: **stop, present to user, wait for resolution**.
 
 ## Sending universal findings upstream
 
-When step 3 classifies a finding as **universal** AND the finding points at a specific skill's instructions (rather than `AGENTS.md` itself), do not edit the skill file in the consuming repo — hand off to `[skill-feedback](../skill-feedback/SKILL.md)`. It will file the finding at the skill's declared source repository using the `source:` field in its frontmatter. This keeps skill improvements flowing back to the canonical source instead of forking across clones.
+When step 3 classifies a finding as **universal** AND the finding points at a specific skill's instructions (rather than `AGENTS.md` itself), do not edit the skill file in the consuming repo — hand off to `[skill-feedback](../skill-feedback/README.md)`. It will file the finding at the skill's declared source repository using the `source:` field in its frontmatter. This keeps skill improvements flowing back to the canonical source instead of forking across clones.
 
 ## Anti-Patterns
 
@@ -126,5 +126,5 @@ When step 3 classifies a finding as **universal** AND the finding points at a sp
 
 - [ATTRIBUTION.md](references/ATTRIBUTION.md) — AI attribution headers for external posts
 - `drill` — scoped descent that returns a `prevention_plan`.
-- `[backlog](../backlog/SKILL.md)` — track actionable follow-up work.
-- `[persistent-memory](../persistent-memory/SKILL.md)` — persistent knowledge across sessions.
+- `[backlog](../backlog/README.md)` — track actionable follow-up work.
+- `[persistent-memory](../persistent-memory/README.md)` — persistent knowledge across sessions.
