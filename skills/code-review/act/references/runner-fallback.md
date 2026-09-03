@@ -106,13 +106,15 @@ git push
 ## 5. Watch the checks
 
 ```bash
-# Get the latest run ID on this branch
-RUN_ID=$(gh run list --repo <owner>/<repo> --branch <branch> --json databaseId --jq '.[0].databaseId')
-gh run watch "$RUN_ID" --repo <owner>/<repo>
+# Block until all checks on the PR complete (required AND optional)
+gh pr checks <pr> --repo <owner>/<repo> --watch
 ```
 
-`gh run watch` blocks until the run finishes. After it exits, re-run
-`pr-state.ts` or `gh pr checks <pr>` to verify all required checks are green.
+`gh pr checks --watch` blocks until every check on the PR's head SHA
+finishes — across all workflow runs, not just one. Do not pass
+`--required` or `--fail-fast`; optional SAST checks must be waited on
+too. After it exits, re-run `pr-state.ts` to verify
+`CI_REQUIRED_PENDING=0` and `SAST_FINDINGS_PENDING=0`.
 
 If checks fail, fix the code and repeat from step 4. Do not stop the runner
 while there are still jobs to run.
