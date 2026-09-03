@@ -112,10 +112,13 @@ function relativeSkillPath(
   byName: Map<string, Skill>
 ): string | null {
   if (!byName.has(targetName)) return null;
+  // Dependency skills are emitted as README.md (not SKILL.md) so that
+  // skills.sh indexer sees exactly one SKILL.md per snapshot — the primary.
+  const fileName = targetName === projectName ? 'SKILL.md' : 'README.md';
   const targetPath =
     targetName === projectName
       ? path.join(outDir, 'SKILL.md')
-      : path.join(outDir, 'references', targetName, 'SKILL.md');
+      : path.join(outDir, 'references', targetName, fileName);
   return path.relative(fromDir, targetPath).replace(/\\/g, '/');
 }
 
@@ -219,18 +222,28 @@ function emitSkill(
     const target = byName.get(link.targetName);
     if (!target) return link.raw;
     if (isPrimary) {
-      return `[${link.text}](references/${target.name}/SKILL.md)`;
+      return `[${link.text}](references/${target.name}/${target.name === projectName ? 'SKILL.md' : 'README.md'})`;
     }
     if (target.name === projectName) {
       return `[${link.text}](../../SKILL.md)`;
     }
-    return `[${link.text}](../${target.name}/SKILL.md)`;
+    return `[${link.text}](../${target.name}/README.md)`;
   };
 
   const header = `---\n${normalizeFrontmatter(skill.frontmatter, options.publicSource)}---\n`;
   const body = rewriteBody(skill.body, skill.links, linkFormatter, skill);
-  const skillMdPath = path.join(destDir, 'SKILL.md');
-  fs.writeFileSync(skillMdPath, header + body, 'utf8');
+
+  // Primary skill: write SKILL.md (the one skills.sh indexes).
+  // Dependency skills: write README.md and remove SKILL.md so the snapshot
+  // contains exactly one SKILL.md — the primary — which skills.sh expects.
+  const primaryPath = path.join(destDir, 'SKILL.md');
+  if (isPrimary) {
+    fs.writeFileSync(primaryPath, header + body, 'utf8');
+  } else {
+    fs.rmSync(primaryPath, { force: true });
+    fs.writeFileSync(path.join(destDir, 'README.md'), header + body, 'utf8');
+  }
+  const skillMdPath = isPrimary ? primaryPath : path.join(destDir, 'README.md');
 
   // Rewrite $skill{} macros and file links to SKILL.md in bundled reference
   // files so they remain resolvable when the skill is installed on its own.
