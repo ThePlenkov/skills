@@ -178,7 +178,7 @@ If a lower-stack change causes conflicts in downstream branches:
 
 1. **Do not blindly resolve** — trace each side's intent to its
    primary source (commit message, PR description). Use
-   `[resolving-merge-conflicts](resolving-merge-conflicts/SKILL.md)`.
+   `[resolving-merge-conflicts](resolving-merge-conflicts/README.md)`.
 2. Resolve conflicts on the downstream branch only.
 3. Push the downstream branch.
 4. Verify CI on the downstream branch.

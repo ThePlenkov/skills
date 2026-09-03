@@ -212,7 +212,7 @@ the script literally cannot run.
 
 `/act` operates on an **existing** PR/MR — it reviews an open PR, not
 commits already on `main`. To get automated review on already-merged
-work, use one of: a fork (`[shadow-fork](references/shadow-fork/SKILL.md)`) with a fork→upstream
+work, use one of: a fork (`[shadow-fork](references/shadow-fork/README.md)`) with a fork→upstream
 PR, review tools run directly on `main` (Codacy, CodeQL, Semgrep, and
 Trivy can scan commits without a PR), or an ephemeral empty branch you
 delete immediately after review. Inventing a custom base branch

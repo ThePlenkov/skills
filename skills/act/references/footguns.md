@@ -87,7 +87,7 @@ This happened twice in one session and frustrated the user both times.
 **Right.** `/act` operates on an *existing* PR — it is not a tool for
 manufacturing review PRs around already-merged work. Pick one:
 
-1. **Fork** — use `[shadow-fork](shadow-fork/SKILL.md)` and open the review PR from
+1. **Fork** — use `[shadow-fork](shadow-fork/README.md)` and open the review PR from
    the fork to upstream. No branches live in the user's repo.
 2. **No PR** — run review tools directly on `main` (Codacy, CodeQL,
    Semgrep, Trivy, etc. can scan commits without a PR). Prefer this
