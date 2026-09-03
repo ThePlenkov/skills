@@ -139,7 +139,7 @@ After pushing, wait for CI **only on the pushed branches**:
 
 ```bash
 # Wait for CI on a specific PR — watches ALL checks on the head SHA, not one run
-gh pr checks <PR> --repo <owner>/<repo> --watch --required --fail-fast
+gh pr checks <PR> --repo <owner>/<repo> --watch
 ```
 
 Do not wait for CI on branches whose HEAD SHA did not change — their

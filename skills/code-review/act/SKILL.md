@@ -55,23 +55,30 @@ re-fetch before that, you miss them and resolve threads prematurely.
 
 ```bash
 # Block until ALL checks on the PR complete — run as a background task, then get_output
-gh pr checks <PR_NUMBER> --repo <owner>/<repo> --watch --required --fail-fast
+gh pr checks <PR_NUMBER> --repo <owner>/<repo> --watch
 ```
 
 - `--watch` → blocks until every check on the PR's head SHA finishes
-- `--required` → only wait on required checks (the ones that gate merge)
-- `--fail-fast` → exit on first check failure (non-zero), so the agent can branch to "fix" immediately
+  (required AND optional — including SAST bots like Codacy, SonarCloud,
+  CodeQL that are often non-required but still post late findings)
+- Do **not** pass `--required` — it would return while optional SAST
+  checks are still running, reintroducing the premature-resolve failure
+  this step exists to prevent
+- Do **not** pass `--fail-fast` — it exits on the first check failure,
+  skipping still-running checks whose findings you would then miss
 - Covers **all workflow runs** triggered by the push (CI, SAST, lint, ...),
   not just one — `gh run watch <run-id>` only watches a single workflow run
   and misses late-posting bots from other runs
 - Run as a **background task** (`timeout: 0`), then `get_output` to
   check the result
+- After `--watch` returns, verify the merge gate via `pr-state.ts`:
+  `CI_REQUIRED_PENDING=0` and `SAST_FINDINGS_PENDING=0`
 - **NEVER** poll with `sleep` loops — it wastes tokens and tempts
   premature resolve
 - Fallbacks (GitLab, no `checks:read` scope, or `--watch` unavailable):
-  `gh pr checks <PR> --required` (single poll, repeat at 30s cadence
-  with a hard cap of 10 minutes), or `pr-state.ts` polling, then bail
-  to the user rather than resolving blind
+  `gh pr checks <PR>` (single poll without `--required`, repeat at 30s
+  cadence with a hard cap of 10 minutes), or `pr-state.ts` polling,
+  then bail to the user rather than resolving blind
 
 Only after `gh pr checks --watch` returns (or the fallback reaches
 `CI_REQUIRED_PENDING=0`): fetch review threads, reply, resolve.
