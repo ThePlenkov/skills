@@ -99,7 +99,7 @@ try {
     execFileSync('git', ['config', 'user.name', 'github-actions[bot]'], { cwd: targetRepoDir });
     execFileSync('git', ['config', 'user.email', 'github-actions[bot]@users.noreply.github.com'], { cwd: targetRepoDir });
     execFileSync('git', ['add', '.'], { cwd: targetRepoDir });
-    execFileSync('git', ['commit', '-m', `publish(skill): ${skillName} (${format}) [skip ci]`], { cwd: targetRepoDir });
+    execFileSync('git', ['commit', '-m', `publish(skill): ${skillName} (${format})`], { cwd: targetRepoDir });
 
     // Retry pull/push in case another publish lands between rebase and push.
     for (let attempt = 1; ; attempt++) {
