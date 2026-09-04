@@ -1,22 +1,33 @@
 # ThePlenkov/skills
 
-Public distribution of agent skills from [theplenkov-ai/skills](https://github.com/theplenkov-ai/skills).
+Public [skills.sh](https://skills.sh) distribution mirror for selected agent skills.
 
 ## Install
 
 ```bash
-# Install all skills
-npx skills add ThePlenkov/skills --all
-
-# Install a specific skill
-npx skills add ThePlenkov/skills --skill <skill-name>
+npx skills add ThePlenkov/skills --skill <name>
 ```
+
+## Badges
+
+![skills.sh](https://img.shields.io/badge/distributed%20via-skills.sh-3178c6)
+![public skills](https://img.shields.io/badge/public%20skills-2-brightgreen)
+![total size](https://img.shields.io/badge/total%20size-23.7%20KB-blue)
+
+## Stats
+
+- **Public skills:** 2
+- **Total SKILL.md size:** 23.7 KB
+- **Total SKILL.md lines:** 470
+- **Total skill edges:** 8
 
 ## Skills
 
-| Skill | Description |
-|---|---|
-| act | Use when the user invokes /act on a PR/MR, /act with no arguments (uses the PR in the current conversation context), or /act <context> with context ∈ {pr, plan, backlog, harvest, stack}. Resolves threads in product code (or posts a substantive in-thread reply), commits, then closes threads. Never resolve-only. /act is the fix loop — collection lives in /harvest and triage in /backlog. |
-| drill | Scoped descent primitive for agent systems. Creates isolated execution frames, materializes them as directory trees, and returns a result plus a parallel prevention plan so the same problem does not recur. |
+| Skill | Category | Description | Size | Lines | Stack | Deps |
+| --- | --- | --- | --- | --- | --- | --- |
+| [act](skills/act/SKILL.md) | code-review/act | Use when the user invokes /act on a PR/MR, /act with no argu… | 15.6 KB | 311 | skills-sh | 3 |
+| [drill](skills/drill/SKILL.md) | safety/drill | Scoped descent primitive for agent systems. Creates isolated… | 8.2 KB | 159 | skills-sh | 5 |
 
-_Auto-published from [theplenkov-ai/skills](https://github.com/theplenkov-ai/skills)._
+---
+
+This README is auto-generated. Do not edit it by hand.
