@@ -2,7 +2,9 @@ import { describe, expect, test } from "bun:test";
 import {
   githubPrWebUrl,
   gitlabMrWebUrl,
+  redactSecrets,
   toggleDraftTitle,
+  validateGitLabHost,
 } from "./platform.ts";
 
 /**
@@ -119,5 +121,82 @@ describe("gitlabMrWebUrl", () => {
       if (prev === undefined) delete process.env.GITLAB_HOST;
       else process.env.GITLAB_HOST = prev;
     }
+  });
+});
+
+describe("validateGitLabHost", () => {
+  test("accepts a bare hostname", () => {
+    expect(validateGitLabHost("gitlab.com")).toBe("gitlab.com");
+  });
+
+  test("accepts a hostname with subdomain", () => {
+    expect(validateGitLabHost("gitlab.example.com")).toBe("gitlab.example.com");
+  });
+
+  test("accepts a hostname with port", () => {
+    expect(validateGitLabHost("gitlab.example.com:8080")).toBe("gitlab.example.com:8080");
+  });
+
+  test("rejects a URL with scheme", () => {
+    expect(() => validateGitLabHost("https://evil.com")).toThrow();
+  });
+
+  test("rejects a URL with path", () => {
+    expect(() => validateGitLabHost("evil.com/exfil")).toThrow();
+  });
+
+  test("rejects a URL with query string", () => {
+    expect(() => validateGitLabHost("evil.com?token=steal")).toThrow();
+  });
+
+  test("rejects an empty string", () => {
+    expect(() => validateGitLabHost("")).toThrow();
+  });
+
+  test("rejects a host with spaces", () => {
+    expect(() => validateGitLabHost("evil .com")).toThrow();
+  });
+
+  test("rejects an IPv4 address", () => {
+    expect(() => validateGitLabHost("127.0.0.1")).toThrow();
+    expect(() => validateGitLabHost("10.0.0.1")).toThrow();
+    expect(() => validateGitLabHost("192.168.1.1")).toThrow();
+  });
+
+  test("rejects localhost", () => {
+    expect(() => validateGitLabHost("localhost")).toThrow();
+  });
+
+  test("error message does not interpolate the raw host value", () => {
+    try {
+      validateGitLabHost("evil.com?token=secret");
+      throw new Error("should have thrown");
+    } catch (e) {
+      const msg = (e as Error).message;
+      expect(msg).not.toContain("evil.com?token=secret");
+      expect(msg).not.toContain("secret");
+    }
+  });
+});
+
+describe("redactSecrets", () => {
+  test("redacts PRIVATE-TOKEN header from curl config form", () => {
+    const input = 'header = "PRIVATE-TOKEN: glpat-xxxxxxxxxxxxxxxxxxxx"';
+    expect(redactSecrets(input)).toBe('header = "PRIVATE-TOKEN: [REDACTED]"');
+  });
+
+  test("redacts token= query parameter", () => {
+    expect(redactSecrets("https://example.com/api?token=secret123")).toBe(
+      "https://example.com/api?token=[REDACTED]",
+    );
+  });
+
+  test("leaves non-token text unchanged", () => {
+    expect(redactSecrets("merge_request 42 not found")).toBe("merge_request 42 not found");
+  });
+
+  test("redacts multiple occurrences", () => {
+    const input = "PRIVATE-TOKEN: abc PRIVATE-TOKEN: def";
+    expect(redactSecrets(input)).toBe("PRIVATE-TOKEN: [REDACTED] PRIVATE-TOKEN: [REDACTED]");
   });
 });

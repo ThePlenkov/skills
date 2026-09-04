@@ -53,9 +53,11 @@ failed SAST runs — see [SKILL.md § P0b](SKILL.md) and
 Copy this directory (and `.agents/skills/harvest/` plus `.agents/review-debt/`).
 Requirements:
 
-- `gh`, `bun` (GitLab workflows need `GITLAB_TOKEN` or `GLAB_TOKEN`)
-- Wire `package.json` scripts or call `bun scripts/review-debt-cli.ts` from the skill root
+- `gh` (GitHub), `git`, `curl` (GitLab workflows need `GITLAB_TOKEN` or `GLAB_TOKEN`)
+- Runtime: `bun` (direct) **or** Node.js ≥ 18 via `npx --yes tsx@4`
+- Wire `package.json` scripts or call `npx --yes tsx@4 scripts/review-debt-cli.ts` from the skill root
 - Set `OPENADT_DEBT_FILE` / `OPENADT_DEBT_SUMMARY` if the ledger path differs
 
 OpenADT wires convenience targets at repo root: `bun run act:debt:*`,
-`bun run harvest:*`.
+`bun run harvest:*`. On repos without Bun, use
+`npx --yes tsx@4 scripts/run.ts .agents/skills/act/scripts/review-debt-cli.ts <cmd>`.

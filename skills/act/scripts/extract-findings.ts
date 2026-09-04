@@ -2,6 +2,9 @@
 /**
  * Extract scorable findings from a GitHub PR or GitLab MR into a JSONL sidecar.
  *
+ * Runtime: `bun` (direct) or `npx --yes tsx@4` (Node.js ≥ 18). No Bun-specific
+ * APIs are used — the script imports only `node:` built-ins.
+ *
  * Two finding kinds:
  *   - code_scan   — one per check-run annotation (GitHub: Codacy, Opengrep,
  *     CodeQL, …) or one per MR vulnerability finding (GitLab Ultimate SAST).
@@ -22,6 +25,7 @@
  * latency; for code_review it includes reviewer availability — split by
  * `type` when analysing.
  */
+import { spawnSync } from "node:child_process";
 import {
   detectProvider,
   gitlabMrWebUrl,
@@ -85,23 +89,28 @@ interface Finding {
 }
 
 function gh(args: string[]): string {
-  const proc = Bun.spawnSync(['gh', ...args], {
+  const proc = spawnSync('gh', args, {
     stdout: 'pipe',
     stderr: 'pipe',
+    encoding: 'utf8',
+    // Node's spawnSync caps stdout at 1MB by default; Bun.spawnSync had no
+    // cap. With --paginate on a large PR, check-runs/annotations/review-comments
+    // responses can exceed 1MB, causing status=null and truncated output.
+    maxBuffer: 64 * 1024 * 1024,
   })
-  if (proc.exitCode !== 0) {
-    const err = new TextDecoder().decode(proc.stderr).trim()
+  if (proc.status !== 0) {
+    const err = (proc.stderr ?? '').trim()
     throw new Error(`gh ${args[0]} failed: ${err}`)
   }
-  return new TextDecoder().decode(proc.stdout)
+  return proc.stdout ?? ''
 }
 
 function ensureGhAuth(): void {
-  const proc = Bun.spawnSync(['gh', 'auth', 'status'], {
+  const proc = spawnSync('gh', ['auth', 'status'], {
     stdout: 'ignore',
     stderr: 'ignore',
   })
-  if (proc.exitCode !== 0) {
+  if (proc.status !== 0) {
     console.error('error: gh not authenticated')
     process.exit(1)
   }

@@ -5,7 +5,11 @@
  * Design goals:
  * - No POSIX shell process substitution (<(...)) so the scripts run on Windows.
  * - No jq dependency; parse JSON in-process.
- * - Works with both `bun` and `node --import tsx`.
+ * - Works with both `bun` and `node --import tsx` (Node.js ≥ 18).
+ * - GitLab API host is validated against a safe pattern to prevent token
+ *   exfiltration via attacker-controlled GITLAB_HOST/GL_HOST env vars.
+ * - Tokens are never placed on the argv (CWE-214); they go through curl
+ *   --config - (stdin). Error messages redact response bodies and tokens.
  */
 import { spawnSync } from "node:child_process";
 
@@ -28,6 +32,70 @@ function toText(buf: Buffer | null): string {
   return buf ? buf.toString("utf8") : "";
 }
 
+/**
+ * Truncate a response snippet for error messages and redact any secrets.
+ * Keeps the first 200 chars — enough to diagnose a 4xx without leaking a
+ * full remote response body that may contain attacker-controlled content.
+ */
+function sanitizeForError(text: string): string {
+  return redactSecrets(text.slice(0, 200));
+}
+
+/**
+ * Validate a GitLab API host against a safe hostname pattern.
+ *
+ * Prevents token exfiltration via attacker-controlled `GITLAB_HOST`/`GL_HOST`
+ * env vars (Socket audit): if the host could be an arbitrary URL like
+ * `evil.com`, the token would be sent there. We require a bare hostname
+ * (optionally with a port), rejecting URLs, paths, query strings, IP
+ * addresses, and localhost-like values. Self-hosted GitLab instances must
+ * be configured with a proper DNS hostname.
+ *
+ * `GITLAB_HOST` is operator-trusted configuration — it must be set by the
+ * user, not derived from untrusted input.
+ */
+export function validateGitLabHost(host: string): string {
+  if (!host) throw new Error("GitLab host is empty (check GITLAB_HOST / GL_HOST)");
+  // Allow: hostname, hostname:port, sub.domain.tld — no scheme, path, query.
+  const ok = /^[a-zA-Z0-9]([a-zA-Z0-9.-]*[a-zA-Z0-9])?(:[0-9]+)?$/.test(host);
+  if (!ok) {
+    // Do not interpolate the raw host — it may contain a token in a query
+    // string (e.g. `evil.com?token=secret`). Report generically.
+    throw new Error(
+      "GitLab host is not a valid bare hostname (no scheme/path/query). " +
+        "Set GITLAB_HOST to a DNS hostname like 'gitlab.example.com'.",
+    );
+  }
+  // Reject raw IP addresses and localhost-like values — these are not valid
+  // GitLab hostnames and are common exfiltration targets.
+  if (/^(\d{1,3}\.){3}\d{1,3}$/.test(host) || /^[0-9a-fA-F:]+$/.test(host)) {
+    throw new Error(
+      "GitLab host must be a DNS hostname, not an IP address. " +
+        "Set GITLAB_HOST to a hostname like 'gitlab.example.com'.",
+    );
+  }
+  if (/^(localhost|localhost\.\w+|127\.\d|0\.0\.0\.0|::1)$/i.test(host)) {
+    throw new Error(
+      "GitLab host must not be a localhost address. " +
+        "Set GITLAB_HOST to a remote hostname like 'gitlab.example.com'.",
+    );
+  }
+  return host;
+}
+
+/**
+ * Redact anything that looks like a GitLab token from a string before it
+ * reaches an error message or log. Exported for testing.
+ *
+ * Matches `PRIVATE-TOKEN: <value>` headers (curl config form, where the
+ * value may be inside quotes) and bare `token=...` query params.
+ */
+export function redactSecrets(text: string): string {
+  return text
+    .replace(/PRIVATE-TOKEN:\s*"?[^\s"]+("?)/gi, "PRIVATE-TOKEN: [REDACTED]$1")
+    .replace(/(token=)[^\s&]+/gi, "$1[REDACTED]");
+}
+
 export function execText(command: string, args: string[], opts: RunOptions = {}): string {
   const result = spawnSync(command, args, {
     stdio: [opts.input ? "pipe" : "inherit", "pipe", "pipe"],
@@ -35,8 +103,8 @@ export function execText(command: string, args: string[], opts: RunOptions = {})
     encoding: "utf8",
   });
   if (!opts.ignoreExitCode && result.status !== 0) {
-    const err = toText(result.stderr as unknown as Buffer) || toText(result.stdout as unknown as Buffer) || `${command} failed`;
-    throw new Error(err.trim());
+    const raw = toText(result.stderr as unknown as Buffer) || toText(result.stdout as unknown as Buffer) || `${command} failed`;
+    throw new Error(sanitizeForError(raw.trim()));
   }
   return toText(result.stdout as unknown as Buffer);
 }
@@ -47,7 +115,7 @@ export function execJson<T = unknown>(command: string, args: string[], opts: Run
   try {
     return JSON.parse(text) as T;
   } catch (e) {
-    throw new Error(`Failed to parse JSON from ${command}: ${(e as Error).message}\n${text.slice(0, 500)}`);
+    throw new Error(`Failed to parse JSON from ${command}: ${(e as Error).message}\n${sanitizeForError(text)}`);
   }
 }
 
@@ -177,7 +245,8 @@ export function resolveGitLabNumber(projectPath: string, number?: string): strin
 }
 
 export function gitlabHost(): string {
-  return process.env.GITLAB_HOST || process.env.GL_HOST || "gitlab.com";
+  const raw = process.env.GITLAB_HOST || process.env.GL_HOST || "gitlab.com";
+  return validateGitLabHost(raw);
 }
 
 export function gitlabToken(): string | undefined {
@@ -275,7 +344,7 @@ export function gitlabRestProject<T = unknown>(projectPath: string, path: string
   try {
     return JSON.parse(text) as T;
   } catch (e) {
-    throw new Error(`Failed to parse GitLab REST JSON: ${(e as Error).message}\n${text.slice(0, 500)}`);
+    throw new Error(`Failed to parse GitLab REST JSON: ${(e as Error).message}\n${sanitizeForError(text)}`);
   }
 }
 

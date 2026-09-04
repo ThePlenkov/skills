@@ -27,10 +27,18 @@ runner and restore workflow labels.
 
 2. Get explicit user approval via `message_user` before registering a runner and
    running arbitrary workflow code on the host. This is a destructive/security
-   operation.
+   operation. **The runner executes `.github/workflows/*.yml` from the PR branch
+   on the local host** — if the PR is from an untrusted contributor, workflow
+   code is untrusted. Prefer `--ephemeral` (default) so the runner removes
+   itself after one job, and never use `--persistent` on PRs from outside
+   contributors.
 
 3. The host must have `node` and `gh` installed and network access to
-   `github.com`.
+   `github.com`. The runner archive is downloaded from `actions/runner` on
+   GitHub. `runner.cjs` attempts SHA-256 verification against the checksum
+   embedded in the release notes; if no checksum marker is found for the
+   platform/arch, it warns and skips verification (review the release notes
+   manually in that case).
 
 ## 1. Get a registration token
 
