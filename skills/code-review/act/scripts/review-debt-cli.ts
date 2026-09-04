@@ -1,6 +1,10 @@
 #!/usr/bin/env bun
 /**
- * Entry point for the review-debt side of /act (`bun run act:debt:*`).
+ * Entry point for the review-debt side of /act (`bun run act:debt:*` or
+ * `npx tsx scripts/run.ts ... review-debt-cli.ts`).
+ *
+ * Runtime: `bun` (direct) or `npx --yes tsx@4` (Node.js ≥ 18). No Bun-specific
+ * APIs are used — the script imports only `node:` built-ins.
  *
  * The companion collection step now lives in its own skill.
  * Debt here means: read the ledger built by /harvest, batch-fix it on a branch,
@@ -12,9 +16,37 @@
  *   bun run act:debt:test
  */
 import { spawnSync } from 'node:child_process'
+import { dirname, join } from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
-const SCRIPT_DIR = import.meta.dir
-const BUN = process.execPath
+const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url))
+
+/**
+ * Detect whether we are running under Bun. Bun sets `process.versions.bun`;
+ * Node does not. This determines how to launch child TypeScript scripts:
+ * - Bun: `bun script.ts` (direct execution)
+ * - Node + tsx: `node --import tsx script.ts` (propagate the tsx loader)
+ */
+const IS_BUN = typeof (process.versions as { bun?: string }).bun === 'string'
+
+/**
+ * Build the argv for launching a child TypeScript script under the current
+ * runtime. Under Bun, `process.execPath` is `bun` and can run `.ts` directly.
+ * Under Node + tsx, `process.execPath` is `node` and needs `--import tsx` to
+ * handle TypeScript — `process.execArgv` carries the loader flags when tsx
+ * was loaded, so we propagate them.
+ */
+function runtimeArgs(scriptPath: string, args: string[]): string[] {
+  if (IS_BUN) {
+    return [scriptPath, ...args]
+  }
+  // Node + tsx: propagate the loader flags from the current process so child
+  // scripts can also run TypeScript. process.execArgv contains flags like
+  // `--import=tsx` or `--require=tsx` when running under tsx.
+  return [...process.execArgv, scriptPath, ...args]
+}
+
+const RUNTIME = process.execPath
 
 const SUBCOMMANDS = {
   query: 'query-debt.ts',
@@ -41,7 +73,7 @@ Examples:
   process.exit(1)
 }
 function runBun(script: string, args: string[]): number {
-  const result = spawnSync(BUN, [joinScript(script), ...args], {
+  const result = spawnSync(RUNTIME, runtimeArgs(joinScript(script), args), {
     stdio: 'inherit',
   })
   if (result.error) {
@@ -51,17 +83,24 @@ function runBun(script: string, args: string[]): number {
 }
 
 function joinScript(name: string): string {
-  return `${SCRIPT_DIR}/${name}`
+  return join(SCRIPT_DIR, name)
 }
 
 function runTests(): number {
   const tests = [
-    `${SCRIPT_DIR}/../../../workflow/harvest/scripts/review-debt-lib.test.ts`,
-    `${SCRIPT_DIR}/../../../workflow/harvest/scripts/resolve-harvest-prs.test.ts`,
-    `${SCRIPT_DIR}/../../../workflow/harvest/scripts/resolve-harvest-target.test.ts`,
-    `${SCRIPT_DIR}/update-debt-status.test.ts`,
+    join(SCRIPT_DIR, '../../../workflow/harvest/scripts/review-debt-lib.test.ts'),
+    join(SCRIPT_DIR, '../../../workflow/harvest/scripts/resolve-harvest-prs.test.ts'),
+    join(SCRIPT_DIR, '../../../workflow/harvest/scripts/resolve-harvest-target.test.ts'),
+    join(SCRIPT_DIR, 'update-debt-status.test.ts'),
   ]
-  const result = spawnSync(BUN, ['test', ...tests], { stdio: 'inherit' })
+  if (!IS_BUN) {
+    console.error(
+      'The "test" subcommand requires Bun (`bun test`). ' +
+        'Install Bun or run tests directly: `bun test ' + tests.join(' ') + '`',
+    )
+    return 1
+  }
+  const result = spawnSync(RUNTIME, ['test', ...tests], { stdio: 'inherit' })
   if (result.error) {
     throw result.error
   }
@@ -100,6 +139,13 @@ function main(): void {
   process.exit(runCommand(cmd!, rest))
 }
 
-if (import.meta.main) {
+// Windows-safe entrypoint check: convert process.argv[1] (a filesystem path
+// like C:\foo\bar.ts on Windows) to a file:// URL before comparing with
+// import.meta.url. Guard against missing argv[1] (e.g. piped via -e).
+const isMain = process.argv[1]
+  ? pathToFileURL(process.argv[1]).href === import.meta.url
+  : false
+
+if (isMain) {
   main()
 }
