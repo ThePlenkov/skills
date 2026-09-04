@@ -1,0 +1,144 @@
+name: SkillSpector Scan
+description: >-
+  Scan AI agent skills with NVIDIA SkillSpector. Discovers SKILL.md files,
+  runs static analysis (optional LLM), merges SARIF/JSON reports, and
+  uploads to GitHub Code Scanning. No Nx, no Docker — just pip.
+author: ThePlenkov
+branding:
+  icon: shield
+  color: red
+
+inputs:
+  path:
+    description: Directory or single SKILL.md to scan.
+    required: false
+    default: "."
+  changed-only:
+    description: >-
+      On pull_request events, scan only skills whose files changed.
+      Falls back to full scan if git diff is unavailable.
+    required: false
+    default: "false"
+  fail-on:
+    description: >-
+      Failure threshold: none, high, or critical.
+      none = never fail; high = fail on high+critical; critical = fail only on critical.
+    required: false
+    default: "none"
+  min-score:
+    description: >-
+      Optional numeric risk score threshold (0-100) that fails the action.
+      Combined with fail-on via OR logic.
+    required: false
+    default: ""
+  baseline:
+    description: >-
+      Path to a SkillSpector baseline file for suppressing accepted findings.
+    required: false
+    default: ""
+  upload-sarif:
+    description: Upload SARIF to GitHub Code Scanning.
+    required: false
+    default: "true"
+  sarif-category:
+    description: Category label for the SARIF upload.
+    required: false
+    default: "skillspector"
+  llm:
+    description: Enable LLM semantic analysis (requires API keys).
+    required: false
+    default: "false"
+  exclude:
+    description: Newline or comma-separated glob patterns to exclude.
+    required: false
+    default: ""
+  skillspector-version:
+    description: >-
+      SkillSpector version: tag (v2.11.0), commit SHA, or "latest".
+    required: false
+    default: "v2.11.0"
+  artifact-name:
+    description: Artifact name for reports. Empty = no artifact.
+    required: false
+    default: "skillspector-reports"
+
+outputs:
+  sarif:
+    description: Path to the merged SARIF report.
+    value: ${{ steps.scan.outputs.sarif }}
+  json:
+    description: Path to the merged JSON report.
+    value: ${{ steps.scan.outputs.json }}
+  markdown:
+    description: Path to the Markdown summary.
+    value: ${{ steps.scan.outputs.markdown }}
+  risk-score:
+    description: Highest risk score across scanned skills (0-100).
+    value: ${{ steps.scan.outputs.risk-score }}
+  risk-severity:
+    description: Highest risk severity across scanned skills.
+    value: ${{ steps.scan.outputs.risk-severity }}
+  findings-count:
+    description: Active finding count (after baseline suppression).
+    value: ${{ steps.scan.outputs.findings-count }}
+  scanned-count:
+    description: Number of skill targets scanned.
+    value: ${{ steps.scan.outputs.scanned-count }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install SkillSpector
+      shell: bash
+      run: |
+        set -euo pipefail
+        VERSION="${{ inputs.skillspector-version }}"
+        if [ "$VERSION" = "latest" ]; then
+          pip install --quiet "git+https://github.com/NVIDIA/SkillSpector.git"
+        else
+          pip install --quiet "git+https://github.com/NVIDIA/SkillSpector.git@${VERSION}"
+        fi
+
+    - name: Run scan
+      id: scan
+      shell: bash
+      env:
+        INPUT_PATH: ${{ inputs.path }}
+        INPUT_CHANGED_ONLY: ${{ inputs.changed-only }}
+        INPUT_FAIL_ON: ${{ inputs.fail-on }}
+        INPUT_MIN_SCORE: ${{ inputs.min-score }}
+        INPUT_BASELINE: ${{ inputs.baseline }}
+        INPUT_LLM: ${{ inputs.llm }}
+        INPUT_EXCLUDE: ${{ inputs.exclude }}
+        GITHUB_EVENT_NAME: ${{ github.event_name }}
+        GITHUB_EVENT_PATH: ${{ github.event_path }}
+        GITHUB_OUTPUT: ${{ github.output }}
+        GITHUB_STEP_SUMMARY: ${{ github.step_summary }}
+        GITHUB_WORKSPACE: ${{ github.workspace }}
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
+      run: |
+        python3 "$GITHUB_ACTION_PATH/scripts/scan.py"
+
+    - name: Upload reports artifact
+      if: ${{ always() && inputs.artifact-name != '' && steps.scan.outputs.json != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: |
+          ${{ steps.scan.outputs.json }}
+          ${{ steps.scan.outputs.sarif }}
+          ${{ steps.scan.outputs.markdown }}
+        if-no-files-found: ignore
+
+    - name: Upload SARIF to code scanning
+      if: ${{ always() && inputs.upload-sarif == 'true' && steps.scan.outputs.sarif != '' }}
+      continue-on-error: true
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ${{ steps.scan.outputs.sarif }}
+        category: ${{ inputs.sarif-category }}

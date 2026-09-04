@@ -1,0 +1,63 @@
+name: Validate published skills
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'skills/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  detect-changed:
+    runs-on: ubuntu-latest
+    outputs:
+      skills: ${{ steps.detect.outputs.skills }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - id: detect
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            skills=$(find skills -maxdepth 2 -name SKILL.md -printf '%h\n' | sed 's|skills/||' | sort | jq -R . | jq -s .)
+          else
+            changed_files=$(git diff --name-only HEAD~1 HEAD -- 'skills/')
+            skills=$(echo "$changed_files" | sed -n 's|^skills/\([^/]*\)/.*|\1|p' | sort -u | jq -R . | jq -s .)
+          fi
+          echo "skills=$skills" >> "$GITHUB_OUTPUT"
+          echo "Changed skills: $skills"
+
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan skills with SkillSpector
+        uses: ./.github/actions/skillspector-scan
+        with:
+          path: ./skills
+          fail-on: high
+          upload-sarif: true
+          skillspector-version: v2.11.0
+
+  reindex:
+    needs: detect-changed
+    if: needs.detect-changed.outputs.skills != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        skill: ${{ fromJSON(needs.detect-changed.outputs.skills) }}
+      fail-fast: false
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Trigger skills.sh re-index
+        working-directory: ${{ runner.temp }}
+        run: npx --yes skills add ThePlenkov/skills --skill ${{ matrix.skill }} -y
