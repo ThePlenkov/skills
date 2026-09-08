@@ -3,7 +3,11 @@
   "defaultBase": "main",
   "plugins": [
     {
-      "plugin": "@theplenkov/nx-skill",
+      "plugin": "@nx-devkit/skill",
+      "options": {}
+    },
+    {
+      "plugin": "@nx-devkit/skillspector",
       "options": {}
     }
   ]

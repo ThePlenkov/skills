@@ -24,7 +24,9 @@ on:
       - 'skills/**'
       - 'skills.config.ts'
       - 'docs/skill-coverage-matrix.md'
-      - 'tools/nx-skill/**'
+      - 'vendor/nx.ts/packages/skill/**'
+      - 'vendor/nx.ts/packages/skillspector/**'
+      - 'scripts/build-nx-plugins.ts'
   pull_request:
     paths:
       - 'README.md'
@@ -47,7 +49,9 @@ on:
       - 'skills/**'
       - 'skills.config.ts'
       - 'docs/skill-coverage-matrix.md'
-      - 'tools/nx-skill/**'
+      - 'vendor/nx.ts/packages/skill/**'
+      - 'vendor/nx.ts/packages/skillspector/**'
+      - 'scripts/build-nx-plugins.ts'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -80,8 +84,11 @@ jobs:
       - name: Install Node dependencies
         run: npm ci --no-audit --no-fund --prefer-offline
 
-      - name: Build Nx plugin
-        run: npm run build --prefix tools/nx-skill
+      - name: Initialize git submodules
+        run: git submodule update --init --recursive
+
+      - name: Build Nx plugins
+        run: npm run build:nx-plugins
 
       - name: Set Nx SHAs
         uses: nrwl/nx-set-shas@v5
