@@ -133,9 +133,16 @@ Did the fix change a lower-stack branch's diff?
 └── NO  → Push just the changed branch
 ```
 
-## CI waiting strategy
+## CI waiting strategy — round-robin, not serial block
 
-After pushing, wait for CI **only on the pushed branches**:
+In stack mode you do **not** block on CI after every single PR push.
+That is the whole point of round-robin: push PR #1, immediately move to
+PR #2 and fix while CI runs on #1, and so on up the stack. CI is async
+— your analysis isn't.
+
+But "don't block per-PR" does **not** mean "skip the CI check". It
+means defer it to the round-robin re-scan. On the re-scan, for each
+pushed branch:
 
 ```bash
 # Wait for CI on a specific PR — watches ALL checks on the head SHA, not one run
@@ -147,27 +154,37 @@ CI status is unchanged from the previous run.
 
 ## Round-robin convergence
 
-After reaching the top of the stack, re-scan from the bottom:
+After reaching the top of the stack, re-scan from the bottom. This is
+where the per-PR CI block + new-comment fetch happens that you deferred
+during the push phase:
 
-1. Query all PRs for new unresolved threads (bots may have posted
-   new comments after the latest CI run). **Use `reviewThreads(last: 100)`**
-   (not `first: 100`) — after a rebase, new bot threads are appended at the
-   end, and `first: 100` returns the oldest (already resolved) threads,
-   causing you to miss new findings. Prefer the `pr-state.ts` helper which
-   paginates correctly.
+1. **Per pushed PR, in order bottom-to-top:**
+   a. **Block on CI** for that PR's HEAD via `gh pr checks <PR> --watch`
+      (or the fallback). Do not fetch threads until CI returns — same
+      hard ordering as single-PR mode: pipeline FIRST, comments SECOND.
+   b. **Only then** query that PR for new unresolved threads (bots may
+      have posted new comments after CI finished). **Use
+      `reviewThreads(last: 100)`** (not `first: 100`) — after a rebase,
+      new bot threads are appended at the end, and `first: 100` returns
+      the oldest (already resolved) threads, causing you to miss new
+      findings. Prefer the `pr-state.ts` helper which paginates correctly.
 2. Query all PRs for CI status (a lower-stack push may have triggered
    CI on downstream PRs).
 3. If any PR has new findings, process it again (bottom-to-top).
-4. Repeat until all PRs are merge-ready.
+4. Repeat until all PRs pass the [exit gate](../SKILL.md#exit-gate--hard-stop-conditions).
 
 ### Convergence check
 
-Each PR in the stack is merge-ready when it satisfies the four exit
-conditions in [SKILL.md § Exit conditions](../SKILL.md#exit-conditions--all-four-must-hold-on-the-same-head)
+Each PR in the stack is merge-ready only when it satisfies the
+[exit gate](../SKILL.md#exit-gate--hard-stop-conditions)
 (`open_threads=0`, `CI_REQUIRED_PENDING=0`, `SAST_FINDINGS_PENDING=0`,
-`SAST_FINDINGS_UNKNOWN=0`, no new bot comments, no cycle-guard signal).
-Additionally, every PR's `mergeable_state` must be `clean` (not
-`conflict` or `dirty`).
+`SAST_FINDINGS_UNKNOWN=0`, no new bot comments, no cycle-guard signal)
+**on that PR's HEAD**. The "don't wait for CI between PRs" lever
+speeds up the push phase — it does not weaken the exit gate. A PR is
+not merge-ready because you pushed a fix to it; it is merge-ready only
+after the round-robin re-scan confirms CI green + no new threads on
+its HEAD. Additionally, every PR's `mergeable_state` must be `clean`
+(not `conflict` or `dirty`).
 
 `mergeable_state: unstable` is acceptable — it means pending review
 approval or non-required checks running, not a conflict.
