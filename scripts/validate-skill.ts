@@ -10,17 +10,20 @@ import { parseArgs } from "node:util";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 
-const { positionals } = parseArgs({
-  options: {},
+const { values, positionals } = parseArgs({
+  options: {
+    skill: { type: "string" },
+  },
   allowPositionals: true,
 });
 
-if (positionals.length === 0) {
-  console.error("Usage: tsx scripts/validate-skill.ts <skill-dir>");
+const skillArg = values.skill ?? positionals[0];
+if (!skillArg) {
+  console.error("Usage: tsx scripts/validate-skill.ts [--skill] <skill-dir>");
   process.exit(1);
 }
 
-const skillDir = resolve(positionals[0]!);
+const skillDir = resolve(skillArg);
 const skillMdPath = join(skillDir, "SKILL.md");
 const openaiYamlPath = join(skillDir, "agents", "openai.yaml");
 const schemaPath = join(ROOT, ".github", "skill-schema.json");

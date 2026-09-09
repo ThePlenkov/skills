@@ -93,13 +93,47 @@ try {
 
   generateReadme(resolvedRepo, targetRepoDir);
 
+  // Sync reusable GitHub Actions and workflows to the public repo so it
+  // has its own CI (SkillSpector scanning + skills.sh re-indexing).
+  const publicActionsDir = path.join(targetRepoDir, '.github', 'actions');
+  const sourceActionsDir = path.join(workspaceRoot, 'actions');
+  if (fs.existsSync(sourceActionsDir)) {
+    for (const actionDir of fs.readdirSync(sourceActionsDir)) {
+      const srcAction = path.join(sourceActionsDir, actionDir);
+      if (fs.statSync(srcAction).isDirectory() && fs.existsSync(path.join(srcAction, 'action.yml'))) {
+        fs.cpSync(srcAction, path.join(publicActionsDir, actionDir), { recursive: true });
+      }
+    }
+  }
+  // Also copy .github/actions/ helpers (e.g. setup-python-with-fallback)
+  // that the published actions depend on.
+  const sourceGithubActionsDir = path.join(workspaceRoot, '.github', 'actions');
+  if (fs.existsSync(sourceGithubActionsDir)) {
+    for (const actionDir of fs.readdirSync(sourceGithubActionsDir)) {
+      const srcAction = path.join(sourceGithubActionsDir, actionDir);
+      if (fs.statSync(srcAction).isDirectory() && fs.existsSync(path.join(srcAction, 'action.yml'))) {
+        fs.cpSync(srcAction, path.join(publicActionsDir, actionDir), { recursive: true });
+      }
+    }
+  }
+  const publicWorkflowsDir = path.join(targetRepoDir, '.github', 'workflows');
+  const sourcePublicWorkflowsDir = path.join(workspaceRoot, 'tools', 'public-repo-workflows');
+  if (fs.existsSync(sourcePublicWorkflowsDir)) {
+    fs.mkdirSync(publicWorkflowsDir, { recursive: true });
+    for (const file of fs.readdirSync(sourcePublicWorkflowsDir)) {
+      if (file.endsWith('.yml') || file.endsWith('.yaml')) {
+        fs.copyFileSync(path.join(sourcePublicWorkflowsDir, file), path.join(publicWorkflowsDir, file));
+      }
+    }
+  }
+
   const status = execSync('git status --porcelain', { cwd: targetRepoDir, encoding: 'utf8' });
   if (status.trim()) {
     const targetBranch = execSync('git branch --show-current', { cwd: targetRepoDir, encoding: 'utf8' }).trim();
     execFileSync('git', ['config', 'user.name', 'github-actions[bot]'], { cwd: targetRepoDir });
     execFileSync('git', ['config', 'user.email', 'github-actions[bot]@users.noreply.github.com'], { cwd: targetRepoDir });
     execFileSync('git', ['add', '.'], { cwd: targetRepoDir });
-    execFileSync('git', ['commit', '-m', `publish(skill): ${skillName} (${format}) [skip ci]`], { cwd: targetRepoDir });
+    execFileSync('git', ['commit', '-m', `publish(skill): ${skillName} (${format})`], { cwd: targetRepoDir });
 
     // Retry pull/push in case another publish lands between rebase and push.
     for (let attempt = 1; ; attempt++) {

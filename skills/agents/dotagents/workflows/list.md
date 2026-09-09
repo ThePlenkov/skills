@@ -20,21 +20,11 @@ List skills available in the current project:
 npx skills add . --list
 ```
 
-Or find them directly:
-
-```bash
-find .agents/skills -name "SKILL.md" -exec dirname {} \; | sort
-```
+Or find them directly using your search tools to locate `SKILL.md` files under `.agents/skills/`.
 
 ### 3. Agent Installations
 
-Check which agents have skills installed:
-
-```bash
-for dir in .windsurf .claude .codex .cursor .agents; do
-  [ -d "$dir/skills" ] && echo "$dir/skills: installed" || echo "$dir/skills: not found"
-done
-```
+Check which agents have skills installed by looking for `skills/` subdirectories under `.windsurf`, `.claude`, `.codex`, `.cursor`, and `.agents`.
 
 ### 4. Check for Updates
 

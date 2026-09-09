@@ -18,7 +18,8 @@ brew install act
 choco install act-cli
 
 # Linux (review script first: https://github.com/nektos/act/blob/master/install.sh)
-curl -fsSL https://raw.githubusercontent.com/nektos/act/master/install.sh -o "${TMPDIR:-/tmp}/act-install.sh" && bash "${TMPDIR:-/tmp}/act-install.sh" -b ~/.local/bin
+curl -fsSL https://raw.githubusercontent.com/nektos/act/master/install.sh -o act-install.sh
+bash act-install.sh -b ~/.local/bin
 
 # Manual: download from https://github.com/nektos/act/releases
 ```

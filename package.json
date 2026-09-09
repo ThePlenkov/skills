@@ -7,7 +7,8 @@
     "skills": "./bin/skills.js"
   },
   "scripts": {
-    "postinstall": "npm run build --prefix tools/compiler",
+    "postinstall": "cd tools/compiler && npm run build",
+    "build:nx-plugins": "tsx scripts/build-nx-plugins.ts",
     "generate": "tsx scripts/generate-skills-index.ts",
     "generate:skills-index-md": "tsx scripts/generate-skills-index-md.ts",
     "check:skills-index-md": "tsx scripts/generate-skills-index-md.ts --check",
@@ -26,7 +27,8 @@
   },
   "devDependencies": {
     "@nx/devkit": "^23.1.0",
-    "@theplenkov/nx-skill": "file:./tools/nx-skill",
+    "@nx-devkit/skill": "file:./vendor/nx.ts/packages/skill",
+    "@nx-devkit/skillspector": "file:./vendor/nx.ts/packages/skillspector",
     "@theplenkov/skills-compiler": "file:./tools/compiler",
     "@types/node": "^20.0.0",
     "ajv-cli": "5.0.0",

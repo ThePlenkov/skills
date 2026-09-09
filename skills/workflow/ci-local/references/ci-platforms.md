@@ -4,22 +4,13 @@ Detection and parsing helpers for non-GitHub-Actions CI platforms. Use when `act
 
 ## Detection commands
 
-```bash
-# GitHub Actions
-find .github/workflows -name "*.yml" -o -name "*.yaml"
+Use your search tools or a Node/Python script to detect CI config files:
 
-# GitLab CI
-test -f .gitlab-ci.yml && echo ".gitlab-ci.yml"
-
-# Azure Pipelines
-find . -name "azure-pipelines.yml" -o -name "azure-pipelines.yaml"
-
-# CircleCI
-test -f .circleci/config.yml && echo ".circleci/config.yml"
-
-# Jenkins
-test -f Jenkinsfile && echo "Jenkinsfile"
-```
+- **GitHub Actions**: look for `.github/workflows/*.yml` and `*.yaml`
+- **GitLab CI**: check for `.gitlab-ci.yml`
+- **Azure Pipelines**: look for `azure-pipelines.yml` or `azure-pipelines.yaml`
+- **CircleCI**: check for `.circleci/config.yml`
+- **Jenkins**: check for `Jenkinsfile`
 
 ## GitHub Actions fallback parsing
 

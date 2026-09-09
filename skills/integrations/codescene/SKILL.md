@@ -78,8 +78,8 @@ cs delta origin/main HEAD --error-on-warnings
 ```bash
 curl --proto '=https' --tlsv1.2 -fsSL \
   -H "Authorization: Bearer ${CS_ACCESS_TOKEN}" \
-  -o /tmp/cs https://downloads.codescene.io/enterprise/cli/install-cs-tool.sh
-bash /tmp/cs -y
+  -o cs-installer.sh https://downloads.codescene.io/enterprise/cli/install-cs-tool.sh
+bash cs-installer.sh -y
 ```
 
 The versioned download endpoint requires `CS_ACCESS_TOKEN` in the `Authorization` header (403 otherwise). The install script in the repo uses the redirect-stable "latest" channel instead.

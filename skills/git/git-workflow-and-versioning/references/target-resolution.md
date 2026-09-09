@@ -18,10 +18,12 @@ Rules and command templates for resolving the `/push` target argument into a `<r
 ```bash
 git branch --show-current
 git remote -v
-git branch -a | grep <target>
-gh pr view <target> 2>/dev/null
-git remote | grep <target>
+git branch -a
+gh pr view <target>
+git remote
 ```
+
+Filter the output with your search tools to find `<target>`.
 
 ## Resolution templates
 
