@@ -93,8 +93,12 @@ try {
 
   generateReadme(resolvedRepo, targetRepoDir);
 
-  // Sync reusable GitHub Actions and workflows to the public repo so it
-  // has its own CI (SkillSpector scanning + skills.sh re-indexing).
+  // Sync reusable GitHub Actions to the public repo so it has its own
+  // CI (SkillSpector scanning + skills.sh re-indexing). Only sync
+  // .github/actions/ (reusable composite actions) — NOT .github/workflows/
+  // because pushing workflow files requires the App to have `workflows`
+  // permission, which the installation may not grant. Workflow files in
+  // the public repo are managed separately (manual or dedicated workflow).
   const publicActionsDir = path.join(targetRepoDir, '.github', 'actions');
   const sourceActionsDir = path.join(workspaceRoot, 'actions');
   if (fs.existsSync(sourceActionsDir)) {
@@ -113,16 +117,6 @@ try {
       const srcAction = path.join(sourceGithubActionsDir, actionDir);
       if (fs.statSync(srcAction).isDirectory() && fs.existsSync(path.join(srcAction, 'action.yml'))) {
         fs.cpSync(srcAction, path.join(publicActionsDir, actionDir), { recursive: true });
-      }
-    }
-  }
-  const publicWorkflowsDir = path.join(targetRepoDir, '.github', 'workflows');
-  const sourcePublicWorkflowsDir = path.join(workspaceRoot, 'tools', 'public-repo-workflows');
-  if (fs.existsSync(sourcePublicWorkflowsDir)) {
-    fs.mkdirSync(publicWorkflowsDir, { recursive: true });
-    for (const file of fs.readdirSync(sourcePublicWorkflowsDir)) {
-      if (file.endsWith('.yml') || file.endsWith('.yaml')) {
-        fs.copyFileSync(path.join(sourcePublicWorkflowsDir, file), path.join(publicWorkflowsDir, file));
       }
     }
   }
