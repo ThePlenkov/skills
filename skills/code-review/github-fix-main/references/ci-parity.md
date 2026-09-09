@@ -15,7 +15,7 @@ yq '.jobs | to_entries | .[] | {job: .key, steps: [.value.steps[].run // empty]}
   .github/workflows/*.yml
 
 # External required checks (GitHub Apps, third-party scanners)
-gh api "repos/$REPO/branches/$MAIN/protection/required_status_checks" 2>/dev/null
+gh api "repos/$REPO/branches/$MAIN/protection/required_status_checks"
 ```
 
 ## Build the local command set

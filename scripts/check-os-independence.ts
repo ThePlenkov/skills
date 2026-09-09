@@ -204,6 +204,14 @@ function isGitSubcommand(line: string, token: string): boolean {
   if (token === 'grep ') {
     return line.includes('git grep');
   }
+  // `--head` is a gh/git CLI flag, not the `head` command.
+  if (token === 'head ') {
+    return /--head[ =]/.test(line);
+  }
+  // `~/.local/bin` and `$HOME/.local/bin` are user-local paths, not hardcoded system paths.
+  if (token === '/bin/') {
+    return /(~\/|\$HOME\/|HOME\b.*\/bin\/)/.test(line);
+  }
   return false;
 }
 
