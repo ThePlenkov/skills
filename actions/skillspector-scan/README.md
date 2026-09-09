@@ -26,7 +26,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # required for changed-only detection
-      - uses: ThePlenkov/skills/.github/actions/skillspector-scan@main
+      - uses: ThePlenkov/skills/actions/skillspector-scan@main
         with:
           path: ./skills
           changed-only: true

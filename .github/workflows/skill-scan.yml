@@ -11,6 +11,7 @@ on:
       - 'skills-lock.json'
       - '.github/workflows/skill-scan.yml'
       - 'actions/skillspector/**'
+      - 'actions/skillspector-scan/**'
   # Pre-merge scan: when a PR is opened or updated. Provides inline
   # annotations on the PR Files Changed tab.
   pull_request:
@@ -19,10 +20,11 @@ on:
       - 'skills-lock.json'
       - '.github/workflows/skill-scan.yml'
       - 'actions/skillspector/**'
+      - 'actions/skillspector-scan/**'
   workflow_dispatch:
     inputs:
       affected:
-        description: 'Scan only affected skills (true) or perform a full scan (false)'
+        description: 'Scan only affected skills (PR events only; dispatch always full-scans)'
         required: false
         default: 'false'
         type: choice

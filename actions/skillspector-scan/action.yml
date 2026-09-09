@@ -95,9 +95,17 @@ runs:
 
     - name: Install SkillSpector
       shell: bash
+      env:
+        VERSION: ${{ inputs.skillspector-version }}
       run: |
         set -euo pipefail
-        VERSION="${{ inputs.skillspector-version }}"
+        # Validate VERSION: must be "latest", a tag (vX.Y.Z), or a commit SHA
+        case "$VERSION" in
+          latest) ;;
+          v[0-9]*) ;;
+          [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) ;;
+          *) echo "Invalid skillspector-version: $VERSION" >&2; exit 1 ;;
+        esac
         if [ "$VERSION" = "latest" ]; then
           pip install --quiet "git+https://github.com/NVIDIA/SkillSpector.git"
         else

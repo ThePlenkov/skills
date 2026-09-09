@@ -91,6 +91,8 @@ def changed_skill_targets(root: Path, excludes: tuple[str, ...] = ()) -> list[Pa
             cwd=workspace, capture_output=True, text=True, check=False,
         )
     except Exception:
+        # git fetch may fail on shallow clones or detached HEADs;
+        # the diff below will catch it and fall back to full scan.
         pass
 
     try:
@@ -114,6 +116,11 @@ def changed_skill_targets(root: Path, excludes: tuple[str, ...] = ()) -> list[Pa
         current = p if p.is_dir() else p.parent
         while True:
             if (current / "SKILL.md").exists():
+                # Reject candidates outside the configured scan root
+                try:
+                    current.relative_to(root_resolved)
+                except ValueError:
+                    break
                 if not _is_excluded(current, root, excludes):
                     targets.add(current)
                 break
@@ -139,29 +146,76 @@ def _is_excluded(path: Path, root: Path, patterns: tuple[str, ...]) -> bool:
 # ---------------------------------------------------------------------------
 
 def run_skillspector(target: Path, work_dir: Path, use_llm: bool, baseline: Path | None) -> dict[str, Any]:
-    """Run SkillSpector on a single target, return merged JSON+SARIF dict."""
+    """Run SkillSpector on a single target, return dict with json and sarif.
+
+    Runs a single scan with JSON output (check=False so a nonzero exit
+    doesn't bypass the fail-on gate). Derives SARIF from the JSON report
+    to avoid a second scan (which would double API cost with LLM enabled).
+    """
     name = hashlib.sha1(str(target).encode()).hexdigest()[:12]
     json_path = work_dir / f"{name}.json"
-    sarif_path = work_dir / f"{name}.sarif"
 
     cmd = ["skillspector", "scan", str(target), "--no-llm"] if not use_llm else ["skillspector", "scan", str(target)]
     if baseline:
         cmd += ["--baseline", str(baseline)]
 
-    # JSON report
-    subprocess.run(
+    # Run once with JSON output. Use check=False so a nonzero scan exit
+    # doesn't raise — we still parse whatever report was produced and let
+    # should_fail() decide the action result based on the configured threshold.
+    proc = subprocess.run(
         [*cmd, "--format", "json", "--output", str(json_path)],
-        check=True, capture_output=True, text=True,
+        capture_output=True, text=True,
     )
-    # SARIF report
-    subprocess.run(
-        [*cmd, "--format", "sarif", "--output", str(sarif_path)],
-        check=True, capture_output=True, text=True,
-    )
+    if proc.returncode != 0:
+        print(f"  SkillSpector exited {proc.returncode} for {target.name}")
+        if proc.stderr:
+            print(f"  stderr: {proc.stderr[:500]}")
+
+    json_report = json.loads(json_path.read_text(encoding="utf-8")) if json_path.exists() else {}
+    sarif_report = _json_to_sarif(json_report)
 
     return {
-        "json": json.loads(json_path.read_text(encoding="utf-8")) if json_path.exists() else {},
-        "sarif": json.loads(sarif_path.read_text(encoding="utf-8")) if sarif_path.exists() else {"runs": []},
+        "json": json_report,
+        "sarif": sarif_report,
+    }
+
+
+def _json_to_sarif(report: dict[str, Any]) -> dict[str, Any]:
+    """Convert a SkillSpector JSON report to SARIF 2.1.0 format."""
+    findings = _extract_findings(report)
+    rules_by_id: dict[str, dict[str, Any]] = {}
+    results: list[dict[str, Any]] = []
+
+    for f in findings:
+        rid = str(f.get("id") or f.get("rule_id") or f.get("ruleId") or "unknown")
+        sev = normalize_severity(f.get("severity"))
+        msg = str(f.get("explanation") or f.get("message") or f.get("description") or "")
+        path = str(f.get("location", {}).get("file", "") or f.get("path") or "") if isinstance(f.get("location"), dict) else str(f.get("path") or "")
+
+        if rid not in rules_by_id:
+            rules_by_id[rid] = {
+                "id": rid,
+                "name": rid,
+                "shortDescription": {"text": msg[:200] if msg else rid},
+            }
+
+        level_map = {"none": "none", "info": "note", "note": "note", "low": "warning",
+                     "warning": "warning", "medium": "warning", "error": "error",
+                     "high": "error", "critical": "error"}
+        results.append({
+            "ruleId": rid,
+            "level": level_map.get(sev, "warning"),
+            "message": {"text": msg},
+            "locations": [{"physicalLocation": {"artifactLocation": {"uri": path}}}] if path else [],
+        })
+
+    return {
+        "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+        "version": "2.1.0",
+        "runs": [{
+            "tool": {"driver": {"name": "SkillSpector", "rules": list(rules_by_id.values())}},
+            "results": results,
+        }],
     }
 
 
@@ -201,17 +255,35 @@ def merge_sarif_reports(reports: list[dict[str, Any]]) -> dict[str, Any]:
             drv = run.get("tool", {}).get("driver", {})
             if drv.get("name"):
                 driver_name = drv["name"]
-            for rule in drv.get("rules", []):
+            # Build a mapping from old rule index to rule ID for this run
+            run_rules = drv.get("rules", [])
+            index_to_id: dict[int, str] = {}
+            for i, rule in enumerate(run_rules):
                 rid = str(rule.get("id") or rule.get("ruleId") or "")
                 if rid and rid not in rules_by_id:
                     rules_by_id[rid] = rule
-            results.extend(run.get("results", []))
+                index_to_id[i] = rid
+
+            # Remap each result's ruleIndex to the merged rules list
+            for res in run.get("results", []):
+                old_idx = res.get("ruleIndex")
+                if old_idx is not None and old_idx in index_to_id:
+                    res["ruleIndex"] = sorted(rules_by_id).index(index_to_id[old_idx]) if index_to_id[old_idx] in rules_by_id else None
+                results.append(res)
+
+    sorted_rules = [rules_by_id[k] for k in sorted(rules_by_id)]
+    # Final remap: ensure all ruleIndex values point to the correct position in sorted_rules
+    rule_id_to_index = {rules_by_id[k].get("id", k): i for i, k in enumerate(sorted(rules_by_id))}
+    for res in results:
+        rid = str(res.get("ruleId") or "")
+        if rid in rule_id_to_index:
+            res["ruleIndex"] = rule_id_to_index[rid]
 
     return {
         "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
         "version": "2.1.0",
         "runs": [{
-            "tool": {"driver": {"name": driver_name, "rules": [rules_by_id[k] for k in sorted(rules_by_id)]}},
+            "tool": {"driver": {"name": driver_name, "rules": sorted_rules}},
             "results": results,
         }],
     }
@@ -233,10 +305,11 @@ def render_markdown(summary: dict[str, Any]) -> str:
     if findings:
         lines += ["### Findings", ""]
         for f in findings[:50]:  # Cap at 50 for step summary
-            rid = f.get("rule_id") or f.get("ruleId") or "unknown"
+            rid = f.get("id") or f.get("rule_id") or f.get("ruleId") or "unknown"
             sev = normalize_severity(f.get("severity"))
-            msg = f.get("message") or f.get("description") or ""
-            path = f.get("path") or ""
+            msg = f.get("explanation") or f.get("message") or f.get("description") or ""
+            loc = f.get("location", {})
+            path = loc.get("file", "") if isinstance(loc, dict) else f.get("path", "")
             lines.append(f"- **{sev}** `{rid}` — {path}: {msg}")
         if len(findings) > 50:
             lines.append(f"\n_...and {len(findings) - 50} more — see JSON report._")
@@ -255,6 +328,8 @@ def _extract_findings(report: dict[str, Any]) -> list[dict[str, Any]]:
     f = report.get("filtered_findings")
     if f is None:
         f = report.get("findings")
+    if f is None:
+        f = report.get("issues")
     return [x for x in (f or []) if isinstance(x, dict)]
 
 

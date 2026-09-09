@@ -7,7 +7,7 @@
     "skills": "./bin/skills.js"
   },
   "scripts": {
-    "postinstall": "cd tools/compiler && npm run build && cd ../.. && npm run build:nx-plugins",
+    "postinstall": "cd tools/compiler && npm run build",
     "build:nx-plugins": "tsx scripts/build-nx-plugins.ts",
     "generate": "tsx scripts/generate-skills-index.ts",
     "generate:skills-index-md": "tsx scripts/generate-skills-index-md.ts",

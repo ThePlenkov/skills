@@ -105,6 +105,17 @@ try {
       }
     }
   }
+  // Also copy .github/actions/ helpers (e.g. setup-python-with-fallback)
+  // that the published actions depend on.
+  const sourceGithubActionsDir = path.join(workspaceRoot, '.github', 'actions');
+  if (fs.existsSync(sourceGithubActionsDir)) {
+    for (const actionDir of fs.readdirSync(sourceGithubActionsDir)) {
+      const srcAction = path.join(sourceGithubActionsDir, actionDir);
+      if (fs.statSync(srcAction).isDirectory() && fs.existsSync(path.join(srcAction, 'action.yml'))) {
+        fs.cpSync(srcAction, path.join(publicActionsDir, actionDir), { recursive: true });
+      }
+    }
+  }
   const publicWorkflowsDir = path.join(targetRepoDir, '.github', 'workflows');
   const sourcePublicWorkflowsDir = path.join(workspaceRoot, 'tools', 'public-repo-workflows');
   if (fs.existsSync(sourcePublicWorkflowsDir)) {
