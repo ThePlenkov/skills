@@ -52,6 +52,7 @@ jobs:
           owner: ThePlenkov
           repositories: skills
           permission-contents: write
+          permission-workflows: write
       - run: npx tsc -p tools/compiler/tsconfig.json
       - run: npx tsx scripts/publish-skill.ts
         env:
