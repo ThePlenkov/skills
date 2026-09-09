@@ -84,6 +84,13 @@ agent's problem to fix. SAST priority ladder and per-tool reproduction:
 
 ## The Loop — iterative, not linear
 
+**`/act` is a loop, not a single pass.** Stopping after one pass
+through the threads is a violation. A clean exit is usually 3–5
+iterations, not 1 — each push triggers bot re-evaluations that open
+new threads. You keep looping until the [exit gate](#exit-gate--hard-stop-conditions)
+passes. Leaving threads unanswered, declaring done without checking
+CI, or resolving after a single pass are all `/act` violations.
+
 ```
    ┌─── FETCH ───► ANALYSE ───► CONFIRM/REJECT ───┐
    │                                                │
@@ -92,17 +99,32 @@ agent's problem to fix. SAST priority ladder and per-tool reproduction:
    └─── PUSH ───► WAIT FOR CI ───► loop back to FETCH   │
 ```
 
+### Hard ordering — pipeline FIRST, comments SECOND
+
+> **Mandatory ordering inside every iteration:**
+> `PUSH` → **`WAIT FOR CI` (block until complete)** → **only then** `FETCH` new comments/threads.
+>
+> Fetching new threads **before** CI has completed on the pushed HEAD
+> is a violation. Bot reviewers (Codacy, SonarCloud, CodeQL, amazon-q,
+> codeant-ai) post findings 30–60s **after** CI finishes — a fetch done
+> mid-CI measures an incomplete state, misses late findings, and leads
+> to premature resolve of threads that get reopened minutes later.
+>
+> This ordering is the single most common `/act` failure. Do not
+> shortcut it. There is no "I'll just peek at the threads while CI
+> runs" — that peek is the failure.
+
 | Step | What |
 |------|------|
-| **FETCH** | PR state — HEAD SHA, check-run status, open threads, SAST annotations |
+| **FETCH** | PR state — HEAD SHA, check-run status, open threads, SAST annotations. **Only after WAIT FOR CI returned** (or the fallback reached `CI_REQUIRED_PENDING=0`). |
 | **ANALYSE** | Investigate each finding — read annotations, threads, understand what changed |
 | **CONFIRM / REJECT** | Is this a real issue? Reject false positives with documented reason |
 | **FIX** | Change product code — one logical fix per commit |
 | **REPLY & RESOLVE** | Reply pointing to commit, then resolve that thread |
 | **VERIFY CLEAN** | `pr-state.ts` → `SAST_FINDINGS_PENDING=0`, `CI_REQUIRED_PENDING=0` |
 | **PUSH** | Atomic push with clear commit messages |
-| **WAIT FOR CI** | Block on CI completion via `gh pr checks --watch` before re-fetching — see [Wait for CI](#wait-for-ci-after-push-before-fetch) |
-| **LOOP** | Re-fetch. New CI may surface new findings. Repeat until clean. |
+| **WAIT FOR CI** | **Block** on CI completion via `gh pr checks --watch` before re-fetching — see [Wait for CI](#wait-for-ci-after-push-before-fetch). This step is mandatory and blocks the loop. |
+| **LOOP** | Re-fetch. New CI may surface new findings. Repeat until the [exit gate](#exit-gate--hard-stop-conditions) passes — never stop after a single pass. |
 
 ### Wait for CI (after PUSH, before FETCH)
 
@@ -144,19 +166,28 @@ gh pr checks <PR_NUMBER> --repo <owner>/<repo> --watch
 Only after `gh pr checks --watch` returns (or the fallback reaches
 `CI_REQUIRED_PENDING=0`): fetch review threads, reply, resolve.
 
-### Exit conditions — all four must hold on the same HEAD
+### Exit gate — hard stop conditions
 
-1. `open_threads == 0`
-2. `CI_REQUIRED_PENDING == 0`, `SAST_FINDINGS_PENDING == 0`, `SAST_FINDINGS_UNKNOWN == 0` — and CI has actually **completed** on this HEAD (verified via `gh pr checks --watch` return, not a polling snapshot that may flip back to pending)
-3. No new bot comments/annotations since last push (compare before/after) — checked **after** the WAIT FOR CI step, not before
+The loop **only** stops when all four conditions hold on the **same
+HEAD**. These are a hard gate, not a guideline. You must explicitly
+verify each one (run the command, read the output) before declaring
+merge-ready. Stopping early — declaring done because "threads look
+resolved" or "CI was green a minute ago" — is a violation.
+
+1. `open_threads == 0` — verified via `pr-state.ts` / `review-state.ts` on the current HEAD, not a stale snapshot.
+2. `CI_REQUIRED_PENDING == 0`, `SAST_FINDINGS_PENDING == 0`, `SAST_FINDINGS_UNKNOWN == 0` — and CI has actually **completed** on this HEAD (verified via `gh pr checks --watch` return, not a polling snapshot that may flip back to pending).
+3. No new bot comments/annotations since last push (compare before/after) — checked **after** the WAIT FOR CI step, not before. If new bot findings appeared, you are not done — loop again.
 4. No cycle-guard signal:
    - **Reopened thread** — any thread was resolved earlier then commented on again → stop, do not merge; user must confirm.
    - **Same rule 2+ times** — same rule ID flagged again after a fix commit → verify fix is on current HEAD; do not re-merge blindly.
    - **Empty /act loop** — 2+ `/act` invocations on the same PR with no new product commits → stop and report cycle.
 
-Do not stop at "all threads resolved" if condition 3 fails — bot
-re-evaluations after each push commonly open new threads. A clean exit
-is usually 3-5 iterations, not 1. Convergence heuristic details:
+**All four must hold simultaneously on the same HEAD.** If any one
+fails, you are still inside the loop — do not declare merge-ready, do
+not write the closing summary, loop again. Do not stop at "all threads
+resolved" if condition 2 or 3 fails — bot re-evaluations after each
+push commonly open new threads. A clean exit is usually 3-5 iterations,
+not 1. Convergence heuristic details:
 [`references/loop-convergence.md`](references/loop-convergence.md).
 
 **Context running low?** Plan a handoff: summarize state, write
@@ -280,7 +311,8 @@ underlying comment was handled on the branch.
 
 ## Merge-ready — the loop has converged
 
-Say **merge-ready** only when **all** are true:
+Say **merge-ready** only when the [exit gate](#exit-gate--hard-stop-conditions)
+has passed **and** all of the following are true:
 
 1. Review feedback **done in code** (or explicitly declined with reason).
 2. CI required checks **success on current HEAD** (`CI_REQUIRED_PENDING=0`), verified via `gh pr checks --watch` return — not a polling snapshot.
@@ -291,7 +323,8 @@ Say **merge-ready** only when **all** are true:
 7. **Move out of draft** (`set-review-state.ts --ready`) — final step.
 
 **If the loop is still producing new findings on each push, it has not
-converged.** Keep iterating. If context is low, hand off.
+converged — you are not merge-ready.** Keep iterating. If context is
+low, hand off. Do not declare merge-ready to escape the loop.
 
 ## PR closing summary
 
@@ -303,12 +336,17 @@ converged.** Keep iterating. If context is low, hand off.
 
 When the user invokes `/act stack` or the PR is part of a stacked branch
 series (`gh stack` or equivalent). The stack is processed bottom-to-top
-with two efficiency levers — **don't wait for CI between PRs** (push,
-then move on; check CI on the round-robin re-scan) and **analyze all PRs
-upfront** to batch similar fixes. Convergence is 2-3 round-robin passes,
-not N serial iterations. Full procedure, push optimization, conflict
-resolution, and the per-PR convergence check:
-[`references/stack-mode.md`](references/stack-mode.md).
+with two efficiency levers — **don't block on CI between PRs during the
+push phase** (push, then move on to the next PR; defer the CI check to
+the round-robin re-scan) and **analyze all PRs upfront** to batch similar
+fixes. Convergence is 2-3 round-robin passes, not N serial iterations.
+
+The "don't block per-PR" lever speeds up the push phase only — it does
+**not** weaken the [exit gate](#exit-gate--hard-stop-conditions). Every
+PR must still pass it (CI green + no new threads on its HEAD) on the
+round-robin re-scan before being declared merge-ready. Full procedure,
+push optimization, conflict resolution, and the per-PR convergence
+check: [`references/stack-mode.md`](references/stack-mode.md).
 
 ## Idempotency
 

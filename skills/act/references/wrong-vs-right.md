@@ -17,7 +17,10 @@ shortcut.
 | Mark a failing SAST check green without reading its `annotation_level=failure` entries | Inspect annotations via `gh api repos/<o>/<r>/check-runs/<id>/annotations`; fix or suppress with documented reason before claiming P0 done |
 | "SonarCloud is an external service, I don't have access" | Read annotations via `gh api` — they're already on the PR. Check for CLI + env vars. Attempt local reproduction. |
 | "Codacy is not my responsibility — it's a third-party tool" | Codacy findings on this PR are your problem. Read annotations, install linter, reproduce, fix. |
-| One pass through threads, then resolve | Loop: fetch → analyse → fix → verify → push → re-fetch. CI may surface new findings after each push. |
+| One pass through threads, then resolve | Loop: fetch → analyse → fix → verify → push → **wait for CI** → re-fetch. CI may surface new findings after each push. |
+| Stop iterating after one pass / declare done because "threads look resolved" | Keep looping until the [exit gate](../SKILL.md#exit-gate--hard-stop-conditions) passes: `open_threads=0` AND CI green on HEAD AND no new bot comments. Stopping early is a violation. |
+| Fetch new threads while CI is still running on the pushed HEAD | **Block** on `gh pr checks --watch` first; only then fetch. Pipeline FIRST, comments SECOND. |
+| Leave threads unanswered / silent resolve | Every open thread gets an in-thread reply with the fix commit SHA before it is resolved. |
 | Stop when context gets large | Plan a handoff: summarize state, write remaining items to backlog/harvest, report to user. |
 | `gh stack rebase && gh stack push` after every single-PR fix | Push only the changed branch. Full-stack push triggers CI on all PRs — see [stack-mode.md](stack-mode.md). |
 | Create a `review/<name>` base branch in the same repo to review already-merged `main` commits | Don't. Use a fork (`[shadow-fork](shadow-fork/README.md)`), run review tools directly on `main`, or use an ephemeral empty branch you delete immediately. Custom base branches go stale and GitHub auto-creates reverse PRs on merge. See [footguns.md](footguns.md#review-only-prs). |
