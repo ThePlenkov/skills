@@ -71,7 +71,7 @@ function main(): void {
           )
           .replace(
             '"./plugin": { "types": "./src/plugin.ts", "default": "./src/plugin.ts" }',
-            '"./plugin": { "@nx/nx-source": "./src/plugin.ts", "types": "./dist/plugin.d.mts", "default": "./dist/plugin.mjs" }',
+            '"./plugin": { "@nx/nx-source": "./src/plugin.ts", "types": "./dist/plugin.d.mts", "default": "./dist/plugin.mjs" },\n    "./package.json": "./package.json"',
           ),
     );
 
@@ -97,6 +97,25 @@ function main(): void {
           return c;
         },
       );
+
+      // Patch 4: build executor — use --project/--out-dir to match local compiler CLI
+      const executorPath = resolve(pkgDir, "src/executors/build/executor.ts");
+      patchFile(
+        executorPath,
+        (c) => c.includes("'--project'"),
+        (c) =>
+          c
+            .replace("'--out',", "'--out-dir',")
+            .replace("'--skill',", "'--project',"),
+      );
+
+      // Patch 5: executors.json — add .mjs extension for ESM resolution
+      const executorsJsonPath = resolve(pkgDir, "executors.json");
+      patchFile(
+        executorsJsonPath,
+        (c) => c.includes('"./dist/executors/build/executor.mjs"'),
+        (c) => c.replace('"./dist/executors/build/executor"', '"./dist/executors/build/executor.mjs"'),
+      );
     } else {
       patchFile(
         pluginPath,
@@ -120,6 +139,14 @@ function main(): void {
           );
           return c;
         },
+      );
+
+      // Patch 5: executors.json — add .mjs extension for ESM resolution
+      const executorsJsonPath = resolve(pkgDir, "executors.json");
+      patchFile(
+        executorsJsonPath,
+        (c) => c.includes('"./dist/executors/scan/executor.mjs"'),
+        (c) => c.replace('"./dist/executors/scan/executor"', '"./dist/executors/scan/executor.mjs"'),
       );
     }
   }
