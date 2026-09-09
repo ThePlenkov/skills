@@ -1,0 +1,5 @@
+interface:
+  display_name: "External Research"
+  short_description: "Find external code via DeepWiki, Sourcegraph, MCP, or registry"
+  brand_color: "#0EA5E9"
+  default_prompt: "Use $external-research to find the right way to look something up outside the current project. Follow $subagents-setup for hierarchy and delegation, and $shared-plan for shared planning."

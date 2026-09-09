@@ -1,0 +1,5 @@
+interface:
+  display_name: "Minimalist"
+  short_description: "Help with Minimalist tasks and workflows"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $minimalist to get started."

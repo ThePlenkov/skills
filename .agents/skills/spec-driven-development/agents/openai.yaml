@@ -1,0 +1,5 @@
+interface:
+  display_name: "Spec Driven Development"
+  short_description: "Creates specs before coding"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $spec-driven-development to get started."

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Bootstrap Gh Self Hosted Runner"
+  short_description: "Help with Bootstrap Gh Self Hosted Runner"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $bootstrap-gh-self-hosted-runner to get started."

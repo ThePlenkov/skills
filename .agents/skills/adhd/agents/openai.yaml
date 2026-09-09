@@ -1,0 +1,5 @@
+interface:
+  display_name: "Adhd"
+  short_description: "Goal anchoring for ADHD-impacted users"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $adhd to get started."

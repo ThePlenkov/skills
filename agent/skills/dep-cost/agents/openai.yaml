@@ -1,0 +1,5 @@
+interface:
+  display_name: "Dep Cost"
+  short_description: "Measure whether a dependency is worth its real cost."
+  brand_color: "#F59E0B"
+  default_prompt: "Use $dep-cost to measure whether a dependency is worth its cost."

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Claude Skills"
+  short_description: "Install or refresh skills for Claude Code using `npx skills add`"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $claude-skills to get started."

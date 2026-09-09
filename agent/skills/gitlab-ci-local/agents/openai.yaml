@@ -1,0 +1,5 @@
+interface:
+  display_name: "Gitlab Ci Local"
+  short_description: "Test GitLab CI pipelines locally using gitlab-ci-local"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $gitlab-ci-local to get started."

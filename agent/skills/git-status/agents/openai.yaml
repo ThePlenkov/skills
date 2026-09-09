@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Status"
+  short_description: "Read-only branch dashboard with ahead/behind and diff"
+  default_prompt: "Use $git-status to show a pretty branch landscape."

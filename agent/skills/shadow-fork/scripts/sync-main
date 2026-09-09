@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+sync-main - safely sync a fork default branch from an upstream default branch
+
+Usage:
+  sync-main [--upstream-remote upstream] [--fork-remote origin] [--branch main] [--dry-run]
+
+What it enforces:
+  - fork/<branch> may be equal to upstream/<branch>
+  - fork/<branch> may be behind upstream/<branch>, in which case it is fast-forwarded
+  - fork/<branch> must never be ahead of upstream/<branch>
+  - fork/<branch> must never diverge from upstream/<branch>
+
+Options:
+  --upstream-remote NAME   remote that points at the canonical upstream repository (default: upstream)
+  --fork-remote NAME       remote that points at the personal fork (default: origin)
+  --branch NAME            default/base branch to compare and sync (default: main)
+  --dry-run                fetch and validate, but do not push to the fork remote
+  -h, --help               show this help
+USAGE
+}
+
+log() { printf '%s\n' "$*" >&2; }
+die() { log "error: $*"; exit 1; }
+
+upstream_remote="upstream"
+fork_remote="origin"
+base_branch="main"
+dry_run=0
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --upstream-remote)
+      upstream_remote="${2:-}"; shift 2 ;;
+    --fork-remote)
+      fork_remote="${2:-}"; shift 2 ;;
+    --branch)
+      base_branch="${2:-}"; shift 2 ;;
+    --dry-run)
+      dry_run=1; shift ;;
+    -h|--help)
+      usage; exit 0 ;;
+    *)
+      die "unknown argument: $1" ;;
+  esac
+done
+
+[ -n "$upstream_remote" ] || die "--upstream-remote must not be empty"
+[ -n "$fork_remote" ] || die "--fork-remote must not be empty"
+[ -n "$base_branch" ] || die "--branch must not be empty"
+
+git rev-parse --is-inside-work-tree >/dev/null 2>&1 || die "not inside a git work tree"
+git remote get-url "$upstream_remote" >/dev/null 2>&1 || die "remote '$upstream_remote' does not exist"
+git remote get-url "$fork_remote" >/dev/null 2>&1 || die "remote '$fork_remote' does not exist"
+
+log "fetching $upstream_remote/$base_branch and $fork_remote/$base_branch"
+git fetch --prune "$upstream_remote" "$base_branch"
+git fetch --prune "$fork_remote" "$base_branch"
+
+up_ref="refs/remotes/$upstream_remote/$base_branch"
+fork_ref="refs/remotes/$fork_remote/$base_branch"
+
+git rev-parse --verify "$up_ref^{commit}" >/dev/null 2>&1 || die "cannot resolve $up_ref"
+git rev-parse --verify "$fork_ref^{commit}" >/dev/null 2>&1 || die "cannot resolve $fork_ref"
+
+up_sha="$(git rev-parse "$up_ref^{commit}")"
+fork_sha="$(git rev-parse "$fork_ref^{commit}")"
+
+log "upstream $upstream_remote/$base_branch: $up_sha"
+log "fork     $fork_remote/$base_branch: $fork_sha"
+
+if [ "$up_sha" = "$fork_sha" ]; then
+  log "ok: $fork_remote/$base_branch already equals $upstream_remote/$base_branch"
+  exit 0
+fi
+
+if git merge-base --is-ancestor "$fork_sha" "$up_sha"; then
+  log "ok: $fork_remote/$base_branch is behind $upstream_remote/$base_branch"
+  log "sync action: fast-forward fork branch to upstream branch"
+  if [ "$dry_run" -eq 1 ]; then
+    log "dry-run: git push $fork_remote $up_ref:refs/heads/$base_branch"
+    exit 0
+  fi
+
+  git push "$fork_remote" "$up_ref:refs/heads/$base_branch"
+  git fetch --prune "$fork_remote" "$base_branch"
+  new_fork_sha="$(git rev-parse "$fork_ref^{commit}")"
+  if [ "$new_fork_sha" != "$up_sha" ]; then
+    die "sync failed: $fork_remote/$base_branch is $new_fork_sha but expected $up_sha"
+  fi
+  log "ok: synced $fork_remote/$base_branch to $upstream_remote/$base_branch"
+  exit 0
+fi
+
+if git merge-base --is-ancestor "$up_sha" "$fork_sha"; then
+  log "blocked: $fork_remote/$base_branch is ahead of $upstream_remote/$base_branch"
+  log "fork-only commits:"
+  git log --oneline --decorate --max-count=20 "$up_ref..$fork_ref" >&2 || true
+  log "resolution: do not create shadow PRs. repair the fork branch explicitly before continuing."
+  exit 20
+fi
+
+log "blocked: $fork_remote/$base_branch has diverged from $upstream_remote/$base_branch"
+log "commits only in upstream:"
+git log --oneline --decorate --max-count=20 "$fork_ref..$up_ref" >&2 || true
+log "commits only in fork:"
+git log --oneline --decorate --max-count=20 "$up_ref..$fork_ref" >&2 || true
+log "resolution: do not create shadow PRs. repair the fork branch explicitly before continuing."
+exit 21

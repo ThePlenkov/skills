@@ -1,0 +1,5 @@
+interface:
+  display_name: "Architecture Review"
+  short_description: "Help with Architecture Review"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $architecture-review to get started."

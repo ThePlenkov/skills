@@ -1,0 +1,8 @@
+interface:
+  display_name: Loop Programming
+  short_description: Run bounded inspect-edit-validate loops for repository tasks
+  default_prompt: >-
+    Use a bounded validator-driven loop. Establish the goal, success criteria,
+    allowed scope, validators, and limits before modifying state. Inspect,
+    make the smallest useful change, validate it, and repeat until success or
+    an explicit stop condition is reached.

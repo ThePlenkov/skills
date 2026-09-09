@@ -1,0 +1,5 @@
+interface:
+  display_name: "Dotagents"
+  short_description: "End-to-end lifecycle management for the .agents/ framework"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $dotagents to get started."

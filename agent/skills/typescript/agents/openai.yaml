@@ -1,0 +1,5 @@
+interface:
+  display_name: "Typescript"
+  short_description: "Use the latest supported TypeScript for the current major line"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $typescript to get started."

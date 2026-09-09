@@ -1,0 +1,5 @@
+interface:
+  display_name: "Using Agent Skills"
+  short_description: "Discovers and invokes agent skills"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $using-agent-skills to get started."

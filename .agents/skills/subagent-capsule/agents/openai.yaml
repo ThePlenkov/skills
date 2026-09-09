@@ -1,0 +1,5 @@
+interface:
+  display_name: "Subagent Capsule"
+  short_description: "Use immediately before launching a subagent"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $subagent-capsule to get started."

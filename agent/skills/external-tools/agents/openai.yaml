@@ -1,0 +1,4 @@
+interface:
+  display_name: "External tools"
+  short_description: "MCP → CLI → native API fallback for external services"
+  default_prompt: "Pick the highest available interface (MCP, CLI, API) for the external tool, verify auth first, and use the per-tool reference for details."

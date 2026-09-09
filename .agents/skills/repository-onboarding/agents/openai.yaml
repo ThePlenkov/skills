@@ -1,0 +1,5 @@
+interface:
+  display_name: "Repository Onboarding"
+  short_description: "Help with Repository Onboarding"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $repository-onboarding to get started."

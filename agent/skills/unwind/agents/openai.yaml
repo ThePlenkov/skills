@@ -1,0 +1,7 @@
+interface:
+  display_name: "Unwind"
+  short_description: "Help with Unwind tasks and workflows"
+  brand_color: "#3B82F6"
+  default_prompt: "Use $unwind to get started."
+policy:
+  allow_implicit_invocation: true

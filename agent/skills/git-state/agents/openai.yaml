@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git State"
+  short_description: "Inspect branches, worktrees, and merge state"
+  default_prompt: "Use $git-state to map this repository safely."
