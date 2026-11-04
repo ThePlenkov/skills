@@ -140,7 +140,7 @@ function main(): void {
 }
 
 // Windows-safe entrypoint check: convert process.argv[1] (a filesystem path
-// like C:\foo\bar.ts on Windows) to a file:// URL before comparing with
+// like \Users\dev\foo\bar.ts on Windows) to a file:// URL before comparing with
 // import.meta.url. Guard against missing argv[1] (e.g. piped via -e).
 const isMain = process.argv[1]
   ? pathToFileURL(process.argv[1]).href === import.meta.url
