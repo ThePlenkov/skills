@@ -1,0 +1,59 @@
+name: Set up Python with self-hosted fallback
+
+description: >-
+  Set up a pinned Python version via actions/setup-python, and fall back to a
+  verified python-build-standalone tarball on self-hosted runners where the
+  hosted action has no cached version.
+
+inputs:
+  python-version:
+    description: Python version to request from actions/setup-python.
+    required: false
+    default: "3.12"
+  standalone-url:
+    description: URL of the python-build-standalone install_only tarball.
+    required: false
+    default: "https://github.com/astral-sh/python-build-standalone/releases/download/20260325/cpython-3.12.13+20260325-x86_64-unknown-linux-gnu-install_only.tar.gz"
+  standalone-sha256:
+    description: SHA-256 of the standalone tarball.
+    required: false
+    default: "86232383051a0950a74a9486949c87f88da45978bafa8d826c2f268629a3f508"
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      id: setup-python
+      uses: actions/setup-python@v6
+      continue-on-error: true
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install Python (self-hosted fallback)
+      if: steps.setup-python.outcome != 'success'
+      shell: bash
+      env:
+        PY_URL: ${{ inputs.standalone-url }}
+        PY_SHA256: ${{ inputs.standalone-sha256 }}
+      run: |
+        set -euo pipefail
+        if [ "${{ runner.os }}" != "Linux" ] || [ "${{ runner.arch }}" != "X64" ] || ! ldd --version 2>&1 | grep -Eqi 'glibc|GNU libc'; then
+          echo "::error::actions/setup-python failed and the self-hosted fallback is only available for glibc-based Linux x86-64 (got ${{ runner.os }} / ${{ runner.arch }})"
+          exit 1
+        fi
+        PY_DIR="${RUNNER_TEMP:-/tmp}/python-${{ inputs.python-version }}"
+        TMP_TAR=$(mktemp)
+        trap 'rm -f "$TMP_TAR"' EXIT
+        mkdir -p "$PY_DIR"
+        echo "Downloading Python ${{ inputs.python-version }} for self-hosted runner..."
+        curl -fsSL \
+          --connect-timeout 10 \
+          --max-time 120 \
+          --retry 3 \
+          --retry-delay 2 \
+          "$PY_URL" -o "$TMP_TAR"
+        echo "$PY_SHA256  $TMP_TAR" | sha256sum -c -
+        tar -xzf "$TMP_TAR" -C "$PY_DIR" --strip-components=1
+        rm -f "$TMP_TAR"
+        echo "$PY_DIR/bin" >> "$GITHUB_PATH"
+        "$PY_DIR/bin/python" --version

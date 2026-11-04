@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/nx-executors",
+  "executors": {
+    "scan": {
+      "implementation": "./dist/executors/scan/executor.js",
+      "schema": "./src/executors/scan/schema.json",
+      "description": "Run SkillSpector on a skill directory; emit GitHub workflow commands and optional SARIF."
+    }
+  }
+}

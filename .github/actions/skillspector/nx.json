@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*"],
+    "production": ["default"],
+    "skill": [
+      "{projectRoot}/SKILL.md",
+      "{projectRoot}/scripts/**/*",
+      "{projectRoot}/references/**/*",
+      "{projectRoot}/assets/**/*"
+    ]
+  },
+  "plugins": [
+    {
+      "plugin": "@theplenkov/nx-skillspector",
+      "options": {
+        "skillsGlob": "SKILL.md",
+        "targetName": "scan"
+      }
+    }
+  ],
+  "targetDefaults": {
+    "scan": {
+      "cache": true,
+      "inputs": ["skill", "^production"]
+    }
+  }
+}

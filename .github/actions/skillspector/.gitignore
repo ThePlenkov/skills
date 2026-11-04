@@ -1,0 +1,12 @@
+# Nx cache + build artifacts
+.nx/
+dist/
+node_modules/
+
+# Skill scans (CI runtime artifacts)
+*.sarif
+
+# Editor
+.vscode/
+.idea/
+.DS_Store

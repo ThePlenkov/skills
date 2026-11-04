@@ -1,0 +1,2 @@
+# Built JS lives in dist/ (esbuild output, regenerated on postinstall).
+dist/
