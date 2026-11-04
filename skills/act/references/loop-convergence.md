@@ -1,6 +1,6 @@
 # Loop convergence — `/act` stability heuristic
 
-The four exit conditions in [SKILL.md § Exit conditions](../SKILL.md)
+The four conditions in [SKILL.md § Exit gate](../SKILL.md)
 are the **only** exit rule — all four must hold on the same HEAD. This
 document explains how to verify conditions 3 (no new bot comments) and
 4 (no cycle-guard signal) are stable.

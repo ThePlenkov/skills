@@ -23,6 +23,8 @@ interface GitLabNote {
   id?: number;
   author?: { username?: string };
   body?: string;
+  // GitLab's authoritative flag for whether this note can be resolved.
+  resolvable?: boolean;
   // REST position uses new_path/old_path/new_line/old_line (not GraphQL filePath/newLine).
   position?: {
     new_path?: string | null;
@@ -72,10 +74,11 @@ function gitlabMrState(projectPath: string, number: string) {
     page += 1;
   }
 
-  // A discussion is "resolvable" if its first note is a diff note (has a position).
+  // The first note is the review root. Use GitLab's explicit `resolvable`
+  // flag instead of inferring reviewability from the optional diff position.
   const isResolvable = (d: GitLabDiscussion): boolean => {
     const note = d.notes?.[0];
-    return !!note && !!note.position;
+    return !!note && note.resolvable === true;
   };
   // In the REST discussions API, `resolved` is on the note, not the discussion object.
   const isResolved = (d: GitLabDiscussion): boolean => !!d.notes?.[0]?.resolved;
